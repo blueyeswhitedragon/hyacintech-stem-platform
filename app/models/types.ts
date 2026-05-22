@@ -6,6 +6,9 @@ export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  options?: string[];
+  actionType?: 'ask_choice' | 'text_input' | 'confirmation' | 'info';
+  phaseComplete?: boolean;
 }
 
 export interface ChatRequest {

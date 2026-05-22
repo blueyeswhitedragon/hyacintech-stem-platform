@@ -15,6 +15,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [healthWarning, setHealthWarning] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // 初始欢迎消息
@@ -38,6 +39,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 启动时健康检测
+  useEffect(() => {
+    fetch('/api/health')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.status !== 'healthy') {
+          const lines: string[] = [];
+          if (!data.checks.config.ok) lines.push(`配置问题: ${data.checks.config.detail || '未知'}`);
+          if (!data.checks.connectivity.ok) lines.push(`网络问题: ${data.checks.connectivity.detail || '无法连接'}`);
+          if (!data.checks.auth.ok) lines.push(`鉴权问题: ${data.checks.auth.detail || '未知'}`);
+          if (lines.length > 0) {
+            setHealthWarning(lines.join('\n'));
+          }
+        }
+      })
+      .catch(() => {
+        // health check itself failed — ignore, chat will surface errors
+      });
+  }, []);
+
   const sendInitialMessage = async () => {
     setIsLoading(true);
     try {
@@ -54,19 +75,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
       });
       
       if (!response.ok) {
-        throw new Error('请求失败');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || '请求失败');
       }
-      
+
       const data: ChatResponse = await response.json();
-      
+
       setMessages([{
         id: uuidv4(),
         role: 'assistant',
-        content: data.dialogue
+        content: data.dialogue,
+        options: data.options,
+        actionType: data.next_action_type,
+        phaseComplete: data.phase_complete,
       }]);
-      
+
     } catch (err) {
-      setError('初始化聊天失败，请刷新页面重试');
+      const msg = err instanceof Error ? err.message : '未知错误';
+      // If it's our structured error from the API, use it directly
+      setError(msg !== '未知错误' ? msg : '初始化聊天失败，请检查网络连接和API配置后刷新重试。');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -102,11 +129,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
       
       if (!response.ok) {
         const errorData = await response.json();
-        if (errorData.error === 'safety_violation') {
-          setError(`安全提醒: ${errorData.message}`);
-        } else {
-          throw new Error('请求失败');
-        }
+        setError(errorData.message || '请求失败，请重试。');
         return;
       }
       
@@ -116,7 +139,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
       const assistantMessage: Message = {
         id: uuidv4(),
         role: 'assistant',
-        content: data.dialogue
+        content: data.dialogue,
+        options: data.options,
+        actionType: data.next_action_type,
+        phaseComplete: data.phase_complete,
       };
       
       setMessages(prev => [...prev, assistantMessage]);
@@ -132,7 +158,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
       }
       
     } catch (err) {
-      setError('发送消息失败，请重试');
+      const msg = err instanceof Error ? err.message : '发送消息失败，请重试';
+      setError(msg !== '未知错误' ? msg : '发送消息失败，请重试');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -156,37 +183,48 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
   };
 
   // 提取最后一条助手消息中的选项（如果有）
-  const getLastAssistantMessageOptions = (): string[] | null => {
+  const getLastAssistantAction = (): {
+    options: string[] | null;
+    actionType: 'ask_choice' | 'text_input' | 'confirmation' | 'info' | null;
+  } => {
     const assistantMessages = messages.filter(msg => msg.role === 'assistant');
-    if (assistantMessages.length === 0) return null;
-    
+    if (assistantMessages.length === 0) return { options: null, actionType: null };
     const lastMessage = assistantMessages[assistantMessages.length - 1];
-    
-    // 尝试从消息中提取JSON结构
-    try {
-      // 在实际项目中，这里应该使用正则表达式来提取JSON部分
-      // 或者直接从API返回的数据中获取选项
-      // 下面是模拟实现
-      if (lastMessage.content.includes('选择')) {
-        return [
-          "选项A",
-          "选项B",
-          "选项C"
-        ];
-      }
-    } catch (err) {
-      console.error('解析选项失败', err);
-    }
-    
-    return null;
+    const actionType = lastMessage.actionType ?? null;
+    const options = actionType === 'ask_choice' && lastMessage.options?.length
+      ? lastMessage.options
+      : null;
+    return { options, actionType };
   };
 
-  const options = getLastAssistantMessageOptions();
+  const { options, actionType: lastActionType } = getLastAssistantAction();
 
   return (
     <div className="flex flex-col h-full">
       {/* 消息列表 */}
       <div className="flex-1 overflow-y-auto p-4">
+        {/* 健康诊断横幅 */}
+        {healthWarning && (
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-800">
+            <div className="flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <div className="font-semibold mb-1">系统诊断</div>
+                {healthWarning.split('\n').map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+              </div>
+              <button
+                onClick={() => setHealthWarning(null)}
+                className="ml-auto text-yellow-600 hover:text-yellow-800 flex-shrink-0"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
         {messages.map(message => (
           <div 
             key={message.id} 
@@ -238,7 +276,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
           </div>
         </div>
       )}
-      
+
+      {/* 确认/取消按钮 */}
+      {lastActionType === 'confirmation' && (
+        <div className="p-4 bg-gray-50">
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => { setInputValue('确认'); setTimeout(() => sendMessage(), 100); }}
+              className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+            >
+              确认
+            </button>
+            <button
+              onClick={() => { setInputValue('取消'); setTimeout(() => sendMessage(), 100); }}
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 输入区域 */}
       <div className="border-t p-4 bg-white">
         <div className="flex">
