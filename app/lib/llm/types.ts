@@ -15,8 +15,12 @@ export interface LLMProviderConfig {
   maxTokens?: number;
 }
 
+export interface ChatOptions {
+  useJsonFormat?: boolean;
+}
+
 export interface LLMProvider {
-  chat(messages: LLMMessage[]): Promise<string>;
+  chat(messages: LLMMessage[], options?: ChatOptions): Promise<string>;
 }
 
 // ---- Error classification ----

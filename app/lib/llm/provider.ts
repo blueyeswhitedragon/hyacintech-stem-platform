@@ -8,7 +8,8 @@ class OpenAICompatibleProvider implements LLMProvider {
     this.config = config;
   }
 
-  async chat(messages: LLMMessage[]): Promise<string> {
+  async chat(messages: LLMMessage[], options?: { useJsonFormat?: boolean }): Promise<string> {
+    const useJsonFormat = options?.useJsonFormat !== false; // default true
     const url = `${this.config.baseURL}/chat/completions`;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30_000);
@@ -25,7 +26,7 @@ class OpenAICompatibleProvider implements LLMProvider {
           messages,
           temperature: this.config.temperature ?? 0.3,
           max_tokens: this.config.maxTokens ?? 2000,
-          response_format: { type: 'json_object' },
+          ...(useJsonFormat ? { response_format: { type: 'json_object' } } : {}),
         }),
         signal: controller.signal,
       });

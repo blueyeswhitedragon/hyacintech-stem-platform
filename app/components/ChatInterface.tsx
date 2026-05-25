@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { usePhase } from '../lib/PhaseContext';
 import { Message, ChatResponse, PhaseEnum } from '../models/types';
 import { v4 as uuidv4 } from 'uuid';
+import MessageItem from './MessageItem';
 
 interface ChatInterfaceProps {
   initialMessage?: string;
@@ -16,6 +17,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [healthWarning, setHealthWarning] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // 初始欢迎消息
@@ -100,70 +103,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
     }
   };
 
-  const sendMessage = async () => {
-    if (inputValue.trim() === '' || isLoading) return;
-    
-    const userMessage: Message = {
-      id: uuidv4(),
-      role: 'user',
-      content: inputValue
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage.content,
-          phase: currentPhase,
-          history: messages
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || '请求失败，请重试。');
-        return;
-      }
-      
-      const data: ChatResponse = await response.json();
-      
-      // 添加助手回复
-      const assistantMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: data.dialogue,
-        options: data.options,
-        actionType: data.next_action_type,
-        phaseComplete: data.phase_complete,
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-      
-      // 如果当前阶段已完成，可以进入下一阶段
-      if (data.phase_complete) {
-        // 更新当前阶段的数据
-        updatePhaseData(currentPhase, { completed: true });
-        // 延迟1秒后转到下一阶段，给用户一个视觉提示
-        setTimeout(() => {
-          transitionToNextPhase({});
-        }, 1000);
-      }
-      
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : '发送消息失败，请重试';
-      setError(msg !== '未知错误' ? msg : '发送消息失败，请重试');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+  const sendMessage = () => {
+    doSend(inputValue);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -182,7 +123,105 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
     }, 100);
   };
 
-  // 提取最后一条助手消息中的选项（如果有）
+  // ---- 重发/编辑 ----
+
+  const deleteFrom = (messageId: string) => {
+    setMessages(prev => {
+      const idx = prev.findIndex(m => m.id === messageId);
+      if (idx === -1) return prev;
+      return prev.slice(0, idx);
+    });
+    setEditingId(null);
+    setEditContent('');
+  };
+
+  const resendFrom = (messageId: string) => {
+    const msg = messages.find(m => m.id === messageId);
+    if (!msg) return;
+    const content = msg.content;
+    deleteFrom(messageId);
+    setInputValue(content);
+    setTimeout(() => {
+      doSend(content);
+    }, 50);
+  };
+
+  const doSend = async (text: string) => {
+    if (text.trim() === '' || isLoading) return;
+
+    const userMessage: Message = {
+      id: uuidv4(),
+      role: 'user',
+      content: text,
+      status: 'sent',
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage.content,
+          phase: currentPhase,
+          history: messages
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || '请求失败，请重试。');
+        return;
+      }
+
+      const data: ChatResponse = await response.json();
+
+      const assistantMessage: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: data.dialogue,
+        options: data.options,
+        actionType: data.next_action_type,
+        phaseComplete: data.phase_complete,
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      if (data.phase_complete) {
+        updatePhaseData(currentPhase, { completed: true });
+        setTimeout(() => { transitionToNextPhase({}); }, 1000);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '发送消息失败，请重试';
+      setError(msg !== '未知错误' ? msg : '发送消息失败，请重试');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startEdit = (messageId: string) => {
+    const msg = messages.find(m => m.id === messageId);
+    if (!msg) return;
+    setEditingId(messageId);
+    setEditContent(msg.content);
+  };
+
+  const submitEdit = (messageId: string) => {
+    if (editContent.trim() === '') return;
+    const content = editContent;
+    deleteFrom(messageId);
+    setInputValue('');
+    setTimeout(() => {
+      doSend(content);
+    }, 50);
+  };
+
+  // ---- 提取最后一条助手消息中的选项（如果有）
   const getLastAssistantAction = (): {
     options: string[] | null;
     actionType: 'ask_choice' | 'text_input' | 'confirmation' | 'info' | null;
@@ -225,22 +264,61 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
             </div>
           </div>
         )}
-        {messages.map(message => (
-          <div 
-            key={message.id} 
-            className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
-          >
-            <div 
-              className={`inline-block rounded-lg px-4 py-2 max-w-3/4 ${
-                message.role === 'user' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {message.content}
-            </div>
-          </div>
-        ))}
+        {messages.map((message, i) => {
+          if (message.id === editingId) {
+            return (
+              <div key={message.id} className="mb-4 text-left">
+                <div className="inline-flex flex-col gap-1 w-full max-w-[75%]">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        submitEdit(message.id);
+                      }
+                      if (e.key === 'Escape') {
+                        setEditingId(null);
+                        setEditContent('');
+                      }
+                    }}
+                    className="w-full resize-none border rounded-lg p-2 text-gray-900 bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    autoFocus
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={() => { setEditingId(null); setEditContent(''); }}
+                      className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      取消
+                    </button>
+                    <button
+                      onClick={() => submitEdit(message.id)}
+                      disabled={editContent.trim() === ''}
+                      className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                    >
+                      发送
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          const isLastUser = message.role === 'user'
+            && !messages.slice(i + 1).some(m => m.role === 'user');
+
+          return (
+            <MessageItem
+              key={message.id}
+              message={message}
+              isLastUser={isLastUser}
+              onResend={resendFrom}
+              onEdit={startEdit}
+            />
+          );
+        })}
         {isLoading && (
           <div className="text-left mb-4">
             <div className="inline-block rounded-lg px-4 py-2 bg-gray-100 text-gray-800">
@@ -305,7 +383,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialMessage }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="输入你的问题或回答..."
-            className="flex-1 resize-none border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 resize-none border rounded-l-lg p-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={2}
             disabled={isLoading}
           />

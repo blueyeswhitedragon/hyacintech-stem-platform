@@ -95,13 +95,34 @@ function heuristicExtract(raw: string): ChatResponse {
   };
 }
 
-export function safeParseChatResponse(raw: string): ChatResponse {
+export function safeParseChatResponse(raw: string | null | undefined): ChatResponse {
+  if (!raw || !raw.trim()) {
+    return {
+      dialogue: '抱歉，AI服务返回了空内容，请重试。',
+      next_action_type: 'text_input',
+      phase_complete: false,
+    };
+  }
+
   try {
     const parsed = extractJSON(raw);
-    return validateChatResponse(parsed);
+    const result = validateChatResponse(parsed);
+    // Check if dialogue came from the fallback (JSON parsed but had no valid dialogue)
+    if (result.dialogue === '抱歉，我暂时无法处理您的请求，请重新描述您的问题。') {
+      throw new Error('JSON parsed but dialogue was empty');
+    }
+    return result;
   } catch {
     // JSON extraction failed — fall back to heuristic parsing from natural language
     console.warn('JSON extraction failed, using heuristic fallback');
-    return heuristicExtract(raw);
+    const heuristic = heuristicExtract(raw);
+    if (!heuristic.dialogue) {
+      return {
+        dialogue: '抱歉，AI回复格式出现异常，请重试。',
+        next_action_type: 'text_input',
+        phase_complete: false,
+      };
+    }
+    return heuristic;
   }
 }

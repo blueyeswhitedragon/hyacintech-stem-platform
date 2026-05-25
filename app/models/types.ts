@@ -9,6 +9,7 @@ export interface Message {
   options?: string[];
   actionType?: 'ask_choice' | 'text_input' | 'confirmation' | 'info';
   phaseComplete?: boolean;
+  status?: 'sending' | 'sent' | 'error';
 }
 
 export interface ChatRequest {
