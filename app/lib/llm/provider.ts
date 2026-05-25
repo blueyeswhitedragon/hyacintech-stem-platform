@@ -25,6 +25,7 @@ class OpenAICompatibleProvider implements LLMProvider {
           messages,
           temperature: this.config.temperature ?? 0.3,
           max_tokens: this.config.maxTokens ?? 2000,
+          response_format: { type: 'json_object' },
         }),
         signal: controller.signal,
       });

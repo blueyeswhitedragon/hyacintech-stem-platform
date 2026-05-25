@@ -61,17 +61,47 @@ function validateChatResponse(obj: unknown): ChatResponse {
   return { dialogue, next_action_type, options, phase_complete };
 }
 
+/**
+ * Fallback: extract a ChatResponse from natural language text when JSON parsing fails.
+ */
+function heuristicExtract(raw: string): ChatResponse {
+  const dialogue = raw.trim();
+
+  // Detect numbered options: lines starting with 1. 2. 3. or 1) 2) 3) or 1、2、3、
+  const optionPattern = /(?:^|\n)\s*(\d+)[\.\)、]\s*(.+?)(?=\n\s*\d+[\.\)、]|\n*$)/g;
+  const optionMatches: string[] = [];
+  let match;
+  while ((match = optionPattern.exec(dialogue)) !== null) {
+    if (match[2]?.trim()) {
+      optionMatches.push(match[2].trim());
+    }
+  }
+
+  // Determine action type
+  let next_action_type: ChatResponse['next_action_type'];
+  if (optionMatches.length >= 2) {
+    next_action_type = 'ask_choice';
+  } else if (/确认|确定|准备好|开始|继续/.test(dialogue)) {
+    next_action_type = 'confirmation';
+  } else {
+    next_action_type = 'text_input';
+  }
+
+  return {
+    dialogue,
+    next_action_type,
+    options: optionMatches.length >= 2 ? optionMatches : undefined,
+    phase_complete: false,
+  };
+}
+
 export function safeParseChatResponse(raw: string): ChatResponse {
   try {
     const parsed = extractJSON(raw);
     return validateChatResponse(parsed);
-  } catch (error) {
-    console.error('Failed to parse LLM response:', error);
-    console.error('Raw response:', raw);
-    return {
-      dialogue: '抱歉，AI回复格式出现异常，请重试。',
-      next_action_type: 'text_input',
-      phase_complete: false,
-    };
+  } catch {
+    // JSON extraction failed — fall back to heuristic parsing from natural language
+    console.warn('JSON extraction failed, using heuristic fallback');
+    return heuristicExtract(raw);
   }
 }
