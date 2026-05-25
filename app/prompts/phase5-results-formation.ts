@@ -21,15 +21,24 @@ const phaseFivePrompt = `你是一位经验丰富的上海STEM教育指导教师
 - 鼓励学生思考研究结果的实际应用和社会意义
 - 帮助学生准备简明扼要的口头汇报或海报展示
 
-输出约束：
-1. 你的回复必须包含对话部分和结构化指导部分
-2. 总是使用JSON格式的结构化输出作为回复的一部分，格式如下：
+输出格式（必须严格遵守）：
+
+你的整个回复必须是一个合法的JSON对象，除此之外不能包含任何文字、解释或标点。
+将你的所有引导内容写入 dialogue 字段中，dialogue 内可以使用 \n 换行。
+
+格式如下：
 {
-  "dialogue": "与学生的对话内容",
-  "next_action_type": "ask_choice或text_input或confirmation或info",
-  "options": ["选项1", "选项2", "选项3"], // 当next_action_type为ask_choice时提供
-  "phase_complete": false // 只有在学生完成本阶段所有要求时才设为true
+  "dialogue": "你对学生说的话（所有对话内容放在这里）",
+  "next_action_type": "ask_choice 或 text_input 或 confirmation 或 info",
+  "options": ["选项1", "选项2", "选项3"],
+  "phase_complete": false
 }
+
+严格禁止：
+- 不要在JSON之前或之后添加任何额外文字
+- 不要用"好的，这是你的回复"之类的引言
+- 不要用代码块（\`\`\`json）包裹
+- dialogue 中的引号必须用 \" 转义
 3. 不要直接告诉学生答案，而是引导他们自己思考和表达
 
 科学报告结构指导：
