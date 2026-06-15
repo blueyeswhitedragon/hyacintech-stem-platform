@@ -58,7 +58,116 @@ function validateChatResponse(obj: unknown): ChatResponse {
     ? raw.phase_complete
     : false;
 
-  return { dialogue, next_action_type, options, phase_complete };
+  return {
+    dialogue,
+    next_action_type,
+    options,
+    phase_complete,
+    ...extractStructuredFields(raw),
+  };
+}
+
+function isStr(v: unknown): v is string {
+  return typeof v === 'string';
+}
+
+/**
+ * 透传 M4 结构化字段：形状合法才保留，畸形则丢弃（绝不抛错）。
+ */
+function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResponse> {
+  const out: Partial<ChatResponse> = {};
+
+  // 阶段1
+  if (raw.stage1_confirmed === true) out.stage1_confirmed = true;
+  if (isStr(raw.snapshot)) out.snapshot = raw.snapshot;
+  if (
+    raw.variables &&
+    typeof raw.variables === 'object' &&
+    isStr((raw.variables as Record<string, unknown>).independent) &&
+    isStr((raw.variables as Record<string, unknown>).dependent)
+  ) {
+    const v = raw.variables as Record<string, string>;
+    out.variables = { independent: v.independent, dependent: v.dependent };
+  }
+
+  // 阶段2 数据表结构
+  const dts = raw.data_table_schema as Record<string, unknown> | undefined;
+  if (dts && Array.isArray(dts.columns)) {
+    const columns = dts.columns.filter(
+      (c): c is { key: string; title: string; type: 'text' | 'number' | 'image'; required: boolean } =>
+        !!c &&
+        typeof c === 'object' &&
+        isStr((c as Record<string, unknown>).key) &&
+        isStr((c as Record<string, unknown>).title) &&
+        ['text', 'number', 'image'].includes((c as Record<string, unknown>).type as string)
+    ).map((c) => ({
+      key: c.key,
+      title: c.title,
+      type: c.type,
+      required: (c as Record<string, unknown>).required === true,
+    }));
+    if (columns.length > 0) {
+      out.data_table_schema = {
+        columns,
+        minRows: typeof dts.minRows === 'number' ? dts.minRows : 1,
+        maxRows: typeof dts.maxRows === 'number' ? dts.maxRows : 200,
+      };
+    }
+  }
+
+  // 阶段2 风险标注
+  if (Array.isArray(raw.risks)) {
+    const risks = raw.risks
+      .filter(
+        (r): r is Record<string, unknown> =>
+          !!r && typeof r === 'object' && isStr((r as Record<string, unknown>).description)
+      )
+      .map((r) => ({
+        columnKey: isStr(r.columnKey) ? (r.columnKey as string) : undefined,
+        description: r.description as string,
+        severity: (['low', 'medium', 'high'].includes(r.severity as string)
+          ? r.severity
+          : 'low') as 'low' | 'medium' | 'high',
+      }));
+    if (risks.length > 0) out.risks = risks;
+  }
+
+  // 阶段3 安全问答
+  const sq = raw.safety_quiz as Record<string, unknown> | undefined;
+  if (
+    sq &&
+    isStr(sq.question) &&
+    Array.isArray(sq.options) &&
+    sq.options.every(isStr) &&
+    sq.options.length >= 2 &&
+    typeof sq.correct === 'number' &&
+    sq.correct >= 0 &&
+    sq.correct < sq.options.length
+  ) {
+    out.safety_quiz = {
+      question: sq.question as string,
+      options: sq.options as string[],
+      correct: sq.correct as number,
+    };
+  }
+
+  // 阶段5 报告框架
+  const rs = raw.report_sections as Record<string, unknown> | undefined;
+  if (rs && typeof rs === 'object') {
+    const keys = ['purpose', 'hypothesis', 'materials', 'procedure', 'dataSummary', 'analysis'] as const;
+    if (keys.some((k) => isStr(rs[k]))) {
+      out.report_sections = {
+        purpose: isStr(rs.purpose) ? rs.purpose : '',
+        hypothesis: isStr(rs.hypothesis) ? rs.hypothesis : '',
+        materials: isStr(rs.materials) ? rs.materials : '',
+        procedure: isStr(rs.procedure) ? rs.procedure : '',
+        dataSummary: isStr(rs.dataSummary) ? rs.dataSummary : '',
+        analysis: isStr(rs.analysis) ? rs.analysis : '',
+      };
+    }
+  }
+
+  return out;
 }
 
 /**

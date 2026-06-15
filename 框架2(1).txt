@@ -1,0 +1,409 @@
+好的，我已经把需求转化成一份**可以直接交给 Claude Code（或任何 AI 编码助手）的完整指令框架**。  
+它包含了技术栈、数据库模型、API 设计、状态流转、AI 行为约束以及直接体验模式的差异。  
+你只需要把它粘贴过去，AI 就能按照施工图开始写代码。
+
+---
+
+# Hyacintech STEM 平台 · 开发指令 v3.0
+
+## 一、总体描述
+你要实现一个**本地可运行的 STEM 探究学习平台**，供教师布置实验作业、学生按照六阶段流程完成探究，全程有 AI 辅助引导与安全监护。  
+系统支持两种使用方式：
+1. **学生/教师正式账号**（本地 SQLite 存储，进度持久化，有教师审核）
+2. **直接体验模式**（无账号，仅会话级保存，跳过教师审核）
+
+**目标**：生成一份可运行的 Next.js 全栈应用代码，包含所有前后端功能、数据库迁移文件和必要的 AI 调用逻辑。
+
+---
+
+## 二、技术栈（必须严格使用）
+- **框架**：Next.js 14 (App Router) + TypeScript
+- **样式**：Tailwind CSS（不做复杂 UI，够用即可）
+- **数据库**：SQLite，通过 Prisma ORM 管理
+- **会话管理**：iron-session（密封的 cookie session）
+- **密码加密**：bcryptjs
+- **AI 调用**：OpenAI API（使用 `gpt-4o` 或 `gpt-4o-mini`，通过 `openai` npm 包）
+- **图表**：Recharts（阶段4自动生成）
+- **文件上传**：使用 `formidable` 或直接处理 `multipart/form-data`，文件存储在 `public/uploads/` 目录，数据库中仅保存相对路径
+- **开发运行**：`npm run dev` 即可启动，无需 Docker
+
+---
+
+## 三、数据库模型（Prisma schema）
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  role         String   // "student" | "teacher"
+  displayName  String
+  createdAt    DateTime @default(now())
+
+  ownedClasses    Class[]              @relation("TeacherClasses")
+  classMemberships ClassMember[]
+  studentAssignments StudentAssignment[]
+  conversations   Conversation[]
+}
+
+model Class {
+  id         String   @id @default(uuid())
+  name       String
+  inviteCode String   @unique
+  teacherId  String
+  createdAt  DateTime @default(now())
+
+  teacher    User              @relation("TeacherClasses", fields: [teacherId], references: [id])
+  members    ClassMember[]
+  assignments Assignment[]
+}
+
+model ClassMember {
+  id        String   @id @default(uuid())
+  classId   String
+  studentId String
+  joinedAt  DateTime @default(now())
+
+  class   Class @relation(fields: [classId], references: [id])
+  student User  @relation(fields: [studentId], references: [id])
+
+  @@unique([classId, studentId])
+}
+
+model Assignment {
+  id             String    @id @default(uuid())
+  classId        String
+  title          String
+  topicDirection String?   // 可选，限定阶段1的研究方向
+  dueDate        DateTime?
+  createdAt      DateTime  @default(now())
+
+  class              Class              @relation(fields: [classId], references: [id])
+  studentAssignments StudentAssignment[]
+}
+
+model StudentAssignment {
+  id             String   @id @default(uuid())
+  assignmentId   String
+  studentId      String
+  conversationId String?  @unique   // 一对一关联 Conversation
+  status         String   @default("NOT_STARTED")
+  // 状态可选值: NOT_STARTED, IN_PROGRESS, PENDING_STAGE2, PENDING_STAGE5, COMPLETED
+  currentStage   Int      @default(0) // 0-6
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignment   Assignment   @relation(fields: [assignmentId], references: [id])
+  student      User         @relation(fields: [studentId], references: [id])
+  conversation Conversation? @relation(fields: [conversationId], references: [id])
+}
+
+model Conversation {
+  id                   String   @id @default(uuid())
+  userId               String
+  studentAssignmentId  String   @unique
+
+  messages             String   @default("[]") // JSON 数组，存储完整的对话历史
+  stageData            String   @default("{}") // JSON 对象，存储所有阶段快照（结构见下文）
+  safetyQuizCompleted  Boolean  @default(false) // 阶段3安全问答是否已完成（正式模式）
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user              User              @relation(fields: [userId], references: [id])
+  studentAssignment StudentAssignment @relation(fields: [studentAssignmentId], references: [id])
+}
+```
+
+### `stageData` 字段的 TypeScript 结构（必须严格遵循）
+
+```typescript
+interface StageData {
+  stage1?: {
+    confirmed: boolean;
+    snapshot: string; // 纯文本《探究问题确认书》
+    variables: {
+      independent: string;
+      dependent: string;
+    };
+  };
+  stage2?: {
+    submitted: boolean;
+    approved: boolean | null; // null=未审核
+    teacherFeedback?: string;
+    schema: {
+      columns: {
+        key: string;
+        title: string;
+        type: "text" | "number" | "image";
+        required: boolean;
+      }[];
+      minRows: number;
+      maxRows: number; // 默认200
+    };
+    aiRiskAnnotations?: {
+      columnKey?: string;
+      description: string;
+      severity: "low" | "medium" | "high";
+    }[];
+  };
+  stage3?: {
+    rows: Record<string, any>[]; // 每行都是 { [colKey]: value }
+    fileAssociations?: {
+      rowIndex: number;
+      colKey: string;
+      fileUrl: string;
+    }[];
+  };
+  // 阶段4无存储数据，图表实时生成
+  stage5?: {
+    submitted: boolean;
+    approved: boolean | null;
+    sections: {
+      purpose: string;
+      hypothesis: string;
+      materials: string;
+      procedure: string;
+      dataSummary: string;
+      analysis: string;
+      conclusion: string;    // 学生填写
+      reflection: string;    // 学生填写
+    };
+    aiReferenceScore?: {
+      overall: number; // 1-10
+      dimensions: {
+        completeness: number;
+        logic: number;
+        dataUsage: number;
+        innovation: number;
+        expression: number;
+      };
+      highlights: string[];
+      suggestions: { text: string; targetSection: string }[];
+      safetyCompliance: boolean;
+    };
+    teacherScore?: number;
+    teacherFeedback?: string;
+  };
+  stage6?: {
+    studentResponse: string;
+    finalReadonly: boolean;
+  };
+}
+```
+
+---
+
+## 四、API 端点设计
+
+所有 API 路由位于 `/app/api/` 下，使用 Next.js Route Handlers。  
+需要实现以下端点：
+
+### 认证
+- `POST /api/auth/register` — 注册（可限定为教师手动创建学生账号，或开放注册均可，但必须包含 role 字段）
+- `POST /api/auth/login` — 登录，成功后在 iron-session 中设置 `user` 对象 `{id, username, role, displayName}`
+- `POST /api/auth/logout` — 销毁 session
+- `GET /api/auth/me` — 返回当前登录用户信息
+
+### 班级管理（教师）
+- `POST /api/classes` — 创建班级（自动生成6位随机邀请码）
+- `GET /api/classes` — 获取当前教师自己的所有班级
+- `GET /api/classes/[id]` — 班级详情，包含成员列表及每个学生的作业进度
+- `DELETE /api/classes/[id]` — 解散班级
+- `POST /api/classes/[id]/join` — 学生通过 `{ inviteCode }` 加入班级
+
+### 作业管理
+- `POST /api/assignments` — 教师发布作业到指定班级（可含 `topicDirection`）
+- `GET /api/assignments?classId=...` — 教师获取某班级的所有作业
+- `GET /api/student/assignments` — 学生获取自己所有作业（显示状态和当前阶段）
+- `POST /api/student/assignments/[id]/start` — 学生开始/继续作业，若 `StudentAssignment` 不存在则创建，否则返回已有的 `conversationId`。该接口负责绑定 `Conversation`。
+
+### 核心交互（六阶段）
+- `GET /api/conversations/[id]` — 获取会话的 `messages` 和 `stageData`，用于恢复进度
+- `POST /api/conversations/[id]/chat` — 学生发送消息，后端调用 AI，将新消息追加到 `messages`，并根据当前阶段修改 `stageData`。**AI 的回复必须符合阶段约束（见后文）**。
+
+### 截停提交
+- `POST /api/conversations/[id]/submit-stage2` — 学生确认方案，将 `stage2.submitted` 设为 `true`，`StudentAssignment.status` 改为 `PENDING_STAGE2`
+- `POST /api/conversations/[id]/submit-stage5` — 学生提交报告，`stage5.submitted = true`，状态改为 `PENDING_STAGE5`，并**自动调用 AI 生成参考评分**存入 `stage5.aiReferenceScore`
+
+### 教师审核
+- `GET /api/teacher/review` — 获取所有待审核的 `StudentAssignment`（状态为 `PENDING_STAGE2` 或 `PENDING_STAGE5`）
+- `GET /api/teacher/review/[studentAssignmentId]` — 查看某个学生的完整会话、方案或报告
+- `POST /api/teacher/review/[studentAssignmentId]` — 教师操作，请求体 `{ action: "approve" | "reject", stage: 2 | 5, score?: number, feedback?: string }`  
+  - 审核通过：更新 `stage2.approved` 或 `stage5.approved` 为 `true`，状态推进到下一阶段  
+  - 驳回：对应 `approved` 设为 `false`，状态回退到 `IN_PROGRESS`，但保留所有已提交数据作为副本
+
+### 安全问答（阶段3）
+- 安全问答不设独立端点，而是嵌入在阶段3的首次 AI 响应中。AI 会在进入阶段3时生成一个包含安全问题的 JSON 块，前端解析并强制学生作答。正式模式下，学生答对后设置 `safetyQuizCompleted = true`，后续进入不再弹窗。
+
+### 直接体验模式
+体验模式完全在前端完成，使用一个独立的上下文/状态管理（如 Zustand），**不调用任何需要认证的 API**，也不持久化到数据库。所有阶段数据、对话历史仅存储在浏览器内存中，刷新即丢失。  
+- 体验模式通过路由 `/experience` 进入，不显示登录入口  
+- AI 调用由前端直接发送给一个开放 API 路由：`POST /api/guest/chat`（无需登录），该路由只做简单的流式转发到 OpenAI，并附加阶段系统提示词。**但为了安全，必须限制体验模式的用量和输入长度。**
+- 阶段2、5 的截停点仅模拟，学生点击“提交”后直接跳至下一阶段，不经过教师审核。
+- 阶段3的安全问答每次进入都强制弹出，且必须勾选确认。
+- 图表、报告等渲染逻辑与正式模式共用组件。
+
+---
+
+## 五、六阶段 AI 行为约束（系统提示词要点）
+
+在 `/api/conversations/[id]/chat` 中，每次调用 OpenAI 时需要动态组合 system prompt，包含以下原则：
+
+1. **通用规则**
+   - 你是 Hyacintech STEM 平台的探究导师，引导学生完成科学探究。
+   - 使用苏格拉底式提问，不直接给出答案。
+   - 所有回复使用中文。
+   - 如果 `topicDirection` 有值，需在阶段1中自然地引导学生朝该方向选题。
+
+2. **阶段1：选题定向**
+   - 追问学生想研究的问题，直到确定**自变量**和**因变量**。
+   - 当学生明确后，生成一份《探究问题确认书》（纯文本），概述研究问题、自变量、因变量和基本假设，并让学生确认。
+   - 学生确认后，在回复中插入一个特殊标记 `<!-- STAGE1_CONFIRMED -->`，前端以此自动触发状态更新。
+
+3. **阶段2：方案设计**
+   - 引导设计实验步骤。
+   - **必须输出实验数据表格结构**，以 JSON 代码块包裹，格式为：
+     ```json
+     {
+       "columns": [
+         { "key": "trial", "title": "试验次数", "type": "number", "required": true },
+         ...
+       ],
+       "minRows": 5,
+       "maxRows": 200
+     }
+     ```
+   - 同时输出一份 AI 预审风险标注（若有危险项），格式为：
+     ```json
+     { "risks": [{ "columnKey": "temp", "description": "涉及高温操作", "severity": "high" }] }
+     ```
+   - 完成后提示学生点击“提交方案”进行截停。
+
+4. **阶段3：过程执行**
+   - 仅作安全监护和操作提示，**不引导思考**。
+   - 首次进入（`safetyQuizCompleted` 为 false 或体验模式）时，回复中必须包含一个安全问答 JSON：
+     ```json
+     { "safetyQuiz": { "question": "...", "options": ["A...","B..."], "correct": 0 } }
+     ```
+     前端解析并弹窗，答对才能进入表格。
+   - 此后仅当学生主动询问安全问题时回应，其余情况可静默或简短确认。
+
+5. **阶段4：数据分析**
+   - 系统会自动把阶段3的数据表格发给 AI，AI 需引导学生观察数据、发现规律，但不做结论。
+   - 可建议生成何种图表，但具体图表由前端根据数据自动渲染。
+
+6. **阶段5：报告成型**
+   - 学生点击“生成报告框架”时，AI 将阶段1-4的内容预填入报告的各节（purpose, hypothesis, materials, procedure, dataSummary, analysis），保留 conclusion 和 reflection 供学生填写。
+   - 学生提交报告后，系统会自动让 AI 生成参考评分（调用单独的一次 API 请求，结果存入 stage5.aiReferenceScore）。评语中的改进建议必须锚定到具体章节。
+
+7. **阶段6：结果反思**
+   - 展示教师评分和评语，学生可回应。AI 只做总结性发言，不新增任务。
+
+---
+
+## 六、前端页面结构
+
+### 通用页面
+- `/` — 首页，[直接体验] 和 [登录] 入口
+- `/auth/login` — 登录页
+- `/auth/register` — 注册页（可选）
+
+### 学生端
+- `/student/dashboard` — 我加入的班级和作业列表
+- `/student/assignments` — 我的所有作业（状态卡片），点击进入
+- `/student/assignments/[id]` — 六阶段主界面，根据 `currentStage` 展示对应阶段组件，顶部显示阶段进度条
+
+### 教师端
+- `/teacher/dashboard` — 概览（班级数、学生数、待审核数）
+- `/teacher/classes` — 管理班级，创建班级，查看邀请码
+- `/teacher/classes/[id]` — 班级成员列表，每人当前阶段
+- `/teacher/assignments` — 发布作业
+- `/teacher/review` — 待审核列表
+- `/teacher/review/[id]` — 审核详情，展示方案/报告 + AI 预审/评分，教师可操作
+
+### 体验模式
+- `/experience` — 直接进入六阶段界面，无教师相关模块，阶段2、5截停自动通过。
+
+### 可复用核心组件
+- `ChatPanel` — 与 AI 的对话区域
+- `DataTableEditor` — 阶段3的动态数据表格（可增行、上传文件）
+- `ChartViewer` — 阶段4图表展示
+- `ReportViewer` — 阶段5实验报告展示与填写
+- `StageProgression` — 阶段进度指示器
+
+---
+
+## 七、状态流转详细规则
+
+- 学生通过 `start` 创建 `StudentAssignment` 及 `Conversation`，初始 `currentStage = 1`
+- **阶段1 → 2**：当 `stage1.confirmed` 为 `true`（由前端检测 AI 回复中的标记后，调用更新接口，或由 `/chat` 在检测到标记时自动推进），后端更新 `currentStage = 2`
+- **阶段2 → 截停**：学生点击“提交方案”，调用 `/submit-stage2`，状态变为 `PENDING_STAGE2`
+- 教师审核通过 → `currentStage = 3`，`stage2.approved = true`
+- 教师驳回 → 状态回 `IN_PROGRESS`，`stage2.approved = false`，学生可修改再提交
+- **阶段3 → 4**：当 `stage3.rows.length > 0` 且所有必填列都有值，且学生点击“完成数据收集”按钮，后端更新 `currentStage = 4`
+- **阶段4 → 5**：学生点击“完成分析，生成报告”，后端自动将阶段1-4摘要预填入 `stage5.sections`，`currentStage = 5`
+- **阶段5 → 截停**：学生填写 conclusion 和 reflection 后提交，状态变为 `PENDING_STAGE5`，AI 自动生成参考评分
+- 教师审核通过 → `currentStage = 6`，展示评分反馈
+- 教师驳回 → 状态回 `IN_PROGRESS`，学生修改报告再提交
+- **阶段6**：学生回应反馈，设置 `stage6.finalReadonly = true`，流程结束，状态变为 `COMPLETED`
+
+所有阶段推进必须由后端校验条件，前端不可直接篡改。
+
+---
+
+## 八、关键交互细节
+
+1. **教师端截停时的高亮**  
+   阶段2审核页，解析 `aiRiskAnnotations`，将对应列或步骤用红色边框/背景标注，并展示风险描述。
+
+2. **多媒体上传**  
+   阶段3表格中，类型为 `image` 的列渲染上传按钮。上传至 `public/uploads/`，路径存入 `fileAssociations`。文件大小限制 5MB，仅允许图片格式。正式模式可用，体验模式禁用上传。
+
+3. **直接体验模式下的安全问答**  
+   每次进入阶段3都弹出安全问答（从 AI 返回的 `safetyQuiz` 解析），且必须勾选“我已阅读并理解安全须知”方可继续。正式模式仅首次。
+
+4. **进度恢复**  
+   学生从作业列表进入时，前端请求 `GET /api/conversations/[id]`，恢复 `messages`、`stageData` 和 `currentStage`，渲染对应阶段的 UI，对话历史可见。
+
+---
+
+## 九、项目初始化和启动说明
+
+生成代码时，请同时包含以下文件或说明：
+
+- `package.json` 包含所有依赖
+- `prisma/schema.prisma` 如上
+- `.env.example` 包含环境变量说明：
+  - `DATABASE_URL="file:./dev.db"`
+  - `SESSION_SECRET`（一个随机字符串）
+  - `OPENAI_API_KEY`
+- 运行步骤：
+  ```bash
+  npm install
+  npx prisma migrate dev --name init
+  npm run dev
+  ```
+- 数据库会自动创建 `dev.db`。可提供一段种子脚本（`prisma/seed.ts`）用于创建演示教师和班级，方便测试。
+
+---
+
+## 十、交付标准
+
+请生成**完整可运行**的 Next.js 项目代码，包含所有路由、组件、Prisma 模型、API 逻辑和简单的 Tailwind 样式。代码需有清晰的中文注释，尤其是与 AI 交互和状态管理部分。  
+这是一个用于研究实验的最小可行平台，无需过度工程化，但必须覆盖完整的六阶段流程、教师审核和体验模式。
+
+---
+
+**现在你可以把这份指令交给 Claude Code 或任何 AI 编码工具，它将严格按照这些规格生成代码。**  
+如果有任何局部需要调整，直接在上述文档修改即可。祝你研究实验顺利！

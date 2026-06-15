@@ -1,0 +1,87 @@
+import { NextResponse } from 'next/server';
+import { db } from '@/app/lib/db';
+import { requireRole } from '@/app/lib/auth';
+import { getReviewItem } from '@/app/lib/queries';
+import { applyReview, type ReviewAction } from '@/app/lib/review';
+import { parseMessages, parseStageData } from '@/app/lib/conversation';
+
+// GET /api/teacher/review/[studentAssignmentId] —— 审核详情
+export async function GET(_req: Request, ctx: RouteContext<'/api/teacher/review/[studentAssignmentId]'>) {
+  const auth = await requireRole('teacher');
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
+  const { studentAssignmentId } = await ctx.params;
+  const item = await getReviewItem(studentAssignmentId);
+  if (!item) return NextResponse.json({ error: '不存在' }, { status: 404 });
+  if (item.assignment.class.teacherId !== auth.user.id) {
+    return NextResponse.json({ error: '无权限' }, { status: 403 });
+  }
+
+  return NextResponse.json({
+    id: item.id,
+    status: item.status,
+    currentStage: item.currentStage,
+    student: item.student,
+    assignment: { title: item.assignment.title, topicDirection: item.assignment.topicDirection, className: item.assignment.class.name },
+    messages: parseMessages(item.conversation?.messages ?? '[]'),
+    stageData: parseStageData(item.conversation?.stageData ?? '{}'),
+  });
+}
+
+// POST /api/teacher/review/[studentAssignmentId] —— 审核操作 approve/reject
+export async function POST(req: Request, ctx: RouteContext<'/api/teacher/review/[studentAssignmentId]'>) {
+  const auth = await requireRole('teacher');
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
+  const { studentAssignmentId } = await ctx.params;
+
+  let body: { action?: ReviewAction; stage?: number; score?: number; feedback?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: '请求体格式错误' }, { status: 400 });
+  }
+  if (body.action !== 'approve' && body.action !== 'reject') {
+    return NextResponse.json({ error: 'action 必须为 approve 或 reject' }, { status: 400 });
+  }
+  if (body.stage !== 2 && body.stage !== 5) {
+    return NextResponse.json({ error: 'stage 必须为 2 或 5' }, { status: 400 });
+  }
+
+  const item = await getReviewItem(studentAssignmentId);
+  if (!item || !item.conversationId) return NextResponse.json({ error: '不存在' }, { status: 404 });
+  if (item.assignment.class.teacherId !== auth.user.id) {
+    return NextResponse.json({ error: '无权限' }, { status: 403 });
+  }
+
+  // 状态须与待审阶段一致
+  const expectedStatus = body.stage === 2 ? 'PENDING_STAGE2' : 'PENDING_STAGE5';
+  if (item.status !== expectedStatus) {
+    return NextResponse.json({ error: '该作业当前不在此审核阶段' }, { status: 400 });
+  }
+
+  const prev = parseStageData(item.conversation?.stageData ?? '{}');
+  const result = applyReview(body.action, body.stage, item.currentStage, prev, {
+    score: body.score,
+    feedback: body.feedback,
+  });
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
+  }
+
+  await db.$transaction([
+    db.conversation.update({
+      where: { id: item.conversationId },
+      data: { stageData: JSON.stringify(result.stageData) },
+    }),
+    db.studentAssignment.update({
+      where: { id: item.id },
+      data: {
+        status: result.status,
+        ...(result.currentStage !== undefined ? { currentStage: result.currentStage } : {}),
+      },
+    }),
+  ]);
+
+  return NextResponse.json({ ok: true, status: result.status, currentStage: result.currentStage });
+}
