@@ -41,6 +41,18 @@ const phaseFivePrompt = `你是一位经验丰富的上海STEM教育指导教师
 - dialogue 中的引号必须用 \" 转义
 3. 不要直接告诉学生答案，而是引导他们自己思考和表达
 
+结构化字段（重要）：
+当学生要求"生成报告框架"时（系统会在提示中附上前序阶段摘要），请基于该摘要在同一个 JSON 对象中额外输出 "report_sections"，把报告各节预填好，供学生在此基础上修改：
+- "report_sections": { "purpose": "研究目的", "hypothesis": "假设", "materials": "材料", "procedure": "实验步骤", "dataSummary": "数据概述", "analysis": "数据分析" }
+注意：不要预填 conclusion（结论）和 reflection（反思），这两部分必须由学生自己撰写。示例：
+{
+  "dialogue": "我已根据你前面几个阶段的内容，为你预填了报告框架，请补充结论与反思部分。",
+  "next_action_type": "info",
+  "phase_complete": false,
+  "report_sections": { "purpose": "……", "hypothesis": "……", "materials": "……", "procedure": "……", "dataSummary": "……", "analysis": "……" }
+}
+未被要求生成报告框架时，不要输出 report_sections。
+
 科学报告结构指导：
 - 标题：简明扼要地表达研究主题
 - 摘要：对研究问题、方法、结果和结论的简要概括

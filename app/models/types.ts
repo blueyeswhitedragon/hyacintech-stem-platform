@@ -12,10 +12,22 @@ export interface Message {
   status?: 'sending' | 'sent' | 'error';
 }
 
-export interface ChatRequest {
-  message: string;
-  phase: number;
-  history: Message[];
+import type {
+  Stage2Column,
+  Stage2RiskAnnotation,
+  Stage5Sections,
+} from './stageData';
+
+/** stage5 报告框架预填字段（不含学生自填的 conclusion/reflection）。 */
+export type ReportSections = Pick<
+  Stage5Sections,
+  'purpose' | 'hypothesis' | 'materials' | 'procedure' | 'dataSummary' | 'analysis'
+>;
+
+export interface SafetyQuiz {
+  question: string;
+  options: string[];
+  correct: number;
 }
 
 export interface ChatResponse {
@@ -23,6 +35,19 @@ export interface ChatResponse {
   next_action_type: 'ask_choice' | 'text_input' | 'confirmation' | 'info';
   options?: string[];
   phase_complete: boolean;
+
+  // ---- M4 结构化产出（可选，按阶段在合适时机出现）----
+  // 阶段1：学生确认研究问题后
+  stage1_confirmed?: boolean;
+  snapshot?: string; // 《探究问题确认书》纯文本
+  variables?: { independent: string; dependent: string };
+  // 阶段2：方案成型
+  data_table_schema?: { columns: Stage2Column[]; minRows: number; maxRows: number };
+  risks?: Stage2RiskAnnotation[];
+  // 阶段3：首次进入
+  safety_quiz?: SafetyQuiz;
+  // 阶段5：生成报告框架
+  report_sections?: ReportSections;
 }
 
 /**
@@ -35,40 +60,4 @@ export enum PhaseEnum {
   DataAnalysis = 4,     // 数据分析
   ResultsFormation = 5, // 成果成型
   Reflection = 6        // 结果反思
-}
-
-/**
- * 每个阶段的数据结构
- */
-export interface PhaseData {
-  [PhaseEnum.TopicSelection]?: {
-    interest?: string;
-    selectedTopic?: string;
-    researchQuestion?: string;
-  };
-  [PhaseEnum.PlanDesign]?: {
-    variables?: {
-      independent?: string;
-      dependent?: string;
-      control?: string[];
-    };
-    materials?: string[];
-    procedure?: string[];
-  };
-  [PhaseEnum.Execution]?: {
-    rawData?: any;
-    observations?: string[];
-  };
-  [PhaseEnum.DataAnalysis]?: {
-    analyzedData?: any;
-    findings?: string[];
-  };
-  [PhaseEnum.ResultsFormation]?: {
-    conclusion?: string;
-    report?: string;
-  };
-  [PhaseEnum.Reflection]?: {
-    improvements?: string[];
-    nextSteps?: string[];
-  };
 }

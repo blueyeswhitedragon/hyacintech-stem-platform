@@ -1,0 +1,97 @@
+// Hyacintech STEM 平台 · 数据库模型
+// 按「框架2(1).txt」第三章定义；SQLite + Prisma。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  role         String // "student" | "teacher"
+  displayName  String
+  createdAt    DateTime @default(now())
+
+  ownedClasses       Class[]             @relation("TeacherClasses")
+  classMemberships   ClassMember[]
+  studentAssignments StudentAssignment[]
+  conversations      Conversation[]
+}
+
+model Class {
+  id         String   @id @default(uuid())
+  name       String
+  inviteCode String   @unique
+  teacherId  String
+  createdAt  DateTime @default(now())
+
+  teacher     User          @relation("TeacherClasses", fields: [teacherId], references: [id])
+  members     ClassMember[]
+  assignments Assignment[]
+}
+
+model ClassMember {
+  id        String   @id @default(uuid())
+  classId   String
+  studentId String
+  joinedAt  DateTime @default(now())
+
+  class   Class @relation(fields: [classId], references: [id])
+  student User  @relation(fields: [studentId], references: [id])
+
+  @@unique([classId, studentId])
+}
+
+model Assignment {
+  id             String    @id @default(uuid())
+  classId        String
+  title          String
+  topicDirection String? // 可选，限定阶段1的研究方向
+  dueDate        DateTime?
+  createdAt      DateTime  @default(now())
+
+  class              Class               @relation(fields: [classId], references: [id])
+  studentAssignments StudentAssignment[]
+}
+
+model StudentAssignment {
+  id             String  @id @default(uuid())
+  assignmentId   String
+  studentId      String
+  conversationId String? @unique // 一对一关联 Conversation
+  status         String  @default("NOT_STARTED")
+  // 状态可选值: NOT_STARTED, IN_PROGRESS, PENDING_STAGE2, PENDING_STAGE5, COMPLETED
+  currentStage   Int     @default(0) // 0-6
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignment   Assignment    @relation(fields: [assignmentId], references: [id])
+  student      User          @relation(fields: [studentId], references: [id])
+  conversation Conversation? @relation(fields: [conversationId], references: [id])
+
+  @@unique([assignmentId, studentId]) // 同一作业对同一学生只允许一条
+}
+
+model Conversation {
+  id     String @id @default(uuid())
+  userId String
+
+  messages            String  @default("[]") // JSON 数组，存储完整的对话历史
+  stageData           String  @default("{}") // JSON 对象，存储所有阶段快照
+  safetyQuizCompleted Boolean @default(false) // 阶段3安全问答是否已完成（正式模式）
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  // 1:1 关系的外键持有方是 StudentAssignment.conversationId，此处为虚拟反向关系。
+  // （框架2在两侧都写了外键，Prisma 不允许循环 1:1，故只在 StudentAssignment 侧保留 FK。）
+  studentAssignment StudentAssignment?
+}

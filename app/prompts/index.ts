@@ -69,11 +69,49 @@ export function checkBlacklistedKeywords(message: string): string | null {
 }
 
 /**
- * 获取特定阶段的提示词
- * @param phase 阶段枚举值
- * @returns 包含安全约束的完整提示词
+ * 动态上下文：在静态提示词后注入作业/阶段相关数据。
  */
-export function getPromptForPhase(phase: PhaseEnum): string {
+export interface PromptContext {
+  topicDirection?: string; // 阶段1：作业限定的研究方向
+  dataRows?: Record<string, unknown>[]; // 阶段4：stage3 收集的数据
+  priorSummary?: string; // 阶段5：stage1-4 摘要，供预填报告
+  needSafetyQuiz?: boolean; // 阶段3：是否首次进入需出安全问答
+}
+
+function renderRowsAsTable(rows: Record<string, unknown>[]): string {
+  if (rows.length === 0) return '（学生尚未录入数据）';
+  const keys = Array.from(new Set(rows.flatMap((r) => Object.keys(r))));
+  const header = keys.join(' | ');
+  const body = rows
+    .map((r) => keys.map((k) => String(r[k] ?? '')).join(' | '))
+    .join('\n');
+  return `${header}\n${body}`;
+}
+
+/**
+ * 获取特定阶段的提示词（含安全约束 + 可选动态上下文）。
+ */
+export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): string {
   const basePrompt = promptTemplates[phase];
-  return injectSafetyConstraints(basePrompt);
+  let prompt = injectSafetyConstraints(basePrompt);
+
+  if (!context) return prompt;
+
+  if (phase === PhaseEnum.TopicSelection && context.topicDirection) {
+    prompt += `\n\n【本作业限定研究方向】\n本次作业要求围绕「${context.topicDirection}」展开。请在选题引导中自然地把学生引向这个方向，但仍让学生自己提出具体问题与变量。`;
+  }
+
+  if (phase === PhaseEnum.Execution && context.needSafetyQuiz) {
+    prompt += `\n\n【首次进入本阶段】\n这是学生首次进入过程执行阶段。请在本次回复的 JSON 中额外输出 safety_quiz 字段（一道与本实验相关的安全单选题），格式见下方结构化字段说明。`;
+  }
+
+  if (phase === PhaseEnum.DataAnalysis && context.dataRows) {
+    prompt += `\n\n【学生收集的实验数据】\n以下是学生在过程执行阶段录入的数据表，请据此引导学生观察规律、发现关系（但不要替学生下结论）：\n${renderRowsAsTable(context.dataRows)}`;
+  }
+
+  if (phase === PhaseEnum.ResultsFormation && context.priorSummary) {
+    prompt += `\n\n【前序阶段摘要】\n当学生要求"生成报告框架"时，请基于以下 1-4 阶段内容预填报告各节（purpose/hypothesis/materials/procedure/dataSummary/analysis），并在 JSON 中额外输出 report_sections 字段：\n${context.priorSummary}`;
+  }
+
+  return prompt;
 }
