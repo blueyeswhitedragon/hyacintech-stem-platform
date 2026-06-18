@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import type { Stage2Data, Stage3Data, Stage3FileAssociation } from '@/app/models/stageData';
+import Button from './ui/Button';
+import SubmitButton from './SubmitButton';
 
 interface Props {
   schema?: Stage2Data['schema'];
@@ -15,8 +17,6 @@ interface Props {
 export default function DataTableEditor({ schema, initial, onSave, onComplete, allowUpload = true }: Props) {
   const [rows, setRows] = useState<Record<string, unknown>[]>(initial?.rows ?? []);
   const [fileAssoc, setFileAssoc] = useState<Stage3FileAssociation[]>(initial?.fileAssociations ?? []);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   if (!schema || schema.columns.length === 0) {
@@ -60,21 +60,12 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
     }
   };
 
-  const handleSave = async () => {
-    setSaving(true); setMsg(null); setErr(null);
-    const e = await onSave(rows, fileAssoc);
-    setSaving(false);
-    if (e) setErr(e); else setMsg('已保存');
-  };
+  const handleSave = async () => onSave(rows, fileAssoc);
 
   const handleComplete = async () => {
-    setSaving(true); setMsg(null); setErr(null);
-    // 先保存再推进
     const se = await onSave(rows, fileAssoc);
-    if (se) { setSaving(false); setErr(se); return; }
-    const e = await onComplete();
-    setSaving(false);
-    if (e) setErr(e);
+    if (se) return se;
+    return onComplete();
   };
 
   return (
@@ -141,29 +132,12 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
       </div>
 
       <div className="flex items-center gap-2 mt-3 flex-wrap">
-        <button
-          onClick={addRow}
-          disabled={rows.length >= maxRows}
-          className="px-3 py-1.5 text-sm border rounded hover:bg-gray-50 disabled:opacity-50"
-        >
+        <Button variant="ghost" size="sm" onClick={addRow} disabled={rows.length >= maxRows}>
           + 添加一行
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-        >
-          {saving ? '保存中…' : '保存'}
-        </button>
-        <button
-          onClick={handleComplete}
-          disabled={saving}
-          className="px-3 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-        >
-          完成数据收集，进入分析
-        </button>
+        </Button>
+        <SubmitButton label="保存" loadingLabel="保存中…" successLabel="✓ 已保存" variant="primary" size="sm" onSubmit={handleSave} />
+        <SubmitButton label="完成数据收集，进入分析" loadingLabel="推进中…" variant="success" size="sm" onSubmit={handleComplete} />
         <span className="text-xs text-gray-400">建议至少 {minRows} 行，最多 {maxRows} 行</span>
-        {msg && <span className="text-sm text-green-600">{msg}</span>}
         {err && <span className="text-sm text-red-600">{err}</span>}
       </div>
     </div>

@@ -54,6 +54,21 @@ console.log('applyReview:');
   check('s5 reject → 留在 stage5', r.ok && r.currentStage === 5);
   check('s5 reject → submitted=false 数据保留', r.stageData.stage5?.submitted === false && r.stageData.stage5?.sections.conclusion === 'c');
 }
+// s5 approve 但分数 <6 → 需重写
+{
+  const sd5: StageData = { stage5: { submitted: true, approved: null, sections: { purpose: '', hypothesis: '', materials: '', procedure: '', dataSummary: '', analysis: '', conclusion: 'c', reflection: 'r' } } };
+  const r = applyReview('approve', 5, 5, sd5, { score: 4, feedback: '不够好' });
+  check('s5 approve 低分 → 留在 stage5', r.ok && r.currentStage === 5);
+  check('s5 approve 低分 → approved=false', r.stageData.stage5?.approved === false);
+  check('s5 approve 低分 → submitted=false', r.stageData.stage5?.submitted === false);
+  check('s5 approve 低分 → 含重写提示', r.stageData.stage5?.teacherFeedback?.includes('重新提交') === true);
+}
+// s5 approve 分数 >=6 → 正常推进
+{
+  const sd5: StageData = { stage5: { submitted: true, approved: null, sections: { purpose: '', hypothesis: '', materials: '', procedure: '', dataSummary: '', analysis: '', conclusion: 'c', reflection: 'r' } } };
+  const r = applyReview('approve', 5, 5, sd5, { score: 7, feedback: '不错' });
+  check('s5 approve 高分 → stage6', r.ok && r.currentStage === 6);
+}
 // 未提交 → error
 {
   const r = applyReview('approve', 2, 2, {}, {});

@@ -86,12 +86,18 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     // 结构化提取（纯函数）
     const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData);
 
+    // 阶段4：每发一条学生消息，分析轮次 +1
+    if (conv.currentStage === 4) {
+      stageData.stage4 = { analysisCount: (conv.stageData.stage4?.analysisCount ?? 0) + 1 };
+    }
+
     const userMessage: Message = { id: uuidv4(), role: 'user', content: message, status: 'sent' };
     const assistantMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
       content: response.dialogue,
       options: response.options,
+      hints: response.hints,
       actionType: response.next_action_type,
       phaseComplete: response.phase_complete,
     };

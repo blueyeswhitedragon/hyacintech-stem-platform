@@ -18,7 +18,8 @@ export function extractStageData(
 ): ExtractionResult {
   const stageData: StageData = { ...prev };
 
-  // 阶段1：学生确认研究问题 → 写《确认书》+ 变量，推进到阶段2
+  // 阶段1：学生确认研究问题 → 写《确认书》+ 变量。
+  // 阶段推进由确认按钮驱动（canAdvance 1→2），不走 chat 自动推进。
   if (currentStage === 1 && response.stage1_confirmed && response.variables) {
     stageData.stage1 = {
       confirmed: true,
@@ -26,9 +27,10 @@ export function extractStageData(
       variables: {
         independent: response.variables.independent,
         dependent: response.variables.dependent,
+        controlled: response.variables.controlled,
       },
     };
-    return { stageData, advanceTo: 2 };
+    return { stageData };
   }
 
   // 阶段2：方案成型 → 写数据表结构 + AI 风险标注（保留既有审核态）

@@ -15,7 +15,7 @@ export async function POST(_req: Request, ctx: RouteContext<'/api/conversations/
   if (!conv) return NextResponse.json({ error: '会话不存在或无权访问' }, { status: 404 });
 
   if (conv.currentStage !== 5) {
-    return NextResponse.json({ error: '当前不在成果成型阶段' }, { status: 400 });
+    return NextResponse.json({ error: '当前不在报告成型阶段' }, { status: 400 });
   }
   const sections = conv.stageData.stage5?.sections;
   if (!sections) {

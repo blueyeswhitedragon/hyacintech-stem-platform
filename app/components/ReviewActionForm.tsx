@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from './ui/Button';
 
 interface Props {
   studentAssignmentId: string;
@@ -44,7 +45,7 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
       <h3 className="font-medium">审核操作</h3>
       {stage === 5 && (
         <div>
-          <label className="block text-sm text-gray-700 mb-1">评分（0–10，可选）</label>
+          <label className="block text-sm text-gray-700 mb-1">评分（0–10）</label>
           <input
             type="number"
             min={0}
@@ -53,6 +54,16 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
             onChange={(e) => setScore(e.target.value)}
             className="w-24 border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {score !== '' && Number(score) < 6 && (
+            <div className="mt-1 text-xs text-red-600 font-medium">
+              ⚠️ 评分低于 6 分将要求学生修改报告后重新提交，无法直接通过。
+            </div>
+          )}
+          {score !== '' && Number(score) >= 6 && (
+            <div className="mt-1 text-xs text-green-600">
+              ✅ 评分 ≥ 6 分，通过后学生将进入反思阶段。
+            </div>
+          )}
         </div>
       )}
       <div>
@@ -67,20 +78,8 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
       </div>
       {err && <div className="text-sm text-red-600">{err}</div>}
       <div className="flex gap-2">
-        <button
-          onClick={() => act('approve')}
-          disabled={busy}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-        >
-          通过
-        </button>
-        <button
-          onClick={() => act('reject')}
-          disabled={busy}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
-        >
-          驳回
-        </button>
+        <Button variant="success" loading={busy} onClick={() => act('approve')}>通过</Button>
+        <Button variant="danger" loading={busy} onClick={() => act('reject')}>驳回</Button>
       </div>
     </div>
   );

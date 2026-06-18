@@ -233,7 +233,7 @@ if p50:
                     ('  PlanDesign = 2,       // 方案设计', 'HTML Preformatted'),
                     ('  Execution = 3,        // 过程执行', 'HTML Preformatted'),
                     ('  DataAnalysis = 4,     // 数据分析', 'HTML Preformatted'),
-                    ('  ResultsFormation = 5, // 成果成型', 'HTML Preformatted'),
+                    ('  ResultsFormation = 5, // 报告成型', 'HTML Preformatted'),
                     ('  Reflection = 6        // 结果反思', 'HTML Preformatted'),
                     ('}', 'HTML Preformatted'),
                     ('', 'Normal (Web)'),

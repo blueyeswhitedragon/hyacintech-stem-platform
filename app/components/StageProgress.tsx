@@ -8,23 +8,29 @@ const STAGE_NAMES: Record<number, string> = {
   2: '方案设计',
   3: '过程执行',
   4: '数据分析',
-  5: '成果成型',
+  5: '报告成型',
   6: '结果反思',
 };
 
-export default function StageProgress({ currentStage }: { currentStage: number }) {
+interface Props {
+  currentStage: number;
+  /** 全部完成时所有圆圈变绿勾 */
+  completed?: boolean;
+}
+
+export default function StageProgress({ currentStage, completed }: Props) {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between relative">
-        <div className="absolute h-1 bg-gray-200 left-0 right-0 top-4 -translate-y-1/2 z-0" />
+        <div className={`absolute h-1 left-0 right-0 top-4 -translate-y-1/2 z-0 ${completed ? 'bg-green-300' : 'bg-gray-200'}`} />
         {Object.entries(STAGE_NAMES).map(([num, name]) => {
           const stage = parseInt(num, 10);
-          const isActive = currentStage === stage;
-          const isCompleted = currentStage > stage;
+          const isActive = !completed && currentStage === stage;
+          const isCompleted = completed || currentStage > stage;
           return (
             <div key={stage} className="flex flex-col items-center relative z-10">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors duration-500
                   ${isActive ? 'bg-blue-500 text-white' : isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
               >
                 {isCompleted ? (
@@ -35,7 +41,7 @@ export default function StageProgress({ currentStage }: { currentStage: number }
                   stage
                 )}
               </div>
-              <span className={`text-xs mt-1 ${isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+              <span className={`text-xs mt-1 ${isActive ? 'text-blue-600 font-medium' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
                 {name}
               </span>
             </div>

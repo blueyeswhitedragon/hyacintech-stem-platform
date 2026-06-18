@@ -51,6 +51,17 @@ export function applyReview(
     return { ok: false, error: '该报告尚未提交', stageData: prev, status: 'PENDING_STAGE5' };
   }
   if (action === 'approve') {
+    // 教师评分低于 6 分 → 需要学生重写报告，重新提交
+    if (opts.score !== undefined && opts.score < 6) {
+      stageData.stage5 = {
+        ...prev.stage5,
+        approved: false,
+        submitted: false,
+        teacherScore: opts.score,
+        teacherFeedback: (opts.feedback || '') + '\n\n⚠️ 教师评分低于6分，请根据反馈修改报告后重新提交。',
+      };
+      return { ok: true, stageData, currentStage: fromStage, status: 'IN_PROGRESS' };
+    }
     stageData.stage5 = {
       ...prev.stage5,
       approved: true,

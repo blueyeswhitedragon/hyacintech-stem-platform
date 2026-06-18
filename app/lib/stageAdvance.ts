@@ -7,12 +7,22 @@ export interface AdvanceCheck {
 
 /**
  * 纯函数：判断学生能否从 from 阶段推进到 to 阶段（带数据 gating）。
- * 仅处理由「学生点按钮」驱动的推进：3→4、4→5。
- * 1→2、2→3 由 chat 的 phase_complete/advanceTo 驱动，不走这里。
+ * 处理由「学生点按钮」驱动的推进：1→2、3→4、4→5。
+ * 2→3 由教师审核驱动，不走这里。
  */
 export function canAdvance(from: number, to: number, stageData: StageData): AdvanceCheck {
   if (to !== from + 1) {
     return { ok: false, error: '只能逐阶段推进' };
+  }
+
+  if (from === 1 && to === 2) {
+    if (!stageData.stage1?.confirmed) {
+      return { ok: false, error: '请先确认探究问题' };
+    }
+    if (!stageData.stage1.variables?.independent || !stageData.stage1.variables?.dependent) {
+      return { ok: false, error: '请先确定自变量和因变量' };
+    }
+    return { ok: true };
   }
 
   if (from === 3 && to === 4) {
@@ -35,6 +45,10 @@ export function canAdvance(from: number, to: number, stageData: StageData): Adva
   }
 
   if (from === 4 && to === 5) {
+    const count = stageData.stage4?.analysisCount ?? 0;
+    if (count < 2) {
+      return { ok: false, error: '请先与AI导师进行至少两轮数据分析讨论，再进入报告成型阶段' };
+    }
     return { ok: true };
   }
 

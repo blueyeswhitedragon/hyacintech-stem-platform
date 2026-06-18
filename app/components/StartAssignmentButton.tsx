@@ -2,26 +2,27 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Button from './ui/Button';
 
 interface Props {
   assignmentId: string;
   started: boolean;
+  completed?: boolean;
 }
 
-export default function StartAssignmentButton({ assignmentId, started }: Props) {
+export default function StartAssignmentButton({ assignmentId, started, completed }: Props) {
   const router = useRouter();
 
-  // 会话页 /student/assignments/[id] 会自动 find-or-create 会话。
-  const handleClick = () => {
-    router.push(`/student/assignments/${assignmentId}`);
-  };
+  const handleClick = () => router.push(`/student/assignments/${assignmentId}`);
+
+  let label: string;
+  if (completed) label = '查看';
+  else if (started) label = '继续';
+  else label = '开始';
 
   return (
-    <button
-      onClick={handleClick}
-      className="bg-blue-500 text-white rounded-lg px-4 py-2 text-sm hover:bg-blue-600 whitespace-nowrap"
-    >
-      {started ? '继续' : '开始'}
-    </button>
+    <Button variant={completed ? 'ghost' : 'primary'} onClick={handleClick}>
+      {label}
+    </Button>
   );
 }

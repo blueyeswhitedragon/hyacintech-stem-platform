@@ -59,6 +59,7 @@ export default async function StudentAssignmentsPage() {
               <StartAssignmentButton
                 assignmentId={a.assignmentId}
                 started={a.status !== 'NOT_STARTED'}
+                completed={a.status === 'COMPLETED'}
               />
             </div>
           ))

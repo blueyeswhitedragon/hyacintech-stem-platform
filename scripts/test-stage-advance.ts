@@ -51,19 +51,36 @@ console.log('canAdvance:');
   const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 5 }] } };
   check('3→4 非必填缺值仍通过', canAdvance(3, 4, sd).ok === true);
 }
-// 4→5：放行
+// 4→5：分析不足 → 拒绝
 {
-  check('4→5 放行', canAdvance(4, 5, {}).ok === true);
+  check('4→5 分析不足被拒', canAdvance(4, 5, {}).ok === false);
+}
+// 4→5：分析达到2轮 → 放行
+{
+  const sd: StageData = { stage4: { analysisCount: 2 } };
+  check('4→5 分析2轮放行', canAdvance(4, 5, sd).ok === true);
 }
 // 非逐阶段：3→5 拒绝
 {
   check('3→5 跳级被拒', canAdvance(3, 5, {}).ok === false);
 }
-// 不属于按钮推进：1→2 拒绝
+// 1→2：无 stage1 数据 → 拒绝
 {
-  check('1→2 不走此操作被拒', canAdvance(1, 2, {}).ok === false);
+  check('1→2 无数据被拒', canAdvance(1, 2, {}).ok === false);
 }
-// 2→3 拒绝（由 chat 驱动）
+// 1→2：有确认+变量 → 通过
+{
+  const sd: StageData = {
+    stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '光照', dependent: '株高' } },
+  };
+  check('1→2 已确认通过', canAdvance(1, 2, sd).ok === true);
+}
+// 1→2：有确认但缺变量 → 拒绝
+{
+  const sd: StageData = { stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '', dependent: '' } } };
+  check('1→2 缺变量被拒', canAdvance(1, 2, sd).ok === false);
+}
+// 2→3 拒绝（由教师审核驱动）
 {
   check('2→3 不走此操作被拒', canAdvance(2, 3, {}).ok === false);
 }

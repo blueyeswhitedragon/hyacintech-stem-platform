@@ -54,6 +54,10 @@ function validateChatResponse(obj: unknown): ChatResponse {
     ? raw.options as string[]
     : undefined;
 
+  const hints = Array.isArray(raw.hints) && raw.hints.every((h: unknown) => typeof h === 'string')
+    ? raw.hints as string[]
+    : undefined;
+
   const phase_complete = typeof raw.phase_complete === 'boolean'
     ? raw.phase_complete
     : false;
@@ -62,6 +66,7 @@ function validateChatResponse(obj: unknown): ChatResponse {
     dialogue,
     next_action_type,
     options,
+    hints,
     phase_complete,
     ...extractStructuredFields(raw),
   };
@@ -86,8 +91,11 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
     isStr((raw.variables as Record<string, unknown>).independent) &&
     isStr((raw.variables as Record<string, unknown>).dependent)
   ) {
-    const v = raw.variables as Record<string, string>;
-    out.variables = { independent: v.independent, dependent: v.dependent };
+    const v = raw.variables as Record<string, unknown>;
+    const controlled = Array.isArray(v.controlled) && v.controlled.every((c: unknown) => typeof c === 'string')
+      ? (v.controlled as string[])
+      : undefined;
+    out.variables = { independent: v.independent as string, dependent: v.dependent as string, controlled };
   }
 
   // 阶段2 数据表结构

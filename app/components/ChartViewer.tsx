@@ -2,18 +2,11 @@
 
 import React, { useState } from 'react';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import type { Stage2Data, Stage3Data } from '@/app/models/stageData';
+import Button from './ui/Button';
+import SubmitButton from './SubmitButton';
 
 interface Props {
   schema?: Stage2Data['schema'];
@@ -25,8 +18,6 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export default function ChartViewer({ schema, stage3, onComplete }: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('line');
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
 
   const rows = stage3?.rows ?? [];
 
@@ -47,26 +38,15 @@ export default function ChartViewer({ schema, stage3, onComplete }: Props) {
     return o;
   });
 
-  const handleComplete = async () => {
-    setBusy(true); setErr(null);
-    const e = await onComplete();
-    setBusy(false);
-    if (e) setErr(e);
-  };
+  const handleComplete = async () => onComplete();
 
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-medium">数据图表</h3>
         <div className="flex gap-1 text-sm">
-          <button
-            onClick={() => setChartType('line')}
-            className={`px-2 py-1 rounded ${chartType === 'line' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-          >折线</button>
-          <button
-            onClick={() => setChartType('bar')}
-            className={`px-2 py-1 rounded ${chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-          >柱状</button>
+          <Button variant={chartType === 'line' ? 'primary' : 'ghost'} size="sm" onClick={() => setChartType('line')}>折线</Button>
+          <Button variant={chartType === 'bar' ? 'primary' : 'ghost'} size="sm" onClick={() => setChartType('bar')}>柱状</Button>
         </div>
       </div>
 
@@ -101,14 +81,7 @@ export default function ChartViewer({ schema, stage3, onComplete }: Props) {
       )}
 
       <div className="flex items-center gap-2 mt-3">
-        <button
-          onClick={handleComplete}
-          disabled={busy}
-          className="px-3 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-        >
-          完成分析，进入报告
-        </button>
-        {err && <span className="text-sm text-red-600">{err}</span>}
+        <SubmitButton label="完成分析，进入报告" loadingLabel="推进中…" variant="success" size="sm" onSubmit={handleComplete} />
       </div>
     </div>
   );

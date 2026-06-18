@@ -10,6 +10,7 @@ export interface Stage1Data {
   variables: {
     independent: string;
     dependent: string;
+    controlled?: string[];
   };
 }
 
@@ -49,7 +50,10 @@ export interface Stage3Data {
   fileAssociations?: Stage3FileAssociation[];
 }
 
-// 阶段4无存储数据，图表实时生成。
+// 阶段4：分析轮次计数（至少2轮有效分析才能进入阶段5）
+export interface Stage4Data {
+  analysisCount: number;
+}
 
 export interface Stage5Sections {
   purpose: string;
@@ -94,6 +98,7 @@ export interface StageData {
   stage1?: Stage1Data;
   stage2?: Stage2Data;
   stage3?: Stage3Data;
+  stage4?: Stage4Data;
   stage5?: Stage5Data;
   stage6?: Stage6Data;
 }

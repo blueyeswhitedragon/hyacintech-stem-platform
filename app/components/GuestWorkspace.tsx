@@ -11,6 +11,10 @@ import DataTableEditor from './DataTableEditor';
 import ChartViewer from './ChartViewer';
 import ReportViewer from './ReportViewer';
 import Stage6Panel from './Stage6Panel';
+import SchemaEditor from './SchemaEditor';
+import Fireworks from './Fireworks';
+import SubmitButton from './SubmitButton';
+import type { Stage2Column } from '../models/stageData';
 
 /**
  * 体验模式：无账号、纯内存六阶段。复用正式模式的富组件与纯函数
@@ -44,6 +48,10 @@ export default function GuestWorkspace() {
 
     // 本地结构化提取（与服务端同源纯函数）
     const { stageData: nextSD, advanceTo } = extractStageData(stage, data, stageData);
+    // 阶段4：每发一条消息，分析轮次 +1
+    if (stage === 4) {
+      nextSD.stage4 = { analysisCount: (stageData.stage4?.analysisCount ?? 0) + 1 };
+    }
     const nextStage = advanceTo ?? stage;
     return { ...data, currentStage: nextStage, stageData: nextSD };
   };
@@ -58,6 +66,41 @@ export default function GuestWorkspace() {
     if (!chk.ok) return chk.error ?? '暂不能进入下一阶段';
     if (to === 3) needQuizRef.current = true;
     setStage(to);
+    return null;
+  };
+
+  /** 阶段完成后的确认推进（本地直接调 advanceLocal，不发 LLM 请求） */
+  const onPhaseConfirm = async (): Promise<string | null> => {
+    const err = await advanceLocal(stage + 1);
+    if (err) return err;
+    // 进入阶段5时自动触发报告框架生成
+    if (stage + 1 === 5 && !stageData.stage5?.sections) {
+      setTimeout(async () => {
+        try {
+          const res = await fetch('/api/guest/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: '开始报告成型', stage: 5, history: [], needSafetyQuiz: false }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.stageData) setStageData(data.stageData);
+          if (res.ok && data.report_sections) {
+            setStageData((prev) => ({
+              ...prev,
+              stage5: {
+                submitted: false,
+                approved: null,
+                sections: {
+                  ...data.report_sections,
+                  conclusion: '',
+                  reflection: '',
+                },
+              },
+            }));
+          }
+        } catch { /* 不阻断 */ }
+      }, 500);
+    }
     return null;
   };
 
@@ -104,6 +147,16 @@ export default function GuestWorkspace() {
     return null;
   };
 
+  /** 体验模式：本地保存列定义修改 */
+  const saveSchema = async (columns: Stage2Column[]): Promise<string | null> => {
+    setStageData((prev) =>
+      prev.stage2
+        ? { ...prev, stage2: { ...prev.stage2, schema: { ...prev.stage2.schema, columns } } }
+        : prev
+    );
+    return null;
+  };
+
   const respondStage6 = async (response: string): Promise<string | null> => {
     setStageData((prev) => ({ ...prev, stage6: { studentResponse: response, finalReadonly: true } }));
     setCompleted(true);
@@ -115,16 +168,22 @@ export default function GuestWorkspace() {
       case 2:
         if (!stageData.stage2?.schema) return null;
         return (
-          <div className="p-4">
-            <h3 className="font-medium mb-2">数据表结构预览</h3>
-            <ul className="text-sm text-gray-700 list-disc pl-5 mb-3">
-              {stageData.stage2.schema.columns.map((c) => (
-                <li key={c.key}>{c.title}（{c.type}）{c.required && <span className="text-red-500">必填</span>}</li>
-              ))}
-            </ul>
-            <button onClick={submitStage2} className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600">
-              提交方案（体验模式直接进入下一阶段）
-            </button>
+          <div>
+            <SchemaEditor
+              columns={stageData.stage2.schema.columns}
+              onSave={saveSchema}
+            />
+            {stageData.stage2.aiRiskAnnotations && stageData.stage2.aiRiskAnnotations.length > 0 && (
+              <div className="mx-4 mb-3 bg-amber-50 border border-amber-200 rounded p-2 text-sm">
+                <div className="font-medium text-amber-800 mb-1">⚠️ 安全/风险提示</div>
+                {stageData.stage2.aiRiskAnnotations.map((r, i) => (
+                  <div key={i} className="text-amber-700">· {r.description}（{r.severity}）</div>
+                ))}
+              </div>
+            )}
+            <div className="px-4 pb-4">
+              <SubmitButton label="提交方案（体验模式直接进入下一阶段）" variant="success" onSubmit={submitStage2} />
+            </div>
           </div>
         );
       case 3:
@@ -140,7 +199,7 @@ export default function GuestWorkspace() {
       case 4:
         return <ChartViewer schema={stageData.stage2?.schema} stage3={stageData.stage3} onComplete={() => advanceLocal(5)} />;
       case 5:
-        return <ReportViewer stage5={stageData.stage5} onSave={saveStage5} onSubmit={submitStage5} />;
+        return <ReportViewer stage5={stageData.stage5} schemaColumns={stageData.stage2?.schema?.columns} dataRows={stageData.stage3?.rows} onSave={saveStage5} onSubmit={submitStage5} />;
       case 6:
         return <Stage6Panel stage5={stageData.stage5} stage6={stageData.stage6} completed={completed} onSubmit={respondStage6} guestMode />;
       default:
@@ -153,9 +212,10 @@ export default function GuestWorkspace() {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <ConversationChat initialMessages={welcome} stage={stage} send={send} onResult={onChatResult} />
+        <ConversationChat initialMessages={welcome} stage={stage} completed={completed} send={send} onResult={onChatResult} onPhaseConfirm={onPhaseConfirm} />
       </div>
       {panel && <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">{panel}</div>}
+      {completed && <Fireworks />}
     </div>
   );
 }

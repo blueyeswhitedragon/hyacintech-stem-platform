@@ -33,7 +33,7 @@ function base(extra: Partial<ChatResponse>): ChatResponse {
 
 console.log('extractStageData:');
 
-// 1. stage1 确认 → 写 stage1 + advanceTo 2
+// 1. stage1 确认 → 写 stage1，但不再自动推进（由确认按钮驱动）
 {
   const r = extractStageData(
     1,
@@ -45,7 +45,7 @@ console.log('extractStageData:');
     {}
   );
   check('stage1 确认写入 stage1', r.stageData.stage1?.confirmed === true && r.stageData.stage1?.variables.independent === '光照时长');
-  check('stage1 确认推进到 2', r.advanceTo === 2);
+  check('stage1 确认不再自动推进', r.advanceTo === undefined);
 }
 
 // 2. stage1 缺 variables → 不写、不推进

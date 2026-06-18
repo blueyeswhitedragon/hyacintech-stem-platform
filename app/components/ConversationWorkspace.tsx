@@ -8,6 +8,10 @@ import DataTableEditor from './DataTableEditor';
 import ChartViewer from './ChartViewer';
 import ReportViewer from './ReportViewer';
 import Stage6Panel from './Stage6Panel';
+import SchemaEditor from './SchemaEditor';
+import Fireworks from './Fireworks';
+import SubmitButton from './SubmitButton';
+import type { Stage2Column } from '../models/stageData';
 
 interface Props {
   conversationId: string;
@@ -27,6 +31,7 @@ export default function ConversationWorkspace({
   const [stage, setStage] = useState(initialStage);
   const [stageData, setStageData] = useState<StageData>(initialStageData);
   const [status, setStatus] = useState<AssignmentStatus>(initialStatus);
+  const [completed, setCompleted] = useState(initialStatus === 'COMPLETED');
 
   // 发送消息到会话端点（ConversationChat 注入；服务端已有历史，忽略 history 参数）
   const sendChat = async (message: string): Promise<ChatApiResponse> => {
@@ -64,7 +69,10 @@ export default function ConversationWorkspace({
     const data = await res.json();
     if (!res.ok) return data.error || '操作失败';
     if (data.stageData) setStageData(data.stageData);
-    if (data.status) setStatus(data.status);
+    if (data.status) {
+      setStatus(data.status);
+      if (data.status === 'COMPLETED') setCompleted(true);
+    }
     if (typeof data.currentStage === 'number') setStage(data.currentStage);
     return null;
   };
@@ -72,6 +80,19 @@ export default function ConversationWorkspace({
   const submitStage2 = () => postAction('submit-stage2');
   const submitStage5 = () => postAction('submit-stage5');
   const respondStage6 = (response: string) => postAction('stage6-respond', { response });
+
+  /** 保存学生对数据表列定义的修改（阶段2） */
+  const saveSchema = async (columns: Stage2Column[]): Promise<string | null> => {
+    const res = await fetch(`/api/conversations/${conversationId}/stage-data`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stage2: { columns } }),
+    });
+    const data = await res.json();
+    if (!res.ok) return data.error || '保存失败';
+    setStageData(data.stageData);
+    return null;
+  };
 
   // PATCH 保存阶段3数据；返回 error 字符串或 null
   const saveStage3 = async (
@@ -114,6 +135,28 @@ export default function ConversationWorkspace({
     return null;
   };
 
+  /** 阶段完成后的确认推进（直接调 advance 端点，不发 LLM 请求） */
+  const onPhaseConfirm = async (): Promise<string | null> => {
+    const err = await advanceTo(stage + 1);
+    if (err) return err;
+    // 进入阶段5时自动触发报告框架生成（无需学生手动输入）
+    if (stage + 1 === 5 && !stageData.stage5?.sections) {
+      // 延迟一小段，让状态先更新
+      setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/conversations/${conversationId}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: '开始报告成型' }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.stageData) setStageData(data.stageData);
+        } catch { /* 自动生成失败不阻断 */ }
+      }, 500);
+    }
+    return null;
+  };
+
   const pendingStage2 = status === 'PENDING_STAGE2';
   const pendingStage5 = status === 'PENDING_STAGE5';
   const rejected2 = stageData.stage2?.approved === false ? stageData.stage2.teacherFeedback : null;
@@ -146,18 +189,14 @@ export default function ConversationWorkspace({
       case 2:
         if (!stageData.stage2?.schema) return null;
         return (
-          <div className="p-4">
+          <div>
             {banner}
-            <h3 className="font-medium mb-2">数据表结构预览</h3>
-            <ul className="text-sm text-gray-700 list-disc pl-5 mb-3">
-              {stageData.stage2.schema.columns.map((c) => (
-                <li key={c.key}>
-                  {c.title}（{c.type}）{c.required && <span className="text-red-500">必填</span>}
-                </li>
-              ))}
-            </ul>
+            <SchemaEditor
+              columns={stageData.stage2.schema.columns}
+              onSave={saveSchema}
+            />
             {stageData.stage2.aiRiskAnnotations && stageData.stage2.aiRiskAnnotations.length > 0 && (
-              <div className="bg-amber-50 border border-amber-200 rounded p-2 text-sm mb-3">
+              <div className="mx-4 mb-3 bg-amber-50 border border-amber-200 rounded p-2 text-sm">
                 <div className="font-medium text-amber-800 mb-1">⚠️ 安全/风险提示</div>
                 {stageData.stage2.aiRiskAnnotations.map((r, i) => (
                   <div key={i} className="text-amber-700">· {r.description}（{r.severity}）</div>
@@ -165,7 +204,9 @@ export default function ConversationWorkspace({
               </div>
             )}
             {!pendingStage2 && (
-              <SubmitButton label="提交方案，等待教师审核" onSubmit={submitStage2} />
+              <div className="px-4 pb-4">
+                <SubmitButton label="提交方案，等待教师审核" loadingLabel="提交中…" variant="success" onSubmit={submitStage2} />
+              </div>
             )}
           </div>
         );
@@ -192,6 +233,8 @@ export default function ConversationWorkspace({
             {banner}
             <ReportViewer
               stage5={stageData.stage5}
+              schemaColumns={stageData.stage2?.schema?.columns}
+              dataRows={stageData.stage3?.rows}
               onSave={saveStage5}
               onSubmit={pendingStage5 ? undefined : submitStage5}
             />
@@ -217,9 +260,11 @@ export default function ConversationWorkspace({
         <ConversationChat
           initialMessages={initialMessages}
           stage={stage}
+          completed={completed}
           send={sendChat}
           onResult={onChatResult}
           onSafetyPassed={markSafetyPassed}
+          onPhaseConfirm={onPhaseConfirm}
         />
       </div>
       {panel && (
@@ -227,29 +272,7 @@ export default function ConversationWorkspace({
           {panel}
         </div>
       )}
-    </div>
-  );
-}
-
-function SubmitButton({ label, onSubmit }: { label: string; onSubmit: () => Promise<string | null> }) {
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const click = async () => {
-    setBusy(true); setErr(null);
-    const e = await onSubmit();
-    setBusy(false);
-    if (e) setErr(e);
-  };
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={click}
-        disabled={busy}
-        className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-      >
-        {busy ? '提交中…' : label}
-      </button>
-      {err && <span className="text-sm text-red-600">{err}</span>}
+      {completed && <Fireworks />}
     </div>
   );
 }

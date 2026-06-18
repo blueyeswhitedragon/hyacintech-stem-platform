@@ -7,7 +7,11 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   options?: string[];
+  /** 可选提示/引导建议，区别于 options（选项），hints 是思维引导而非直接选择 */
+  hints?: string[];
   actionType?: 'ask_choice' | 'text_input' | 'confirmation' | 'info';
+  /** 特殊消息类型：confirmation_doc 会以卡片样式渲染（阶段确认书等） */
+  messageType?: 'confirmation_doc';
   phaseComplete?: boolean;
   status?: 'sending' | 'sent' | 'error';
 }
@@ -34,13 +38,15 @@ export interface ChatResponse {
   dialogue: string;
   next_action_type: 'ask_choice' | 'text_input' | 'confirmation' | 'info';
   options?: string[];
+  /** 可选提示/引导建议（思维引导，不直接给答案）。点击填入输入框而非直接发送。 */
+  hints?: string[];
   phase_complete: boolean;
 
   // ---- M4 结构化产出（可选，按阶段在合适时机出现）----
   // 阶段1：学生确认研究问题后
   stage1_confirmed?: boolean;
   snapshot?: string; // 《探究问题确认书》纯文本
-  variables?: { independent: string; dependent: string };
+  variables?: { independent: string; dependent: string; controlled?: string[] };
   // 阶段2：方案成型
   data_table_schema?: { columns: Stage2Column[]; minRows: number; maxRows: number };
   risks?: Stage2RiskAnnotation[];
@@ -58,6 +64,6 @@ export enum PhaseEnum {
   PlanDesign = 2,       // 方案设计
   Execution = 3,        // 过程执行
   DataAnalysis = 4,     // 数据分析
-  ResultsFormation = 5, // 成果成型
+  ResultsFormation = 5, // 报告成型
   Reflection = 6        // 结果反思
 }

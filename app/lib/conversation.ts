@@ -48,7 +48,7 @@ export async function ensureStudentConversation(
 ): Promise<EnsureConversationResult> {
   const assignment = await db.assignment.findUnique({
     where: { id: assignmentId },
-    select: { id: true, classId: true },
+    select: { id: true, classId: true, title: true, topicDirection: true },
   });
   if (!assignment) return { ok: false, error: 'not_found' };
 
@@ -78,7 +78,10 @@ export async function ensureStudentConversation(
     };
   }
 
-  const welcome = [initialWelcomeMessage()];
+  const welcome = [initialWelcomeMessage({
+    assignmentTitle: assignment.title,
+    topicDirection: assignment.topicDirection ?? undefined,
+  })];
   const result = await db.$transaction(async (tx) => {
     const conversation = await tx.conversation.create({
       data: { userId: studentId, messages: JSON.stringify(welcome) },
