@@ -48,6 +48,21 @@ console.log('extractStageData:');
   check('stage1 确认不再自动推进', r.advanceTo === undefined);
 }
 
+// 1b. stage1 仅自变量（无因变量，新口径）→ dependent 落为空串、不报错
+{
+  const r = extractStageData(
+    1,
+    base({
+      stage1_confirmed: true,
+      snapshot: '《确认书》正文',
+      variables: { independent: '光照时长' },
+    }),
+    {}
+  );
+  check('stage1 仅自变量写入', r.stageData.stage1?.variables.independent === '光照时长');
+  check('stage1 因变量缺省落为空串', r.stageData.stage1?.variables.dependent === '');
+}
+
 // 2. stage1 缺 variables → 不写、不推进
 {
   const r = extractStageData(1, base({ stage1_confirmed: true }), {});

@@ -16,17 +16,59 @@ export interface ReviewOpts {
 }
 
 /**
- * 纯函数：教师对阶段2/5 的审核动作 → 新的 stageData / currentStage / status。
+ * 纯函数：教师对阶段2/3/5 的审核动作 → 新的 stageData / currentStage / status。
  * 无副作用、不读 DB —— 便于单测。调用方负责落库。
+ *
+ * 第三阶段为「可选 / 非阻塞 / 有界回滚」：
+ *  - approve：仅背书（approved=true），不改阶段（学生本就已自助推进）。
+ *  - reject：按学生当前阶段 fromStage 有界回滚——
+ *      fromStage===3 → 留 3 写反馈；
+ *      fromStage===4 → 回退到 3，并清零 stage4.analysisCount（旧分析失效）；
+ *      fromStage>=5  → 拒绝打回（交由第五阶段审核处理）。
  */
 export function applyReview(
   action: ReviewAction,
-  stage: 2 | 5,
+  stage: 2 | 3 | 5,
   fromStage: number,
   prev: StageData,
   opts: ReviewOpts = {}
 ): ReviewResult {
   const stageData: StageData = { ...prev };
+
+  if (stage === 3) {
+    if (!prev.stage3) {
+      return { ok: false, error: '该数据表尚未提交', stageData: prev, status: 'IN_PROGRESS' };
+    }
+    if (action === 'approve') {
+      // 背书：不改阶段（currentStage 不返回 → 调用方不更新）
+      stageData.stage3 = {
+        ...prev.stage3,
+        approved: true,
+        teacherFeedback: opts.feedback,
+      };
+      return { ok: true, stageData, status: 'IN_PROGRESS' };
+    }
+    // reject：有界回滚
+    if (fromStage >= 5) {
+      return {
+        ok: false,
+        error: '学生已进入报告阶段，请改用报告（第五阶段）审核处理',
+        stageData: prev,
+        status: 'IN_PROGRESS',
+      };
+    }
+    stageData.stage3 = {
+      ...prev.stage3,
+      approved: false,
+      submitted: false,
+      teacherFeedback: opts.feedback,
+    };
+    if (fromStage === 4) {
+      // 回退到第三阶段：旧分析基于旧表已失效，清零分析轮次
+      stageData.stage4 = { analysisCount: 0 };
+    }
+    return { ok: true, stageData, currentStage: 3, status: 'IN_PROGRESS' };
+  }
 
   if (stage === 2) {
     if (!prev.stage2) {

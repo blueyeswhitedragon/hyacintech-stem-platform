@@ -7,33 +7,10 @@ import { checkBlacklistedKeywords, getPromptForPhase, type PromptContext } from 
 import { classifyError } from '@/app/lib/llm/errors';
 import { callLLM } from '@/app/lib/llm/chat';
 import { extractStageData } from '@/app/lib/stageExtraction';
+import { buildPriorSummary } from '@/app/lib/reportSummary';
+import { shouldNudgeConvergence } from '@/app/lib/pacing';
 import { PhaseEnum, type Message } from '@/app/models/types';
 import type { StageData } from '@/app/models/stageData';
-
-/** 给阶段5用：把前序阶段内容压成一段文本摘要。 */
-function buildPriorSummary(stageData: StageData): string {
-  const parts: string[] = [];
-  if (stageData.stage1?.snapshot) {
-    parts.push(`【选题确认书】\n${stageData.stage1.snapshot}`);
-    if (stageData.stage1.variables) {
-      parts.push(`自变量：${stageData.stage1.variables.independent}，因变量：${stageData.stage1.variables.dependent}${stageData.stage1.variables.controlled?.length ? '，控制变量：' + stageData.stage1.variables.controlled.join('、') : ''}`);
-    }
-  }
-  if (stageData.stage2?.schema) {
-    const cols = stageData.stage2.schema.columns.map((c) => `${c.title}(${c.type})`).join('、');
-    parts.push(`【实验方案-数据表列】${cols}，最少${stageData.stage2.schema.minRows}行，最多${stageData.stage2.schema.maxRows}行`);
-  }
-  if (stageData.stage3?.rows?.length) {
-    const keys = stageData.stage2?.schema?.columns.map(c => c.key) ?? Object.keys(stageData.stage3.rows[0]);
-    const titles = stageData.stage2?.schema?.columns.map(c => c.title) ?? keys;
-    const header = titles.join(' | ');
-    const body = stageData.stage3.rows.map((row, i) =>
-      `${i + 1}. ` + keys.map(k => String(row[k] ?? '')).join(' | ')
-    ).join('\n');
-    parts.push(`【实验数据-共${stageData.stage3.rows.length}行】\n${header}\n${body}`);
-  }
-  return parts.join('\n\n') || '（前序阶段暂无结构化摘要，请参考对话历史）';
-}
 
 function buildContext(stage: number, conv: {
   topicDirection: string | null;
@@ -90,8 +67,16 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   }
 
   try {
-    const context = buildContext(conv.currentStage, conv);
-    const systemPrompt = getPromptForPhase(conv.currentStage as PhaseEnum, context);
+    // 轮次累加（含本条消息）+ 超阈值注入「该收敛」提示
+    const stage = conv.currentStage;
+    const prevRounds = conv.stageData.roundCounts ?? {};
+    const roundCount = (prevRounds[stage] ?? 0) + 1;
+
+    let context = buildContext(stage, conv);
+    if (shouldNudgeConvergence(stage, roundCount)) {
+      context = { ...(context ?? {}), nudgeConverge: true };
+    }
+    const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
     const response = await callLLM(systemPrompt, message, conv.messages);
 
     // 结构化提取（纯函数）
@@ -101,6 +86,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     if (conv.currentStage === 4) {
       stageData.stage4 = { analysisCount: (conv.stageData.stage4?.analysisCount ?? 0) + 1 };
     }
+
+    // 记录本阶段轮次
+    stageData.roundCounts = { ...prevRounds, [stage]: roundCount };
 
     const userMessage: Message = { id: uuidv4(), role: 'user', content: message, status: 'sent' };
     const assistantMessage: Message = {

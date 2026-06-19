@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 interface Props {
   studentAssignmentId: string;
-  stage: 2 | 5;
+  stage: 2 | 3 | 5;
 }
 
 export default function ReviewActionForm({ studentAssignmentId, stage }: Props) {
@@ -42,6 +42,12 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
   return (
     <div className="bg-white border rounded-lg p-4 space-y-3">
       <h3 className="font-medium">审核操作</h3>
+      {stage === 3 && (
+        <div className="text-xs text-gray-500 bg-gray-50 border rounded p-2">
+          可选审核：通过=认可数据表（不改变学生进度）；驳回=打回让学生修改数据表。
+          若学生已在第四阶段，驳回会把他退回第三阶段并清空已有的数据分析轮次。
+        </div>
+      )}
       {stage === 5 && (
         <div>
           <label className="block text-sm text-gray-700 mb-1">评分（0–10）</label>
@@ -72,7 +78,7 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
           onChange={(e) => setFeedback(e.target.value)}
           rows={3}
           className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder={stage === 2 ? '对实验方案的意见…' : '对报告的评价…'}
+          placeholder={stage === 2 ? '对实验方案的意见…' : stage === 3 ? '对数据表的修改意见…' : '对报告的评价…'}
         />
       </div>
       {err && <div className="text-sm text-red-600">{err}</div>}

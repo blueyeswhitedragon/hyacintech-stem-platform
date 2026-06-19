@@ -76,6 +76,19 @@ export interface PromptContext {
   dataRows?: Record<string, unknown>[]; // 阶段4：stage3 收集的数据
   priorSummary?: string; // 阶段5：stage1-4 摘要，供预填报告
   needSafetyQuiz?: boolean; // 阶段3：是否首次进入需出安全问答
+  nudgeConverge?: boolean; // 任意阶段：轮次过多，提示模型尽快收敛放行
+}
+
+/**
+ * 注入统一的对话节奏总则（降低过度追问）。所有阶段都加。
+ */
+export function injectPacingGuidance(basePrompt: string): string {
+  const pacing = `
+【对话节奏总则（务必遵守）】
+- 每轮最多 1 个核心问题 + 至多 1 个追问，不要连续追问同一个点。
+- 学生给出合理（即使不完美）的回答时，顺势推进并补充思维提示，不必追求完美。
+- 若连续多轮停留在同一问题上，主动给出可选范式并推进，不要让追问变得没有意义。`;
+  return `${basePrompt}\n${pacing}`;
 }
 
 function renderRowsAsTable(rows: Record<string, unknown>[]): string {
@@ -94,8 +107,13 @@ function renderRowsAsTable(rows: Record<string, unknown>[]): string {
 export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): string {
   const basePrompt = promptTemplates[phase];
   let prompt = injectSafetyConstraints(basePrompt);
+  prompt = injectPacingGuidance(prompt);
 
   if (!context) return prompt;
+
+  if (context.nudgeConverge) {
+    prompt += `\n\n【对话节奏提醒——该收敛了】\n本阶段对话轮次已较多。请在本轮尽快收敛：若学生已满足本阶段最低要求，就立即输出阶段完成信号（第一阶段输出 stage1_confirmed 与确认书；第二阶段输出 data_table_schema），不要再提出新的追问。`;
+  }
 
   if (phase === PhaseEnum.TopicSelection && context.topicDirection) {
     prompt += `\n\n【本作业限定研究方向】\n本次作业要求围绕「${context.topicDirection}」展开。请在选题引导中自然地把学生引向这个方向，但仍让学生自己提出具体问题与变量。`;

@@ -44,8 +44,8 @@ export async function POST(req: Request, ctx: RouteContext<'/api/teacher/review/
   if (body.action !== 'approve' && body.action !== 'reject') {
     return NextResponse.json({ error: 'action 必须为 approve 或 reject' }, { status: 400 });
   }
-  if (body.stage !== 2 && body.stage !== 5) {
-    return NextResponse.json({ error: 'stage 必须为 2 或 5' }, { status: 400 });
+  if (body.stage !== 2 && body.stage !== 3 && body.stage !== 5) {
+    return NextResponse.json({ error: 'stage 必须为 2、3 或 5' }, { status: 400 });
   }
 
   const item = await getReviewItem(studentAssignmentId);
@@ -54,10 +54,17 @@ export async function POST(req: Request, ctx: RouteContext<'/api/teacher/review/
     return NextResponse.json({ error: '无权限' }, { status: 403 });
   }
 
-  // 状态须与待审阶段一致
-  const expectedStatus = body.stage === 2 ? 'PENDING_STAGE2' : 'PENDING_STAGE5';
-  if (item.status !== expectedStatus) {
-    return NextResponse.json({ error: '该作业当前不在此审核阶段' }, { status: 400 });
+  if (body.stage === 3) {
+    // 第三阶段为非阻塞审核：不校验 PENDING 状态，改为有界窗口校验（学生未越过第四阶段）
+    if (item.currentStage > 4) {
+      return NextResponse.json({ error: '学生已进入报告阶段，请改用报告（第五阶段）审核处理' }, { status: 400 });
+    }
+  } else {
+    // 状态须与待审阶段一致
+    const expectedStatus = body.stage === 2 ? 'PENDING_STAGE2' : 'PENDING_STAGE5';
+    if (item.status !== expectedStatus) {
+      return NextResponse.json({ error: '该作业当前不在此审核阶段' }, { status: 400 });
+    }
   }
 
   const prev = parseStageData(item.conversation?.stageData ?? '{}');

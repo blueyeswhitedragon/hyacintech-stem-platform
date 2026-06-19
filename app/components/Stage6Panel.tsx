@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import type { Stage5Data, Stage6Data } from '@/app/models/stageData';
+import type { Stage5Data, Stage6Data, Stage2Column } from '@/app/models/stageData';
+import ReportDocument from './ReportDocument';
 
 interface Props {
   stage5?: Stage5Data;
@@ -9,9 +10,12 @@ interface Props {
   completed: boolean;
   onSubmit: (response: string) => Promise<string | null>;
   guestMode?: boolean;
+  /** 阶段2列定义 + 阶段3数据，用于在反思阶段继续展示完整报告与数据表。 */
+  schemaColumns?: Stage2Column[];
+  dataRows?: Record<string, unknown>[];
 }
 
-export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guestMode }: Props) {
+export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guestMode, schemaColumns, dataRows }: Props) {
   const [response, setResponse] = useState(stage6?.studentResponse ?? '');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -25,6 +29,23 @@ export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guest
 
   return (
     <div className="p-4 space-y-4">
+      {/* 完整报告 + 数据表在反思阶段继续可见（只读），消除「进入下一阶段后表格消失」的观感 */}
+      {stage5?.sections && (
+        <details className="border rounded" open>
+          <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50">
+            📄 实验报告（含数据表）
+          </summary>
+          <div className="p-3">
+            <ReportDocument
+              stage5={stage5}
+              schemaColumns={schemaColumns}
+              dataRows={dataRows}
+              showStudentFields={true}
+            />
+          </div>
+        </details>
+      )}
+
       <h3 className="font-medium">结果反思</h3>
 
       {guestMode ? (

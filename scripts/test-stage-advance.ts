@@ -68,17 +68,29 @@ console.log('canAdvance:');
 {
   check('1→2 无数据被拒', canAdvance(1, 2, {}).ok === false);
 }
-// 1→2：有确认+变量 → 通过
+// 1→2：有确认+自变量 → 通过
 {
   const sd: StageData = {
     stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '光照', dependent: '株高' } },
   };
   check('1→2 已确认通过', canAdvance(1, 2, sd).ok === true);
 }
-// 1→2：有确认但缺变量 → 拒绝
+// 1→2：仅自变量（无因变量，新口径：因变量下沉到第二阶段）→ 通过
 {
-  const sd: StageData = { stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '', dependent: '' } } };
-  check('1→2 缺变量被拒', canAdvance(1, 2, sd).ok === false);
+  const sd: StageData = {
+    stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '光照' } },
+  };
+  check('1→2 仅自变量也通过', canAdvance(1, 2, sd).ok === true);
+}
+// 1→2：有确认但自变量为空 → 拒绝
+{
+  const sd: StageData = { stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '' } } };
+  check('1→2 缺自变量被拒', canAdvance(1, 2, sd).ok === false);
+}
+// 1→2：自变量仅空白字符 → 拒绝
+{
+  const sd: StageData = { stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '   ' } } };
+  check('1→2 自变量纯空白被拒', canAdvance(1, 2, sd).ok === false);
 }
 // 2→3 拒绝（由教师审核驱动）
 {

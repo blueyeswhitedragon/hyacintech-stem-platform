@@ -1,34 +1,40 @@
 import { ChatResponse } from '../../models/types';
+import { repairJson } from './jsonRepair';
+
+function tryParse(s: string): unknown | undefined {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return undefined;
+  }
+}
 
 function extractJSON(raw: string): unknown {
   const trimmed = raw.trim();
 
   // Strategy 1: direct parse
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    // continue
-  }
+  const direct = tryParse(trimmed);
+  if (direct !== undefined) return direct;
 
-  // Strategy 2: extract from markdown code fences
+  // Strategy 2: extract from markdown code fences (+ repair)
   const fenceMatch = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
   if (fenceMatch) {
-    try {
-      return JSON.parse(fenceMatch[1].trim());
-    } catch {
-      // continue
-    }
+    const inner = fenceMatch[1].trim();
+    const v = tryParse(inner) ?? tryParse(repairJson(inner));
+    if (v !== undefined) return v;
   }
 
   // Strategy 3: brace matching — find first { to last }
   const firstBrace = trimmed.indexOf('{');
   const lastBrace = trimmed.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace > firstBrace) {
-    try {
-      return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
-    } catch {
-      // continue
-    }
+    const slice = trimmed.slice(firstBrace, lastBrace + 1);
+    const v = tryParse(slice);
+    if (v !== undefined) return v;
+
+    // Strategy 4: deterministic repair then parse（jsonRepair 兜底）
+    const repaired = tryParse(repairJson(slice));
+    if (repaired !== undefined) return repaired;
   }
 
   throw new Error('Failed to extract JSON from LLM response');
@@ -88,14 +94,18 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
   if (
     raw.variables &&
     typeof raw.variables === 'object' &&
-    isStr((raw.variables as Record<string, unknown>).independent) &&
-    isStr((raw.variables as Record<string, unknown>).dependent)
+    isStr((raw.variables as Record<string, unknown>).independent)
   ) {
+    // 第一阶段只要求自变量；因变量（dependent）可空——不要因缺 dependent 而整体丢弃 variables
     const v = raw.variables as Record<string, unknown>;
     const controlled = Array.isArray(v.controlled) && v.controlled.every((c: unknown) => typeof c === 'string')
       ? (v.controlled as string[])
       : undefined;
-    out.variables = { independent: v.independent as string, dependent: v.dependent as string, controlled };
+    out.variables = {
+      independent: v.independent as string,
+      dependent: isStr(v.dependent) ? (v.dependent as string) : undefined,
+      controlled,
+    };
   }
 
   // 阶段2 数据表结构
@@ -179,10 +189,31 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
 }
 
 /**
+ * 从坏掉的 JSON 文本里抢救 dialogue 字段的值（即使整体无法解析）。
+ * 匹配 "dialogue": "...."（允许内部转义），再做 JSON 字符串反转义。返回干净文本或 null。
+ */
+function salvageDialogueField(raw: string): string | null {
+  const m = raw.match(/"dialogue"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (!m) return null;
+  try {
+    return JSON.parse(`"${m[1]}"`);
+  } catch {
+    // 退而求其次：手工反转义常见序列
+    return m[1]
+      .replace(/\\n/g, '\n')
+      .replace(/\\t/g, '\t')
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, '\\');
+  }
+}
+
+/**
  * Fallback: extract a ChatResponse from natural language text when JSON parsing fails.
+ * 优先抢救 dialogue 字段值（干净文本），抢不到再用整段原文，避免把 JSON 噪声丢给用户。
  */
 function heuristicExtract(raw: string): ChatResponse {
-  const dialogue = raw.trim();
+  const salvaged = salvageDialogueField(raw);
+  const dialogue = salvaged && salvaged.trim() ? salvaged : raw.trim();
 
   // Detect numbered options: lines starting with 1. 2. 3. or 1) 2) 3) or 1、2、3、
   const optionPattern = /(?:^|\n)\s*(\d+)[\.\)、]\s*(.+?)(?=\n\s*\d+[\.\)、]|\n*$)/g;

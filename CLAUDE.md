@@ -16,11 +16,12 @@ npm run db:seed    # Seed demo teacher + class (tsx prisma/seed.ts)
 npm run db:studio  # Open Prisma Studio (inspect dev.db)
 ```
 
-Tests (no test framework configured; run via `npx tsx`):
+Tests (no test framework configured; pure-function unit tests run via `npx tsx`):
 ```
 npx tsx scripts/test-stage-advance.ts      # canAdvance gating
 npx tsx scripts/test-stage-extraction.ts   # extractStageData + safeParseChatResponse
 npx tsx scripts/test-review.ts             # applyReview (teacher review logic)
+npx tsx scripts/test-guest-ratelimit.ts    # checkRateLimit sliding window (now injected)
 ```
 
 ### First-time setup
@@ -36,6 +37,8 @@ Seed creates teacher `teacher1` / password `demo1234` and one demo class.
 ## Architecture
 
 This is a Next.js 16 App Router project — a single-page STEM education platform where an AI teacher guides students through a six-phase scientific inquiry process (based on Shanghai junior high science curriculum standards).
+
+> **Next.js 16 conventions** (see `AGENTS.md` — APIs differ from older training data): route handlers type their second arg as `RouteContext<'/api/.../[id]/...'>` and `ctx.params` is a **Promise** (`const { id } = await ctx.params`). Read `node_modules/next/dist/docs/` before writing new routes/pages.
 
 ### Six-phase pipeline
 
@@ -143,6 +146,19 @@ When entering stage 5 (via confirm button or `/advance`), `ConversationWorkspace
 - Student-editable conclusion and reflection fields
 - Teacher score display (green for ≥6, red for <6 with rewrite notice)
 - AI reference score display
+
+### Safety system
+
+- `checkBlacklistedKeywords()` runs before every chat call (both guest and DB-backed) and returns `400 safety_violation` on hit.
+- The LLM may emit a `safety_quiz` object in stage 2/3 (risks identification). In the DB-backed flow, `POST /api/conversations/[id]/safety-quiz` with `{ passed: true }` sets `Conversation.safetyQuizCompleted = true` (correctness is judged client-side against `safety_quiz.correct` — education MVP). Guest mode passes `needSafetyQuiz` to the prompt builder instead (no persistence).
+
+### AI reference scoring (stage 5)
+
+`generateReferenceScore(sections)` in `app/lib/llm/scoring.ts` calls the LLM with `buildScoringPrompt()` / `buildReportText()` (`app/prompts/scoring.ts`) to produce a `Stage5ReferenceScore`: an `overall` 1–10, five clamped `dimensions` (completeness/logic/dataUsage/innovation/expression), `highlights`, `suggestions`, and `safetyCompliance`. **It never throws** — config/network/parse failures return `null` so report submission is never blocked. This is the *AI reference score* shown alongside the teacher's score in `ReportViewer`; the teacher score is what actually gates 5→6.
+
+### Image uploads
+
+`POST /api/uploads` (student-only, `requireRole('student')`) accepts a `multipart/form-data` `file` field. Validates type (PNG/JPG/WebP/GIF) and ≤5MB, writes to `public/uploads/<uuid>.<ext>`, returns `{ url }`. Used for experiment photos during execution.
 
 ### Stage 4 analysis gate
 

@@ -17,10 +17,14 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
   if (item.assignment.class.teacherId !== user.id) redirect('/teacher/review');
 
   const stageData = parseStageData(item.conversation?.stageData ?? '{}');
-  const reviewStage: 2 | 5 = item.status === 'PENDING_STAGE2' ? 2 : 5;
+  // 审核阶段：PENDING_STAGE2→2、PENDING_STAGE5→5，否则按当前阶段视为第三阶段非阻塞过目
+  const reviewStage: 2 | 3 | 5 =
+    item.status === 'PENDING_STAGE2' ? 2 : item.status === 'PENDING_STAGE5' ? 5 : 3;
   const riskCols = new Set(
     (stageData.stage2?.aiRiskAnnotations ?? []).map((r) => r.columnKey).filter(Boolean)
   );
+  const stage3Cols = stageData.stage2?.schema?.columns ?? [];
+  const stage3Rows = stageData.stage3?.rows ?? [];
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -68,6 +72,42 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
                     · {r.columnKey ? `[${r.columnKey}] ` : ''}{r.description}（{r.severity}）
                   </div>
                 ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {reviewStage === 3 && (
+          <section className="bg-white border rounded-lg p-4">
+            <h2 className="font-medium mb-3">过程执行 · 数据表（第 {item.currentStage} 阶段，可选审核）</h2>
+            {stage3Cols.length === 0 ? (
+              <p className="text-sm text-gray-500">该学生尚未生成数据表结构。</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border">
+                  <thead className="bg-gray-50 text-gray-600">
+                    <tr>
+                      <th className="p-2 border text-center w-10">#</th>
+                      {stage3Cols.map((c) => (
+                        <th key={c.key} className="p-2 border text-left whitespace-nowrap">{c.title}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stage3Rows.length === 0 ? (
+                      <tr><td className="p-2 border text-gray-400" colSpan={stage3Cols.length + 1}>（学生尚未录入数据）</td></tr>
+                    ) : (
+                      stage3Rows.map((row, i) => (
+                        <tr key={i}>
+                          <td className="p-2 border text-center text-gray-400">{i + 1}</td>
+                          {stage3Cols.map((c) => (
+                            <td key={c.key} className="p-2 border text-gray-800">{String(row[c.key] ?? '—')}</td>
+                          ))}
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             )}
           </section>

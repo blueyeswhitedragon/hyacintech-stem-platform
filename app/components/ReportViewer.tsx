@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
+import ReportDocument from './ReportDocument';
 
 interface Props {
   stage5?: Stage5Data;
@@ -12,23 +13,20 @@ interface Props {
   onSave: (conclusion: string, reflection: string) => Promise<string | null>;
   /** 提交报告进入教师审核；为 undefined 时（如已提交待审）隐藏提交按钮。 */
   onSubmit?: () => Promise<string | null>;
+  /** 导出报告为 docx（含数据表）。 */
+  onExport?: () => Promise<string | null>;
+  /** 上传学生自己的 docx 报告（轻量留存 + 文本提取）。 */
+  onImport?: (file: File) => Promise<string | null>;
 }
 
-const AI_FIELDS: { key: keyof Stage5Data['sections']; label: string }[] = [
-  { key: 'purpose', label: '研究目的' },
-  { key: 'hypothesis', label: '假设' },
-  { key: 'materials', label: '实验材料' },
-  { key: 'procedure', label: '实验步骤' },
-  { key: 'dataSummary', label: '数据概述' },
-  { key: 'analysis', label: '数据分析' },
-];
-
-export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, onSubmit }: Props) {
+export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, onSubmit, onExport, onImport }: Props) {
   const sections = stage5?.sections;
   const [conclusion, setConclusion] = useState(sections?.conclusion ?? '');
   const [reflection, setReflection] = useState(sections?.reflection ?? '');
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -50,65 +48,69 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
     if (e) setErr(e);
   };
 
+  const handleExport = async () => {
+    if (!onExport) return;
+    setExporting(true); setMsg(null); setErr(null);
+    const e = await onExport();
+    setExporting(false);
+    if (e) setErr(e);
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 允许重复选同一文件
+    if (!file || !onImport) return;
+    setImporting(true); setMsg(null); setErr(null);
+    const err2 = await onImport(file);
+    setImporting(false);
+    if (err2) setErr(err2); else setMsg('已上传你的报告');
+  };
+
   if (!sections) {
     return (
-      <div className="text-sm text-gray-500 p-4">
-        还没有报告框架。请等待 AI 自动生成报告框架。
+      <div className="text-sm text-gray-500 p-4 flex items-center gap-2">
+        <span className="inline-block h-3 w-3 rounded-full border-2 border-gray-300 border-t-blue-500 animate-spin" />
+        正在根据前序阶段自动生成报告框架，请稍候…
       </div>
     );
   }
 
   return (
     <div className="p-4 space-y-4">
-      <h3 className="font-medium text-lg">📝 实验报告</h3>
-
-      {/* AI 预填的报告各节 */}
-      {AI_FIELDS.map(({ key, label }) => (
-        <div key={key}>
-          <div className="text-sm font-medium text-gray-600 mb-1">{label}</div>
-          <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-            {sections[key] || <span className="text-gray-400">（AI 未预填）</span>}
-          </div>
+      <div className="flex items-center justify-between">
+        <h3 className="font-medium text-lg">📝 实验报告</h3>
+        <div className="flex items-center gap-2">
+          {onImport && (
+            <label className="px-3 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 cursor-pointer">
+              {importing ? '上传中…' : '上传我的 Word 报告'}
+              <input
+                type="file"
+                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                className="hidden"
+                disabled={importing}
+                onChange={handleImport}
+              />
+            </label>
+          )}
+          {onExport && (
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              className="px-3 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:opacity-50"
+            >
+              {exporting ? '导出中…' : '导出为 Word'}
+            </button>
+          )}
         </div>
-      ))}
+      </div>
 
-      {/* 嵌入的实验数据表 */}
-      {dataRows && dataRows.length > 0 && schemaColumns && schemaColumns.length > 0 && (
-        <div>
-          <div className="text-sm font-medium text-gray-600 mb-1">📊 实验数据记录</div>
-          <div className="overflow-x-auto border rounded">
-            <table className="w-full text-xs">
-              <thead className="bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="p-1.5 border text-center w-8">#</th>
-                  {schemaColumns.map((c) => (
-                    <th key={c.key} className="p-1.5 border text-left whitespace-nowrap">
-                      {c.title}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {dataRows.map((row, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-1.5 border text-center text-gray-400">{i + 1}</td>
-                    {schemaColumns.map((c) => (
-                      <td key={c.key} className="p-1.5 border text-gray-800">
-                        {c.type === 'image' && row[c.key] ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={String(row[c.key])} alt="" className="h-8 w-8 object-cover rounded" />
-                        ) : (
-                          String(row[c.key] ?? '—')
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {/* 只读报告主体（六节 + 数据表 + 上传报告），结论/反思在下方用可编辑框 */}
+      <ReportDocument
+        stage5={stage5}
+        schemaColumns={schemaColumns}
+        dataRows={dataRows}
+        showStudentFields={false}
+      />
 
       {/* 简单图表提示（阶段4的分析在数据概述中体现） */}
       {dataRows && dataRows.length > 0 && (

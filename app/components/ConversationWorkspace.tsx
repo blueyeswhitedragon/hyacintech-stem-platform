@@ -134,24 +134,77 @@ export default function ConversationWorkspace({
     return null;
   };
 
+  const generateStage5ReportFramework = async (): Promise<string | null> => {
+    if (stageData.stage5?.sections) return null;
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: '开始报告成型' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return data.message || data.error || '报告框架生成失败，请稍后重试。';
+      if (data.stageData) setStageData(data.stageData);
+      return null;
+    } catch {
+      return '报告框架生成失败，请稍后重试。';
+    }
+  };
+
+  const advanceToStage5 = async (): Promise<string | null> => {
+    const err = await advanceTo(5);
+    if (err) return err;
+    return generateStage5ReportFramework();
+  };
+
+  /** 导出报告为 docx 并触发浏览器下载。 */
+  const exportReportDocx = async (): Promise<string | null> => {
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/report/export`, { method: 'POST' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return data.error || '导出失败，请稍后重试。';
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '实验报告.docx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      return null;
+    } catch {
+      return '导出失败，请稍后重试。';
+    }
+  };
+
+  /** 上传学生自己的 docx 报告（轻量留存 + 文本提取）。 */
+  const importReportDocx = async (file: File): Promise<string | null> => {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch(`/api/conversations/${conversationId}/report/import`, {
+        method: 'POST',
+        body: form,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return data.error || '上传失败，请稍后重试。';
+      if (data.stageData) setStageData(data.stageData);
+      return null;
+    } catch {
+      return '上传失败，请稍后重试。';
+    }
+  };
+
   /** 阶段完成后的确认推进（直接调 advance 端点，不发 LLM 请求） */
   const onPhaseConfirm = async (): Promise<string | null> => {
     const err = await advanceTo(stage + 1);
     if (err) return err;
     // 进入阶段5时自动触发报告框架生成（无需学生手动输入）
     if (stage + 1 === 5 && !stageData.stage5?.sections) {
-      // 延迟一小段，让状态先更新
-      setTimeout(async () => {
-        try {
-          const res = await fetch(`/api/conversations/${conversationId}/chat`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: '开始报告成型' }),
-          });
-          const data = await res.json().catch(() => ({}));
-          if (res.ok && data.stageData) setStageData(data.stageData);
-        } catch { /* 自动生成失败不阻断 */ }
-      }, 500);
+      return generateStage5ReportFramework();
     }
     return null;
   };
@@ -159,6 +212,7 @@ export default function ConversationWorkspace({
   const pendingStage2 = status === 'PENDING_STAGE2';
   const pendingStage5 = status === 'PENDING_STAGE5';
   const rejected2 = stageData.stage2?.approved === false ? stageData.stage2.teacherFeedback : null;
+  const rejected3 = stageData.stage3?.approved === false ? stageData.stage3.teacherFeedback : null;
   const rejected5 = stageData.stage5?.approved === false ? stageData.stage5.teacherFeedback : null;
 
   const banner = (() => {
@@ -169,7 +223,7 @@ export default function ConversationWorkspace({
         </div>
       );
     }
-    const fb = stage === 2 ? rejected2 : stage === 5 ? rejected5 : null;
+    const fb = stage === 2 ? rejected2 : stage === 3 ? rejected3 : stage === 5 ? rejected5 : null;
     if (fb) {
       return (
         <div className="m-4 p-3 bg-red-50 border border-red-300 rounded text-sm text-red-800">
@@ -216,19 +270,22 @@ export default function ConversationWorkspace({
         );
       case 3:
         return (
-          <DataTableEditor
-            schema={stageData.stage2?.schema}
-            initial={stageData.stage3}
-            onSave={saveStage3}
-            onComplete={() => advanceTo(4)}
-          />
+          <div>
+            {banner}
+            <DataTableEditor
+              schema={stageData.stage2?.schema}
+              initial={stageData.stage3}
+              onSave={saveStage3}
+              onComplete={() => advanceTo(4)}
+            />
+          </div>
         );
       case 4:
         return (
           <ChartViewer
             schema={stageData.stage2?.schema}
             stage3={stageData.stage3}
-            onComplete={() => advanceTo(5)}
+            onComplete={advanceToStage5}
           />
         );
       case 5:
@@ -241,6 +298,8 @@ export default function ConversationWorkspace({
               dataRows={stageData.stage3?.rows}
               onSave={saveStage5}
               onSubmit={pendingStage5 ? undefined : submitStage5}
+              onExport={exportReportDocx}
+              onImport={pendingStage5 ? undefined : importReportDocx}
             />
           </div>
         );
@@ -251,6 +310,8 @@ export default function ConversationWorkspace({
             stage6={stageData.stage6}
             completed={status === 'COMPLETED'}
             onSubmit={respondStage6}
+            schemaColumns={stageData.stage2?.schema?.columns}
+            dataRows={stageData.stage3?.rows}
           />
         );
       default:
@@ -269,6 +330,7 @@ export default function ConversationWorkspace({
           onResult={onChatResult}
           onSafetyPassed={markSafetyPassed}
           onPhaseConfirm={onPhaseConfirm}
+          roundCount={stageData.roundCounts?.[stage] ?? 0}
         />
       </div>
       {panel && (

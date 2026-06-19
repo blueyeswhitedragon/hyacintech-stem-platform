@@ -1,5 +1,6 @@
 import 'server-only';
 import { db } from './db';
+import { parseStageData } from './conversation';
 import type { AssignmentStatus } from '@/app/models/stageData';
 
 /**
@@ -193,6 +194,43 @@ export async function getPendingReviews(teacherId: string) {
       assignment: { select: { title: true, class: { select: { name: true } } } },
     },
   });
+}
+
+/**
+ * 第三阶段「数据表待过目（可选）」清单：
+ * 所辖班级中 currentStage∈{3,4}、IN_PROGRESS，且 stage3 已提交、尚未被教师认可的学生作业。
+ * stage3.submitted/approved 存在 stageData JSON 中，无法用 Prisma where 过滤，故先取候选再在内存里筛。
+ */
+export async function getOptionalStage3Reviews(teacherId: string) {
+  const rows = await db.studentAssignment.findMany({
+    where: {
+      status: 'IN_PROGRESS',
+      currentStage: { in: [3, 4] },
+      assignment: { class: { teacherId } },
+    },
+    orderBy: { updatedAt: 'asc' },
+    select: {
+      id: true,
+      currentStage: true,
+      updatedAt: true,
+      student: { select: { displayName: true, username: true } },
+      assignment: { select: { title: true, class: { select: { name: true } } } },
+      conversation: { select: { stageData: true } },
+    },
+  });
+
+  return rows
+    .filter((r) => {
+      const sd = parseStageData(r.conversation?.stageData ?? '{}');
+      return sd.stage3?.submitted === true && sd.stage3?.approved !== true;
+    })
+    .map((r) => ({
+      id: r.id,
+      currentStage: r.currentStage,
+      updatedAt: r.updatedAt,
+      student: r.student,
+      assignment: r.assignment,
+    }));
 }
 
 /** 审核详情：单个学生作业 + 会话 messages/stageData + 归属（class.teacherId）。 */

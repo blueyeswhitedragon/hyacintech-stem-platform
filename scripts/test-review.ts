@@ -75,5 +75,46 @@ console.log('applyReview:');
   check('s2 未提交 → error', r.ok === false && !!r.error);
 }
 
+// ---- 第三阶段（可选/非阻塞/有界回滚）----
+const sd3: StageData = {
+  stage3: { rows: [{ day: 1 }], submitted: true, approved: null },
+  stage4: { analysisCount: 3 },
+};
+
+// s3 approve → 背书，不改阶段
+{
+  const r = applyReview('approve', 3, 4, sd3, { feedback: '表格不错' });
+  check('s3 approve → ok 且不改阶段', r.ok && r.currentStage === undefined && r.status === 'IN_PROGRESS');
+  check('s3 approve → approved=true', r.stageData.stage3?.approved === true && r.stageData.stage3?.teacherFeedback === '表格不错');
+  check('s3 approve → 不动 analysisCount', r.stageData.stage4?.analysisCount === 3);
+}
+
+// s3 reject 且学生在第三阶段 → 留 3、写反馈
+{
+  const r = applyReview('reject', 3, 3, sd3, { feedback: '列设计混乱' });
+  check('s3 reject@3 → 回到 stage3', r.ok && r.currentStage === 3 && r.status === 'IN_PROGRESS');
+  check('s3 reject@3 → approved/submitted=false', r.stageData.stage3?.approved === false && r.stageData.stage3?.submitted === false);
+  check('s3 reject@3 → 写反馈', r.stageData.stage3?.teacherFeedback === '列设计混乱');
+}
+
+// s3 reject 且学生已在第四阶段 → 回退到 3 + 清零 analysisCount
+{
+  const r = applyReview('reject', 3, 4, sd3, { feedback: '重做' });
+  check('s3 reject@4 → 回退 stage3', r.ok && r.currentStage === 3);
+  check('s3 reject@4 → analysisCount 清零', r.stageData.stage4?.analysisCount === 0);
+}
+
+// s3 reject 且学生已在第五阶段 → 拒绝
+{
+  const r = applyReview('reject', 3, 5, sd3, { feedback: 'x' });
+  check('s3 reject@5 → 拒绝', r.ok === false && !!r.error);
+}
+
+// s3 未提交 → error
+{
+  const r = applyReview('approve', 3, 4, {}, {});
+  check('s3 未提交 → error', r.ok === false && !!r.error);
+}
+
 console.log(`\n结果: ${passed} 通过, ${failed} 失败`);
 process.exit(failed > 0 ? 1 : 0);

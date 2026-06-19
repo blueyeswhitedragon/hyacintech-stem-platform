@@ -19,8 +19,9 @@ export function canAdvance(from: number, to: number, stageData: StageData): Adva
     if (!stageData.stage1?.confirmed) {
       return { ok: false, error: '请先确认探究问题' };
     }
-    if (!stageData.stage1.variables?.independent || !stageData.stage1.variables?.dependent) {
-      return { ok: false, error: '请先确定自变量和因变量' };
+    // 第一阶段只需确认「研究问题 + 自变量方向」；因变量测量方式与控制变量下沉到第二阶段。
+    if (!stageData.stage1.variables?.independent?.trim()) {
+      return { ok: false, error: '请先确定要改变的自变量' };
     }
     return { ok: true };
   }

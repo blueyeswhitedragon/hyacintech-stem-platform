@@ -6,6 +6,7 @@ import type { Message } from '../models/types';
 import { initialWelcomeMessage } from '../lib/welcome';
 import { extractStageData } from '../lib/stageExtraction';
 import { canAdvance } from '../lib/stageAdvance';
+import { buildPriorSummary } from '../lib/reportSummary';
 import ConversationChat, { type ChatApiResponse } from './ConversationChat';
 import DataTableEditor from './DataTableEditor';
 import ChartViewer from './ChartViewer';
@@ -38,6 +39,7 @@ export default function GuestWorkspace() {
         history,
         dataRows: stageData.stage3?.rows,
         needSafetyQuiz: stage === 3 && needQuizRef.current,
+        priorSummary: stage === 5 ? buildPriorSummary(stageData) : undefined,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -68,37 +70,43 @@ export default function GuestWorkspace() {
     return null;
   };
 
+  const generateStage5ReportFramework = async (): Promise<string | null> => {
+    if (stageData.stage5?.sections) return null;
+    try {
+      const res = await fetch('/api/guest/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: '开始报告成型',
+          stage: 5,
+          history: [],
+          needSafetyQuiz: false,
+          priorSummary: buildPriorSummary(stageData),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return data.message || data.error || '报告框架生成失败，请稍后重试。';
+      const { stageData: nextSD } = extractStageData(5, data, stageData);
+      setStageData(nextSD);
+      return null;
+    } catch {
+      return '报告框架生成失败，请稍后重试。';
+    }
+  };
+
+  const advanceToStage5 = async (): Promise<string | null> => {
+    const err = await advanceLocal(5);
+    if (err) return err;
+    return generateStage5ReportFramework();
+  };
+
   /** 阶段完成后的确认推进（本地直接调 advanceLocal，不发 LLM 请求） */
   const onPhaseConfirm = async (): Promise<string | null> => {
     const err = await advanceLocal(stage + 1);
     if (err) return err;
     // 进入阶段5时自动触发报告框架生成
     if (stage + 1 === 5 && !stageData.stage5?.sections) {
-      setTimeout(async () => {
-        try {
-          const res = await fetch('/api/guest/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: '开始报告成型', stage: 5, history: [], needSafetyQuiz: false }),
-          });
-          const data = await res.json().catch(() => ({}));
-          if (res.ok && data.stageData) setStageData(data.stageData);
-          if (res.ok && data.report_sections) {
-            setStageData((prev) => ({
-              ...prev,
-              stage5: {
-                submitted: false,
-                approved: null,
-                sections: {
-                  ...data.report_sections,
-                  conclusion: '',
-                  reflection: '',
-                },
-              },
-            }));
-          }
-        } catch { /* 不阻断 */ }
-      }, 500);
+      return generateStage5ReportFramework();
     }
     return null;
   };
@@ -201,7 +209,7 @@ export default function GuestWorkspace() {
           />
         );
       case 4:
-        return <ChartViewer schema={stageData.stage2?.schema} stage3={stageData.stage3} onComplete={() => advanceLocal(5)} />;
+        return <ChartViewer schema={stageData.stage2?.schema} stage3={stageData.stage3} onComplete={advanceToStage5} />;
       case 5:
         return <ReportViewer stage5={stageData.stage5} schemaColumns={stageData.stage2?.schema?.columns} dataRows={stageData.stage3?.rows} onSave={saveStage5} onSubmit={submitStage5} />;
       case 6:

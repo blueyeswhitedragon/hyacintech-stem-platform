@@ -1,5 +1,6 @@
 import type { ChatResponse } from '@/app/models/types';
 import type { StageData } from '@/app/models/stageData';
+import { normalizeSchema } from './schemaNormalize';
 
 export interface ExtractionResult {
   stageData: StageData;
@@ -26,7 +27,8 @@ export function extractStageData(
       snapshot: response.snapshot ?? '',
       variables: {
         independent: response.variables.independent,
-        dependent: response.variables.dependent,
+        // 第一阶段因变量可空（下沉到第二阶段）；控制变量也不强制。
+        dependent: response.variables.dependent ?? '',
         controlled: response.variables.controlled,
       },
     };
@@ -39,7 +41,8 @@ export function extractStageData(
       submitted: prev.stage2?.submitted ?? false,
       approved: prev.stage2?.approved ?? null,
       teacherFeedback: prev.stage2?.teacherFeedback,
-      schema: response.data_table_schema,
+      // 落库前规整：key snake_case+去重、补 notes 列、minRows>=3、maxRows=200
+      schema: normalizeSchema(response.data_table_schema),
       aiRiskAnnotations: response.risks ?? prev.stage2?.aiRiskAnnotations,
     };
     return { stageData };

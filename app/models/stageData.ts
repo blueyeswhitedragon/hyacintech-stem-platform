@@ -9,7 +9,8 @@ export interface Stage1Data {
   snapshot: string; // 纯文本《探究问题确认书》
   variables: {
     independent: string;
-    dependent: string;
+    /** 第一阶段只确定自变量方向；因变量的具体测量方式下沉到第二阶段，故此处可空。 */
+    dependent?: string;
     controlled?: string[];
   };
 }
@@ -48,6 +49,11 @@ export interface Stage3FileAssociation {
 export interface Stage3Data {
   rows: Record<string, unknown>[]; // 每行都是 { [colKey]: value }
   fileAssociations?: Stage3FileAssociation[];
+  /** 学生点 3→4 推进时置 true，进入教师「数据表待过目（可选）」清单（非阻塞）。 */
+  submitted?: boolean;
+  /** 教师审核结果：true=已过目认可；false=被打回需修改；undefined=未过目。 */
+  approved?: boolean | null;
+  teacherFeedback?: string;
 }
 
 // 阶段4：分析轮次计数（至少2轮有效分析才能进入阶段5）
@@ -87,6 +93,10 @@ export interface Stage5Data {
   aiReferenceScore?: Stage5ReferenceScore;
   teacherScore?: number;
   teacherFeedback?: string;
+  /** docx 轻量导入：学生上传报告的原文件 URL（留存）。 */
+  uploadedDocUrl?: string;
+  /** docx 轻量导入：从上传报告提取的纯文本（供学生/教师参考，不覆盖 AI 框架）。 */
+  uploadedText?: string;
 }
 
 export interface Stage6Data {
@@ -101,6 +111,8 @@ export interface StageData {
   stage4?: Stage4Data;
   stage5?: Stage5Data;
   stage6?: Stage6Data;
+  /** 各阶段累计对话轮次（学生消息数），用于过度追问的节奏兜底与逃生按钮判定。键为阶段号。 */
+  roundCounts?: Record<number, number>;
 }
 
 /** StudentAssignment.status 取值。 */

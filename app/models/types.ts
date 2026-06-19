@@ -46,7 +46,7 @@ export interface ChatResponse {
   // 阶段1：学生确认研究问题后
   stage1_confirmed?: boolean;
   snapshot?: string; // 《探究问题确认书》纯文本
-  variables?: { independent: string; dependent: string; controlled?: string[] };
+  variables?: { independent: string; dependent?: string; controlled?: string[] };
   // 阶段2：方案成型
   data_table_schema?: { columns: Stage2Column[]; minRows: number; maxRows: number };
   risks?: Stage2RiskAnnotation[];

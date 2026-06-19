@@ -6,6 +6,10 @@ import { Message, ChatResponse, SafetyQuiz } from '../models/types';
 import type { StageData } from '../models/stageData';
 import MessageItem from './MessageItem';
 import StageProgress from './StageProgress';
+import { shouldShowEscapeHatch } from '../lib/pacing';
+
+/** 逃生按钮发送的强制收敛消息：促使模型立即输出确认书（仍由模型产出结构化信号，不绕过 gating）。 */
+const FORCE_CONVERGE_TEXT = '我觉得讨论得差不多了，请你直接给出《探究问题确认书》，让我进入下一阶段。';
 
 export interface ChatApiResponse extends ChatResponse {
   currentStage?: number;
@@ -25,6 +29,8 @@ interface Props {
   onSafetyPassed?: () => void | Promise<void>;
   /** 当阶段完成且用户点击"确认"时，直接推进阶段（不再发 LLM 请求）。 */
   onPhaseConfirm?: () => Promise<string | null>;
+  /** 本阶段累计对话轮次，用于判断是否显示「我已准备好，进入下一步」逃生按钮。 */
+  roundCount?: number;
 }
 
 const noop = () => {};
@@ -41,7 +47,7 @@ function structuredNotice(data: ChatApiResponse): string | null {
   return null;
 }
 
-export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm }: Props) {
+export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, roundCount = 0 }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -246,6 +252,19 @@ export default function ConversationChat({ initialMessages, stage, completed, se
             className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 text-lg font-medium"
           >
             {isLoading ? '处理中…' : '确认，进入下一阶段'}
+          </button>
+        </div>
+      )}
+
+      {/* 逃生按钮：轮次过多且当前没有确认按钮时出现。发送强制收敛消息促使模型给出确认书。 */}
+      {lastActionType !== 'confirmation' && !quiz && shouldShowEscapeHatch(stage, roundCount) && (
+        <div className="px-4 pt-3 flex justify-center">
+          <button
+            onClick={() => doSend(FORCE_CONVERGE_TEXT)}
+            disabled={isLoading}
+            className="px-4 py-1.5 text-sm bg-white border border-green-400 text-green-700 rounded-md hover:bg-green-50 disabled:opacity-50"
+          >
+            讨论得差不多了？让我进入下一步 →
           </button>
         </div>
       )}

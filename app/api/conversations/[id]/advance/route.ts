@@ -32,10 +32,24 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     return NextResponse.json({ error: check.error }, { status: 400 });
   }
 
-  await db.studentAssignment.update({
-    where: { id: conv.studentAssignmentId },
-    data: { currentStage: body.to },
-  });
+  // 3→4：标记数据表已就绪，进入教师「数据表待过目（可选）」清单（非阻塞）
+  let stageData = conv.stageData;
+  if (conv.currentStage === 3 && body.to === 4 && conv.stageData.stage3) {
+    stageData = {
+      ...conv.stageData,
+      stage3: { ...conv.stageData.stage3, submitted: true, approved: conv.stageData.stage3.approved ?? null },
+    };
+  }
 
-  return NextResponse.json({ currentStage: body.to, stageData: conv.stageData });
+  await db.$transaction([
+    db.studentAssignment.update({
+      where: { id: conv.studentAssignmentId },
+      data: { currentStage: body.to },
+    }),
+    ...(stageData !== conv.stageData
+      ? [db.conversation.update({ where: { id: conversationId }, data: { stageData: JSON.stringify(stageData) } })]
+      : []),
+  ]);
+
+  return NextResponse.json({ currentStage: body.to, stageData });
 }

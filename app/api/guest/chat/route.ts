@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     history?: Message[];
     dataRows?: Record<string, unknown>[];
     needSafetyQuiz?: boolean;
+    priorSummary?: string;
   };
   try {
     body = await req.json();
@@ -58,6 +59,7 @@ export async function POST(req: Request) {
   const context: PromptContext = {};
   if (stage === PhaseEnum.Execution && body.needSafetyQuiz) context.needSafetyQuiz = true;
   if (stage === PhaseEnum.DataAnalysis) context.dataRows = body.dataRows ?? [];
+  if (stage === PhaseEnum.ResultsFormation && body.priorSummary) context.priorSummary = body.priorSummary;
 
   try {
     const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
