@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import type { Stage5Data, Stage6Data } from '@/app/models/stageData';
-import SubmitButton from './SubmitButton';
 
 interface Props {
   stage5?: Stage5Data;
@@ -14,8 +13,15 @@ interface Props {
 
 export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guestMode }: Props) {
   const [response, setResponse] = useState(stage6?.studentResponse ?? '');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  const handleSubmit = () => onSubmit(response);
+  const handleSubmit = async () => {
+    setBusy(true); setErr(null);
+    const e = await onSubmit(response);
+    setBusy(false);
+    if (e) setErr(e);
+  };
 
   return (
     <div className="p-4 space-y-4">
@@ -75,13 +81,15 @@ export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guest
             className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="结合教师评价，谈谈你的收获、不足，以及下一步可以怎样深入研究……"
           />
-          <div className="mt-2">
-            <SubmitButton
-              label="提交反思，完成探究"
-              loadingLabel="提交中…"
-              onSubmit={handleSubmit}
-              disabled={response.trim() === ''}
-            />
+          <div className="mt-2 flex items-center gap-2">
+            <button
+              onClick={handleSubmit}
+              disabled={busy || response.trim() === ''}
+              className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+            >
+              {busy ? '提交中…' : '提交反思，完成探究'}
+            </button>
+            {err && <span className="text-sm text-red-600">{err}</span>}
           </div>
         </div>
       )}

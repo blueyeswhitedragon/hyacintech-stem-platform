@@ -6,7 +6,6 @@ import { Message, ChatResponse, SafetyQuiz } from '../models/types';
 import type { StageData } from '../models/stageData';
 import MessageItem from './MessageItem';
 import StageProgress from './StageProgress';
-import Button from './ui/Button';
 
 export interface ChatApiResponse extends ChatResponse {
   currentStage?: number;
@@ -241,9 +240,13 @@ export default function ConversationChat({ initialMessages, stage, completed, se
 
       {lastActionType === 'confirmation' && (
         <div className="p-4 bg-gray-50 flex justify-center">
-          <Button variant="success" size="lg" loading={isLoading} onClick={handleConfirm}>
-            确认，进入下一阶段
-          </Button>
+          <button
+            onClick={handleConfirm}
+            disabled={isLoading}
+            className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 text-lg font-medium"
+          >
+            {isLoading ? '处理中…' : '确认，进入下一阶段'}
+          </button>
         </div>
       )}
 
@@ -265,9 +268,13 @@ export default function ConversationChat({ initialMessages, stage, completed, se
             ))}
           </div>
           {quizError && <div className="text-sm text-red-600 mb-2">{quizError}</div>}
-          <Button variant="warning" size="sm" onClick={submitQuiz} disabled={quizChoice === null}>
+          <button
+            onClick={submitQuiz}
+            disabled={quizChoice === null}
+            className="px-4 py-1.5 bg-amber-500 text-white rounded hover:bg-amber-600 disabled:opacity-50 text-sm"
+          >
             提交答案
-          </Button>
+          </button>
         </div>
       )}
 
@@ -303,14 +310,13 @@ export default function ConversationChat({ initialMessages, stage, completed, se
             rows={2}
             disabled={isLoading || quiz !== null}
           />
-          <Button
-            variant="primary"
+          <button
             onClick={sendMessage}
             disabled={isLoading || quiz !== null || inputValue.trim() === ''}
-            className="rounded-l-none rounded-r-lg"
+            className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 disabled:opacity-50"
           >
             发送
-          </Button>
+          </button>
         </div>
       </div>
 

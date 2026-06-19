@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from './ui/Button';
 
 export default function JoinClassForm() {
   const router = useRouter();
@@ -44,9 +43,10 @@ export default function JoinClassForm() {
         className="border rounded-lg p-2 text-gray-900 tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-0"
         maxLength={6}
       />
-      <Button type="submit" variant="primary" loading={loading} loadingText="加入中…" disabled={inviteCode.trim() === ''}>
-        加入班级
-      </Button>
+      <button type="submit" disabled={loading || inviteCode.trim() === ''}
+        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
+        {loading ? '加入中…' : '加入班级'}
+      </button>
       {error && <span className="text-sm text-red-600 self-center">{error}</span>}
     </form>
   );

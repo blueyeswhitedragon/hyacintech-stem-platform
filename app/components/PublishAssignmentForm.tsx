@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from './ui/Button';
 
 interface ClassOption {
   id: string;
@@ -99,9 +98,10 @@ export default function PublishAssignmentForm({ classes }: { classes: ClassOptio
 
       {error && <div className="text-sm text-red-600">{error}</div>}
 
-      <Button type="submit" variant="primary" loading={loading} loadingText="发布中…" disabled={title.trim() === ''}>
-        发布作业
-      </Button>
+      <button type="submit" disabled={loading || title.trim() === ''}
+        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
+        {loading ? '发布中…' : '发布作业'}
+      </button>
     </form>
   );
 }

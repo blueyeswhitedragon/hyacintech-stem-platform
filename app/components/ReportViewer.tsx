@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
-import SubmitButton from './SubmitButton';
 
 interface Props {
   stage5?: Stage5Data;
@@ -28,14 +27,27 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
   const sections = stage5?.sections;
   const [conclusion, setConclusion] = useState(sections?.conclusion ?? '');
   const [reflection, setReflection] = useState(sections?.reflection ?? '');
+  const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-  const handleSave = async () => onSave(conclusion, reflection);
+  const handleSave = async () => {
+    setSaving(true); setMsg(null); setErr(null);
+    const e = await onSave(conclusion, reflection);
+    setSaving(false);
+    if (e) setErr(e); else setMsg('报告已保存');
+  };
 
   const handleSubmit = async () => {
-    if (!onSubmit) return '无法提交';
+    if (!onSubmit) return;
+    setSubmitting(true); setMsg(null); setErr(null);
+    // 先保存再提交
     const se = await onSave(conclusion, reflection);
-    if (se) return se;
-    return onSubmit();
+    if (se) { setSubmitting(false); setErr(se); return; }
+    const e = await onSubmit();
+    setSubmitting(false);
+    if (e) setErr(e);
   };
 
   if (!sections) {
@@ -154,10 +166,24 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
       )}
 
       <div className="flex items-center gap-2">
-        <SubmitButton label="保存报告" loadingLabel="保存中…" successLabel="✓ 已保存" variant="primary" size="sm" onSubmit={handleSave} />
+        <button
+          onClick={handleSave}
+          disabled={saving || submitting}
+          className="px-4 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+        >
+          {saving ? '保存中…' : '保存报告'}
+        </button>
         {onSubmit && (
-          <SubmitButton label="提交报告，等待教师审核" loadingLabel="提交中…" variant="success" size="sm" onSubmit={handleSubmit} />
+          <button
+            onClick={handleSubmit}
+            disabled={saving || submitting}
+            className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+          >
+            {submitting ? '提交中…' : '提交报告，等待教师审核'}
+          </button>
         )}
+        {msg && <span className="text-sm text-green-600">{msg}</span>}
+        {err && <span className="text-sm text-red-600">{err}</span>}
       </div>
     </div>
   );

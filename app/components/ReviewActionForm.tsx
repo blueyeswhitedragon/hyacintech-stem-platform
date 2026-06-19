@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from './ui/Button';
 
 interface Props {
   studentAssignmentId: string;
@@ -78,8 +77,20 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
       </div>
       {err && <div className="text-sm text-red-600">{err}</div>}
       <div className="flex gap-2">
-        <Button variant="success" loading={busy} onClick={() => act('approve')}>通过</Button>
-        <Button variant="danger" loading={busy} onClick={() => act('reject')}>驳回</Button>
+        <button
+          onClick={() => act('approve')}
+          disabled={busy}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+        >
+          {busy ? '处理中…' : '通过'}
+        </button>
+        <button
+          onClick={() => act('reject')}
+          disabled={busy}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+        >
+          驳回
+        </button>
       </div>
     </div>
   );

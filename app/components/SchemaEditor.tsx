@@ -2,8 +2,6 @@
 
 import React from 'react';
 import type { Stage2Column } from '@/app/models/stageData';
-import Button from './ui/Button';
-import SubmitButton from './SubmitButton';
 
 interface Props {
   columns: Stage2Column[];
@@ -14,6 +12,9 @@ export default function SchemaEditor({ columns: initial, onSave }: Props) {
   const [columns, setColumns] = React.useState<Stage2Column[]>(() =>
     initial.map((c) => ({ ...c }))
   );
+  const [saving, setSaving] = React.useState(false);
+  const [msg, setMsg] = React.useState<string | null>(null);
+  const [err, setErr] = React.useState<string | null>(null);
 
   const setCol = (idx: number, patch: Partial<Stage2Column>) => {
     setColumns((prev) => prev.map((c, i) => (i === idx ? { ...c, ...patch } : c)));
@@ -39,6 +40,13 @@ export default function SchemaEditor({ columns: initial, onSave }: Props) {
       keys.add(c.key);
     }
     return onSave(columns);
+  };
+
+  const doSave = async () => {
+    setSaving(true); setMsg(null); setErr(null);
+    const e = await handleSave();
+    setSaving(false);
+    if (e) setErr(e); else setMsg('✓ 已保存');
   };
 
   return (
@@ -92,8 +100,14 @@ export default function SchemaEditor({ columns: initial, onSave }: Props) {
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <Button variant="ghost" size="sm" onClick={addColumn}>+ 添加列</Button>
-        <SubmitButton label="保存列定义" loadingLabel="保存中…" successLabel="✓ 已保存" variant="primary" size="sm" onSubmit={handleSave} />
+        <button onClick={addColumn}
+          className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded hover:bg-gray-100">+ 添加列</button>
+        <button onClick={doSave} disabled={saving}
+          className="px-4 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50">
+          {saving ? '保存中…' : '保存列定义'}
+        </button>
+        {msg && <span className="text-sm text-green-600">{msg}</span>}
+        {err && <span className="text-sm text-red-600">{err}</span>}
       </div>
     </div>
   );

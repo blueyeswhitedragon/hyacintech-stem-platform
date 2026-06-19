@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Button from './ui/Button';
 
 interface Props {
   assignmentId: string;
@@ -21,8 +20,9 @@ export default function StartAssignmentButton({ assignmentId, started, completed
   else label = '开始';
 
   return (
-    <Button variant={completed ? 'ghost' : 'primary'} onClick={handleClick}>
+    <button onClick={handleClick}
+      className={`px-4 py-2 rounded-lg font-medium transition-colors ${completed ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
       {label}
-    </Button>
+    </button>
   );
 }

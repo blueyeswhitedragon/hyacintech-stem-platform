@@ -10,7 +10,6 @@ import ReportViewer from './ReportViewer';
 import Stage6Panel from './Stage6Panel';
 import SchemaEditor from './SchemaEditor';
 import Fireworks from './Fireworks';
-import SubmitButton from './SubmitButton';
 import type { Stage2Column } from '../models/stageData';
 
 interface Props {
@@ -205,7 +204,12 @@ export default function ConversationWorkspace({
             )}
             {!pendingStage2 && (
               <div className="px-4 pb-4">
-                <SubmitButton label="提交方案，等待教师审核" loadingLabel="提交中…" variant="success" onSubmit={submitStage2} />
+                <button
+                  onClick={submitStage2}
+                  className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  提交方案，等待教师审核
+                </button>
               </div>
             )}
           </div>

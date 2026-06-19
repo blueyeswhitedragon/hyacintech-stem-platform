@@ -110,7 +110,7 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
   }
 
   if (phase === PhaseEnum.ResultsFormation && context.priorSummary) {
-    prompt += `\n\n【前序阶段摘要】\n当学生要求"生成报告框架"时，请基于以下 1-4 阶段内容预填报告各节（purpose/hypothesis/materials/procedure/dataSummary/analysis），并在 JSON 中额外输出 report_sections 字段：\n${context.priorSummary}`;
+    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。你必须在本次回复中自动生成 report_sections 字段，预填以下各节（purpose/hypothesis/materials/procedure/dataSummary/analysis），无需等待学生开口要求。conclusion 和 reflection 留空给学生自己填写。\n\n${context.priorSummary}`;
   }
 
   return prompt;
