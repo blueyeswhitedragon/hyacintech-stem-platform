@@ -1,0 +1,1384 @@
+[
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0077-v2-1c42fc4760-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究电磁铁磁性强弱的因素-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0077-v2-1c42fc4760"
+    ],
+    "qualityNotes": "这条样本训练在实验阶段提醒安全规范、真实记录和异常数据标注，通过轻量脚手架推动学生自主行动，体现教学引导而非代做。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们准备开始实验，改变电磁铁的线圈匝数，匝数分别是20匝、40匝、60匝，测量每个匝数下吸引的大头针数量。现在可以开始吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"在接通电路前，请先检查电池正负极是否正确连接，确保开关处于断开状态，避免短路烫伤。你提到会测量不同匝数下吸引的大头针数量，请准备一个记录表，每次实验后立即记下匝数和吸引的大头针数，如果出现异常数据（比如匝数增加但吸起数量反而减少），也要如实记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用表格记录匝数、大头针数量和备注\",\"先检查导线连接，不要用手触摸线圈发热部位\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0077-v2-1c42fc4760",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0077",
+      "subject": "物理,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究电磁铁磁性强弱的因素",
+        "retainedFeature": "围绕「探究电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-fuzzy-yogurt-temperature-v2-1ffec32dec-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-酸奶与温度-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-fuzzy-yogurt-temperature-v2-1ffec32dec"
+    ],
+    "qualityNotes": "训练在实验启动时嵌入安全提醒（扇闻法）与数据诚实原则；单一回合仅传递关键操作与记录指令，避免多步骤堆叠，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们把三杯酸奶放好了：冰箱4℃、室内阴凉处、暖气片旁边。准备每天看一次，看颜色和闻气味来记录变质。现在可以开始了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好。开始记录前，请先确认安全：闻到任何异味时，只用手扇动气味，不要直接凑近瓶口嗅。观察到的任何颜色、气味、质地变化，都要如实记下，即使和预期不同，也不要编辑数据。现在先记录三杯酸奶的初始状态。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"打开记录本，写出每杯的颜色、气味、表面状态。\",\"如果出现任何异常（如胀盖、液体分离），马上停下记录并告诉我。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-fuzzy-yogurt-temperature-v2-1ffec32dec",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-yogurt-temperature",
+      "subject": "food_chemistry",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物保存",
+        "retainedFeature": "温度影响微生物活动",
+        "classroomProxy": "不同存放温度",
+        "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+        "independentVariable": "存放温度",
+        "dependentDirection": "变质快慢",
+        "safetyNotes": [
+          "变质食物只观察不食用",
+          "闻气味用手扇，不直接凑近"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-cooperative-dough-fermentation-v2-af09c4c961-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-面团发酵-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-cooperative-dough-fermentation-v2-af09c4c961"
+    ],
+    "qualityNotes": "在实验启动轮次中，只给出1条关键安全提醒（勿舔尝酵母）和1个立即记录动作（记录初始体积并开始计时），避免多步骤堆叠。强调异常记录的重要性，但不替学生编造观察。引导学生确认第一步记录，推动真实实验行为。保持认知负荷低，不给选项。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "酵母、面粉和水都准备好了，量筒也检查过了，可以开始做实验了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"安全第一：不要用手直接接触酵母溶液，更不要舔尝。现在用1g酵母组开始：将面粉与水混合后立即读取量筒上混合物的初始体积，记入数据表，然后启动计时，之后每5分钟记录一次体积。如果出现开裂、异味等异常，立即标注并拍照。准备好后，请告诉我你记录的初始体积和开始时间。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-cooperative-dough-fermentation-v2-af09c4c961",
+      "sourceKind": "persona",
+      "personaId": "cooperative-dough-fermentation",
+      "subject": "food_chemistry",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "面团发酵",
+        "retainedFeature": "酵母用量影响发酵速度",
+        "classroomProxy": "不同酵母添加量",
+        "researchQuestion": "酵母添加量是否影响面团发酵体积？",
+        "independentVariable": "酵母添加量",
+        "dependentDirection": "面团发酵体积"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0081-v2-d6ebafca9c-v1",
+    "source": "distill_dsv4",
+    "scenario": "电磁铁——影响通电螺线管磁性强弱的因素.mp4-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0081-v2-d6ebafca9c"
+    ],
+    "qualityNotes": "在实验启动环节，导师用一条安全提醒（防短路防过热）和一个立即记录指令（记录初始自变量/计数起点），引导学生规范操作并如实记录，避免替学生做决定。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已经把电源、开关、滑动变阻器和线圈都接好了，准备用大头针测试磁性强弱。现在可以通电吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"现在是实验阶段，安全第一：接通前确认电路无短路，电源电压调至最低。通电后逐渐增大电流，每次记录后断开电路避免线圈过热。开始前请先记下当前的自变量数值和大头针的初始计数方式。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请列出你当前的自变量数值和测量方式。\",\"若大头针数量异常，如实记录，不要忽略。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0081-v2-d6ebafca9c",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0081",
+      "subject": "物理,初中",
+      "expectedTransformation": {
+        "originalInterest": "电磁铁——影响通电螺线管磁性强弱的因素.mp4",
+        "retainedFeature": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-variable-confusion-apple-browning-v2-feadd4e2e9-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-variable-confusion-apple-browning-v2-feadd4e2e9"
+    ],
+    "qualityNotes": "样本聚焦阶段3的安全提醒与即时记录动作，仅提供1条关键安全提醒和1个记录动作，引导学生进行真实观察，防止替学生编造数据，体现阶段纪律与教学引导。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我准备了三块苹果，分别用盐水、柠檬汁涂抹，还有一块什么都不涂。打算切开后放10分钟观察，现在可以开始切了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，请务必安全使用刀具，手指远离刀刃。开始前，先记录三个处理组苹果切面的初始颜色并拍照，然后计时观察。如有异常立即停止。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录每个苹果切面的初始颜色并拍照\",\"注意计时和保持静置，避免触摸切面\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-variable-confusion-apple-browning-v2-feadd4e2e9",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-cooperative-paper-airplane-distance-v2-ff7177a376-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-纸飞机飞行距离-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "expression",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-cooperative-paper-airplane-distance-v2-ff7177a376"
+    ],
+    "qualityNotes": "阶段3安全提醒与实操引导结合，先提示走廊投掷前确认无人经过并指定落点安全区，再要求立即记录当前机翼折法类型与试飞环境，避免堆砌步骤，对话简洁聚焦一次动作；hints提供安全自查和记录要素，不替学生观察；符合expression和safety要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我按计划折了好几种机翼的纸飞机，准备去走廊试飞了。第一次试飞要注意什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"试飞前务必确认投掷方向与落点区域无人通过，用标志物划定安全区。现在先记下你要测试的第一种机翼折法名称、当前走廊是否有风、以及你计划采用的投掷姿势，再开始第一次试飞。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"投掷前请确认走廊两端无人，不朝玻璃窗方向投掷。\",\"先记录机翼类型、风向感知和投掷姿势，再开始投掷。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-cooperative-paper-airplane-distance-v2-ff7177a376",
+      "sourceKind": "persona",
+      "personaId": "cooperative-paper-airplane-distance",
+      "subject": "physics_motion",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "纸飞机飞得远",
+        "retainedFeature": "机翼形状影响升力",
+        "classroomProxy": "不同机翼折法",
+        "researchQuestion": "机翼折法是否影响纸飞机飞行距离？",
+        "independentVariable": "机翼折法",
+        "dependentDirection": "飞行距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-solar-car-angle-v2-ba730e75df-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-太阳能小车光强-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-solar-car-angle-v2-ba730e75df"
+    ],
+    "qualityNotes": "在阶段4引导学生整理数据、观察趋势，不直接剔除异常，通过提问促使学生考虑实验干扰和后续分析，保持学生能动性，避免工程简化（直接将相关视为因果）和代理漂移（因变量明确为速度），同时融合光电转换知识。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们记录了三天数据，每组代表不同光源距离：group_a最远，group_c最近。速度似乎随距离减小而增加，但第三天C组有个速度值异常高，我们不确定该不该去掉这个数据？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的初步观察很好。我们先整理数据：group_a最远，group_c最近？从三天看，距离越近速度越大，但第三天C组出现异常。别急着剔除，思考可能原因（如光源角度、接触不良）。接下来可以算各组平均速度并画散点图，看趋势是否线性。另外，你还观察到一天内不同组的其他差异吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回忆实验时小车是否每次都能直线行驶，或转向影响速度。\",\"异常数据可能反映光源距离以外的干扰，记录在实验备注中。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-solar-car-angle-v2-ba730e75df",
+      "sourceKind": "persona",
+      "personaId": "engineering-solar-car-angle",
+      "subject": "electricity_energy",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "太阳能小车跑得快",
+        "retainedFeature": "光强影响太阳能板输出",
+        "classroomProxy": "光源与小车的不同距离（改变光强）",
+        "researchQuestion": "光源距离是否影响太阳能小车行驶速度？",
+        "independentVariable": "光源距离",
+        "dependentDirection": "行驶速度",
+        "safetyNotes": [
+          "用LED或低压光源，不用强热光源",
+          "避免长时间直视强光"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-safety-circuit-brightness-v2-16c45ea264-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-电路与灯泡亮度-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-safety-circuit-brightness-v2-16c45ea264"
+    ],
+    "qualityNotes": "引导学生描述趋势、比较组间差异，并推测操作原因但不肯定因果；融入安全提醒（勿动电路）与控制认知负荷；提示记录异常，维持学生探究主动权。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们发现第三天有一个样本亮度异常，是不是我们操作有问题？而且我们组的亮度增长好像比别的组慢一些。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们来一起看看这组数据：第一天到第三天，你们的亮度值从0、1、2变化到2、5、6，整体在增加，但第三天有个异常点。你觉得可能的操作原因是什么？有没有检查过电池电压和接触？先别着急动电路，我们整理一下影响因素，再考虑是否重复测量来确认。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想想是否电池松动导致电压不稳\",\"可以记录下异常样本的具体情况\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-safety-circuit-brightness-v2-16c45ea264",
+      "sourceKind": "persona",
+      "personaId": "safety-circuit-brightness",
+      "subject": "electricity_energy",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "灯泡亮不亮",
+        "retainedFeature": "电池数影响电压和亮度",
+        "classroomProxy": "串联电池数",
+        "researchQuestion": "串联电池数是否影响小灯泡亮度？",
+        "independentVariable": "串联电池数",
+        "dependentDirection": "灯泡亮度",
+        "safetyNotes": [
+          "只用干电池，严禁220V市电",
+          "避免短路，注意发热"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-watering-threshold-v2-dbb24075cd-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-自动浇花器-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "teaching_guidance",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-watering-threshold-v2-dbb24075cd"
+    ],
+    "qualityNotes": "学生试图将数据变化直接归因为阈值高低，导师通过澄清自变量/因变量并引导计算正确率来抑制过早因果结论，提出下一步分析问题，保持学生主体性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们的数据显示低阈值时全对，中阈值有一次误浇，高阈值漏浇了。是不是因为阈值越高越灵敏所以越不准？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到低阈值全对、高阈值漏浇，这已经抓住了差异。请注意我们的自变量是湿度触发阈值，因变量是浇水准确率。你能先算一算每种阈值下的正确率吗？看看变化趋势，但先不急着下因果结论。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"计算低阈值正确率：2次全对，100%\",\"先描述模式，再找可能原因，不急于说'因为高阈值导致错误'\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-watering-threshold-v2-dbb24075cd",
+      "sourceKind": "persona",
+      "personaId": "engineering-watering-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "proxy_drift",
+        "engineering_flattening",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "自动浇花器",
+        "retainedFeature": "自动判断干湿并触发浇水",
+        "classroomProxy": "不同湿度触发阈值",
+        "researchQuestion": "湿度触发阈值是否影响自动浇花器浇水准确率？",
+        "independentVariable": "湿度触发阈值",
+        "dependentDirection": "浇水准确率",
+        "safetyNotes": [
+          "用低压水泵或电池供电，不用220V"
+        ],
+        "mustKeepTerms": [
+          [
+            "自动浇花器"
+          ],
+          [
+            "湿度",
+            "阈值"
+          ],
+          [
+            "干湿",
+            "触发"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "湿度",
+            "阈值"
+          ],
+          [
+            "传感器"
+          ],
+          [
+            "水泵"
+          ],
+          [
+            "模拟",
+            "读数"
+          ]
+        ],
+        "forbiddenProxyTerms": [
+          "棉线",
+          "毛细",
+          "虹吸",
+          "浮球",
+          "吸水材料"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:proxy_drift",
+        "failureMode:engineering_flattening",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0120-v2-c5b5e1f046-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「跨学科实践活动1 自制简易净水器 实验」中的影响因素-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0120-v2-c5b5e1f046"
+    ],
+    "qualityNotes": "引导趋势描述与组间比较，强调因果推断需谨慎，提出下一步分析问题，控制认知负荷，保留学生主体性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "数据看起来每天都在变，a组最低b组和c组高一些。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你能观察到A组浑浊度一直较低，B和C组偏高且增长更快，这暗示不同材料过滤效果有差异。但注意第3天出现一个异常样本，可能影响结论。接下来请比较各组每天的浑浊度增长量，并思考异常数据可能的原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察各组浑浊度变化趋势\",\"注意异常样本，思考其对结论的影响\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0120-v2-c5b5e1f046",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0120",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究「跨学科实践活动1 自制简易净水器 实验」中的影响因素",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-alarm-sensitivity-v2-bacfa68151-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-倾斜报警器灵敏度-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-alarm-sensitivity-v2-bacfa68151"
+    ],
+    "qualityNotes": "引导学生描述趋势与组间差异，强调相关性不等于因果，提出定位异常样本的下一步分析，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们记录了三天数据，A组阈值最低，但准确率也最低；C组阈值最高，准确率却最高。不过每天也在增加，为什么？是不是阈值越高越准？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到的趋势很清晰：随着触发角度阈值增大，响应准确率也在提升，三组每天都有增长。A组阈值最低但误响应多，C组阈值高且准确率稳定。不过还不能直接下结论说“阈值越高越准”，比如第二天的异常样本可能干扰了结果。建议你先定位这个异常样本属于哪一组，再检查它是否改变了组间的差异趋势。请试着分析一下。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试统计各组准确率增长速率，比较一致性。\",\"思考阈值设置和报警时机的关系，是否存在最优区间。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-alarm-sensitivity-v2-bacfa68151",
+      "sourceKind": "persona",
+      "personaId": "engineering-alarm-sensitivity",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "防倾倒报警器",
+        "retainedFeature": "触发灵敏度影响响应",
+        "classroomProxy": "不同倾斜触发角度阈值",
+        "researchQuestion": "倾斜触发角度阈值是否影响报警器响应准确率？",
+        "independentVariable": "倾斜触发角度阈值",
+        "dependentDirection": "响应准确率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-sorting-color-sensor-v2-3e8b26187f-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-颜色分拣装置-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-sorting-color-sensor-v2-3e8b26187f"
+    ],
+    "qualityNotes": "引导学生在灵敏度梯度下观察准确率趋势，追问异常点可能原因而不直接归因于装置好坏，提示计算平均值与波动性等下一步分析动作，避免工程化扁平归因和代理变量漂移。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天实验数据，三个组（低、中、高灵敏度）的准确率好像高灵敏度更好，但第三天Group C出现了一个异常低的点，我不确定这个实验是否可靠。接下来我应该怎么分析这些数据？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到了灵敏度提高与准确率上升的趋势，这很好。不过Group C第3天的异常点提示，可能有其他干扰因素，比如样本颜色偏差。我们可以问：灵敏度是不是越高越好？异常是否因为某类颜色难以识别？下一步，你可以计算各组准确率的平均值和波动性，或者尝试分析异常样本的具体颜色特征，来探究灵敏度与准确率之间是否真的是简单的线性关系。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试用图表展示各组每日准确率变化，找出趋势。\",\"针对异常点，回看该样本的颜色值，是否处于阈值边界？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-sorting-color-sensor-v2-3e8b26187f",
+      "sourceKind": "persona",
+      "personaId": "engineering-sorting-color-sensor",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "自动颜色分拣装置",
+        "retainedFeature": "颜色识别阈值影响分拣",
+        "classroomProxy": "不同颜色识别灵敏度设置",
+        "researchQuestion": "颜色识别灵敏度是否影响分拣装置准确率？",
+        "independentVariable": "颜色识别灵敏度",
+        "dependentDirection": "分拣准确率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-plant-light-auto-duration-v2-bade5fe298-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-补光灯时长-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-plant-light-auto-duration-v2-bade5fe298"
+    ],
+    "qualityNotes": "阶段4数据分析引导：学生汇报了初步数据并倾向因果结论，导师通过提问引导学生区分相关与因果、注意异常值影响，并要求描述趋势和提出可能原因，避免直接下结论，保留了学生自主分析空间，同时控制认知负荷，仅聚焦一个分析任务。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们记录了三天绿豆幼苗的高度数据：A组（无补光）每天0,1,2cm；B组（定时补光4h）1,3,5cm；C组（定时补光8h）2,4,6cm，但C组第三天有个异常样本（备注了生长缓慢）。补光越多长得越快，这个结论对吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到的整体趋势的确是补光时长越长，平均高度增长越多。不过，我们需要先描述规律，再检查异常值，避免直接把相关当作因果。请你先用一句话总结三组高度的变化趋势，然后说明C组异常值出现在哪一天、可能什么原因，最后想想除了时长，还有哪些因素可能影响生长。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"描述趋势时注意区分‘相关’和‘因果’。\",\"检查异常值是否由光照不均、水分等偶然因素造成。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-plant-light-auto-duration-v2-bade5fe298",
+      "sourceKind": "persona",
+      "personaId": "engineering-plant-light-auto-duration",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "theme_loss"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "自动补光植物灯",
+        "retainedFeature": "补光时长自动控制影响植物",
+        "classroomProxy": "不同定时补光时长",
+        "researchQuestion": "定时补光时长是否影响绿豆幼苗生长？",
+        "independentVariable": "定时补光时长",
+        "dependentDirection": "幼苗生长情况"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:theme_loss",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-fan-temperature-threshold-v2-3f755aab42-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-温控风扇阈值-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "safety",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-fan-temperature-threshold-v2-3f755aab42"
+    ],
+    "qualityNotes": "在阶段4引导学生从原始数据中识别趋势与异常，避免直接下结论，强调证据与解释的区分，并提出进一步分析方向，体现学生代理与认知负荷控制。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天不同阈值组的响应情况，但数据里第三天有个异常样本，不知道该怎么看每组的变化趋势。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们先看看三天的数据走向。组A、B、C的数值都在上升，而且B、C的增幅比A大，这提示阈值可能影响响应量。第三天那个异常笔记，你觉得可能是什么原因？它会影响结论吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较各组日均变化幅度，而不是只看最后一天。\",\"异常值需要追溯实验条件，不能直接丢弃。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-fan-temperature-threshold-v2-3f755aab42",
+      "sourceKind": "persona",
+      "personaId": "engineering-fan-temperature-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "温度高了自动开风扇",
+        "retainedFeature": "温度触发阈值影响响应",
+        "classroomProxy": "不同温度触发阈值",
+        "researchQuestion": "温度触发阈值是否影响温控风扇响应准确率？",
+        "independentVariable": "温度触发阈值",
+        "dependentDirection": "响应准确率",
+        "safetyNotes": [
+          "用低压风扇，不用220V市电"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0131-v2-53f4a8e6fb-v1",
+    "source": "distill_dsv4",
+    "scenario": "科学探究-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0131-v2-53f4a8e6fb"
+    ],
+    "qualityNotes": "引导描述趋势与组间差异，不直接剔除异常值，强调检查原始记录与可能原因，保持因果不确定，鼓励提出下一步分析问题；通过hints分解思考负担，维护学生主导分析。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看到第三天B组有一个异常样本，数值突然比前两天高很多，我们要不要直接把这个值删掉，免得它拉高平均值，影响我们的结论？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到这个异常记录特别敏锐。不急着删掉它，因为异常结果也可能反映真实变化。先一起梳理：这三组每天都做了什么处理？先把各组的变化趋势和组间差异画出来或描述清楚，再根据实验过程检查这个异常有没有合理的解释。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"趋势描述：组B第3天与前一天相比，变化幅度是多少？其他两组呢？\",\"下一步问题：改变自变量如何影响因变量的变化趋势？各组趋势相同还是不同？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0131-v2-53f4a8e6fb",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0131",
+      "subject": "科学,初中",
+      "expectedTransformation": {
+        "originalInterest": "科学探究",
+        "retainedFeature": "围绕「科学探究」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「科学探究」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「科学探究」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-cooperative-dough-fermentation-v2-afae4e5b50-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-面团发酵-蒸馏样本2",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-cooperative-dough-fermentation-v2-afae4e5b50"
+    ],
+    "qualityNotes": "提供报告框架，用 report_sections 明确六部分，数据总结结合已有记录，对未详述的材料与步骤使用‘待学生补充’提示，保持学生主导，避免替写结论。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们的发酵实验数据都记录好了，能帮忙整理成正式的实验报告吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们一起搭实验报告框架。请你根据记录填空，确认无误后再导出。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请补充材料和步骤的具体细节。\",\"确认数据总结是否准确。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究酵母添加量是否影响面团发酵体积。\",\"hypothesis\":\"待学生补充：如酵母用量越多发酵体积越大。\",\"materials\":\"待学生补充：请列出使用的面粉、水、酵母、量杯等材料。\",\"procedure\":\"待学生补充：描述酵母添加量分组、面团制备、每日体积测量等步骤。\",\"dataSummary\":\"三天内，Group A 酵母最少，体积从0增至2；Group B 中等，从1增至5；Group C 最多，从2增至6，呈梯度上升。\",\"analysis\":\"初步趋势表明酵母添加量与发酵体积正相关，但需检查 Day3 一个异常样本的影响，并讨论测量误差。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-cooperative-dough-fermentation-v2-afae4e5b50",
+      "sourceKind": "persona",
+      "personaId": "cooperative-dough-fermentation",
+      "subject": "food_chemistry",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "面团发酵",
+        "retainedFeature": "酵母用量影响发酵速度",
+        "classroomProxy": "不同酵母添加量",
+        "researchQuestion": "酵母添加量是否影响面团发酵体积？",
+        "independentVariable": "酵母添加量",
+        "dependentDirection": "面团发酵体积"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0081-v2-fcfe8a4aca-v1",
+    "source": "distill_dsv4",
+    "scenario": "电磁铁——影响通电螺线管磁性强弱的因素.mp4-蒸馏样本2",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0081-v2-fcfe8a4aca"
+    ],
+    "qualityNotes": "阶段5报告框架生成：提供完整report_sections，要求学生补充自变量和材料细节；提示基于数据证据，避免替学生下结论；符合探究报告结构合规性和STEM适切性表达。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我分析了数据，想写成报告，但不知道怎么组织，能给我一个框架吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"按研究问题整理报告框架，你需补充自变量和材料细节。我们列出六个部分，请核对已有内容并填入。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请确定你的自变量是什么，并在材料和步骤中说明\",\"数据表中有异常样本，需在分析中解释可能原因\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究改变通电螺线管某一条件对其磁性强弱的影响。\",\"hypothesis\":\"若改变该条件，则可观察到的结果会呈现规律性变化。\",\"materials\":\"待学生补充：具体材料清单（如线圈、电源、铁芯、小磁针等）\",\"procedure\":\"待学生补充：分组实验步骤，如何改变条件并记录因变量数据。\",\"dataSummary\":\"三天记录显示，A组从0增到2，B组从1增到5，C组从2增到6；第三天C组出现异常备注。\",\"analysis\":\"趋势表明自变量增大与因变量增长正相关，但异常样本需核查实验控制是否一致，可能原因待分析。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0081-v2-fcfe8a4aca",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0081",
+      "subject": "物理,初中",
+      "expectedTransformation": {
+        "originalInterest": "电磁铁——影响通电螺线管磁性强弱的因素.mp4",
+        "retainedFeature": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-variable-confusion-apple-browning-v2-6f9ca455db-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本2",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-variable-confusion-apple-browning-v2-6f9ca455db"
+    ],
+    "qualityNotes": "训练导师在阶段5提供结构化报告框架，要求补充假设与分析部分，避免代写结论；强化数据证据与报告段落的对应，引导学生自主补全report_sections六字段。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经把三天里三组苹果的褐变分数整理好了，但实验报告完全不知道从哪里下笔，能先给我一个框架吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，这是你的实验报告框架，包含了已确认的信息和数据。请先补充假设和分析部分，稍后我们再一起推敲细节。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较三天数据，找出褐变速度最慢的处理。\",\"思考第三天备注的异常样本，是否影响结论？\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同抗褐变处理（盐水浸泡、柠檬汁涂抹、不处理）对苹果切面褐变速度的影响。\",\"hypothesis\":\"待学生补充：你预测哪种处理抗褐变效果最好？请写出你的假设。\",\"materials\":\"苹果、水果刀、切板、盐水、柠檬汁、三个浅盘、计时器、褐变评分记录表。\",\"procedure\":\"1. 将苹果切成厚度均匀的薄片；2. 分三组：A组不处理，B组用盐水浸泡5秒，C组均匀涂抹柠檬汁；3. 置于相同室内环境，每隔24小时观察并记录褐变程度（0-5分）。\",\"dataSummary\":\"三天记录：A组（不处理）0→1→2；B组（盐水）1→3→5；C组（柠檬汁）2→4→6（第三天备注一个样本异常）。\",\"analysis\":\"待学生补充：请根据数据趋势，比较各组褐变速度，分析差异原因并说明异常样本可能的影响。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-variable-confusion-apple-browning-v2-6f9ca455db",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-cooperative-paper-airplane-distance-v2-184b198306-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-纸飞机飞行距离-蒸馏样本2",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-cooperative-paper-airplane-distance-v2-184b198306"
+    ],
+    "qualityNotes": "在Phase5提供结构化报告框架，强调证据缺口，避免代写，训练学生主动完善报告和科学表达。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们已经比较了不同机翼折法的飞行距离，现在要写实验报告，你能帮我们整理一下报告结构吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这是根据实验框架整理的报告草稿。请查看各部分的缺口，补充假设、材料详细、异常数据说明等内容。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"补充假设时，联系机翼形状与升力关系。\",\"检查数据异常点的原因，是否排除。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同机翼折法（A/B/C）对纸飞机飞行距离的影响。\",\"hypothesis\":\"待学生补充：你的假设（例如，哪种折法更远）\",\"materials\":\"A4纸、卷尺、数据记录表、笔。\",\"procedure\":\"1. 制作三种不同机翼折法的纸飞机（A/B/C）。\\n2. 每天在固定场地用手投掷，测量飞行距离。\\n3. 每种飞机连续测试三天，记录数据。\",\"dataSummary\":\"三天数据：Group A 由0m增至2m，Group B 由1m至5m，Group C 由2m至6m。第三天记录异常样本，需确认。\",\"analysis\":\"初步可见机翼折法影响距离，Group C 最远。但实验次数少，存在异常值，投掷力度、风等未控制。建议增加试验次数，控制投掷方式。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-cooperative-paper-airplane-distance-v2-184b198306",
+      "sourceKind": "persona",
+      "personaId": "cooperative-paper-airplane-distance",
+      "subject": "physics_motion",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "纸飞机飞得远",
+        "retainedFeature": "机翼形状影响升力",
+        "classroomProxy": "不同机翼折法",
+        "researchQuestion": "机翼折法是否影响纸飞机飞行距离？",
+        "independentVariable": "机翼折法",
+        "dependentDirection": "飞行距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-smartedu-0057-v1-d772bc13bb-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「学生实验」中的影响因素-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-smartedu-0057-v1-d772bc13bb"
+    ],
+    "qualityNotes": "通过追问引导学生自主反思误差来源、设计可执行的改进方案并思考迁移应用，强调证据与局限，不替学生写总结。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们的实验报告完成了，但测量数据波动很大，重复几次结果都不太稳定，我不知道是哪里出了问题，下次该怎么改进呢？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这的确是需要仔细思考的地方。你先回忆一下，实验步骤中哪些环节你可能手忙脚乱或难以控制？比如测量时间点、搅拌速度、温度有没有变化？你觉得最可能带来误差的是哪一个？下一次如果想得到更稳定的数据，你会优先调整哪个步骤？另外，这种控制变量的方法，还可以用来探究其他哪些因素？说说你的想法。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回想操作细节，找出最容易出错的步骤。\",\"思考如何控制干扰因素，减少随机误差。\"],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-smartedu-0057-v1-d772bc13bb",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0057",
+      "subject": "生物,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究「学生实验」中的影响因素",
+        "retainedFeature": "围绕「探究「学生实验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究「学生实验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究「学生实验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-engineering-door-reminder-distance-v1-7ea7edcda5-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-门禁提醒距离-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "interdisciplinary_integration",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-engineering-door-reminder-distance-v1-7ea7edcda5"
+    ],
+    "qualityNotes": "导师用一个开放问题引导学生主动识别误差来源，并要求选择关键源提出改进方案，体现学生主体性；提示帮助跨学科思考传感器物理原理与工程设计，避免直接给出答案；dialogue以鼓励和结构化方式保持教学引导",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们测完了不同距离下的提醒，数据都在报告里了。但发现人离门很近时提醒器有时没反应，准确率就不稳定。现在要先分析误差还是直接改装置？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你发现的现象很有价值。请从传感器精度、安装位置和环境干扰三个方面，找出至少两个可能导致近距未触发的误差来源，选出一个关键源，并设想你会在下次实验中如何改进，请说明选择理由。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"检查实验时有窗帘或物品阻挡声波吗？\",\"安装角度偏差可能造成感应盲区，是否已校准？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-engineering-door-reminder-distance-v1-7ea7edcda5",
+      "sourceKind": "persona",
+      "personaId": "engineering-door-reminder-distance",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "medium",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "门开太久提醒器",
+        "retainedFeature": "距离触发阈值影响响应",
+        "classroomProxy": "不同触发距离阈值",
+        "researchQuestion": "触发距离阈值是否影响门禁提醒准确率？",
+        "independentVariable": "触发距离阈值",
+        "dependentDirection": "提醒准确率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-engineering-plant-light-auto-duration-v1-ff76bbbae1-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-补光灯时长-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "interdisciplinary_integration",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-engineering-plant-light-auto-duration-v1-ff76bbbae1"
+    ],
+    "qualityNotes": "引导反思补光时长控制精度误差，关联定时器电路实现自动化改进，启发跨学科迁移（生物与自动控制），通过确认促进自主反思，避免替学生撰写总结。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经写了误差分析和改进方案。我觉得误差主要来自绿豆种子大小不一样，还有窗户漏光。改进的话可以选同样大小的种子，然后晚上用遮光布挡住窗户。迁移应用可以用在智能温室里自动补光，根据天气调节时长，让蔬菜长得更好。您看这样行吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的分析注意到了种子和漏光，但补光时长控制是否足够稳定？每天手工开关灯，实际时长可能有几分钟偏差。如果使用定时器电路，你能画出控制回路来保证精确吗？迁移方面，智能温室除了根据天气，可以结合土壤湿度或植物生长模型来动态调节，这属于自动控制与生物工程的交叉。你觉得工程上最大的挑战是什么？\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[\"回顾实验记录表，检查补光时长波动\",\"考虑用微控制器实现定时输出\"],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-engineering-plant-light-auto-duration-v1-ff76bbbae1",
+      "sourceKind": "persona",
+      "personaId": "engineering-plant-light-auto-duration",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "theme_loss"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "自动补光植物灯",
+        "retainedFeature": "补光时长自动控制影响植物",
+        "classroomProxy": "不同定时补光时长",
+        "researchQuestion": "定时补光时长是否影响绿豆幼苗生长？",
+        "independentVariable": "定时补光时长",
+        "dependentDirection": "幼苗生长情况"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:theme_loss",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-smartedu-0060-v1-cd7773807b-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「植物生长素的探索史」中的影响因素-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-smartedu-0060-v1-cd7773807b"
+    ],
+    "qualityNotes": "在阶段6引导学生自主识别实验中的误差来源并提出可执行的改进方向，避免直接总结，保持学生主体性，体现教学引导。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我的光照实验做完了，每天光照8小时的绿豆种子发芽率确实比4小时的高，但有些光照8小时的种子也没发芽，这是怎么回事？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到了一个重要的例外现象。这说明实验结果并不是绝对完美的，可能有一些我们没有控制好的因素影响了发芽。请你先试着列出至少两个可能导致这些例外出现的误差来源（比如种子本身、环境条件等），然后我们再一起思考下次如何改进实验方案。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"不同种子的活力可能原本就有差异\",\"光照是否均匀覆盖到每一粒种子\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-smartedu-0060-v1-cd7773807b",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0060",
+      "subject": "生物",
+      "expectedTransformation": {
+        "originalInterest": "探究「植物生长素的探索史」中的影响因素",
+        "retainedFeature": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+        "classroomProxy": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+        "researchQuestion": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+        "independentVariable": "光照时长、水量或环境温度（三选一）",
+        "dependentDirection": "发芽数、株高或叶片数量",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  }
+]

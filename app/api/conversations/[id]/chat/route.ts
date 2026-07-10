@@ -102,6 +102,16 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     };
     const updatedMessages = [...conv.messages, userMessage, assistantMessage];
 
+    // 确认书卡片一并持久化（刷新后仍可见；客户端也会即时插入，reload 时以服务端为准）
+    if (response.stage1_confirmed && response.snapshot) {
+      updatedMessages.push({
+        id: uuidv4(),
+        role: 'assistant',
+        content: response.snapshot,
+        messageType: 'confirmation_doc',
+      });
+    }
+
     // 阶段推进只认 stage1 的 advanceTo（stage1_confirmed）。
     // 其余阶段一律显式推进：3→4/4→5 走 /advance 按钮，2→3/5→6 走教师审核，
     // 6→完成走 stage6-respond。phase_complete 仅作 UI 提示，不再驱动阶段。

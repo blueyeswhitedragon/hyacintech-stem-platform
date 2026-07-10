@@ -1,0 +1,1998 @@
+[
+  {
+    "id": "stem-distill-dsv4-p3-fuzzy-vehicle-ramp-angle-v1-8b84d30dc0-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-小车与斜面-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-fuzzy-vehicle-ramp-angle-v1-8b84d30dc0"
+    ],
+    "qualityNotes": "实验执行阶段强调如实记录异常数据，用备注栏标记跑偏等意外；提供1条关键安全提醒（终点缓冲防飞出），提示检查跑道平直；不连续追问，控制认知负荷；不替学生决定数据取舍，指向原始记录与分析分离。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们做了四个角度（15°、25°、35°、45°），每个角度三次，用卷尺量了距离。但有时小车会跑偏撞到桌腿，那次距离明显不准。35°时板子感觉有点软，下沉了。不知道这些数据要不要？怎么记录？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"把所有实验如实记下来，跑偏那次也留着，在备注栏写“跑偏撞桌腿”。角度大时请用手在终点轻轻挡住，防止飞出伤人。板软如果是下陷，可试着在底下垫硬物保持斜面形状。继续完成剩余实验，记录全部数据。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用数据表‘备注’列记录异常情况，如跑偏、板软\",\"检查跑道是否完全笔直，终点设置软缓冲\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-fuzzy-vehicle-ramp-angle-v1-8b84d30dc0",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-vehicle-ramp-angle",
+      "subject": "physics_motion",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "小车下坡",
+        "retainedFeature": "坡度影响下滑加速度",
+        "classroomProxy": "不同斜面角度",
+        "researchQuestion": "斜面角度是否影响小车下滑距离？",
+        "independentVariable": "斜面角度",
+        "dependentDirection": "下滑距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-all-at-once-parachute-area-v1-fc3a3ae70e-v1",
+    "source": "distill_dsv4",
+    "scenario": "一次给全型-降落伞面积-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-all-at-once-parachute-area-v1-fc3a3ae70e"
+    ],
+    "qualityNotes": "安全风险纠正：将阳台抛物降级为室内释放，避免伤人；引导如实记录异常数据；控制在阶段3内单核问题，不堆叠多指令；hints提供安全替代与异常记录提醒。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们组已经准备好3种伞面面积（小、中、大），计划每人从二楼阳台扔3次，用秒表计时。可以开始实验了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们从安全角度先调整一下：二楼阳台抛落有伤人风险，建议改在室内，比如用梯子或桌面释放，下方清空并铺垫软物。每次释放后请如实记录时间，若伞面缠绕或受风偏转，要在备注栏记下异常，不要丢弃数据。你准备在室内哪个位置操作？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"安全替代：室内桌边释放或长杆悬空，确保下方无人。\",\"异常数据不丢弃，在 notes 栏描述当时情况。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-all-at-once-parachute-area-v1-fc3a3ae70e",
+      "sourceKind": "persona",
+      "personaId": "all-at-once-parachute-area",
+      "subject": "physics_motion",
+      "studentType": "all_at_once",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "降落伞下落快慢",
+        "retainedFeature": "伞面面积影响空气阻力",
+        "classroomProxy": "不同伞面面积",
+        "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+        "independentVariable": "伞面面积",
+        "dependentDirection": "下落时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:all_at_once",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0023-v1-83daaed7fc-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究弹性势能的影响因素-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0023-v1-83daaed7fc"
+    ],
+    "qualityNotes": "澄清自变量与因变量定义，强化安全提醒并推动首次数据记录，要求如实记录异常值。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经把弹簧和钩码准备好了，但还有点分不清哪个是自变量，哪个是因变量。现在可以开始做实验了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"自变量是你主动改变的条件，比如弹簧被压缩的程度；因变量是你观察或测量的结果，比如小球弹起的高度。开始实验前请先戴上护目镜保护眼睛。现在进行第一次尝试：将弹簧压缩1厘米，释放后测量小球的弹起高度，把你的测量结果告诉我。如果发现读数不稳或有异常，也要如实记录。请回复“已准备好，开始实验”。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"测量时眼睛要与尺子刻度平齐。\",\"如果弹簧压缩后释放抖动大，可固定底座后重测。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0023-v1-83daaed7fc",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0023",
+      "subject": "物理",
+      "expectedTransformation": {
+        "originalInterest": "探究弹性势能的影响因素",
+        "retainedFeature": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-over-broad-vehicle-fuel-v1-b76ecb77de-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-新能源车续航-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "proxy_quality",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-over-broad-vehicle-fuel-v1-b76ecb77de"
+    ],
+    "qualityNotes": "在阶段3只保留1条关键安全提醒和1个立即记录动作，引导学生记录真实数据并关注异常（如偏航、打滑），使用hints强化测量标准和记录规范，避免代劳整理，保持proxy一致，对话简洁没有堆叠说明。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们准备测了，先用5根橡皮筋，绕10圈放一次。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"请先确认小车前方畅通，避免撞到其他组员。现在将5根橡皮筋缠绕小车后轴10圈，稳定释放后测量从起始线到后轮的直线距离。你观察到的行驶距离是多少厘米？行驶时有没有跑偏或打滑？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"行驶距离以小车后轮停止位置为准。\",\"若出现打滑或断裂，记录“打滑”稍后分析。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-over-broad-vehicle-fuel-v1-b76ecb77de",
+      "sourceKind": "persona",
+      "personaId": "over-broad-vehicle-fuel",
+      "subject": "physics_motion",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "新能源汽车续航",
+        "retainedFeature": "能量来源影响续航",
+        "classroomProxy": "不同橡皮筋数量（模拟能量储备）",
+        "researchQuestion": "橡皮筋数量是否影响动力小车行驶距离？",
+        "independentVariable": "橡皮筋数量",
+        "dependentDirection": "行驶距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-cooperative-thermal-insulation-v1-b9a7d9d183-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-保温材料-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "expression",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-cooperative-thermal-insulation-v1-b9a7d9d183"
+    ],
+    "qualityNotes": "指导聚焦于真实记录与安全提醒，用一条安全提示和一条记录动作，没有替学生编造数据或给予过多指令。保留了学生主动记录的空间，并要求标注异常。提供了2条精确操作提示。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们小组已经拿到三种包覆材料和热水了，是不是现在就能开始测量降温速度？我们需要记录哪些数据？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"可以开始了。请按你们的设计先记录0分钟时的初始水温，之后每分钟记录一次温度，持续10分钟。操作时注意：使用60-70℃热水，用抹布持杯，防止烫伤。如果发现数据异常（如某次温度不降反升），立即在备注栏记下。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"温度计探头不要接触杯壁或杯底\",\"读数时视线与液面齐平，减少误差\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-cooperative-thermal-insulation-v1-b9a7d9d183",
+      "sourceKind": "persona",
+      "personaId": "cooperative-thermal-insulation",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "保温杯保温",
+        "retainedFeature": "材料隔热性能差异",
+        "classroomProxy": "不同包覆材料",
+        "researchQuestion": "包覆材料是否影响热水降温速度？",
+        "independentVariable": "包覆材料",
+        "dependentDirection": "降温速度",
+        "safetyNotes": [
+          "热水温度控制在60-70℃，避免烫伤"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0026-v1-deecd0dbe5-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响电磁铁磁性强弱的因素-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0026-v1-deecd0dbe5"
+    ],
+    "qualityNotes": "样本引导学生在阶段3注意安全操作并启动真实数据记录，使用开放问题推动学生思考记录方法，符合安全与阶段纪律要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已经接好电路并绕好线圈，可以开始实验了。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"开始前务必确认电路连接时开关保持断开，避免短路或烫伤。请先检查线圈是否缠绕紧密、铁芯是否为软铁，并准备好数据记录表。你计划如何记录每组的吸引数量？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"实验操作前开关必须断开\",\"使用数据表记录每一组实验的吸引数量\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0026-v1-deecd0dbe5",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0026",
+      "subject": "物理,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究影响电磁铁磁性强弱的因素",
+        "retainedFeature": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-engineering-waterproof-material-v1-3567a46f06-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-防水材料-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "interdisciplinary_integration",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-engineering-waterproof-material-v1-3567a46f06"
+    ],
+    "qualityNotes": "在阶段3开始时，导师快速确认实验准备，引入安全提醒（桌面防滑），并推动立即记录第一个数据点。强调控制变量（水量、高度）和真实记录异常，避免替学生编造数据，保持工程严谨性。对话简洁聚焦，不堆叠说明。符合教学指导规范。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们小组把纸板都裁好了，涂层也涂了，分别是石蜡、丙烯酸漆和无涂层对照。干透了，现在可以开始滴水计时了，怎么记录比较准确？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，现在进入实验执行阶段。请将纸板水平放置，用滴管每次滴同样体积的水，高度保持一致。注意保持桌面干燥，防止滑倒。从现在开始，记录每片纸板第一次背面出现湿痕的时间到表格中。如果涂层有剥落或渗水不均匀，立刻记在notes里。现在先测试石蜡涂层那片，完成告诉我数据。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录渗透时间精确到秒，用秒表\",\"观察背面湿痕是否从一个点开始扩散\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-engineering-waterproof-material-v1-3567a46f06",
+      "sourceKind": "persona",
+      "personaId": "engineering-waterproof-material",
+      "subject": "materials_structure",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "做防水的东西",
+        "retainedFeature": "材料表面影响渗水",
+        "classroomProxy": "不同涂层材料",
+        "researchQuestion": "涂层材料是否影响纸板渗水时间？",
+        "independentVariable": "涂层材料",
+        "dependentDirection": "渗水时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-fuzzy-absorbent-paper-v1-c1ca8fadeb-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-吸水材料-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-fuzzy-absorbent-paper-v1-c1ca8fadeb"
+    ],
+    "qualityNotes": "阶段3安全提醒与记录动作简洁，只保留一条安全要点和一个立即操作，避免堆叠指令；推动学生自主开始实验，不替代学生填写数据。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经准备好了三种纸条（A4纸、报纸、厨房纸巾），水盆和水。我可以开始实验了，但需要注意什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"开始实验前，请注意安全：保持桌面干燥，水洒出立即擦干。然后，将三种纸条同时浸入水盆，立即计时，每30秒测量并记录各纸条吸水高度。发现异常（如快速吸完、下沉）及时备注。完成后把数据表发给我。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用手机倒计时提醒每30秒记录\",\"看到弯曲变形等情况立即填写备注栏\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-fuzzy-absorbent-paper-v1-c1ca8fadeb",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-absorbent-paper",
+      "subject": "materials_structure",
+      "studentType": "fuzzy_interest",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "纸吸水",
+        "retainedFeature": "材质影响吸水高度",
+        "classroomProxy": "不同纸条材质",
+        "researchQuestion": "纸条材质是否影响吸水高度？",
+        "independentVariable": "纸条材质",
+        "dependentDirection": "吸水高度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0030-v1-ba5f5f52c9-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响结构稳定性的主要因素-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0030-v1-ba5f5f52c9"
+    ],
+    "qualityNotes": "本样本训练导师在实验阶段开始时提供简洁的安全提醒和记录格式，引导学生自主操作，避免代劳。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已经按照方案准备好了不同形状的模型和测量工具，现在可以开始实验吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"请确认你已佩戴护目镜，并将测试区域远离桌边。现在开始第一次测试：用同种材料、相同质量加载，记录结构形状与承受的最大质量。请直接输入数据，格式如“形状，承重”。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"护目镜佩戴，教师在场监督\",\"按形状与承重质量格式记录\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0030-v1-ba5f5f52c9",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0030",
+      "subject": "STEM",
+      "expectedTransformation": {
+        "originalInterest": "探究影响结构稳定性的主要因素",
+        "retainedFeature": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "classroomProxy": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "researchQuestion": "不同结构形状会怎样影响模型的承重能力？",
+        "independentVariable": "结构形状或支撑方式",
+        "dependentDirection": "最大承重质量",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0026-v1-35e497f896-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响电磁铁磁性强弱的因素-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0026-v1-35e497f896"
+    ],
+    "qualityNotes": "该样本在phase4引导学生描述趋势和组间差异，不直接给出结论，强调相关性非因果，提出对异常数据的质疑和下一步分析，体现学生能动性和认知负荷控制。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我发现三组数据每天都在增加，但组C增长最快，组A最慢，而且组C第二天到第三天跳变明显。还有一条标了‘一个样本异常’，会不会是偶然误差？该怎么解释这个趋势呢？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"观察得很仔细。请用一两句话描述三天里各组的变化趋势，并指出哪组幅度最大。注意目前看到的是相关性，不等同于因果。对于异常样本，建议重复测量后再分析。然后思考：如果条件不变，这些差异可能代表什么？现在请把趋势描述和初步猜想写下来。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"保持控制变量一致，仅改变一个条件。\",\"用折线图展示数据趋势。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0026-v1-35e497f896",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0026",
+      "subject": "物理,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究影响电磁铁磁性强弱的因素",
+        "retainedFeature": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-waterproof-material-v1-b8e5229026-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-防水材料-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-waterproof-material-v1-b8e5229026"
+    ],
+    "qualityNotes": "聚焦趋势描述与组间差异，避免过早因果结论，提出计算均值与作图作为下一步分析，保持学生主体。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我算了三天数据，A组从0到2，B组从1到5，C组从2到6，C组变化最大，第三天还有个异常样本。涂层材料是不是真的影响渗水？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到的趋势很清楚：C组渗水时间增长最快，A组最平缓。这提示涂层可能影响渗水速率，但我们先别直接说‘影响’，试着从材料表面亲疏水性解释为什么C组变化快。异常样本可能是涂层不均匀造成的吗？接下来可以计算各组平均值并绘制折线图，进一步比较趋势和离散程度。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"关注疏水涂层是否延缓渗水\",\"异常样本可能源于涂层不均\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-waterproof-material-v1-b8e5229026",
+      "sourceKind": "persona",
+      "personaId": "engineering-waterproof-material",
+      "subject": "materials_structure",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "做防水的东西",
+        "retainedFeature": "材料表面影响渗水",
+        "classroomProxy": "不同涂层材料",
+        "researchQuestion": "涂层材料是否影响纸板渗水时间？",
+        "independentVariable": "涂层材料",
+        "dependentDirection": "渗水时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-fuzzy-absorbent-paper-v1-75b0485347-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-吸水材料-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-fuzzy-absorbent-paper-v1-75b0485347"
+    ],
+    "qualityNotes": "引导描述趋势和组间差异，追问异常原因但不给结论，提出下一步重复测试或检查操作，控制一次只问两个核心问题，保护学生主导分析，避免过度提问。dialogue限制认知负荷，hints提供关键提示。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看了一下数据，三组纸条的吸水高度都是每天增加差不多1厘米，A组涨得慢，C组最快。而且第三天C组有个样本异常，会不会是测量错误？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到各组吸水高度随时间上升，A组最低，C组最高，第三天C组出现异常样本。这说明材质可能影响吸水速度。这个异常是测量误差还是材质问题？我们下一步可以重复测试或检查实验操作。请你先简单描述整体趋势，然后指出哪个对比最明显。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"趋势：随天数增加吸水高度上升；组间差异：C组最高，A组最低。\",\"异常样本需要标记，考虑是否剔除或重做。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-fuzzy-absorbent-paper-v1-75b0485347",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-absorbent-paper",
+      "subject": "materials_structure",
+      "studentType": "fuzzy_interest",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "纸吸水",
+        "retainedFeature": "材质影响吸水高度",
+        "classroomProxy": "不同纸条材质",
+        "researchQuestion": "纸条材质是否影响吸水高度？",
+        "independentVariable": "纸条材质",
+        "dependentDirection": "吸水高度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0030-v1-f217060257-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响结构稳定性的主要因素-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0030-v1-f217060257"
+    ],
+    "qualityNotes": "该样本在阶段4引导学生从数据中提取趋势，关注异常点对结论的影响，避免绝对归因，并建议计算平均值与检查控制变量，体现认知负荷控制、学生主动性和教学引导。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我发现三组数据都有增长，但C组增长最快，而且第三天有个异常记录，这会影响结论吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到趋势了。我们先整理：A组0→2缓慢上升，B组1→5，C组2→6，增长斜率不同。第三天C组异常样本需核对记录原因，可能来自测量误差或结构破坏。暂时保留，分析时需说明其影响。比较组间差异初步显示C组承重更高，但能否直接归因于形状？控制变量是否一致？下一步试试计算各组平均值，看看离散程度，再讨论可能的原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着计算每组三天平均承重，比较变异性。\",\"回想你是否严格保持材料、连接方式一致？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0030-v1-f217060257",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0030",
+      "subject": "STEM",
+      "expectedTransformation": {
+        "originalInterest": "探究影响结构稳定性的主要因素",
+        "retainedFeature": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "classroomProxy": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "researchQuestion": "不同结构形状会怎样影响模型的承重能力？",
+        "independentVariable": "结构形状或支撑方式",
+        "dependentDirection": "最大承重质量",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-cooperative-water-filter-v1-afbf673716-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-净水过滤材料-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-cooperative-water-filter-v1-afbf673716"
+    ],
+    "qualityNotes": "在数据分析阶段引导学生比较趋势而不直接断言因果，温和纠正饮用安全风险，鼓励检查异常数据并提出下一步分析问题，突显学生主动探究，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看数据表，C组的澄清度从2到4到6，B组从1到3到5，A组才0到2。是不是C是最好的过滤材料？那用C过滤的水是不是可以喝一点？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你发现了很有意思的趋势。C组和B组澄清度都在稳步上升，C组涨幅更大。但过滤后的水依然不能饮用，我们只能观察外观变化。另外，第三天C组有一个样本异常，这提醒我们数据可能受偶然因素影响。你能不能试着解释为什么C组的澄清程度更高？我们可以先比较材料特性，再分析异常可能的原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"过滤材料颗粒大小或排列方式可能影响拦截效果\",\"异常样本可能是操作失误或材料松动，需重复实验\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-cooperative-water-filter-v1-afbf673716",
+      "sourceKind": "persona",
+      "personaId": "cooperative-water-filter",
+      "subject": "water_environment",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "把脏水变清",
+        "retainedFeature": "过滤材料拦截杂质",
+        "classroomProxy": "不同过滤材料",
+        "researchQuestion": "过滤材料是否影响浑水澄清程度？",
+        "independentVariable": "过滤材料",
+        "dependentDirection": "澄清程度",
+        "safetyNotes": [
+          "净化后的水不可饮用，仅观察"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-engineering-oil-separation-v1-0c7c60fcf6-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-油污分离装置-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-engineering-oil-separation-v1-0c7c60fcf6"
+    ],
+    "qualityNotes": "通过澄清自变量/因变量纠正学生将时间误认为自变量，引导比较组间趋势并指出异常值，维护工程问题与代理变量匹配，避免因果误判。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看了实验数据，发现第1天到第3天每组数值都在涨，组C最高，组A最低，是不是时间越长除油越多，材料区别不大？我们该研究“时间是否影响除油效率”？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到数据随时间上升，但我们的研究问题自变量是吸附材料，因变量是除油效率。时间是我们设定的观测点，不是操纵变量。从数据看，组间增长趋势不同：组C增幅最大，但第3天标注了异常样本，需谨慎。我们应比较各材料的净增量并思考可能原因，而非直接下结论。请计算每组第3天较第1天的除油效率差，并推测差异背后的原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"区分自变量（你改变的材料）和因变量（测量的效率），时间只是观测维度。\",\"先计算组C的净增量，考虑异常值是否影响结论，再比较全组。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-engineering-oil-separation-v1-0c7c60fcf6",
+      "sourceKind": "persona",
+      "personaId": "engineering-oil-separation",
+      "subject": "water_environment",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "油污处理装置",
+        "retainedFeature": "材料亲水/疏油差异影响分离",
+        "classroomProxy": "不同吸附材料",
+        "researchQuestion": "吸附材料是否影响从水面除油效率？",
+        "independentVariable": "吸附材料",
+        "dependentDirection": "除油效率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0047-v1-5dbe0faa0e-v1",
+    "source": "distill_dsv4",
+    "scenario": "初中化学实验设计与评价专题复习-数据分析",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0047-v1-5dbe0faa0e"
+    ],
+    "qualityNotes": "引导学生描述数据趋势、比较组间差异，识别异常并思考可能原因，避免因果断言，鼓励设计验证方案。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我看到了数据，A组每天增加1，B组和C组每天增加2，但C组第三天数据异常，可能是什么原因？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已经明确描述了各组数值变化趋势。A组增长较慢，B、C组较快，异常数据可能意味着操作误差或条件波动。不要急于把相关性当因果，请考虑可能影响因素并设计一个验证方案。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想实验过程中哪些步骤可能引入误差？\",\"如何重复实验或控制变量来确认？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0047-v1-5dbe0faa0e",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0047",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素",
+        "retainedFeature": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-variable-confusion-turbidity-settle-v1-e0a098f938-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-泥沙沉降-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-variable-confusion-turbidity-settle-v1-e0a098f938"
+    ],
+    "qualityNotes": "学生发现数据反直觉并提出变量混淆。导师引导描述趋势、比较组间差异，指出异常样本可能为混淆因素，不预设因果关系，提出绘图建议，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看了记录的数据，有个奇怪的地方：静置时间越长，浊度怎么反而越大？Group A静置0天，Group C静置2天，但Day3 Group C浊度最高，这不合理。是不是我们变量弄反了？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你发现的数据模式反直觉。请描述三组从Day1到Day3的浊度变化趋势，再比较组间差异。注意Day3有一个样本异常，可能是混淆因素。不能直接说静置时间导致浊度升高，需排查其他变量。下一步：绘制浊度随天数变化的折线图，比较各组斜率并讨论原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"说出每组从Day1到Day3浊度值的变化方向。\",\"比较组间差异时，关注Day3异常样本的影响。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-variable-confusion-turbidity-settle-v1-e0a098f938",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-turbidity-settle",
+      "subject": "water_environment",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "泥水变清",
+        "retainedFeature": "静置时间影响沉降程度",
+        "classroomProxy": "不同静置时间",
+        "researchQuestion": "静置时间是否影响泥水浊度？",
+        "independentVariable": "静置时间",
+        "dependentDirection": "浊度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-cooperative-electromagnet-coils-v1-8f87fe3ba2-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-电磁铁线圈数-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-cooperative-electromagnet-coils-v1-8f87fe3ba2"
+    ],
+    "qualityNotes": "引导学生主动描述趋势并对比组间差异，刻意不直接命名规律；用‘相关性≠因果’提示区分，防止绝对化结论；提出检查通电时间一致性的下一步问题，让学生在证据驱动下推演，保持低认知负荷与高自主性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们做了三天实验，A组0匝吸到的回形针最少，C组2匝吸到的最多，B组中间。是不是可以证明线圈匝数越多，电磁铁吸力就越强？因为匝数越多磁性越大。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你在数据里找到了一个整体增长的趋势，这很好。不过我们暂时还不能直接下结论，因为存在一些细节：第3天C组的数据里有一个异常样本，另外各组数据每天波动也不完全整齐。请先对比A、B、C三天各自的回形针数变化，试着描述规律，并想一想：除了匝数，哪些实验条件可能没控制一致？之后我们一起来检查通电时间是否统一，看看这是否影响了结果。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着描述 A、B、C 三组的回形针数在三天里的变化趋势。\",\"注意第3天 C 组的异常样本，它可能提示我们需要复查实验操作。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-cooperative-electromagnet-coils-v1-8f87fe3ba2",
+      "sourceKind": "persona",
+      "personaId": "cooperative-electromagnet-coils",
+      "subject": "electricity_energy",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "电磁铁吸力",
+        "retainedFeature": "线圈匝数影响磁场强度",
+        "classroomProxy": "不同线圈匝数",
+        "researchQuestion": "线圈匝数是否影响电磁铁吸引回形针数量？",
+        "independentVariable": "线圈匝数",
+        "dependentDirection": "吸引回形针数量",
+        "safetyNotes": [
+          "用干电池，不用220V电源",
+          "通电时间短，避免发热"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0050-v1-ad88564e0d-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「化学实验基本操作」中的影响因素-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0050-v1-ad88564e0d"
+    ],
+    "qualityNotes": "在数据分析阶段，导师通过开放式提问引导学生观察数据趋势、比较组间差异并关注异常值，不直接给结论；提出下一步分析问题，降低认知负荷，保持学生探究自主性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我做了实验，记录了这些数据：第一天组A0，组B1，组C2；第二天组A1，组B3，组C4；第三天组A2，组B5，组C6，其中第三天有一个样本出现了异常。我想知道实验结论是什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"从你记录的数据看，三组的数值都随时间增加而上升。你注意到各组上升的快慢有什么不同吗？另外，第三天的异常样本你在备注里写到了，你觉得这个异常可能和什么有关？不妨先尝试描述一下每组的变化趋势，再比较组间差异。接下来，我们可以尝试用数据来说明为什么会出现这样的差异，以及怎样进一步验证你的猜想。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"注意比较每天各组增加的幅度。\",\"考虑异常值是否与操作或测量有关。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0050-v1-ad88564e0d",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0050",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究「化学实验基本操作」中的影响因素",
+        "retainedFeature": "围绕「探究「化学实验基本操作」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究「化学实验基本操作」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究「化学实验基本操作」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-fuzzy-windmill-blades-v1-a2a1117c1c-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-风车叶片数-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-fuzzy-windmill-blades-v1-a2a1117c1c"
+    ],
+    "qualityNotes": "学生独立提出观察到的趋势和异常样本，助手仅引导其描述总体趋势、解释可能原因，避免将相关性等同于因果，并提示用平均值比较验证想法，保持单一分析问题，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天数据，发现转速好像随着叶片数增加而增大，但第3天C组（6片）有一个转速异常高，这会不会影响结论？是不是叶片越多转速一定越快？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到的趋势和异常点都很值得关注。先忽略那个异常样本，你能描述一下三天里A、B、C三组的转速总体如何变化吗？这种模式背后可能的原因有哪些？记住，我们目前只能讨论相关性，不能直接断定叶片数多就必然转速高。下一步，你可以计算各组转速的平均值，看看是否能更清晰地呈现趋势。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"计算叶片数2、4、6片对应的三天转速平均值，比较组间差异。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-fuzzy-windmill-blades-v1-a2a1117c1c",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-windmill-blades",
+      "subject": "electricity_energy",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "风力发电",
+        "retainedFeature": "叶片数影响风能利用",
+        "classroomProxy": "不同叶片数",
+        "researchQuestion": "叶片数是否影响小风车转速？",
+        "independentVariable": "叶片数",
+        "dependentDirection": "转速"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-safety-circuit-brightness-v1-82169c0f3b-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-电路与灯泡亮度-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-safety-circuit-brightness-v1-82169c0f3b"
+    ],
+    "qualityNotes": "引而不替：将数据描述与趋势解释的主导权交还学生，仅给框架提问。强化安全提醒（先确认限用干电池、无短路风险），降低认知负荷（一次只问趋势与异常），维护学生主体性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "这是我们实验记录的数据，你看看有什么发现吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们整理一下数据：串联电池数从0增至2节时，亮度值大致从0升至6。请描述你看到的趋势，并思考可能的原因。另外，你记录的异常样本是怎样的情况？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察电池数与亮度值的变化方向\",\"异常样本可能影响结论，需记录排除原因\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-safety-circuit-brightness-v1-82169c0f3b",
+      "sourceKind": "persona",
+      "personaId": "safety-circuit-brightness",
+      "subject": "electricity_energy",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "灯泡亮不亮",
+        "retainedFeature": "电池数影响电压和亮度",
+        "classroomProxy": "串联电池数",
+        "researchQuestion": "串联电池数是否影响小灯泡亮度？",
+        "independentVariable": "串联电池数",
+        "dependentDirection": "灯泡亮度",
+        "safetyNotes": [
+          "只用干电池，严禁220V市电",
+          "避免短路，注意发热"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0054-v1-c2f52d3c38-v1",
+    "source": "distill_dsv4",
+    "scenario": "课题２ 学习开展化学实验探究-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0054-v1-c2f52d3c38"
+    ],
+    "qualityNotes": "训练助手在数据分析阶段纠正“相关性即因果”的认知误区与危险操作，引导学生比较组间差异、关注异常点，并维持安全探究边界。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "组a、组b、组c的数据都在变大，是不是多蒸馏几次纯度就能一直提高？我能不能用家里的酒精灯直接加热试一下？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"数据确实在上升，但仅凭这三天的测量还不能确定是蒸馏次数直接导致了纯度提高，可能还有其他因素。另外，酒精灯属于危险火源，不可在家自行操作。我们先比较一下各组的变化幅度：组c的数值增长最快，组a最慢，这里面可能有不同的控制条件。你还注意到第3天有一个异常样本，这个异常值会怎样影响你的结论？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较组c与组a的趋势斜率\",\"思考异常样本可能的来源\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0054-v1-c2f52d3c38",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0054",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "课题２ 学习开展化学实验探究",
+        "retainedFeature": "围绕「课题２ 学习开展化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「课题２ 学习开展化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「课题２ 学习开展化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-fuzzy-vehicle-ramp-angle-v1-62f1e88267-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-小车与斜面-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-fuzzy-vehicle-ramp-angle-v1-62f1e88267"
+    ],
+    "qualityNotes": "提供结构化报告框架但避免直接替写，所有字段指向学生补充，强化证据驱动的写作意识；语言无代理痕迹，用'我们'组织；hints精准指向数据总结与异常分析，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们已经做了不同角度下滑实验，三次数据有表，你能帮我们理一下报告怎么写吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们已整理实验报告框架。请根据你的研究问题补充以下内容：1. 目的：研究斜面角度是否影响下滑距离。2. 假设：待补充（角度增加距离会变远/变近？）。3. 材料：列出实际使用的器材。4. 步骤：按实际操作记录。5. 数据总结：描述你的三次测量结果及趋势。6. 分析：解释数据是否支持假设，讨论异常点。请填写后回复。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"数据总结中用均值比较不同角度的影响\",\"分析时留意第三天数据中的异常样本\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"研究斜面角度是否影响小车下滑距离\",\"hypothesis\":\"待学生补充：例如，角度越大，下滑距离越远\",\"materials\":\"待学生补充：如斜面、小车、刻度尺、量角器等\",\"procedure\":\"待学生补充：如设定三个角度（0°,1°,2°）、重复测量3次、记录下滑距离\",\"dataSummary\":\"待学生补充：比较各组距离均值，描述趋势\",\"analysis\":\"待学生补充：对比假设与数据，讨论误差来源，异常点分析\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-fuzzy-vehicle-ramp-angle-v1-62f1e88267",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-vehicle-ramp-angle",
+      "subject": "physics_motion",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "小车下坡",
+        "retainedFeature": "坡度影响下滑加速度",
+        "classroomProxy": "不同斜面角度",
+        "researchQuestion": "斜面角度是否影响小车下滑距离？",
+        "independentVariable": "斜面角度",
+        "dependentDirection": "下滑距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-all-at-once-parachute-area-v1-7a494d653d-v1",
+    "source": "distill_dsv4",
+    "scenario": "一次给全型-降落伞面积-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-all-at-once-parachute-area-v1-7a494d653d"
+    ],
+    "qualityNotes": "生成报告框架，避免替代学生写完整报告；安全提醒后直接给出六要素框架，仅提示补充空缺，不追问多个问题；符合一次推动一个核心要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们用不同大小的圆形塑料袋做了降落伞，从教学楼二楼扔下测时间，面积大的落得慢。表格数据在下面：第一天A0 B1 C2；第二天A1 B3 C4；第三天A2 B5 C6（一个异常）。报告要怎么写？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们已经整理出报告框架。注意，从高处抛落不安全，请改用室内固定高度释放装置。请确认研究问题：伞面积是否影响下落时间？假设：面积越大，下落时间越长。材料需补充塑料袋尺寸、绳长等。步骤请详写。数据摘要见报告，异常点需分析原因。请补充空缺部分。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"补充材料部分，注明塑料袋的具体尺寸和厚度\",\"分析异常数据点，可能是释放高度不一致或计时误差\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究降落伞伞面面积对下落时间的影响。\",\"hypothesis\":\"若伞面面积增大，则空气阻力增加，下落时间延长。\",\"materials\":\"待学生补充：塑料袋（不同面积）、计时器、释放装置、卷尺等。\",\"procedure\":\"待学生补充：例如，在室内固定高度释放降落伞，用秒表记录从释放到落地的时间，每种面积重复三次。\",\"dataSummary\":\"三天观测，A组(小面积)：0s,1s,2s；B组(中面积)：1s,3s,5s；C组(大面积)：2s,4s,6s。第三天C组有一个异常值记录，需说明。\",\"analysis\":\"数据显示面积与下落时间正相关。需进一步计算平均值，讨论异常值可能原因。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-all-at-once-parachute-area-v1-7a494d653d",
+      "sourceKind": "persona",
+      "personaId": "all-at-once-parachute-area",
+      "subject": "physics_motion",
+      "studentType": "all_at_once",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "降落伞下落快慢",
+        "retainedFeature": "伞面面积影响空气阻力",
+        "classroomProxy": "不同伞面面积",
+        "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+        "independentVariable": "伞面面积",
+        "dependentDirection": "下落时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:all_at_once",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0023-v1-a808b117bd-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究弹性势能的影响因素-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0023-v1-a808b117bd"
+    ],
+    "qualityNotes": "在阶段5提供报告框架，列出六个栏目，概括数据趋势但不代下结论，并要求补充实验细节，训练结构规范和基于证据的表达。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我做完实验了，数据也记了，接下来该怎么写报告？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们先把实验内容整理成报告框架。请查看以下各栏目，并补充缺失的材料和步骤，数据部分已根据记录整理，请注意第三天异常值需核实。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请确认所用的具体器材和步骤，如实填写。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究弹性势能的影响因素：改变一个条件会怎样影响观察结果？\",\"hypothesis\":\"待学生补充：实验前你对自变量如何影响因变量的预测。\",\"materials\":\"待学生补充：请列出实际使用的材料，如弹簧、刻度尺、小球等。\",\"procedure\":\"待学生补充：请按步骤记录实验过程，包括如何改变自变量、测量因变量、重复次数。\",\"dataSummary\":\"三天记录中，group_a值从0上升至2，group_b从1上升至5，group_c从2上升至6；第三天group_c出现异常值6（标注：一个样本异常）。其他组相对平稳。\",\"analysis\":\"初步比较显示不同组间趋势差异，但数据量少且存在异常值，无法下结论。需要增加重复实验，核查异常样本，并控制其他变量以确认自变量效应。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0023-v1-a808b117bd",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0023",
+      "subject": "物理",
+      "expectedTransformation": {
+        "originalInterest": "探究弹性势能的影响因素",
+        "retainedFeature": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-over-broad-vehicle-fuel-v1-10104f56e1-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-新能源车续航-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "proxy_quality",
+      "stem_fit",
+      "structure_compliance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-over-broad-vehicle-fuel-v1-10104f56e1"
+    ],
+    "qualityNotes": "阶段5提供结构化报告框架，六个section均以“待学生补充”开头，但指向明确，贴合数据与课堂代理，避免直接给出完整内容，提示证据缺口和趋势描述方向，保持主题一贯性，防止将橡皮筋模型误链接到真实新能源车电池技术导致代理漂移。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们做完了实验，数据都记录好了。报告要怎么写啊？有没有模板可以参考？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们可以按六个部分来整理报告：研究目的、假设、材料、步骤、数据摘要和分析。你先从“研究目的”开始，说明我们探究橡皮筋数量对小车行驶距离的影响，模拟能量储备。然后假设你的预测是什么。步骤你可以先回忆实际怎么操作的。数据我们已经有了三天的记录，可以填入摘要。分析部分要描述变化趋势，有没有异常点。你觉得这个结构可以吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"重点关注数据趋势是否随橡皮筋数量增加而上升\",\"异常点需要注明原因\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究橡皮筋数量对动力小车行驶距离的影响，作为理解能量来源与续航关系的简单模型。\",\"hypothesis\":\"待学生补充：请根据实验预测写出假设，例如“橡皮筋数量增加，行驶距离会变长/不变/变短”，并说明理由。\",\"materials\":\"待学生补充：列出使用的材料，如动力小车、不同数量橡皮筋、卷尺等。\",\"procedure\":\"待学生补充：请回忆并列出实验步骤，包括如何固定小车、测量距离等。\",\"dataSummary\":\"待学生补充：将记录的数据整理成表格：第一天A组0米，B组1米，C组2米；第二天A组1米，B组3米，C组4米；第三天A组2米，B组5米，C组6米（其中第三天有一个异常样本）。请补充单位并标注异常。\",\"analysis\":\"待学生补充：描述距离随橡皮筋数量增加的变化趋势，比较不同组的最大差值，讨论异常样本的可能影响。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-over-broad-vehicle-fuel-v1-10104f56e1",
+      "sourceKind": "persona",
+      "personaId": "over-broad-vehicle-fuel",
+      "subject": "physics_motion",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "新能源汽车续航",
+        "retainedFeature": "能量来源影响续航",
+        "classroomProxy": "不同橡皮筋数量（模拟能量储备）",
+        "researchQuestion": "橡皮筋数量是否影响动力小车行驶距离？",
+        "independentVariable": "橡皮筋数量",
+        "dependentDirection": "行驶距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0026-v1-889d772fd8-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响电磁铁磁性强弱的因素-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0026-v1-889d772fd8"
+    ],
+    "qualityNotes": "该样本训练agent在阶段5提供结构化报告框架并标注证据缺口，引导学生补充假设、材料、步骤和分析，避免替学生写完整报告，体现inquiry范式与精炼表达。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我根据实验数据画了趋势图，但不知道怎么写实验报告，你能帮我看看吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"让我们按照探究报告框架整理你的发现。目的：研究电磁铁磁性强弱与某个条件的关系。假设：请明确你的猜测。材料：列出你用的电池、线圈、铁芯等。步骤：请记录分组与测量操作。数据摘要：你已有三天数据，group_c增长最快，group_a最慢，第二天有一个异常样本需标注。分析：请根据趋势说明结论和可能原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请先补充你的假设和材料清单。\",\"数据异常样本可能是什么原因？\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"研究电磁铁磁性强弱与某个条件之间的关系。\",\"hypothesis\":\"待学生补充：改变该条件会对电磁铁吸引回形针的数量产生影响。\",\"materials\":\"待学生补充：如干电池、漆包线、铁钉、回形针等。\",\"procedure\":\"待学生补充：实验如何分组、测量等。\",\"dataSummary\":\"已有三天数据：group_a从0到2，group_b从1到5，group_c从2到6。group_c增长最快，group_a最慢。第二天一个样本异常。\",\"analysis\":\"待学生补充：趋势是否支持假设？异常样本可能的原因？还有哪些干扰因素？\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0026-v1-889d772fd8",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0026",
+      "subject": "物理,初中",
+      "expectedTransformation": {
+        "originalInterest": "探究影响电磁铁磁性强弱的因素",
+        "retainedFeature": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-engineering-waterproof-material-v1-f8addcf76c-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-防水材料-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "interdisciplinary_integration",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-engineering-waterproof-material-v1-f8addcf76c"
+    ],
+    "qualityNotes": "本样本训练在阶段5提供报告框架，不替代学生书写，强调证据缺口与数据局限，推动自主分析与修正。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们做了涂层材料渗水实验，记录了三天数据，现在要写实验报告，但不知道从哪里入手。你能帮我们搭个框架吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们搭个框架。请确认下方六部分，补充细节和你的分析。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"对比各组三天渗水时间变化趋势。\",\"分析第三天Group C异常数据的可能原因。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究涂层材料是否影响纸板渗水时间。\",\"hypothesis\":\"待学生补充：写明预期结果及依据。\",\"materials\":\"纸板、三种涂层材料（记为A/B/C，请具体命名）、计时器、水容器等（请补充完整）。\",\"procedure\":\"1. 准备三组纸板样品，分别涂覆材料A、B、C；2. 将水滴于样品表面，计时至渗水；3. 连续三天重复，记录时间（请完善步骤详情）。\",\"dataSummary\":\"三天数据：Day1组A0s，B1s，C2s；Day2组A1s，B3s，C4s；Day3组A2s，B5s，C6s（C组有异常标记）。整体趋势：C组渗水时间最长，B组次之，A组最短。\",\"analysis\":\"待学生补充：根据趋势，对比不同涂层材料对渗水时间的影响，讨论第三天C组异常的可能原因，提出改进实验的建议。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-engineering-waterproof-material-v1-f8addcf76c",
+      "sourceKind": "persona",
+      "personaId": "engineering-waterproof-material",
+      "subject": "materials_structure",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "做防水的东西",
+        "retainedFeature": "材料表面影响渗水",
+        "classroomProxy": "不同涂层材料",
+        "researchQuestion": "涂层材料是否影响纸板渗水时间？",
+        "independentVariable": "涂层材料",
+        "dependentDirection": "渗水时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-fuzzy-absorbent-paper-v1-eea0de95bb-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-吸水材料-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-fuzzy-absorbent-paper-v1-eea0de95bb"
+    ],
+    "qualityNotes": "该样本训练gpt在阶段5提供报告框架而非替学生完成，六个字段均非空，指向证据缺口，控制认知负荷，符合STEM教学行为规范。避免代理学生行动。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我根据实验数据画了趋势图，觉得不同材质吸水差别挺大的。现在要写实验报告，应该怎么写？框架是什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们共同整理了实验报告框架，请你仔细核对并补充所缺信息，比如纸条的具体材质、详细操作步骤，这样报告才完整。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请补充三种纸条的具体材质名称，例如复印纸、报纸等。\",\"请回忆并描述实验的具体操作步骤和测量方法。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究纸条材质是否影响吸水高度\",\"hypothesis\":\"不同纸条材质的吸水高度可能存在差异\",\"materials\":\"纸条A、纸条B、纸条C（待你补充具体材质名称）、直尺、盛水容器、计时器、悬挂架\",\"procedure\":\"待学生补充：详细实验步骤，包括纸条悬挂方式、浸水深度、每天记录时间、重复组数等\",\"dataSummary\":\"三天连续记录，Group A吸水高度：0,1,2；Group B：1,3,5；Group C：2,4,6（其中第三天C组一个样本异常）\",\"analysis\":\"数据表明三组吸水高度均随时间上升；C组整体最高，A组最低。材质可能影响吸水高度，但需分析异常样本的影响，并考虑实验误差。待学生补充：异常可能的原因、实验结论及改进建议。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-fuzzy-absorbent-paper-v1-eea0de95bb",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-absorbent-paper",
+      "subject": "materials_structure",
+      "studentType": "fuzzy_interest",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "纸吸水",
+        "retainedFeature": "材质影响吸水高度",
+        "classroomProxy": "不同纸条材质",
+        "researchQuestion": "纸条材质是否影响吸水高度？",
+        "independentVariable": "纸条材质",
+        "dependentDirection": "吸水高度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-smartedu-0016-v1-359955c073-v1",
+    "source": "distill_dsv4",
+    "scenario": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-smartedu-0016-v1-359955c073"
+    ],
+    "qualityNotes": "在反思阶段通过提问引导学生自主回溯操作、识别误差来源并提出可执行改进，避免代劳，强化迁移应用意识，体现学生主体性与教师引导作用。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们净水实验报告写完了，但过滤效果没想象中好，各组数据差别大，是不是没控制好条件？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们先回顾你的操作：每次倒入污水量一样吗？浑浊度是怎么测的？如果这两个环节没统一，可能就是主要误差。你能试着列出2个可能误差，并想一个下次能更精确的办法吗？比如用量杯控制水量，或用手机拍照比灰度。改进后，你觉得这个方法还能用在什么场景？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回顾操作中是否固定了水量\",\"思考浑浊度测量是否更精确\"],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-smartedu-0016-v1-359955c073",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0016",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-safety-bread-mold-preservative-v1-6ff6a6f756-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-面包防腐-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "safety",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-safety-bread-mold-preservative-v1-6ff6a6f756"
+    ],
+    "qualityNotes": "导师在阶段6引导学生自主反思误差来源与改进方向，强化安全提醒（发霉面包不食用），保持学生主体性，不代写结论，通过开放问题推动迁移应用思考。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们的面包防腐实验报告已经完成了，但我感觉好像有很多地方可以做得更好，你能帮我分析一下有哪些可以改进的地方吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"回想一下实验过程，哪些测量或观察步骤可能造成误差？请你在报告中补充误差来源和下次改进方案。同时，发霉面包只观察不食用，确保安全。你还能想到这种防腐方式在其他食物上的应用吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑面包片厚度、温度、湿度等外部因素\",\"观察时间间隔是否一致会影响霉变速度判断\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-safety-bread-mold-preservative-v1-6ff6a6f756",
+      "sourceKind": "persona",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物怎么防腐",
+        "retainedFeature": "防腐方式抑制微生物",
+        "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+        "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+        "independentVariable": "防腐处理方式",
+        "dependentDirection": "发霉速度",
+        "safetyNotes": [
+          "发霉食物只观察不食用，可能产生毒素",
+          "避免吸入霉菌孢子"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-variable-confusion-apple-browning-v1-60684033e1-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "stage_discipline",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-variable-confusion-apple-browning-v1-60684033e1"
+    ],
+    "qualityNotes": "阶段6反思与迁移：抓住学生自我觉察的混淆变量（观察时间），引导用假设性句式重新规划测量步骤，并迁移到家庭厨房场景，强化变量控制意识与表达，避免直接替写总结。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我报告写完了，但感觉实验有问题。我记录褐变速度的时候，家里不同位置光线不一样，观察时间也没掐表，最后只能大概说盐水泡的变褐慢。这算误差吗？下次怎么改？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你发现了一个重要的混淆变量——观察光线和计时不统一。请用‘如果…那么…’句式写出一个改进方案，例如“如果每次在固定灯光下拍照且掐表计时，那么比较不同处理组的褐变程度会更公平”。然后想一想，如果让爸妈在家重复你的实验，你需要在步骤里添加哪一条关键提醒？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"区分你改变的变量（处理方式）与需要保持不变的变量（光照、观察时间）。\",\"用‘下次我会…’开头写出至少一个可操作的调整动作。\"],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-variable-confusion-apple-browning-v1-60684033e1",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-smartedu-0020-v1-48e5b2047f-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响光合作用的因素（实验）反思改进",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-smartedu-0020-v1-48e5b2047f"
+    ],
+    "qualityNotes": "引导反思误差与改进方向，通过提问让学生自主发现误差来源并提出可执行的改进措施，保持学生主体性，不直接给出结论，训练教学引导能力。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经把光合作用实验的报告写完了，接下来还需要做什么吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的报告记录了实验过程和初步结论。现在请你回顾整个实验过程，想一想：在测量光照强度或观察气泡数量时，可能出现了哪些误差？这些误差对结果有什么影响？如果下次再做这个实验，你会怎样改进某个步骤以减少误差？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"注意区分系统误差和偶然误差\",\"思考是否增加重复实验次数\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-smartedu-0020-v1-48e5b2047f",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0020",
+      "subject": "生物",
+      "expectedTransformation": {
+        "originalInterest": "探究影响光合作用的因素（实验）",
+        "retainedFeature": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-fuzzy-vehicle-ramp-angle-v1-0171275aa2-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-小车与斜面-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-fuzzy-vehicle-ramp-angle-v1-0171275aa2"
+    ],
+    "qualityNotes": "对话聚焦单一改进方向，用‘我们’和‘请你’保持学生主体；提示基于证据反思误差，提出可执行方案，同时控制认知负荷，避免多问题轰炸；鼓励迁移应用但不替代构思。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我完成了斜面实验报告，角度越大滑动越远，但有几组数据波动明显，我猜可能是释放时手不稳定。另外，这个结论能不能用在设计玩具赛车跑道上？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到了关键误差源——手释放的一致性。下次可以尝试用直尺挡板统一释放点，或用手机慢动作回放检查。请你结合这个发现，写一个改进计划：如何控制释放变量？并初步设想一个应用场景，比如让小车坡道更安全。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考如何用身边的物品设计一个释放器，确保每次起始状态一致\",\"你设计的玩具跑道如果要保证小车不冲出，坡度需要满足什么条件？\"],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-fuzzy-vehicle-ramp-angle-v1-0171275aa2",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-vehicle-ramp-angle",
+      "subject": "physics_motion",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "小车下坡",
+        "retainedFeature": "坡度影响下滑加速度",
+        "classroomProxy": "不同斜面角度",
+        "researchQuestion": "斜面角度是否影响小车下滑距离？",
+        "independentVariable": "斜面角度",
+        "dependentDirection": "下滑距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-all-at-once-parachute-area-v1-6a1e3c5ebc-v1",
+    "source": "distill_dsv4",
+    "scenario": "一次给全型-降落伞面积-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-all-at-once-parachute-area-v1-6a1e3c5ebc"
+    ],
+    "qualityNotes": "在阶段六，通过学生主动提出高空释放的安全隐患，引导反思误差来源和改进方案，温和纠正风险并提供室内替代方案，保持学生主体性，仅提供框架性引导而非直接给出结论，训练教学引导和错误模式避免能力。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，实验报告我写完了，但分析部分还是有点模糊——比如释放高度没严格一致可能影响下落时间，还有我们在阳台做的，风忽大忽小。这样误差是不是太大了？我想下次是不是可以用风扇在室内模拟更安全些？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你能反思到风和释放高度的影响，这很关键。室内更安全，但风扇模拟不可靠——建议改用固定挂绳释放，重复多次，用手机慢动作录像计时。你已经抓住了改进核心：控制变量和多次测量。下次可明确测量工具、记录方法，再迁移研究伞面材料或伞绳长度。现在最想先优化哪个环节？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试用慢动作视频逐帧分析时间\",\"每次实验记录风速和释放高度\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-all-at-once-parachute-area-v1-6a1e3c5ebc",
+      "sourceKind": "persona",
+      "personaId": "all-at-once-parachute-area",
+      "subject": "physics_motion",
+      "studentType": "all_at_once",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "降落伞下落快慢",
+        "retainedFeature": "伞面面积影响空气阻力",
+        "classroomProxy": "不同伞面面积",
+        "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+        "independentVariable": "伞面面积",
+        "dependentDirection": "下落时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:all_at_once",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch200"
+    }
+  }
+]

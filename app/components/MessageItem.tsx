@@ -10,6 +10,22 @@ interface MessageItemProps {
   onEdit: (id: string) => void;
 }
 
+/**
+ * 极简内联渲染：把成对的 **……** 渲染为 <strong>，其余文本原样输出。
+ * 不引入 markdown 库（沙箱无 npm registry）；prompt 已约束模型只允许用 ** 加粗。
+ */
+function renderWithBold(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
+      <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>
+    ) : (
+      part
+    )
+  );
+}
+
 const MessageItem: React.FC<MessageItemProps> = ({ message, isLastUser, onResend, onEdit }) => {
   const [hover, setHover] = useState(false);
   const isUser = message.role === 'user';
@@ -25,7 +41,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isLastUser, onResend
             📋 探究问题确认书
           </div>
           <div className="px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-            {message.content}
+            {renderWithBold(message.content)}
           </div>
         </div>
       </div>
@@ -40,13 +56,13 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isLastUser, onResend
     >
       <div className="inline-flex items-start gap-1 max-w-[75%]">
         <div
-          className={`rounded-lg px-4 py-2 ${
+          className={`rounded-lg px-4 py-2 whitespace-pre-wrap ${
             isUser
               ? 'bg-blue-500 text-white'
               : 'bg-gray-100 text-gray-800'
           }`}
         >
-          {message.content}
+          {isUser ? message.content : renderWithBold(message.content)}
         </div>
 
         {showActions && (

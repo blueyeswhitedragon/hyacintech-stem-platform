@@ -31,3 +31,12 @@ export async function requireRole(role: UserRole): Promise<AuthResult> {
   }
   return auth;
 }
+
+export async function requireAnyRole(roles: readonly UserRole[]): Promise<AuthResult> {
+  const auth = await requireUser();
+  if (!auth.ok) return auth;
+  if (!roles.includes(auth.user.role)) {
+    return { ok: false, error: '无权限', status: 403 };
+  }
+  return auth;
+}

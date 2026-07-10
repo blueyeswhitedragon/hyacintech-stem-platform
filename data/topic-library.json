@@ -1,0 +1,2433 @@
+{
+  "generatedAt": "2026-07-07T15:21:31.468Z",
+  "source": "basic.smartedu.cn public APIs (x-search + technologyEdu channel CDN)",
+  "stats": {
+    "rawCount": 195,
+    "topicCount": 120,
+    "inquiryCount": 86,
+    "engineeringCount": 34
+  },
+  "examples": [
+    {
+      "id": "smartedu-0004",
+      "paradigm": "inquiry",
+      "title": "实验探究",
+      "sourceTitle": "实验探究",
+      "subjectTags": [
+        "生物",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「实验探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "efed6f2f-85b9-250d-9d96-3dbcc3ee45f1"
+      }
+    },
+    {
+      "id": "smartedu-0006",
+      "paradigm": "inquiry",
+      "title": "在科学探究中怎样设计实验",
+      "sourceTitle": "在科学探究中怎样设计实验",
+      "subjectTags": [
+        "物理",
+        "科学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「在科学探究中怎样设计实验」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "3cade8eb-9879-11ec-92ef-246e9675e50c"
+      }
+    },
+    {
+      "id": "smartedu-0009",
+      "paradigm": "inquiry",
+      "title": "化学实验探究",
+      "sourceTitle": "化学实验探究",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "95177bb9-5ac6-a0ff-3c03-f21390d8d509"
+      }
+    },
+    {
+      "id": "smartedu-0010",
+      "paradigm": "inquiry",
+      "title": "走进实验室：学习科学探究",
+      "sourceTitle": "走进实验室：学习科学探究",
+      "subjectTags": [
+        "物理",
+        "科学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「走进实验室：学习科学探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "e9400cc6-a21d-6313-217e-e88b3dfab097"
+      }
+    },
+    {
+      "id": "smartedu-0011",
+      "paradigm": "inquiry",
+      "title": "控制变量法在初中化学实验探究中的应用",
+      "sourceTitle": "控制变量法在初中化学实验探究中的应用",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "262e53ee-d789-5728-5543-68f5af50ba75"
+      }
+    },
+    {
+      "id": "smartedu-0012",
+      "paradigm": "inquiry",
+      "title": "《控制变量法在初中化学实验探究中的应用》",
+      "sourceTitle": "《控制变量法在初中化学实验探究中的应用》",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "b2d847c6-37b8-681e-691f-dde850d20556"
+      }
+    },
+    {
+      "id": "smartedu-0013",
+      "paradigm": "inquiry",
+      "title": "与控制变量有关的科学探究",
+      "sourceTitle": "与控制变量有关的科学探究",
+      "subjectTags": [
+        "化学",
+        "科学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「与控制变量有关的科学探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "65b0337f-5414-11eb-96b8-fa20200c3759"
+      }
+    },
+    {
+      "id": "smartedu-0014",
+      "paradigm": "inquiry",
+      "title": "科学探究中怎样控制变量",
+      "sourceTitle": "科学探究中怎样控制变量",
+      "subjectTags": [
+        "物理",
+        "科学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「科学探究中怎样控制变量」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "f37f02c8-bf74-4e01-bded-1c6f0a5f68d0"
+      }
+    },
+    {
+      "id": "smartedu-0016",
+      "paradigm": "inquiry",
+      "title": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+      "sourceTitle": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "ff808081-84a8-cb01-0184-adcf2d9b013e"
+      }
+    },
+    {
+      "id": "smartedu-0018",
+      "paradigm": "inquiry",
+      "title": "探究光合作用的影响因素",
+      "sourceTitle": "探究光合作用的影响因素",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "ff808081-849d-4015-0184-a284ba730242"
+      }
+    },
+    {
+      "id": "smartedu-0019",
+      "paradigm": "inquiry",
+      "title": "探究影响光合作用的因素",
+      "sourceTitle": "探究影响光合作用的因素",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究影响光合作用的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "b1e1bb12-7a0b-24db-57c4-96e64c1fc1fc"
+      }
+    },
+    {
+      "id": "smartedu-0020",
+      "paradigm": "inquiry",
+      "title": "探究影响光合作用的因素（实验）",
+      "sourceTitle": "探究影响光合作用的因素（实验）",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "8aee80c0-6c97-4ef1-016c-99815f030065"
+      }
+    },
+    {
+      "id": "smartedu-0021",
+      "paradigm": "inquiry",
+      "title": "探究影响结构强度的主要因素",
+      "sourceTitle": "探究影响结构强度的主要因素",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "a775f952-0637-7fea-7e6b-56db7449d0f0"
+      }
+    },
+    {
+      "id": "smartedu-0022",
+      "paradigm": "inquiry",
+      "title": "探究影响电流的因素",
+      "sourceTitle": "探究影响电流的因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究影响电流的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "fdddea9d-2cd4-938e-336d-0c8c061e0155"
+      }
+    },
+    {
+      "id": "smartedu-0023",
+      "paradigm": "inquiry",
+      "title": "探究弹性势能的影响因素",
+      "sourceTitle": "探究弹性势能的影响因素",
+      "subjectTags": [
+        "物理"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "535cee42-f17c-dc76-1bfa-3e944c4553b3"
+      }
+    },
+    {
+      "id": "smartedu-0024",
+      "paradigm": "inquiry",
+      "title": "探究影响感应电流方向的因素",
+      "sourceTitle": "探究影响感应电流方向的因素",
+      "subjectTags": [
+        "物理"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究影响感应电流方向的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "a588b982-6458-d360-a996-71d812607caa"
+      }
+    },
+    {
+      "id": "smartedu-0025",
+      "paradigm": "inquiry",
+      "title": "探究蒸发快慢影响因素",
+      "sourceTitle": "课件-探究蒸发快慢影响因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究蒸发快慢影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "1526bad8-9a98-a9a6-cbef-8f6efaeee750"
+      }
+    },
+    {
+      "id": "smartedu-0026",
+      "paradigm": "inquiry",
+      "title": "探究影响电磁铁磁性强弱的因素",
+      "sourceTitle": "探究影响电磁铁磁性强弱的因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "4832d64b-e448-b5d3-9307-c3c616f35c98"
+      }
+    },
+    {
+      "id": "smartedu-0027",
+      "paradigm": "inquiry",
+      "title": "【实验】探究影响压力作用效果的因素",
+      "sourceTitle": "【实验视频】探究影响压力作用效果的因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「【实验】探究影响压力作用效果的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "c7e645d7-4fbb-2667-0b7d-64731768dda8"
+      }
+    },
+    {
+      "id": "smartedu-0028",
+      "paradigm": "inquiry",
+      "title": "探究蒸发快慢的影响因素",
+      "sourceTitle": "探究蒸发快慢的影响因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究蒸发快慢的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "7ce3be87-2cf0-e02d-6291-ba5055cae7db"
+      }
+    },
+    {
+      "id": "smartedu-0030",
+      "paradigm": "inquiry",
+      "title": "探究影响结构稳定性的主要因素",
+      "sourceTitle": "探究影响结构稳定性的主要因素",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "53b5dd26-d646-c4bf-f19e-3eb3416dca3c"
+      }
+    },
+    {
+      "id": "smartedu-0039",
+      "paradigm": "inquiry",
+      "title": "探究「设计实验」中的影响因素",
+      "sourceTitle": "设计实验",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「设计实验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "8c0d25d4-c4ae-50dd-1911-9e6259a09dc4"
+      }
+    },
+    {
+      "id": "smartedu-0046",
+      "paradigm": "inquiry",
+      "title": "探究「【设计】化学实验基本技能训练（一）_化学_初中_韩宁.p」中的影响因素",
+      "sourceTitle": "【课件设计】化学实验基本技能训练（一）_化学_初中_韩宁.p",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「【设计】化学实验基本技能训练（一）_化学_初中_韩宁.p」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "c68843ed-af9f-e4b3-b8ae-9057c9b60749"
+      }
+    },
+    {
+      "id": "smartedu-0047",
+      "paradigm": "inquiry",
+      "title": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素",
+      "sourceTitle": "初中化学实验设计与评价（中考专题复习）",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "21fee6ad-8932-e1aa-4f3e-98bd82d76637"
+      }
+    },
+    {
+      "id": "smartedu-0048",
+      "paradigm": "inquiry",
+      "title": "探究「初中化学实验的设计与评价（中考专题复习）」中的影响因素",
+      "sourceTitle": "初中化学实验的设计与评价（中考专题复习）",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「初中化学实验的设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "ebaf227b-5b45-a108-0dce-09fc44b430aa"
+      }
+    },
+    {
+      "id": "smartedu-0049",
+      "paradigm": "inquiry",
+      "title": "第七课 化学实验探究",
+      "sourceTitle": "第七课 化学实验探究",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「第七课 化学实验探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "3149f746-a341-11ec-92ef-246e9675e50c"
+      }
+    },
+    {
+      "id": "smartedu-0050",
+      "paradigm": "inquiry",
+      "title": "探究「化学实验基本操作」中的影响因素",
+      "sourceTitle": "化学实验基本操作",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「化学实验基本操作」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "89c67370-dd5a-2a29-bf7b-4aa1c7276988"
+      }
+    },
+    {
+      "id": "smartedu-0051",
+      "paradigm": "inquiry",
+      "title": "探究「实验是化学的基础」中的影响因素",
+      "sourceTitle": "实验是化学的基础",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「实验是化学的基础」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "d7ac8a96-43a9-2b72-7f8e-41289e339545"
+      }
+    },
+    {
+      "id": "smartedu-0053",
+      "paradigm": "inquiry",
+      "title": "探究「化学实验之美再体验」中的影响因素",
+      "sourceTitle": "化学实验之美再体验",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「化学实验之美再体验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "132b07ac-c3e5-4c5c-d585-5e9877efb885"
+      }
+    },
+    {
+      "id": "smartedu-0054",
+      "paradigm": "inquiry",
+      "title": "课题２ 学习开展化学实验探究",
+      "sourceTitle": "课题２ 学习开展化学实验探究",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「课题２ 学习开展化学实验探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "51fbff70-f17c-c30a-8cd5-c29a63e579c4"
+      }
+    },
+    {
+      "id": "smartedu-0055",
+      "paradigm": "inquiry",
+      "title": "化学探究实验方案设计",
+      "sourceTitle": "化学探究实验方案设计",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「化学探究实验方案设计」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "4de22923-51ff-ca0e-15ad-4a804f4e4c75"
+      }
+    },
+    {
+      "id": "smartedu-0056",
+      "paradigm": "inquiry",
+      "title": "探究「走进化学实验室」中的影响因素",
+      "sourceTitle": "走进化学实验室",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「走进化学实验室」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "4197cfeb-35e4-4617-b4e3-1dbf553a3293"
+      }
+    },
+    {
+      "id": "smartedu-0057",
+      "paradigm": "inquiry",
+      "title": "探究「学生实验」中的影响因素",
+      "sourceTitle": "学生实验",
+      "subjectTags": [
+        "生物",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「学生实验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "11b0f7f4-649b-f1e5-1400-e64d49beb0f8"
+      }
+    },
+    {
+      "id": "smartedu-0058",
+      "paradigm": "inquiry",
+      "title": "探究「实验」中的影响因素",
+      "sourceTitle": "实验视频",
+      "subjectTags": [
+        "生物",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「实验」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "705a36b3-5646-c0f1-e136-05256f9f60eb"
+      }
+    },
+    {
+      "id": "smartedu-0059",
+      "paradigm": "inquiry",
+      "title": "探究「植物生长」中的影响因素",
+      "sourceTitle": "植物生长",
+      "subjectTags": [
+        "生物",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "ce2954be-10b3-dd2e-de9c-d31f768ded22"
+      }
+    },
+    {
+      "id": "smartedu-0060",
+      "paradigm": "inquiry",
+      "title": "探究「植物生长素的探索史」中的影响因素",
+      "sourceTitle": "植物生长素的探索史",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "8aee80b6-6b1a-387a-016b-1c630f070311"
+      }
+    },
+    {
+      "id": "smartedu-0061",
+      "paradigm": "inquiry",
+      "title": "探究·实践 探索植物生长调节剂的应用",
+      "sourceTitle": "探究·实践 探索植物生长调节剂的应用",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "91a1e1db-b648-8fb9-f5f3-86f3ccfa78bc"
+      }
+    },
+    {
+      "id": "smartedu-0062",
+      "paradigm": "inquiry",
+      "title": "探究「第2节 植物的生长」中的影响因素",
+      "sourceTitle": "第2节 植物的生长",
+      "subjectTags": [
+        "生物",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "8568b03c-c7c2-3ce3-0233-da228c962d03"
+      }
+    },
+    {
+      "id": "smartedu-0063",
+      "paradigm": "inquiry",
+      "title": ".植物的变化 实验",
+      "sourceTitle": "5.植物的变化 实验视频",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "61cee2f0-66df-a7e1-0402-9d9a1e7156b5"
+      }
+    },
+    {
+      "id": "smartedu-0065",
+      "paradigm": "inquiry",
+      "title": "探究「第1节 植物生长素」中的影响因素",
+      "sourceTitle": "第1节 植物生长素",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "bc795992-0467-4d9a-a92b-8777817ccabe"
+      }
+    },
+    {
+      "id": "smartedu-0066",
+      "paradigm": "inquiry",
+      "title": "探究「植物的生长」中的影响因素",
+      "sourceTitle": "11.2 植物的生长",
+      "subjectTags": [
+        "生物",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "5dac82c1-5b09-bcdb-f189-434693af6af7"
+      }
+    },
+    {
+      "id": "smartedu-0067",
+      "paradigm": "inquiry",
+      "title": "探究「第一节 植物生长素」中的影响因素",
+      "sourceTitle": "第一节 植物生长素",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "7d8a7f52-d4df-08ea-c481-b40ee40dcec2"
+      }
+    },
+    {
+      "id": "smartedu-0068",
+      "paradigm": "inquiry",
+      "title": "探究「第1节 植物生长素（第一课时）」中的影响因素",
+      "sourceTitle": "第1节 植物生长素（第一课时）",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+      "independentVariable": "光照时长、水量或环境温度（三选一）",
+      "dependentVariable": "发芽数、株高或叶片数量",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "2fb19d2d-5481-11eb-96b8-fa20200c3759"
+      }
+    },
+    {
+      "id": "smartedu-0071",
+      "paradigm": "inquiry",
+      "title": "探究影响物质溶解快慢的常见因素",
+      "sourceTitle": "探究影响物质溶解快慢的常见因素",
+      "subjectTags": [
+        "化学",
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「探究影响物质溶解快慢的常见因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "2b3b32be-f226-decf-864a-7f32571fa250"
+      }
+    },
+    {
+      "id": "smartedu-0074",
+      "paradigm": "inquiry",
+      "title": "《探究影响物质溶解快慢的常见因素》(提交）",
+      "sourceTitle": "《探究影响物质溶解快慢的常见因素》课件(提交）",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「《探究影响物质溶解快慢的常见因素》(提交）」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "cbd7df56-27a7-3fa3-6875-90c875d194a7"
+      }
+    },
+    {
+      "id": "smartedu-0075",
+      "paradigm": "inquiry",
+      "title": "《探究电磁铁磁性强弱》",
+      "sourceTitle": "《探究电磁铁磁性强弱》",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「《探究电磁铁磁性强弱》」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "df654171-0dfc-4d90-df4b-2911fefe9d88"
+      }
+    },
+    {
+      "id": "smartedu-0076",
+      "paradigm": "inquiry",
+      "title": "探究电磁铁磁性强弱",
+      "sourceTitle": "探究电磁铁磁性强弱",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究电磁铁磁性强弱」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "c0913073-9234-de78-e452-b62ffa8b2008"
+      }
+    },
+    {
+      "id": "smartedu-0077",
+      "paradigm": "inquiry",
+      "title": "探究电磁铁磁性强弱的因素",
+      "sourceTitle": "探究电磁铁磁性强弱的因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "11e7f62f-e1e7-2139-fd3e-06919a44702e"
+      }
+    },
+    {
+      "id": "smartedu-0078",
+      "paradigm": "inquiry",
+      "title": "项目学习探究影响电磁铁磁性强弱的因素",
+      "sourceTitle": "项目学习探究影响电磁铁磁性强弱的因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「项目学习探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "72556642-a27e-911a-addb-16ad13036d06"
+      }
+    },
+    {
+      "id": "smartedu-0079",
+      "paradigm": "inquiry",
+      "title": "电磁铁——影响通电螺线管磁性强弱的因素",
+      "sourceTitle": "16.3 电磁铁——影响通电螺线管磁性强弱的因素",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「电磁铁——影响通电螺线管磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "f4509f84-547f-5f0a-71b2-3b96bfa700c7"
+      }
+    },
+    {
+      "id": "smartedu-0081",
+      "paradigm": "inquiry",
+      "title": "电磁铁——影响通电螺线管磁性强弱的因素.mp4",
+      "sourceTitle": "16.3电磁铁——影响通电螺线管磁性强弱的因素.mp4",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「电磁铁——影响通电螺线管磁性强弱的因素.mp4」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "1d76f2ca-3e2f-512b-22ef-74bec642e07a"
+      }
+    },
+    {
+      "id": "smartedu-0085",
+      "paradigm": "inquiry",
+      "title": "学习任务单 16.3电磁铁——影响通电螺线管磁性强弱的因素.docx",
+      "sourceTitle": "学习任务单 16.3电磁铁——影响通电螺线管磁性强弱的因素.docx",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「学习任务单 16.3电磁铁——影响通电螺线管磁性强弱的因素.docx」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "72fc53c3-a265-f240-b80b-de70ad1acde6"
+      }
+    },
+    {
+      "id": "smartedu-0087",
+      "paradigm": "engineering",
+      "title": "任务一 探析结构稳定性",
+      "sourceTitle": "任务一 探析结构稳定性",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "8ae7e49f-7cde-823e-017c-eec085bb03a8"
+      }
+    },
+    {
+      "id": "smartedu-0088",
+      "paradigm": "engineering",
+      "title": "任务一 探析结构稳定性-学习任务单",
+      "sourceTitle": "任务一 探析结构稳定性-学习任务单",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "4974a915-a486-1948-adc4-ddd056a2b020"
+      }
+    },
+    {
+      "id": "smartedu-0090",
+      "paradigm": "engineering",
+      "title": "任务一 探析结构稳定性第1学时",
+      "sourceTitle": "任务一 探析结构稳定性第1学时",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "78a4cb32-2ee0-f26c-5a44-61675f2e9c59"
+      }
+    },
+    {
+      "id": "smartedu-0091",
+      "paradigm": "engineering",
+      "title": "稳固结构的探析",
+      "sourceTitle": "稳固结构的探析",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "1926a2e5-b9df-ab72-578d-7758220f76a6"
+      }
+    },
+    {
+      "id": "smartedu-0095",
+      "paradigm": "engineering",
+      "title": "稳固结构的探析.mp4",
+      "sourceTitle": "稳固结构的探析.mp4",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "不同结构形状会怎样影响模型的承重能力？",
+      "independentVariable": "结构形状或支撑方式",
+      "dependentVariable": "最大承重质量",
+      "engineeringTranslation": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "d8f1eb01-eca1-a767-c7cb-8184a3b2afce"
+      }
+    },
+    {
+      "id": "smartedu-0102",
+      "paradigm": "inquiry",
+      "title": "探究「《纸飞机》」中的影响因素",
+      "sourceTitle": "《纸飞机》",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "不同机翼形状或折叠方式会怎样影响纸飞机飞行距离？",
+      "independentVariable": "机翼形状或折叠方式",
+      "dependentVariable": "飞行距离",
+      "engineeringTranslation": "把“做飞得远的纸飞机”转化为“改变一个设计参数，测试飞行距离”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "7f804345-acad-443f-a570-c9dffb8beb69"
+      }
+    },
+    {
+      "id": "smartedu-0104",
+      "paradigm": "inquiry",
+      "title": "探究「折纸飞机」中的影响因素",
+      "sourceTitle": "折纸飞机",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "不同机翼形状或折叠方式会怎样影响纸飞机飞行距离？",
+      "independentVariable": "机翼形状或折叠方式",
+      "dependentVariable": "飞行距离",
+      "engineeringTranslation": "把“做飞得远的纸飞机”转化为“改变一个设计参数，测试飞行距离”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "99369382-7269-9a3e-b479-36c9590cef91"
+      }
+    },
+    {
+      "id": "smartedu-0106",
+      "paradigm": "inquiry",
+      "title": "探究「折纸飞机第1学时」中的影响因素",
+      "sourceTitle": "1 折纸飞机第1学时",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "不同机翼形状或折叠方式会怎样影响纸飞机飞行距离？",
+      "independentVariable": "机翼形状或折叠方式",
+      "dependentVariable": "飞行距离",
+      "engineeringTranslation": "把“做飞得远的纸飞机”转化为“改变一个设计参数，测试飞行距离”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "037e7658-1eb6-e266-182d-0e376186c180"
+      }
+    },
+    {
+      "id": "smartedu-0107",
+      "paradigm": "inquiry",
+      "title": "探究「折纸飞机」中的影响因素",
+      "sourceTitle": "1 折纸飞机",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "不同机翼形状或折叠方式会怎样影响纸飞机飞行距离？",
+      "independentVariable": "机翼形状或折叠方式",
+      "dependentVariable": "飞行距离",
+      "engineeringTranslation": "把“做飞得远的纸飞机”转化为“改变一个设计参数，测试飞行距离”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "8aee80c0-638c-99d2-0163-9106b80917db"
+      }
+    },
+    {
+      "id": "smartedu-0109",
+      "paradigm": "inquiry",
+      "title": "探究「图上距离与实际距离」中的影响因素",
+      "sourceTitle": "图上距离与实际距离",
+      "subjectTags": [
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「图上距离与实际距离」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "a18a8c68-4ecb-9860-8167-3d6e87a0b9be"
+      }
+    },
+    {
+      "id": "smartedu-0110",
+      "paradigm": "inquiry",
+      "title": "探究「球面距离」中的影响因素",
+      "sourceTitle": "15.6 球面距离",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究「球面距离」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "71255da1-a1c1-11ec-9c6b-fa20200f090a"
+      }
+    },
+    {
+      "id": "smartedu-0111",
+      "paradigm": "inquiry",
+      "title": "探究「两平行线间的距离」中的影响因素",
+      "sourceTitle": "4.6两平行线间的距离",
+      "subjectTags": [
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「两平行线间的距离」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "c8e8d886-2479-ab7d-e88d-289f342954e7"
+      }
+    },
+    {
+      "id": "smartedu-0112",
+      "paradigm": "inquiry",
+      "title": "探究「制造距离感（现实空间）」中的影响因素",
+      "sourceTitle": "制造距离感（现实空间）",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "高中素材（需降阶改造）",
+      "questionStem": "围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "d7ca3aa0-1ec1-c198-1ee8-9fad4921b50f"
+      }
+    },
+    {
+      "id": "smartedu-0113",
+      "paradigm": "inquiry",
+      "title": "《比较相同距离内运动的快慢》",
+      "sourceTitle": "《比较相同距离内运动的快慢》课件",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「《比较相同距离内运动的快慢》」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "928a48bc-4450-116f-839f-119a6a959a76"
+      }
+    },
+    {
+      "id": "smartedu-0114",
+      "paradigm": "engineering",
+      "title": "自制净水器",
+      "sourceTitle": "自制净水器",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "836fdab6-3e86-c2fe-87f4-28728ad3b032"
+      }
+    },
+    {
+      "id": "smartedu-0115",
+      "paradigm": "inquiry",
+      "title": "探究「水质检测及自制净水器」中的影响因素",
+      "sourceTitle": "水质检测及自制净水器",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "094f9508-2c88-a16b-f098-9d5ffd2e9a28"
+      }
+    },
+    {
+      "id": "smartedu-0116",
+      "paradigm": "engineering",
+      "title": "水质检测及自制净水器1",
+      "sourceTitle": "水质检测及自制净水器1",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "028cbd22-90af-425c-3a76-0c9dc485be4c"
+      }
+    },
+    {
+      "id": "smartedu-0117",
+      "paradigm": "engineering",
+      "title": "跨学科实践活动1 自制简易净水器",
+      "sourceTitle": "跨学科实践活动1 自制简易净水器",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "c4a66b4c-21ba-4a32-0bd2-a07c55bbd985"
+      }
+    },
+    {
+      "id": "smartedu-0119",
+      "paradigm": "engineering",
+      "title": "跨学科实践活动1 自制简易净水器",
+      "sourceTitle": "跨学科实践活动1 自制简易净水器 课件",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "e85eabb6-36d9-fcbb-5570-8a1ff7272a78"
+      }
+    },
+    {
+      "id": "smartedu-0120",
+      "paradigm": "inquiry",
+      "title": "探究「跨学科实践活动1 自制简易净水器 实验」中的影响因素",
+      "sourceTitle": "跨学科实践活动1 自制简易净水器 实验视频",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "0e65dac2-f38f-6116-35f5-fda97bcba176"
+      }
+    },
+    {
+      "id": "smartedu-0122",
+      "paradigm": "engineering",
+      "title": "跨学科实践活动1 自制简易净水器 微课",
+      "sourceTitle": "跨学科实践活动1 自制简易净水器 微课视频",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "f6f8c0f3-76cd-4c06-d68d-267dfeea2ea8"
+      }
+    },
+    {
+      "id": "smartedu-0123",
+      "paradigm": "engineering",
+      "title": "跨学科实践活动1 自制简易净水器 学习任务单",
+      "sourceTitle": "跨学科实践活动1 自制简易净水器 学习任务单",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "5caf5026-0a19-f6ce-eceb-e65200488fb4"
+      }
+    },
+    {
+      "id": "smartedu-0124",
+      "paradigm": "engineering",
+      "title": "跨学科实践活动3 水质检测及自制净水器",
+      "sourceTitle": "跨学科实践活动3 水质检测及自制净水器",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "d93b9979-ca2e-d6c6-4e7c-2d2522dbc7c3"
+      }
+    },
+    {
+      "id": "smartedu-0125",
+      "paradigm": "engineering",
+      "title": "水质检测及自制净水器.mp4",
+      "sourceTitle": "水质检测及自制净水器视频.mp4",
+      "subjectTags": [
+        "化学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "4e580c26-343d-c344-d8bc-31df2a48db35"
+      }
+    },
+    {
+      "id": "smartedu-0129",
+      "paradigm": "inquiry",
+      "title": "探究「生活中的物理」中的影响因素",
+      "sourceTitle": "生活中的物理",
+      "subjectTags": [
+        "物理",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「探究「生活中的物理」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "f315fa05-7c50-bdf0-20bb-8ccee1590a31"
+      }
+    },
+    {
+      "id": "smartedu-0131",
+      "paradigm": "inquiry",
+      "title": "科学探究",
+      "sourceTitle": "科学探究",
+      "subjectTags": [
+        "科学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「科学探究」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "e87d9d48-7d5f-93c4-22c6-f1ce4765f026"
+      }
+    },
+    {
+      "id": "smartedu-0136",
+      "paradigm": "inquiry",
+      "title": "科学探究（PAD课）",
+      "sourceTitle": "科学探究（PAD课）",
+      "subjectTags": [
+        "化学",
+        "科学",
+        "初中"
+      ],
+      "gradeBand": "初中",
+      "questionStem": "围绕「科学探究（PAD课）」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "search",
+        "resourceId": "abdf7e91-a2f5-9363-84d6-c8ea3cae71ea"
+      }
+    },
+    {
+      "id": "smartedu-0143",
+      "paradigm": "engineering",
+      "title": "机器人舞台-百年征程 未来可期",
+      "sourceTitle": "机器人舞台-百年征程 未来可期",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "c67e9780-2bf0-7724-91e5-e70312f2af7d",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0144",
+      "paradigm": "engineering",
+      "title": "宇宙灯塔-探索宇宙的边缘",
+      "sourceTitle": "宇宙灯塔-探索宇宙的边缘",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「宇宙灯塔-探索宇宙的边缘」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "0aa0ac2b-be58-d827-d962-a565e6f1bacf",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0145",
+      "paradigm": "inquiry",
+      "title": "探究「科学公开课第三季」中的影响因素",
+      "sourceTitle": "科学公开课第三季",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「科学公开课第三季」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "aa9ed3f8-117a-4fff-ab59-1597523d241d",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0146",
+      "paradigm": "inquiry",
+      "title": "探究「科学公开课第一季」中的影响因素",
+      "sourceTitle": "科学公开课第一季",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「科学公开课第一季」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "72dde67f-c62d-40fb-afba-3a7c99ef1acd",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0147",
+      "paradigm": "inquiry",
+      "title": "探究「推动文明进程的人——汉代造纸专家蔡伦」中的影响因素",
+      "sourceTitle": "推动文明进程的人——汉代造纸专家蔡伦",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「推动文明进程的人——汉代造纸专家蔡伦」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "4c7360c5-fee5-45ad-869e-b8da10010851",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0148",
+      "paradigm": "engineering",
+      "title": "欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月",
+      "sourceTitle": "欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "02cdce18-7b97-0443-725c-cb159fc719a3",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0150",
+      "paradigm": "inquiry",
+      "title": "探究「钟南山 著名呼吸病学专家 | 打败怪兽，医学科技有智慧」中的影响因素",
+      "sourceTitle": "钟南山 著名呼吸病学专家 | 打败怪兽，医学科技有智慧",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「钟南山 著名呼吸病学专家 | 打败怪兽，医学科技有智慧」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "a952380a-81c8-ba51-d644-3c662587abd3",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0151",
+      "paradigm": "engineering",
+      "title": "天和核心舱",
+      "sourceTitle": "天和核心舱",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「天和核心舱」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "722b8e50-193d-ba75-f542-6e1396320072",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0152",
+      "paradigm": "engineering",
+      "title": "李铁风 软体机器人与智能装备科学 软体机器鱼遨游万米深海（上）",
+      "sourceTitle": "李铁风 软体机器人与智能装备科学 软体机器鱼遨游万米深海（上）",
+      "subjectTags": [
+        "科学",
+        "人工智能"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "ab86c405-a4d6-5808-2ee2-aea4e1f8c71a",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0153",
+      "paradigm": "inquiry",
+      "title": "探究「科学公开课第二季」中的影响因素",
+      "sourceTitle": "科学公开课第二季",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「科学公开课第二季」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "f702a6c9-6038-4c17-baff-884f427b2514",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0154",
+      "paradigm": "inquiry",
+      "title": "探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素",
+      "sourceTitle": "世所罕见的“全面发展之人物”——汉代科学家张衡",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "365524cb-0709-4191-bd8a-b79c4376a541",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/4.json"
+      }
+    },
+    {
+      "id": "smartedu-0155",
+      "paradigm": "inquiry",
+      "title": "探究「如何在太阳系寻找生命？如何在太阳系中寻找生命？」中的影响因素",
+      "sourceTitle": "如何在太阳系寻找生命？第2课：如何在太阳系中寻找生命？",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「探究「如何在太阳系寻找生命？如何在太阳系中寻找生命？」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "a8369a77-6be1-ed6d-27a0-7abbc34667bd",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0156",
+      "paradigm": "engineering",
+      "title": "走进工艺世界——掐丝珐琅杯的制作",
+      "sourceTitle": "走进工艺世界——掐丝珐琅杯的制作",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「走进工艺世界——掐丝珐琅杯的制作」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "a976491d-3fc1-203a-c60e-62fc153ad039",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0157",
+      "paradigm": "engineering",
+      "title": "制作太阳能净水器",
+      "sourceTitle": "制作太阳能净水器",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+      "independentVariable": "过滤材料种类或过滤层数",
+      "dependentVariable": "过滤后水的浑浊程度/颜色变化",
+      "engineeringTranslation": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "5e9718a7-02ab-25d3-f0e0-bb9010040b51",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0158",
+      "paradigm": "inquiry",
+      "title": "探究「地球上为什么会有生命 地球也有航天服吗？」中的影响因素",
+      "sourceTitle": "地球上为什么会有生命 第1课：地球也有航天服吗？",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「探究「地球上为什么会有生命 地球也有航天服吗？」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "8e633a5a-a703-cce6-a3ab-c1045b6910a2",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0159",
+      "paradigm": "engineering",
+      "title": "高中人工智能校本课程设计和教学实践",
+      "sourceTitle": "高中人工智能校本课程设计和教学实践",
+      "subjectTags": [
+        "人工智能"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "24ff1d04-8b0e-b48d-96ec-7a692eea5ace",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0160",
+      "paradigm": "inquiry",
+      "title": "探究「“花卉的一生”跨学科项目化学习案例」中的影响因素",
+      "sourceTitle": "“花卉的一生”跨学科项目化学习案例",
+      "subjectTags": [
+        "化学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「“花卉的一生”跨学科项目化学习案例」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "4135052e-f44d-a66c-65f7-34ef9ac9d5c8",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0161",
+      "paradigm": "engineering",
+      "title": "科学探究与艺术创生的融合实践——以《石头的新装》跨学科项目为例",
+      "sourceTitle": "科学探究与艺术创生的融合实践——以《石头的新装》跨学科项目为例",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「科学探究与艺术创生的融合实践——以《石头的新装》跨学科项目为例」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "1fbf7bb8-e128-3286-09b4-e24f97db69c1",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0162",
+      "paradigm": "engineering",
+      "title": "融美于废，启智于行",
+      "sourceTitle": "融美于废，启智于行",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「融美于废，启智于行」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "2c92318b-d882-b8a8-5e37-e6c1b1eb3996",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0163",
+      "paradigm": "inquiry",
+      "title": "模拟白浪河湿地探究水体生态失衡问题",
+      "sourceTitle": "模拟白浪河湿地探究水体生态失衡问题",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「模拟白浪河湿地探究水体生态失衡问题」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "ab9529b4-1528-4729-412c-7de6bd2c4a19",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0164",
+      "paradigm": "engineering",
+      "title": "探究智能遮光系统——基于环境光的自动控制",
+      "sourceTitle": "探究智能遮光系统——基于环境光的自动控制",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "37a36400-35c6-2032-6897-8d85943ac2bf",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0165",
+      "paradigm": "engineering",
+      "title": "虚拟现实实验室课程手册",
+      "sourceTitle": "虚拟现实实验室课程手册",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「虚拟现实实验室课程手册」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "73fabd48-648c-4c68-fcb4-6c206fe44d4c",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0166",
+      "paradigm": "engineering",
+      "title": "AI辅助三维设计的实践应用",
+      "sourceTitle": "AI辅助三维设计的实践应用",
+      "subjectTags": [
+        "人工智能"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "f969efe5-91c6-045b-825f-d4557f1e7ed9",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0167",
+      "paradigm": "engineering",
+      "title": "“处州印象”STEM课程之奇迹创意积木",
+      "sourceTitle": "“处州印象”STEM课程之奇迹创意积木",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「“处州印象”STEM课程之奇迹创意积木」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "f313ccf5-c173-3594-ed7f-d0aa2553436d",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0168",
+      "paradigm": "engineering",
+      "title": "指向核心素养的AI课程教学案例——为学生 提供项目式学习的情境",
+      "sourceTitle": "指向核心素养的AI课程教学案例——为学生 提供项目式学习的情境",
+      "subjectTags": [
+        "人工智能"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "415bad84-bd28-4371-9918-dceb6bb75bc5",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0169",
+      "paradigm": "inquiry",
+      "title": "探究「如何在太阳系寻找生命 太阳是我们的朋友，它也会发脾气吗？」中的影响因素",
+      "sourceTitle": "如何在太阳系寻找生命 第1课：太阳是我们的朋友，它也会发脾气吗？",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「探究「如何在太阳系寻找生命 太阳是我们的朋友，它也会发脾气吗？」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "bc9551b3-e649-b446-b7ce-c78106f8cff0",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0170",
+      "paradigm": "engineering",
+      "title": "火星基地食物供给系统的设计",
+      "sourceTitle": "火星基地食物供给系统的设计",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "efe08d74-4bf4-d5fb-bb20-327929ca08aa",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0171",
+      "paradigm": "engineering",
+      "title": "基于中草药的AI劳动实践活动",
+      "sourceTitle": "基于中草药的AI劳动实践活动",
+      "subjectTags": [
+        "劳动",
+        "人工智能"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "863a0983-3fea-20cf-5b04-82aca6e7f964",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0172",
+      "paradigm": "inquiry",
+      "title": "地球上为什么会有生命 地球也会发生变化吗",
+      "sourceTitle": "地球上为什么会有生命 第2课：地球也会发生变化吗",
+      "subjectTags": [
+        "科学"
+      ],
+      "gradeBand": "小学高年级/初中可改造",
+      "questionStem": "围绕「地球上为什么会有生命 地球也会发生变化吗」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "e4125d4c-739e-559b-ab56-ee705abcb002",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0173",
+      "paradigm": "inquiry",
+      "title": "探究「万物共生，和美永续——守护生物多样性云展览」中的影响因素",
+      "sourceTitle": "万物共生，和美永续——守护生物多样性云展览",
+      "subjectTags": [
+        "生物"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「万物共生，和美永续——守护生物多样性云展览」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "996c167d-8959-e95f-6d2b-0675eafc9008",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0174",
+      "paradigm": "inquiry",
+      "title": "探究「揭秘水族箱的秘密」中的影响因素",
+      "sourceTitle": "揭秘水族箱的秘密",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「揭秘水族箱的秘密」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "80d523f9-6c8d-8d35-2008-104c275cac05",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/5.json"
+      }
+    },
+    {
+      "id": "smartedu-0175",
+      "paradigm": "engineering",
+      "title": "有柄杯倒置无污染沥水装置",
+      "sourceTitle": "有柄杯倒置无污染沥水装置",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「有柄杯倒置无污染沥水装置」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "4c6c2e09-a483-eff7-d11a-b516ba51ef18",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0176",
+      "paradigm": "engineering",
+      "title": "中国星照前程（北斗卫星导航系统）",
+      "sourceTitle": "中国星照前程（北斗卫星导航系统）",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "a9eb2b62-aa5d-5980-c875-3689e5242221",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0177",
+      "paradigm": "inquiry",
+      "title": "探究「垃圾分类突击队」中的影响因素",
+      "sourceTitle": "垃圾分类突击队",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「垃圾分类突击队」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "4f63bad1-0fd9-b80c-6129-be47b58060bd",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0178",
+      "paradigm": "inquiry",
+      "title": "探究「防作弊视力检测箱」中的影响因素",
+      "sourceTitle": "防作弊视力检测箱",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「防作弊视力检测箱」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "e95c2a56-f6ac-8505-7637-48d2e95a9150",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0179",
+      "paradigm": "inquiry",
+      "title": "探究「云端智学轩-信息技术学科专题网站」中的影响因素",
+      "sourceTitle": "云端智学轩-信息技术学科专题网站",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「云端智学轩-信息技术学科专题网站」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "5299bcc9-8ab4-0b6b-c446-05fd186be914",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0180",
+      "paradigm": "engineering",
+      "title": "关于减少电动自行车安全隐患的车座压力保险装置的研究",
+      "sourceTitle": "关于减少电动自行车安全隐患的车座压力保险装置的研究",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「关于减少电动自行车安全隐患的车座压力保险装置的研究」，改变一个设计参数会怎样影响作品表现？",
+      "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+      "dependentVariable": "作品表现指标（成功率、距离、速度、稳定性等）",
+      "engineeringTranslation": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "730bc1d5-abf6-5b7c-0c2e-0d5ab68487ed",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0181",
+      "paradigm": "inquiry",
+      "title": "探究「悬浮时钟」中的影响因素",
+      "sourceTitle": "悬浮时钟",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「悬浮时钟」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "1dc7268e-2b02-f36f-6471-8d7dc210baac",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0182",
+      "paradigm": "inquiry",
+      "title": "探究「奇妙火星之旅」中的影响因素",
+      "sourceTitle": "奇妙火星之旅",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「奇妙火星之旅」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "a24869e7-28a3-30ea-6bdc-ee4468d3843c",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0183",
+      "paradigm": "engineering",
+      "title": "社团智领系统",
+      "sourceTitle": "社团智领系统",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+      "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+      "dependentVariable": "成功率、响应时间或误判次数",
+      "engineeringTranslation": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "9da2cb4f-4f25-17a2-869e-f1578a571637",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/6.json"
+      }
+    },
+    {
+      "id": "smartedu-0184",
+      "paradigm": "inquiry",
+      "title": "探究「全球STEM教育发展的关键一步」中的影响因素",
+      "sourceTitle": "全球STEM教育发展的关键一步",
+      "subjectTags": [
+        "STEM"
+      ],
+      "gradeBand": "初中可改造",
+      "questionStem": "围绕「探究「全球STEM教育发展的关键一步」中的影响因素」，改变一个条件会怎样影响观察结果？",
+      "independentVariable": "一个可人为改变的条件",
+      "dependentVariable": "可观察或可测量的结果",
+      "safetyNote": "优先选择低风险、材料易得、可在教师指导下完成的方案。",
+      "source": {
+        "platform": "basic.smartedu.cn",
+        "api": "technologyEdu",
+        "resourceId": "6efaf375-e6f8-1733-2e07-56756e191c30",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/e5649925-441d-4a53-b525-51a2f1c4e0a8/auxo_channel_api/v2/channels/3303d351-a43f-4580-9a43-58a929595fda/sections/229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc/files/7.json"
+      }
+    }
+  ]
+}

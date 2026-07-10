@@ -91,6 +91,22 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
   // 阶段1
   if (raw.stage1_confirmed === true) out.stage1_confirmed = true;
   if (isStr(raw.snapshot)) out.snapshot = raw.snapshot;
+  const tm = raw.theme_mapping as Record<string, unknown> | undefined;
+  if (
+    tm &&
+    typeof tm === 'object' &&
+    isStr(tm.originalInterest) &&
+    isStr(tm.retainedFeature) &&
+    isStr(tm.classroomProxy) &&
+    isStr(tm.researchQuestion)
+  ) {
+    out.theme_mapping = {
+      originalInterest: tm.originalInterest,
+      retainedFeature: tm.retainedFeature,
+      classroomProxy: tm.classroomProxy,
+      researchQuestion: tm.researchQuestion,
+    };
+  }
   if (
     raw.variables &&
     typeof raw.variables === 'object' &&

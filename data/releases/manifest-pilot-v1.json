@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "version": "pilot-v1",
+  "frozenAt": "2026-07-10T04:47:32.251Z",
+  "recipe": {
+    "goldWeight": 1.5,
+    "silverWeight": 1,
+    "includeHumanGold": true,
+    "includeReviewedSilver": true
+  },
+  "summary": {
+    "clean": 1,
+    "humanGold": 1,
+    "reviewedSilver": 0,
+    "byPhase": {
+      "P1": 1
+    }
+  },
+  "items": [
+    {
+      "sampleId": "9e2f7ead-87b5-47f4-a376-d3b819e5bb82",
+      "revisionId": "e978d191-9f87-41a4-b567-304dd9c05d7f",
+      "tier": "human_gold",
+      "reason": "review:3edabb9e-a6b5-4d0f-94e0-2845ccaba4fa"
+    }
+  ]
+}

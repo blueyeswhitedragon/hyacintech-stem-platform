@@ -1,0 +1,408 @@
+[
+  {
+    "id": "stem-p1-engineering-watering-threshold-v1",
+    "source": "handcrafted_from_blind_eval_v3",
+    "scenario": "工程项目型-自动浇花器",
+    "phase": 1,
+    "rubricTargets": [
+      "theme_fidelity",
+      "student_agency",
+      "proxy_quality",
+      "transformation_reasoning",
+      "interdisciplinary_integration",
+      "cognitive_load_control",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "data/blind-eval/verdict-qwen-smoke-vs-dsv4-smoke-工程项目型.json",
+      "data/blind-eval/transcript-qwen-smoke.json:persona-工程项目型"
+    ],
+    "qualityNotes": "Keep the sensor/threshold mechanism. Do not replace it with cotton thread, capillary action, siphons, or other unrelated physical proxies.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个自动浇花器，最好能根据土壤干湿自己浇水"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"自动浇花器这个想法可以转成很好的探究问题。我们先抓住它最核心的机制：它不是单纯“浇水多不多”，而是装置能不能根据土壤干湿作出判断。\\n\\n你最想保留的是“自动判断干湿并触发浇水”这个机制吗？如果是，下一步我们就把它翻译成课堂里可改变的“湿度阈值”。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先说清原装置里最关键的判断机制，而不是先想材料清单。\",\"把“自动”翻译成一句话：达到某个条件时才触发动作。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "那我想研究土壤湿度阈值不同，会不会影响自动浇花器的浇水效果"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个研究问题已经清楚了：你保留了自动浇花器里的“湿度阈值触发”机制，并把要改变的因素锁定为土壤湿度阈值。请查看下方《探究问题确认书》，确认无误后进入方案设计阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"制作一个能根据土壤干湿自动浇水的装置\",\"retainedFeature\":\"装置根据土壤湿度阈值自动判断是否需要浇水\",\"classroomProxy\":\"用低压土壤湿度传感器或模拟读数设置不同触发阈值，观察触发判断是否准确\",\"researchQuestion\":\"不同土壤湿度阈值是否会影响自动浇花器的浇水准确率？\"},\"snapshot\":\"原始兴趣：制作一个能根据土壤干湿自动浇水的装置\\n\\n保留的情境特征：装置根据土壤湿度阈值自动判断是否需要浇水\\n\\n课堂代理：用低压土壤湿度传感器或模拟读数设置不同触发阈值，观察触发判断是否准确\\n\\n研究问题：不同土壤湿度阈值是否会影响自动浇花器的浇水准确率？\\n\\n要改变的（自变量方向）：土壤湿度触发阈值\\n\\n想观察/比较的现象：自动浇水判断是否准确（具体测量方式留待方案设计阶段确定）\",\"variables\":{\"independent\":\"土壤湿度触发阈值\"}}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p2-engineering-watering-schema-v1",
+    "source": "handcrafted_from_blind_eval_v3",
+    "scenario": "工程项目型-自动浇花器",
+    "phase": 2,
+    "rubricTargets": [
+      "proxy_quality",
+      "interdisciplinary_integration",
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "data/blind-eval/verdict-qwen-smoke-vs-dsv4-smoke-工程项目型.json",
+      "data/blind-eval/transcript-dsv4-smoke.json:persona-工程项目型"
+    ],
+    "qualityNotes": "Phase 2 should keep the threshold/sensor design and generate an accuracy-oriented table once variables are clear.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已确认选题，现在开始设计实验方案。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们进入方案设计阶段。当前研究问题是：不同土壤湿度阈值是否会影响自动浇花器的浇水准确率？\\n\\n本阶段按这个顺序推进：① 先定阈值梯度 ② 再定义浇水准确率 ③ 确认控制变量 ④ 生成数据记录表。\\n\\n先聚焦第一步：你准备设置哪几个湿度阈值？可以用百分比或传感器读数表示。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如果暂时没有传感器数值，也可以先写“低/中/高”，下一轮再具体化。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我打算设三个阈值：低、中、高，每种阈值测试10次"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"三个阈值梯度和每组10次重复都合理。现在只补一个关键定义：你怎样判断“浇水准确”？\\n\\n请用一句话说明：在什么土壤状态下应该启动水泵，什么状态下不应该启动。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"把因变量写成可记录的结果，例如“判断正确/错误”或“是否误触发”。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "因变量看该浇水时有没有浇、不该浇时有没有误浇，控制同一个传感器、同一种土壤和水泵"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好。你已经明确了因变量是浇水判断是否正确，控制变量包括同一传感器、同一种土壤和同一个水泵。\\n\\n最后确认记录方式：每次测试都记录土壤状态、阈值、是否启动水泵和判断是否正确，这样可以吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"一行记录一次测试，后续可以按阈值统计正确率。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "每次测试记录土壤状态、阈值、是否启动水泵和判断是否正确，可以生成数据表了"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"方案已经成型。我根据你的设计生成了数据记录表：每一行是一轮测试，记录阈值设置、土壤状态、水泵动作和判断结果，便于后续计算不同阈值下的准确率。\\n\\n右侧面板可以预览和修改列定义，检查无误后点击提交。安全上请使用低压电源，传感器和水泵接线远离水滴。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":false,\"data_table_schema\":{\"columns\":[{\"key\":\"test_id\",\"title\":\"测试编号\",\"type\":\"number\",\"required\":true},{\"key\":\"threshold_level\",\"title\":\"阈值设置\",\"type\":\"text\",\"required\":true},{\"key\":\"soil_state\",\"title\":\"模拟土壤状态\",\"type\":\"text\",\"required\":true},{\"key\":\"pump_action\",\"title\":\"水泵是否启动\",\"type\":\"text\",\"required\":true},{\"key\":\"judgment_correct\",\"title\":\"判断是否正确\",\"type\":\"text\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":30,\"maxRows\":200},\"risks\":[{\"description\":\"水泵和传感器需要使用低压供电，接线处应远离水滴，避免短路。\",\"severity\":\"medium\"}]}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p1-high-concept-mars-light-v1",
+    "source": "handcrafted_from_blind_eval_v3",
+    "scenario": "高概念降级型-火星基地植物",
+    "phase": 1,
+    "rubricTargets": [
+      "theme_fidelity",
+      "student_agency",
+      "transformation_reasoning",
+      "cognitive_load_control",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "data/blind-eval/verdict-qwen-smoke-vs-dsv4-smoke-高概念降级型.json"
+    ],
+    "qualityNotes": "Preserve the Mars-base artificial-control feature while avoiding a ready-made list of topics.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个和太空有关的项目，最好有点像火星基地"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"火星基地这个主题可以降级成课堂探究，但关键是不要把它随便换成普通植物实验。\\n\\n你觉得火星基地和地球生活相比，最想保留的真实困难或限制是什么？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先找“火星基地”里最特别的限制条件。\",\"再想课堂里能不能用一个安全条件模拟它。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我最感兴趣的是火星基地里植物怎么活下来，因为那里条件都要人工控制"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你抓住了“人工控制环境”这个核心特征。下一步只需要选一个课堂里能安全改变的人工控制条件。\\n\\n在植物生长条件里，哪一个条件最适合用教室里的材料模拟，并且你愿意亲自去观察它造成的变化？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用“我想保留……，在课堂里用……来模拟”这句话整理思路。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想保留人工控制光照这个特点，用不同人工光照时长看看绿豆发芽会不会不一样"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，你没有把“火星基地”简单换成绿豆发芽，而是保留了“植物生长条件需要人工控制”这一点，并用人工光照时长做代理。请查看下方《探究问题确认书》，确认无误后进入方案设计阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"火星基地里植物怎样生存\",\"retainedFeature\":\"基地环境中植物生长条件需要人工控制\",\"classroomProxy\":\"用不同人工光照时长模拟光照管理策略\",\"researchQuestion\":\"不同人工光照时长是否影响绿豆发芽和早期生长？\"},\"snapshot\":\"原始兴趣：火星基地里植物怎样生存\\n\\n保留的情境特征：基地环境中植物生长条件需要人工控制\\n\\n课堂代理：用不同人工光照时长模拟光照管理策略\\n\\n研究问题：不同人工光照时长是否影响绿豆发芽和早期生长？\\n\\n要改变的（自变量方向）：每天的人工光照时长\\n\\n想观察/比较的现象：绿豆发芽和早期生长情况（具体测量方式留待方案设计阶段确定）\",\"variables\":{\"independent\":\"人工光照时长\"}}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p2-high-concept-mars-light-schema-v1",
+    "source": "handcrafted_from_blind_eval_v3",
+    "scenario": "高概念降级型-火星基地植物",
+    "phase": 2,
+    "rubricTargets": [
+      "student_agency",
+      "cognitive_load_control",
+      "safety",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "data/blind-eval/verdict-qwen-smoke-vs-dsv4-smoke-高概念降级型.json"
+    ],
+    "qualityNotes": "Avoid giving gradients before the student. Add operational definition and light/electricity safety.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已确认选题，现在开始设计实验方案。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们开始方案设计。研究问题是：不同人工光照时长是否影响绿豆发芽和早期生长？\\n\\n路线是：① 定光照时长梯度 ② 定发芽和生长的测量方式 ③ 确认控制变量 ④ 生成数据记录表。\\n\\n先从第一步开始：你准备设置哪几个每天光照时长？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"只需要先说光照时长的几个水平，其他细节下一步再定。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我准备设0小时、4小时、8小时、12小时人工光照，每组10颗绿豆"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"四个光照时长梯度很清楚，每组10颗绿豆也便于比较。\\n\\n现在聚焦因变量：你准备怎样定义“发芽”和“早期生长”？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"例如先定一个可重复判断的发芽标准，再定一个简单可测的生长指标。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "观察每天有没有发芽和幼苗大概长得怎么样，绿豆品种、水量、温度尽量一样"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"思路已经够用了。我们把“发芽”定义为胚根突破种皮约2毫米，把“早期生长”记录为芽长或幼苗高度；你也已经提出绿豆品种、水量、温度作为控制变量。\\n\\n如果你每天固定时间记录一次，准备连续记录几天？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录天数决定数据表需要多少行。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "每天固定时间记录一次，做7天，可以生成数据表了"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"方案设计得差不多了。我根据你的实验设计生成了数据记录表：每天一行，每个光照时长组分别记录发芽数和芽长，方便比较趋势。\\n\\n右侧面板可以预览和修改列定义，检查无误后点击提交。使用LED灯和定时器时不要直视强光，电源和接线要远离水源。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":false,\"data_table_schema\":{\"columns\":[{\"key\":\"day\",\"title\":\"天数\",\"type\":\"number\",\"required\":true},{\"key\":\"group_0h_germinated\",\"title\":\"0h组发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"group_0h_height_mm\",\"title\":\"0h组芽长(mm)\",\"type\":\"number\",\"required\":true},{\"key\":\"group_4h_germinated\",\"title\":\"4h组发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"group_4h_height_mm\",\"title\":\"4h组芽长(mm)\",\"type\":\"number\",\"required\":true},{\"key\":\"group_8h_germinated\",\"title\":\"8h组发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"group_8h_height_mm\",\"title\":\"8h组芽长(mm)\",\"type\":\"number\",\"required\":true},{\"key\":\"group_12h_germinated\",\"title\":\"12h组发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"group_12h_height_mm\",\"title\":\"12h组芽长(mm)\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":7,\"maxRows\":200},\"risks\":[{\"description\":\"人工光源和定时器需远离水源，避免长时间直视强光。\",\"severity\":\"medium\"}]}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p1-real-world-classroom-heat-v1",
+    "source": "handcrafted_from_topic_library_and_rubric",
+    "scenario": "现实问题抽象型-教室遮光降温",
+    "phase": 1,
+    "rubricTargets": [
+      "theme_fidelity",
+      "proxy_quality",
+      "transformation_reasoning",
+      "student_agency",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "scripts/blind-eval.ts:PERSONAS.现实问题抽象型",
+      "data/topic-library.json"
+    ],
+    "qualityNotes": "Transform a real classroom problem into a safe proxy without over-designing phase 2 details.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究教室里夏天太热这个问题，但不知道能不能做成实验"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个现实问题可以做成课堂探究。先不要急着搭完整教室模型，我们先找它的关键机制：夏天教室变热，可能和阳光照射、遮挡材料、通风等因素有关。\\n\\n请说一个你最想保留的真实变化，我们再把它变成课堂里安全可做的小模型。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"从真实问题里抽出一个可改变条件，再找一个安全的小模型模拟它。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想保留“遮挡阳光以后室内变凉”这个特点，课堂里也许可以用台灯照纸盒"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个转化很合适：用台灯照纸盒模拟阳光照进教室，用不同遮光材料模拟窗户遮挡。现在只需要把要改变的因素说清楚。\\n\\n你准备改变的是遮光材料，对吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"研究问题可以写成“不同……会不会影响……”。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "那我想研究不同遮光材料会不会影响纸盒里面温度变化，要改变的是遮光材料"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，你已经把真实问题转化成可操作的课堂探究，并明确了自变量方向。请查看下方《探究问题确认书》，确认无误后进入方案设计阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"教室夏天太热\",\"retainedFeature\":\"遮挡阳光后室内升温可能变慢或温度降低\",\"classroomProxy\":\"用台灯照射纸盒，并比较不同遮光材料覆盖后的盒内温度变化\",\"researchQuestion\":\"不同遮光材料是否会影响纸盒内部温度变化？\"},\"snapshot\":\"原始兴趣：教室夏天太热\\n\\n保留的情境特征：遮挡阳光后室内升温可能变慢或温度降低\\n\\n课堂代理：用台灯照射纸盒，并比较不同遮光材料覆盖后的盒内温度变化\\n\\n研究问题：不同遮光材料是否会影响纸盒内部温度变化？\\n\\n要改变的（自变量方向）：遮光材料种类\\n\\n想观察/比较的现象：纸盒内部温度变化情况（具体测量方式留待方案设计阶段确定）\",\"variables\":{\"independent\":\"遮光材料种类\"}}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p1-engineering-smart-shade-threshold-v1",
+    "source": "handcrafted_from_blind_eval_persona_extension",
+    "scenario": "工程保真型-智能遮光系统",
+    "phase": 1,
+    "rubricTargets": [
+      "theme_fidelity",
+      "proxy_quality",
+      "transformation_reasoning",
+      "student_agency",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "scripts/blind-eval.ts:PERSONAS.工程保真型",
+      "data/topic-library.json"
+    ],
+    "qualityNotes": "A smart-shade project must preserve automatic trigger thresholds instead of becoming only a material comparison.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个智能遮光系统，可以光太强的时候自动挡住"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个项目的关键不是“遮光材料好不好”，而是系统能不能自动判断光强并触发遮挡。我们先保留这个自动触发机制。\\n\\n你最想比较的是不同触发阈值会不会影响系统反应表现吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"工程装置可以转成“改变一个设计参数，测试作品表现”的探究问题。\",\"先保留“自动判断”这个机制，再找可改变参数。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想保留“自动判断什么时候遮光”这个机制，不只是做一个窗帘模型"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"对，这样能保留智能遮光系统的核心。课堂里可以用光照触发阈值做代理：阈值低时较早遮挡，阈值高时较晚遮挡。\\n\\n你准备把研究问题表述为“不同光照触发阈值会不会影响遮光系统响应准确率”吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如果学生已经说清机制和自变量方向，就顺势确认，不再追问材料和步骤。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "那我研究不同光照触发阈值会不会影响遮光系统响应准确率，要改变的是触发阈值"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，研究问题和自变量方向都清楚了，也保留了智能遮光系统的自动判断机制。请查看下方《探究问题确认书》，确认无误后进入方案设计阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"制作一个能在光太强时自动遮挡的智能遮光系统\",\"retainedFeature\":\"系统根据光照强弱阈值自动判断是否触发遮挡\",\"classroomProxy\":\"设置不同光照触发阈值，测试系统是否在该遮挡时及时遮挡、不该遮挡时不误触发\",\"researchQuestion\":\"不同光照触发阈值是否会影响遮光系统响应准确率？\"},\"snapshot\":\"原始兴趣：制作一个能在光太强时自动遮挡的智能遮光系统\\n\\n保留的情境特征：系统根据光照强弱阈值自动判断是否触发遮挡\\n\\n课堂代理：设置不同光照触发阈值，测试系统是否在该遮挡时及时遮挡、不该遮挡时不误触发\\n\\n研究问题：不同光照触发阈值是否会影响遮光系统响应准确率？\\n\\n要改变的（自变量方向）：光照触发阈值\\n\\n想观察/比较的现象：遮光系统响应是否准确（具体测量方式留待方案设计阶段确定）\",\"variables\":{\"independent\":\"光照触发阈值\"}}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p1-proxy-drift-repair-watering-v1",
+    "source": "handcrafted_negative_repair_from_blind_eval_v3",
+    "scenario": "反例修正-自动浇花器代理漂移",
+    "phase": 1,
+    "rubricTargets": [
+      "proxy_quality",
+      "theme_fidelity",
+      "student_agency",
+      "transformation_reasoning",
+      "cognitive_load_control"
+    ],
+    "evidence": [
+      "data/blind-eval/verdict-qwen-smoke-vs-dsv4-smoke-工程项目型.json"
+    ],
+    "qualityNotes": "This teaches the model to reject its own bad proxy drift while preserving student agency.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究自动浇花器的湿度阈值，但有人说可以改成研究棉线粗细和毛细吸水，这样可以吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"如果你的原始目标是自动浇花器的“湿度阈值触发”，那直接改成棉线粗细和毛细吸水会偏离核心机制。棉线实验研究的是材料吸水速度，不再是传感器或阈值判断。\\n\\n更保真的课堂代理是：保留湿度阈值这个自变量，用低压传感器读数或教师提供的模拟湿度读数设置不同阈值，再观察是否正确触发浇水。\\n\\n你想继续保留“阈值触发”这个机制吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"判断代理是否合适：它有没有保留原装置里的关键机制？\",\"如果代理让研究问题变成另一个物理现象，就要及时拉回。\"],\"phase_complete\":false}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p1-fuzzy-food-open-question-v1",
+    "source": "handcrafted_from_blind_eval_persona_and_topic_library",
+    "scenario": "模糊型-食物主题",
+    "phase": 1,
+    "rubricTargets": [
+      "student_agency",
+      "cognitive_load_control",
+      "theme_fidelity",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "scripts/blind-eval.ts:PERSONAS.模糊型",
+      "data/topic-library.json"
+    ],
+    "qualityNotes": "Avoid offering food-topic menus. Ask for an observable change the student has noticed.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做点跟吃的有关的实验"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"可以。先不要急着选题，我们从你生活里真实见过的变化开始。\\n\\n最近你有没有注意到某种食物在不同条件下会变快、变慢、变硬、变软或变味？请说一个你最想弄明白的现象。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"从“我见过的变化”入手，比从题目清单里挑一个更像科学探究。\",\"先描述现象，下一步再把它改写成“改变什么，会不会影响什么”。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "嗯……牛奶？酸奶？不知道能研究什么"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"没关系，我们继续抓可观察变化。以酸奶为例，你可能关心的是存放条件变化后，它的气味、结块或变质速度有没有不同。\\n\\n你更想研究酸奶在什么条件改变后，会出现什么可观察变化？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"把句子补全：我想改变……，看看酸奶的……会不会变化。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "哦哦，那我想知道酸奶放在不同温度下会怎么样"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"方向清楚了：你想改变存放温度，观察酸奶变质或状态变化。请再用一句话确认研究问题和要改变的因素，我们就可以生成确认书。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以说：我想研究不同存放温度是否会影响酸奶变质快慢。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，就是研究温度对酸奶变质快慢的影响，改变的是存放温度"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，你已经把食物兴趣收敛成了具体、安全、可观察的研究问题。请查看下方《探究问题确认书》，确认无误后进入方案设计阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"做一个和食物有关的实验\",\"retainedFeature\":\"食物在不同存放条件下状态变化快慢可能不同\",\"classroomProxy\":\"比较酸奶在不同安全存放温度下的状态变化\",\"researchQuestion\":\"不同存放温度是否会影响酸奶变质快慢？\"},\"snapshot\":\"原始兴趣：做一个和食物有关的实验\\n\\n保留的情境特征：食物在不同存放条件下状态变化快慢可能不同\\n\\n课堂代理：比较酸奶在不同安全存放温度下的状态变化\\n\\n研究问题：不同存放温度是否会影响酸奶变质快慢？\\n\\n要改变的（自变量方向）：酸奶存放温度\\n\\n想观察/比较的现象：酸奶状态变化或变质快慢（具体测量方式留待方案设计阶段确定）\",\"variables\":{\"independent\":\"酸奶存放温度\"}}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p4-light-germination-analysis-v1",
+    "source": "handcrafted_from_blind_eval_phase4",
+    "scenario": "阶段4数据分析-光色与绿豆发芽",
+    "phase": 4,
+    "rubricTargets": [
+      "teaching_guidance",
+      "student_agency",
+      "stem_fit",
+      "cognitive_load_control",
+      "expression"
+    ],
+    "evidence": [
+      "data/blind-eval/transcript-dsv4-smoke.json:phase4-data-analysis",
+      "data/blind-eval/transcript-qwen-smoke.json:phase4-data-analysis"
+    ],
+    "qualityNotes": "Give scientific possibilities but require evidence and limitations; do not replace the student conclusion.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我发现白光组发芽最快，绿光组最慢，这说明什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这是一个有价值的发现，但先不要把它写成最终结论。你可以这样分析：\\n\\n1. 数据现象：白光组发芽数增长最快，绿光组最慢。\\n2. 可能解释：白光包含多种颜色的光；绿光常被植物反射较多，因此可能对后续生长帮助较弱。\\n3. 需要保留的谨慎：种子萌发早期也依赖自身养分，所以光色影响可能不是唯一原因。\\n\\n你能从数据里找出一个最能支持“白光更快”的具体数字吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先用数据说话，再写原因解释。\",\"结论里可以用“可能”“在本次实验中”降低过度推断。\"],\"phase_complete\":false}"
+      }
+    ]
+  },
+  {
+    "id": "stem-p5-report-sections-light-germination-v1",
+    "source": "handcrafted_from_app_report_contract",
+    "scenario": "阶段5报告成型-光色与绿豆发芽",
+    "phase": 5,
+    "rubricTargets": [
+      "structure_compliance",
+      "stage_discipline",
+      "stem_fit",
+      "expression"
+    ],
+    "evidence": [
+      "app/prompts/phase5-results-formation.ts",
+      "app/lib/reportSummary.ts"
+    ],
+    "qualityNotes": "Stage 5 must auto-fill report_sections and leave conclusion/reflection for the student.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "开始报告成型"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我已根据前序阶段内容生成报告框架。右侧面板会预填研究目的、假设、材料步骤、数据概述和初步分析；结论与反思留给你根据数据自己补充。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"写结论时先回答研究问题，再引用一两个关键数据。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同颜色的光是否会影响绿豆发芽速度。\",\"hypothesis\":\"如果光的颜色会影响绿豆发芽，那么不同颜色光照组的发芽数增长速度可能不同。\",\"materials\":\"绿豆种子、培养容器、红/蓝/绿/白光源或滤色材料、清水、记录表。\",\"procedure\":\"设置红光、蓝光、绿光、白光四组，每组放入相同数量绿豆；控制水量、温度、容器和观察时间；每天固定时间记录各组发芽数。\",\"dataSummary\":\"从已记录数据看，各组发芽数随天数增加而增加，白光组增长较快，绿光组增长较慢。\",\"analysis\":\"不同光色可能影响绿豆萌发或早期生长表现。分析时应结合每天发芽数变化趋势，比较各组差异，并注意样本量、环境控制和观察误差对结果的影响。\"}}"
+      }
+    ]
+  }
+]

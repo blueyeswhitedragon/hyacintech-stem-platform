@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { StageData, Stage3FileAssociation } from '../models/stageData';
 import type { Message } from '../models/types';
 import { initialWelcomeMessage } from '../lib/welcome';
@@ -27,6 +27,11 @@ export default function GuestWorkspace() {
   const [completed, setCompleted] = useState(false);
   // 进入阶段3后是否还需出安全问答（每次"进入"强制一次）
   const needQuizRef = useRef(true);
+  // ConversationChat 注册的程序化发送（自动触发消息正常进入聊天流）
+  const autoSendRef = useRef<((text: string) => Promise<void>) | null>(null);
+  const registerAutoSend = (fn: (text: string) => Promise<void>) => {
+    autoSendRef.current = fn;
+  };
 
   // ConversationChat 注入的发送：打 guest 端点，本地跑结构化提取
   const send = async (message: string, history: Message[]): Promise<ChatApiResponse> => {
@@ -72,6 +77,11 @@ export default function GuestWorkspace() {
 
   const generateStage5ReportFramework = async (): Promise<string | null> => {
     if (stageData.stage5?.sections) return null;
+    // 优先走聊天流（用户可见 AI 的开场回复与"已生成报告框架"提示）
+    if (autoSendRef.current) {
+      await autoSendRef.current('开始报告成型');
+      return null;
+    }
     try {
       const res = await fetch('/api/guest/chat', {
         method: 'POST',
@@ -94,21 +104,32 @@ export default function GuestWorkspace() {
     }
   };
 
+  // 阶段推进后的自动触发：1→2 承接开场；进入5生成报告框架（含失败兜底）
+  const prevStageRef = useRef(1);
+  const stage5FallbackFired = useRef(false);
+  useEffect(() => {
+    const prev = prevStageRef.current;
+    prevStageRef.current = stage;
+    if (prev === 1 && stage === 2) {
+      void autoSendRef.current?.('我已确认选题，现在开始设计实验方案。');
+      return;
+    }
+    if (stage === 5 && !stageData.stage5?.sections && !stage5FallbackFired.current) {
+      stage5FallbackFired.current = true;
+      void generateStage5ReportFramework();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
+
   const advanceToStage5 = async (): Promise<string | null> => {
-    const err = await advanceLocal(5);
-    if (err) return err;
-    return generateStage5ReportFramework();
+    // 进入阶段5后，上方 useEffect 会自动触发报告框架生成
+    return advanceLocal(5);
   };
 
-  /** 阶段完成后的确认推进（本地直接调 advanceLocal，不发 LLM 请求） */
+  /** 阶段完成后的确认推进（本地直接调 advanceLocal，不发 LLM 请求）。
+   * 推进后的自动触发消息由监听 stage 变化的 useEffect 统一处理。 */
   const onPhaseConfirm = async (): Promise<string | null> => {
-    const err = await advanceLocal(stage + 1);
-    if (err) return err;
-    // 进入阶段5时自动触发报告框架生成
-    if (stage + 1 === 5 && !stageData.stage5?.sections) {
-      return generateStage5ReportFramework();
-    }
-    return null;
+    return advanceLocal(stage + 1);
   };
 
   const saveStage3 = async (rows: Record<string, unknown>[], fileAssociations: Stage3FileAssociation[]) => {
@@ -224,7 +245,7 @@ export default function GuestWorkspace() {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <ConversationChat initialMessages={welcome} stage={stage} completed={completed} send={send} onResult={onChatResult} onPhaseConfirm={onPhaseConfirm} />
+        <ConversationChat initialMessages={welcome} stage={stage} completed={completed} send={send} onResult={onChatResult} onPhaseConfirm={onPhaseConfirm} registerAutoSend={registerAutoSend} />
       </div>
       {panel && <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">{panel}</div>}
       {completed && <Fireworks />}

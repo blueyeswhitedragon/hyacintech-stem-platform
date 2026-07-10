@@ -6,6 +6,12 @@ export function buildPriorSummary(stageData: StageData): string {
 
   if (stageData.stage1?.snapshot) {
     parts.push(`【选题确认书】\n${stageData.stage1.snapshot}`);
+    if (stageData.stage1.themeMapping) {
+      const m = stageData.stage1.themeMapping;
+      parts.push(
+        `【课题转化链】原始兴趣：${m.originalInterest}；保留特征：${m.retainedFeature}；课堂代理：${m.classroomProxy}；研究问题：${m.researchQuestion}`
+      );
+    }
     if (stageData.stage1.variables) {
       const v = stageData.stage1.variables;
       const controlled = v.controlled?.length

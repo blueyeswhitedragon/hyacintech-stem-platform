@@ -13,6 +13,7 @@ export interface LLMProviderConfig {
   model: string;
   temperature?: number;
   maxTokens?: number;
+  timeoutMs?: number;
 }
 
 export interface ChatOptions {

@@ -11,6 +11,28 @@ const prisma = new PrismaClient();
 async function main() {
   const passwordHash = await bcrypt.hash('demo1234', 10);
 
+  const adminUsername = process.env.ADMIN_USERNAME?.trim();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminDisplayName = process.env.ADMIN_DISPLAY_NAME?.trim();
+  if (adminUsername || adminPassword || adminDisplayName) {
+    if (!adminUsername || !adminPassword || !adminDisplayName) {
+      throw new Error('ADMIN_USERNAME、ADMIN_PASSWORD、ADMIN_DISPLAY_NAME 必须同时设置');
+    }
+    if (adminPassword.length < 8) throw new Error('ADMIN_PASSWORD 至少 8 个字符');
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
+    await prisma.user.upsert({
+      where: { username: adminUsername },
+      update: { passwordHash: adminPasswordHash, displayName: adminDisplayName, role: 'admin' },
+      create: {
+        username: adminUsername,
+        passwordHash: adminPasswordHash,
+        displayName: adminDisplayName,
+        role: 'admin',
+      },
+    });
+    console.log(`   管理员: ${adminUsername}`);
+  }
+
   // 演示教师（用户名唯一，可重复执行）
   const teacher = await prisma.user.upsert({
     where: { username: 'teacher1' },

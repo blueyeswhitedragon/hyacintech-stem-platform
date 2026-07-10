@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "batchId": "dsv4-smoke-tier-test",
+  "createdAt": "2026-07-09T03:12:14.029Z",
+  "inputs": [
+    "/root/hyacintech-stem-platform/data/blind-eval/transcript-dsv4-smoke.json"
+  ],
+  "options": {
+    "sourceTags": [
+      "dsv4-smoke"
+    ],
+    "sourceFiles": [],
+    "out": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json",
+    "phases": [
+      1,
+      2,
+      4,
+      5
+    ],
+    "onlyClean": true,
+    "skipFallback": true,
+    "minTurns": 1,
+    "includeKinds": [
+      "persona",
+      "phase3",
+      "phase4",
+      "phase5",
+      "phase6",
+      "fixed-regression"
+    ],
+    "pure": false,
+    "batchId": "dsv4-smoke-tier-test",
+    "tierMode": "conservative",
+    "emitReviewManifest": true,
+    "reviewOut": "/root/hyacintech-stem-platform/data/sft/review-manifest-dsv4-smoke-tier-test.json",
+    "includeNeedsReview": false
+  },
+  "summary": {
+    "totalRecords": 8,
+    "skipped": 0,
+    "byTier": {
+      "silver": 4,
+      "gold_candidate": 4
+    },
+    "byPhase": {
+      "P1": 3,
+      "P2": 3,
+      "P4": 1,
+      "P5": 1
+    },
+    "bySubject": {
+      "biology_ecology": 2,
+      "engineering_automation": 2,
+      "high_concept_interdisciplinary": 2,
+      "unknown": 2
+    },
+    "byStudentType": {
+      "cooperative": 2,
+      "engineering_project": 2,
+      "high_concept": 2,
+      "unknown": 2
+    },
+    "byFailureMode": {
+      "over_questioning": 2,
+      "proxy_drift": 4,
+      "engineering_flattening": 2,
+      "weak_confirmation_doc": 4,
+      "theme_loss": 2,
+      "none": 2
+    },
+    "skipReasons": {}
+  },
+  "records": [
+    {
+      "id": "stem-transcript-dsv4-smoke-persona-5d81b49c2d-p1-v1",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "clean:routine"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "persona-配合型",
+      "scenarioName": "配合型",
+      "phase": 1,
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-persona-5d81b49c2d-p2-v1",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "clean:routine"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "persona-配合型",
+      "scenarioName": "配合型",
+      "phase": 2,
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-persona-b2a2b8441a-p1-v1",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:proxy_drift",
+        "failureMode:engineering_flattening",
+        "failureMode:weak_confirmation_doc",
+        "phase1:high-value-subject:engineering_automation"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "persona-工程项目型",
+      "scenarioName": "工程项目型",
+      "phase": 1,
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "proxy_drift",
+        "engineering_flattening",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-persona-b2a2b8441a-p2-v1",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:proxy_drift",
+        "failureMode:engineering_flattening",
+        "failureMode:weak_confirmation_doc",
+        "phase2:high-value-subject:engineering_automation"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "persona-工程项目型",
+      "scenarioName": "工程项目型",
+      "phase": 2,
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "proxy_drift",
+        "engineering_flattening",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-persona-8043ec4ccc-p1-v1",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc",
+        "phase1:high-value-subject:high_concept_interdisciplinary"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "persona-高概念降级型",
+      "scenarioName": "高概念降级型",
+      "phase": 1,
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-persona-8043ec4ccc-p2-v1",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc",
+        "phase2:high-value-subject:high_concept_interdisciplinary"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "persona-高概念降级型",
+      "scenarioName": "高概念降级型",
+      "phase": 2,
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-phase4-data-analysis-p4-v1",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "clean:routine"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "phase4-data-analysis",
+      "scenarioName": "阶段4数据分析",
+      "phase": 4,
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    },
+    {
+      "id": "stem-transcript-dsv4-smoke-phase5-report-p5-v1",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "clean:routine"
+      ],
+      "sourceTag": "dsv4-smoke",
+      "scenarioId": "phase5-report",
+      "scenarioName": "阶段5报告成型",
+      "phase": 5,
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-dsv4-smoke-tier-test.json"
+    }
+  ],
+  "skipped": []
+}

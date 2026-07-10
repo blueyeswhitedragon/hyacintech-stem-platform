@@ -1,0 +1,3411 @@
+[
+  {
+    "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v5-ec9490a377-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-垃圾分类装置-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-over-broad-trash-sorting-v5-ec9490a377"
+    ],
+    "qualityNotes": "学生在宏大到代理转化中保持主题保真度，导师通过渐进式提问逐步聚焦变量，避免认知过载，成功确认跨学科整合的探究框架，并给予学生充分表述空间。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我原来想法是智能垃圾分类装置，自动识别种类，但太复杂，我打算改成利用材质差异做物理分拣，想听听你的建议。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你从智能识别转向物理分拣，保持了材料差异分拣的核心特征。我们先聚焦：你想保留的“材料属性差异可被分拣”，在课堂上可用什么简单材料来表现？能否描述一下可能观察到的现象？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑不同材质小球在斜面上滚动的差异\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想用不同材质的小球，比如金属球、塑料球、玻璃球，在斜面上滚动，看它们会不会因为材质不同而滚到不同位置，用这个来实现分拣。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好的方向！利用不同材质小球在斜面上的滚动差异来模拟分拣。现在我们需要明确研究问题：你计划改变什么因素来观察不同的结果？请聚焦到一个具体可操作的变量上。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"这个实验中你需要主动改变的是什么？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我确定研究材质是否影响小球在分拣斜面上的归位，要改变的是小球材质，看看归位准确率怎么变。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们整理确认你的研究框架：原始兴趣为智能垃圾分类，保留材料属性差异可被分拣的特征，课堂代理为不同材质小球的滚动差异。研究问题：材质是否影响小球在分拣斜面上的归位？你要改变的自变量是小球材质，目标是观察归位准确率。请确认按此开展实验。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"智能垃圾分类\",\"retainedFeature\":\"材料物理属性差异可被分拣\",\"classroomProxy\":\"不同材质小球的滚动差异\",\"researchQuestion\":\"材质是否影响小球在分拣斜面上的归位？\"},\"snapshot\":\"【选题确认书】\\n原始兴趣：智能垃圾分类\\n保留特征：材料物理属性差异可被分拣\\n课堂代理：不同材质小球的滚动差异\\n研究问题：材质是否影响小球在分拣斜面上的归位？\\n自变量：小球材质\\n因变量：归位准确率\",\"variables\":{\"independent\":\"小球材质\",\"dependent\":\"归位准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-over-broad-trash-sorting-v5-ec9490a377",
+      "sourceKind": "persona",
+      "personaId": "over-broad-trash-sorting",
+      "subject": "water_environment",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "智能垃圾分类",
+        "retainedFeature": "材料物理属性差异可被分拣",
+        "classroomProxy": "不同材质小球的滚动差异",
+        "researchQuestion": "材质是否影响小球在分拣斜面上的归位？",
+        "independentVariable": "小球材质",
+        "dependentDirection": "归位准确率"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:engineering_flattening"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v5-a51ca64b24-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-泥沙沉降-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-variable-confusion-turbidity-settle-v5-a51ca64b24"
+    ],
+    "qualityNotes": "本样本训练在阶段1确认研究问题，强化变量识别，不使用选项，通过开放提问引导学生主动定义自变量和因变量，同时温和纠正安全风险（推荐泥沙水），并输出符合要求的 stage1_confirmed 字段。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究泥水怎么变清，但不知道该改变什么。是时间吧？放久了就更清。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你捕捉到“放久了就更清”这个现象，说明时间可能是关键。安全起见，我们用泥沙和水模拟，不接触不明液体。请先说一说，你想把哪个量作为实验中主动改变的因素？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考哪个因素你会手动调整它的不同值，比如时长\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，自变量是静置时间，因变量是浊度。我准备用泥沙和水混合，改变静置时间，比如1小时、2小时、4小时，测量浊度。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你明确了自变量（静置时间）和因变量（浊度），并考虑了测量。我们只用安全材料，不品尝。现在请确认：研究问题能否表述为“静置时间是否影响泥水浊度”？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如果同意请直接确认，也可以微调表述\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我确定研究静置时间是否影响泥水浊度，要改变的是静置时间。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"已接受研究问题“静置时间是否影响泥水浊度？”。我们整理出核心框架：自变量是静置时间，因变量是浊度。请确认以上记录，我们将进入下一阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"泥水变清\",\"retainedFeature\":\"静置时间影响沉降程度\",\"classroomProxy\":\"不同静置时间\",\"researchQuestion\":\"静置时间是否影响泥水浊度？\"},\"snapshot\":\"学生提出研究静置时间对泥水浊度的影响，自变量为静置时间，因变量为浊度。已提醒安全操作。\",\"variables\":{\"independent\":\"静置时间\",\"dependent\":\"浊度\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-variable-confusion-turbidity-settle-v5-a51ca64b24",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-turbidity-settle",
+      "subject": "water_environment",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "泥水变清",
+        "retainedFeature": "静置时间影响沉降程度",
+        "classroomProxy": "不同静置时间",
+        "researchQuestion": "静置时间是否影响泥水浊度？",
+        "independentVariable": "静置时间",
+        "dependentDirection": "浊度"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-cooperative-electromagnet-coils-v5-67ccd83b7f-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-电磁铁线圈数-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "proxy_quality",
+      "structure_compliance",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-cooperative-electromagnet-coils-v5-67ccd83b7f"
+    ],
+    "qualityNotes": "引导学生在变量混乱时用一句话澄清自变量/因变量，强化问题表述，一轮只问一个核心问题，避免多问题轰炸，确保认知负荷控制、结构合规、学生能动性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我想研究电磁铁，改变线圈圈数，看吸力怎么变，但我不太确定怎么量化吸力。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已明确了改变线圈匝数。那用什么来反映吸力变化呢？比如我们可以数吸引的回形针数量，这样就能量化了。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想，吸力可以通过吸引小物体的数量来体现。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "哦，用回形针数量来表示吸力，那匝数就是自变量，回形针数量是因变量，对吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"是的！匝数是你要改变的量（自变量），吸引回形针数量是你要测量的量（因变量）。现在你能把研究问题说完整吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试用“线圈匝数是否影响……”的句式来组织。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我的研究问题是：线圈匝数是否影响电磁铁吸引回形针的数量？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"研究问题很清晰！自变量（匝数）和因变量（回形针数）已明确。实验时注意：只用干电池，通电要短。我们确认方案，进入下一阶段记录数据。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"电磁铁吸力\",\"retainedFeature\":\"线圈匝数影响磁场强度\",\"classroomProxy\":\"不同线圈匝数\",\"researchQuestion\":\"线圈匝数是否影响电磁铁吸引回形针数量？\"},\"snapshot\":\"研究问题：线圈匝数是否影响电磁铁吸引回形针数量？自变量：线圈匝数；因变量：吸引回形针数量。\",\"variables\":{\"independent\":\"线圈匝数\",\"dependent\":\"吸引回形针数量\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-cooperative-electromagnet-coils-v5-67ccd83b7f",
+      "sourceKind": "persona",
+      "personaId": "cooperative-electromagnet-coils",
+      "subject": "electricity_energy",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "电磁铁吸力",
+        "retainedFeature": "线圈匝数影响磁场强度",
+        "classroomProxy": "不同线圈匝数",
+        "researchQuestion": "线圈匝数是否影响电磁铁吸引回形针数量？",
+        "independentVariable": "线圈匝数",
+        "dependentDirection": "吸引回形针数量",
+        "safetyNotes": [
+          "用干电池，不用220V电源",
+          "通电时间短，避免发热"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:format_discipline"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v5-dcad6ba9b3-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-太阳能小车光强-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-solar-car-angle-v5-dcad6ba9b3"
+    ],
+    "qualityNotes": "本样本训练关键行为：面对低投入学生，通过开放问题保持学生主体，不使用选项菜单，引导其将兴趣聚焦到可控自变量（光源距离），在阶段1完成规范确认，输出theme_mapping、snapshot和variables.independent，同时保留原兴趣与代理转换的推理链，防止工程压扁和代理漂移。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个太阳能小车，让它跑得快。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提到了太阳能小车跑得快，这听起来像个有趣的挑战。想让车跑得更快，可以从哪些方面入手？比如动力来源呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以考虑光的强弱对太阳能板输出功率的影响。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想研究光强对太阳能小车速度的影响。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，光强是影响太阳能板输出的关键因素。在教室中，我们可以用光源与太阳能板的距离来改变光强。如果要测试不同距离下车速的变化，你打算设定哪几个距离值？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考距离的梯度，比如10cm、20cm、30cm。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我确定研究光源距离是否影响太阳能小车行驶速度，要改变的是光源距离。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已明确研究问题：光源距离是否影响行驶速度，自变量是光源距离。我们用控制距离代表光强变化，这符合可操作的课堂代理。确认后便进入下一阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"太阳能小车跑得快\",\"retainedFeature\":\"光强影响太阳能板输出\",\"classroomProxy\":\"光源与小车的不同距离（改变光强）\",\"researchQuestion\":\"光源距离是否影响太阳能小车行驶速度？\"},\"snapshot\":\"学生将探究光源距离对太阳能小车行驶速度的影响\",\"variables\":{\"independent\":\"光源距离\",\"dependent\":\"行驶速度\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-solar-car-angle-v5-dcad6ba9b3",
+      "sourceKind": "persona",
+      "personaId": "engineering-solar-car-angle",
+      "subject": "electricity_energy",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "太阳能小车跑得快",
+        "retainedFeature": "光强影响太阳能板输出",
+        "classroomProxy": "光源与小车的不同距离（改变光强）",
+        "researchQuestion": "光源距离是否影响太阳能小车行驶速度？",
+        "independentVariable": "光源距离",
+        "dependentDirection": "行驶速度",
+        "safetyNotes": [
+          "用LED或低压光源，不用强热光源",
+          "避免长时间直视强光"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-smartedu-0112-v5-ed6ebc25a7-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「制造距离感（现实空间）」中的影响因素-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-smartedu-0112-v5-ed6ebc25a7"
+    ],
+    "qualityNotes": "语言保留学生原兴趣表述，未使用选项菜单，通过连续提问引导学生自行确定自变量（课桌前后距离）和因变量（主动交谈人次）。确认阶段完整输出theme_mapping、snapshot和variables.independent字段，保持主题忠实性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我对‘制造距离感（现实空间）’很感兴趣。比如在我们的教室里，座位靠得近和离得远，同学之间说话的感觉就不一样。这算不算一种距离感？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到了座位距离对交流感觉的影响，这是一个很具体的观察。如果我们要把它变成一个可以自己动手研究的小问题，你最先想改变教室里的哪一个具体条件，来看看它会让距离感发生什么变化呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考一下你可以直接调整的教室布置元素。\",\"聚焦一个你可以动手改变的‘条件’。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我觉得可以把课桌之间的前后距离拉大或者缩小，看看这种变化会不会让同学们更愿意聊天，还是更疏远。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好的想法，把‘课桌前后距离’当作可以改变的条件。接下来我们需要想清楚：你准备通过什么方式来判断距离感真的发生了变化呢？你预计能观察到或者测量到什么具体的结果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想你可以记录哪些可见的行为或反馈。\",\"观察或测量要简单可行，在教室里就能完成。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我可以在下课时悄悄数一数主动找同桌或前后桌说话的人次，距离拉近和拉远后分别记录几天。这样就能看到变化了。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"梳理一下，你打算改变‘课桌前后距离’，通过记录下课时主动交谈的人次来判断距离感的变化。这是一个清晰的研究思路。我们现在确认：研究问题是‘改变课桌前后距离，对同学间主动交谈人次有什么影响？’如果没问题，我们就进入下一步的实验设计。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"探究「制造距离感（现实空间）」中的影响因素\",\"retainedFeature\":\"围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？\",\"classroomProxy\":\"围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？\",\"researchQuestion\":\"围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？\"},\"snapshot\":\"课桌前后距离影响主动交谈人次\",\"variables\":{\"independent\":\"课桌前后距离\",\"dependent\":\"下课时主动交谈人次\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-smartedu-0112-v5-ed6ebc25a7",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0112",
+      "subject": "STEM",
+      "expectedTransformation": {
+        "originalInterest": "探究「制造距离感（现实空间）」中的影响因素",
+        "retainedFeature": "围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究「制造距离感（现实空间）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-safety-circuit-brightness-v5-fe744c3793-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-电路与灯泡亮度-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "safety",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-safety-circuit-brightness-v5-fe744c3793"
+    ],
+    "qualityNotes": "安全降级清晰（市电→干电池），一次只问一个开放问题，确认时完整输出theme_mapping/snapshot/independent变量，无选项和替答行为，严格维护学生代理。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究灯泡亮度，想直接接家里的插座试试。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"直接插220V插座很危险，会烧坏灯泡还可能触电。我们只能用干电池。你能说说想改变什么条件来观察亮度的变化吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以从改变串联的电池数目来思考。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "那我用干电池做，研究串联电池数对亮度的影响。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你明确了用串联电池数作为改变的条件，很棒。研究问题可以定为“串联电池数是否影响小灯泡亮度？”自变量是串联电池数，因变量是你观察的亮度。你确认这个表述吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false,\"stage1_confirmed\":false,\"theme_mapping\":{\"original_interest\":\"灯泡亮不亮\",\"retained_feature\":\"电池数影响电压和亮度\",\"classroom_proxy\":\"串联电池数\"},\"snapshot\":\"选题阶段：学生从危险操作转为安全方案，确定研究串联电池数对亮度的影响，等待最终确认。\",\"variables\":{\"independent\":\"串联电池数\"}}"
+      },
+      {
+        "from": "human",
+        "value": "对，我确定研究串联电池数是否影响小灯泡亮度，要改变的是串联电池数。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"已确认选题：研究串联电池数是否影响小灯泡亮度。我们会在后续设计实验，全程只用干电池。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"灯泡亮不亮\",\"retainedFeature\":\"电池数影响电压和亮度\",\"classroomProxy\":\"串联电池数\",\"researchQuestion\":\"串联电池数是否影响小灯泡亮度？\"},\"snapshot\":\"选题确认完成：研究问题\\\"串联电池数是否影响小灯泡亮度？\\\"，自变量为串联电池数，因变量为灯泡亮度，安全约束为仅用干电池。\",\"variables\":{\"independent\":\"串联电池数\",\"dependent\":\"灯泡亮度\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-safety-circuit-brightness-v5-fe744c3793",
+      "sourceKind": "persona",
+      "personaId": "safety-circuit-brightness",
+      "subject": "electricity_energy",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "灯泡亮不亮",
+        "retainedFeature": "电池数影响电压和亮度",
+        "classroomProxy": "串联电池数",
+        "researchQuestion": "串联电池数是否影响小灯泡亮度？",
+        "independentVariable": "串联电池数",
+        "dependentDirection": "灯泡亮度",
+        "safetyNotes": [
+          "只用干电池，严禁220V市电",
+          "避免短路，注意发热"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-watering-threshold-v5-16a54ac43f-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-自动浇花器-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "structure_compliance",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-watering-threshold-v5-16a54ac43f"
+    ],
+    "qualityNotes": "引导学生在给出丰富细节时聚焦开放问题、确认边界，输出完整阶段1确认字段，避免提供选项。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个自动浇花器，最好能根据土壤干湿自己浇水，还想研究不同土壤湿度阈值，会不会影响自动浇花器的浇水效果。我打算用湿度传感器，改变触发浇水的阈值，看浇水准确率变化。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提到想研究湿度阈值对浇水效果的影响，能具体说说，你打算怎样衡量“浇水效果”呢？比如你认为什么算准确的浇水？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想：怎样判断浇水量是否适合植物需求？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我觉得浇水准确率就是每次浇水的量是不是刚刚好，不会太多或太少。如果土壤湿度低于阈值就启动浇水，直到达到一定湿度停止，看看每次实际浇水量和目标差值，就是准确率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"理解你的想法，用每次浇水量与目标值的偏差来衡量准确率。那我们可以把研究问题概括为：不同湿度触发阈值如何影响浇水准确率？你能明确自变量和因变量分别是什么吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是你主动改变的，因变量是你测量观察的。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "自变量就是湿度触发阈值，因变量是浇水准确率。这样我就保留了自动浇花器根据干湿自动触发的核心特点，只是用不同阈值看效果变化。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，我们已经梳理清楚。研究问题是：湿度触发阈值是否影响自动浇花器浇水准确率？自变量是湿度触发阈值，因变量是浇水准确率。核心特征保留：自动判断干湿并触发浇水。确认进入下一阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"自动浇花器\",\"retainedFeature\":\"自动判断干湿并触发浇水\",\"classroomProxy\":\"不同湿度触发阈值\",\"researchQuestion\":\"湿度触发阈值是否影响自动浇花器浇水准确率？\"},\"snapshot\":\"自动浇花器自动判断干湿并触发浇水，通过设置不同湿度触发阈值观察浇水准确率变化。\",\"variables\":{\"independent\":\"湿度触发阈值\",\"dependent\":\"浇水准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-watering-threshold-v5-16a54ac43f",
+      "sourceKind": "persona",
+      "personaId": "engineering-watering-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "proxy_drift",
+        "engineering_flattening",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "自动浇花器",
+        "retainedFeature": "自动判断干湿并触发浇水",
+        "classroomProxy": "不同湿度触发阈值",
+        "researchQuestion": "湿度触发阈值是否影响自动浇花器浇水准确率？",
+        "independentVariable": "湿度触发阈值",
+        "dependentDirection": "浇水准确率",
+        "safetyNotes": [
+          "用低压水泵或电池供电，不用220V"
+        ],
+        "mustKeepTerms": [
+          [
+            "自动浇花器"
+          ],
+          [
+            "湿度",
+            "阈值"
+          ],
+          [
+            "干湿",
+            "触发"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "湿度",
+            "阈值"
+          ],
+          [
+            "传感器"
+          ],
+          [
+            "水泵"
+          ],
+          [
+            "模拟",
+            "读数"
+          ]
+        ],
+        "forbiddenProxyTerms": [
+          "棉线",
+          "毛细",
+          "虹吸",
+          "浮球",
+          "吸水材料"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:proxy_drift",
+        "failureMode:engineering_flattening",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-smart-shade-threshold-v5-4e76580820-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程保真型-智能遮光系统-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-smart-shade-threshold-v5-4e76580820"
+    ],
+    "qualityNotes": "高保真保留自动遮光触发机制；阈值映射为代理变量防止工程扁平化；学生主导提出测量方法；确认时完整输出研究映射、快照与自变量定义；认知负荷控制在一轮一核心问题。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个智能遮光系统，当光线太强时它能自动放下窗帘遮光。我特别想保留“自动判断什么时候需要遮光”这个机制，而不是单纯做一个开关窗帘的模型。你觉得我可以研究点什么能让它更智能？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的想法很有工程价值！保留自动判断机制正是关键。要让系统更智能，我们需要一个可测量的变量。你打算研究哪一个因素会影响遮光判断的准确度呢？比如，光照强度达到多少就触发遮光，这个触发值会不会影响响应效果？你愿意尝试研究不同光照触发阈值对系统响应的影响吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考：改变哪个设定值可能影响系统工作表现？\",\"注意：自动判断依据的是光照强度值\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，我就想研究光照触发阈值。我可以设置不同的阈值，比如设定光照超过300lux就遮光，或者500lux，看哪个阈值下系统的响应更准确。不过怎么知道准确不准确呢？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好的方向！你把光照触发阈值作为自变量，执行机构每次的遮光结果作为因变量。那么，你要如何测量“响应准确率”？比如，在设定阈值下，当光照确实超过阈值时，系统是否每次都成功放下窗帘？你能设计一个测试方法来记录成功和失败的次数吗？同时需要注意，测试时环境光强度要保持一致，避免其他光变化干扰结果。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议用计数方法：成功次数/总触发次数\",\"控制变量：保证测试时环境自然光稳定\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我打算每次测试时，用手电筒照射光线传感器，让它超过设定阈值，看窗帘是否自动放下。记录总触发次数和放下次数，计算准确率。环境光我固定用台灯提供恒定背景光。这样可行吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的方案很完整！我们来确认一下研究设计：把智能遮光的自动判断机制转化为课堂可操作的实验，研究光照触发阈值对响应准确率的影响。自变量是光照触发阈值，因变量是响应准确率（成功遮光次数/总触发次数）。你已经明确了测量方法和控制变量（环境光恒定），接下来将进入实验设计与数据记录阶段。请确认以上研究问题与变量设计。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"智能遮光系统\",\"retainedFeature\":\"自动判断何时遮光并触发\",\"classroomProxy\":\"不同光照触发阈值\",\"researchQuestion\":\"光照触发阈值是否影响遮光系统响应准确率？\"},\"snapshot\":\"研究问题：光照触发阈值是否影响遮光系统响应准确率？\\n自变量：光照触发阈值\",\"variables\":{\"independent\":\"光照触发阈值\",\"dependent\":\"响应准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-smart-shade-threshold-v5-4e76580820",
+      "sourceKind": "persona",
+      "personaId": "engineering-smart-shade-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "智能遮光系统",
+        "retainedFeature": "自动判断何时遮光并触发",
+        "classroomProxy": "不同光照触发阈值",
+        "researchQuestion": "光照触发阈值是否影响遮光系统响应准确率？",
+        "independentVariable": "光照触发阈值",
+        "dependentDirection": "响应准确率",
+        "mustKeepTerms": [
+          [
+            "智能遮光"
+          ],
+          [
+            "自动",
+            "遮光"
+          ],
+          [
+            "光照",
+            "触发"
+          ],
+          [
+            "触发",
+            "阈值"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "光照",
+            "阈值"
+          ],
+          [
+            "传感器"
+          ],
+          [
+            "响应",
+            "准确率"
+          ],
+          [
+            "自动",
+            "触发"
+          ]
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-alarm-sensitivity-v5-048f492455-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-倾斜报警器灵敏度-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-alarm-sensitivity-v5-048f492455"
+    ],
+    "qualityNotes": "该样本展示了在工程主题中引导学生将兴趣特征‘触发灵敏度’转化为可控变量‘倾斜触发角度阈值’的过程，避免了直接给出选项，保持学生主导，认知负荷低，并准确构造研究问题与自变量映射，实现工程制品到科学实验的转化推理。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我想做一个防倾倒报警器，东西倒了就响。我想知道触发灵敏度不同会不会影响报警效果。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的想法很贴近工程实际。报警器靠检测倾斜角度触发，灵敏度其实对应触发警报的倾斜角度阈值。我们可以把灵敏度具体化为某个角度值。你觉得研究‘倾斜触发角度阈值不同是否导致报警器响应准确率变化’怎么样？这样就能把作品设计转为可测量的实验。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，我就是要改变触发角度阈值，看会不会影响准确率。研究问题就是：倾斜触发角度阈值是否影响报警器响应准确率？自变量是倾斜触发角度阈值，因变量是响应准确率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已经清晰定义了变量：自变量是倾斜触发角度阈值，因变量是响应准确率。研究问题也明确了。接下来我们整理成选题确认书，包含原始兴趣、保留特征、课堂代理和研究问题。请你确认以下内容是否一致？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "一致，我确认。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"确认完毕。原始兴趣‘防倾倒报警器’，保留特征‘触发灵敏度影响响应’，课堂代理为‘不同倾斜触发角度阈值’。研究问题：倾斜触发角度阈值是否影响报警器响应准确率？自变量：倾斜触发角度阈值。我们将通过实验调整角度阈值，记录报警器响应准确率。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"防倾倒报警器\",\"retainedFeature\":\"触发灵敏度影响响应\",\"classroomProxy\":\"不同倾斜触发角度阈值\",\"researchQuestion\":\"倾斜触发角度阈值是否影响报警器响应准确率？\"},\"snapshot\":\"原始兴趣：防倾倒报警器\\n保留特征：触发灵敏度影响响应\\n研究问题：倾斜触发角度阈值是否影响报警器响应准确率？\",\"variables\":{\"independent\":\"倾斜触发角度阈值\",\"dependent\":\"响应准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-alarm-sensitivity-v5-048f492455",
+      "sourceKind": "persona",
+      "personaId": "engineering-alarm-sensitivity",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "防倾倒报警器",
+        "retainedFeature": "触发灵敏度影响响应",
+        "classroomProxy": "不同倾斜触发角度阈值",
+        "researchQuestion": "倾斜触发角度阈值是否影响报警器响应准确率？",
+        "independentVariable": "倾斜触发角度阈值",
+        "dependentDirection": "响应准确率"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-smartedu-0117-v5-b7f1d7bf8e-v1",
+    "source": "distill_dsv4",
+    "scenario": "跨学科实践活动1 自制简易净水器-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-smartedu-0117-v5-b7f1d7bf8e"
+    ],
+    "qualityNotes": "一次只推进一个核心开放问题：先聚焦材料选择，再聚焦比较方式，最后确认变量并安全验证。全程避免 ask_choice 和选项菜单，使用温和纠正替代危险想法，保留‘做净水器’兴趣，转化为过滤材料对效果影响的探究，突出工程变量的可控性与比较逻辑。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师好，我想做一个简易净水器，把泥水变干净。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个想法很不错。我们能不能把‘做一个净水器’变成一个可以比较的问题？比如，试试不同过滤材料——棉花、沙子、石子——看看哪种能让水变得更清澈。你想先用哪些材料来试？记得用安全、容易找到的东西，不要加化学药品。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想生活中有哪些常见的过滤材料，比如旧布、细沙、碎石\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想用棉花和沙子，两个瓶子分开装。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"用棉花和沙子分别装到两个瓶子里，这个思路很清晰。接下来我们要想好怎样公平地比较它们。你会倒进同样多的脏水吗？怎样观察哪个过滤效果更好？先说说你的比较办法。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以观察水的浑浊程度或颜色变化来比较效果\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我打算倒同样多的泥水，一个瓶子全用棉花过滤，另一个用沙子，看哪个出来的水更透亮。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你设计的比较方法很明白：同样多的泥水，分别用棉花和沙子过滤，再比较水的清澈程度。这样我们就有了一个可以探究的问题：‘棉花和沙子哪种过滤材料的净水效果更好？’老师已经帮你整理好这个问题，其中过滤材料就是我们要改变的东西，水的清澈程度就是我们要观察的结果。我们确认一下，是不是就按这个方向来研究？\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"跨学科实践活动1 自制简易净水器\",\"retainedFeature\":\"把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。\",\"classroomProxy\":\"把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。\",\"researchQuestion\":\"不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？\"},\"snapshot\":\"学生计划用两个瓶子分别装棉花和沙子，倒入等量泥水，比较过滤后水的透亮程度。已明确自变量为过滤材料种类，因变量为水的清澈程度。\",\"variables\":{\"independent\":\"过滤材料种类（棉花或沙子）\",\"dependent\":\"过滤后水的浑浊程度/颜色变化\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-smartedu-0117-v5-b7f1d7bf8e",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0117",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "跨学科实践活动1 自制简易净水器",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-door-reminder-distance-v5-10255bb7b6-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-门禁提醒距离-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-door-reminder-distance-v5-10255bb7b6"
+    ],
+    "qualityNotes": "学生变量表述混杂时，通过单一开放问题引导其明确说出要改变的条件和观察的结果，避免提供选项；确认阶段输出完整theme_mapping与变量定义，并将确认权交还学生，强化主动性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个门开太久会提醒的装置，还打算研究触发距离不同会不会影响提醒准不准。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的想法涉及两个关键点：装置的触发条件和提醒效果。为了下一步设计实验，我们需要先区分清楚：在你设想的测试中，哪一个是你要主动改变的条件？哪一个是你要观察和记录的结果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我要改变的是触发距离阈值，看看提醒准不准会不会跟着变。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"明白了。那我们就可以把研究问题界定为：“触发距离阈值是否影响门禁提醒准确率？”其中，你要改变的自变量是触发距离阈值，你要观察的因变量是提醒准确率。请你确认这个选题是否就是你想要研究的。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"门开太久提醒器\",\"retainedFeature\":\"距离触发阈值影响响应\",\"classroomProxy\":\"不同触发距离阈值\",\"researchQuestion\":\"触发距离阈值是否影响门禁提醒准确率？\"},\"snapshot\":\"研究触发距离阈值对门禁提醒准确率的影响\",\"variables\":{\"independent\":\"触发距离阈值\",\"dependent\":\"提醒准确率\"}}"
+      },
+      {
+        "from": "human",
+        "value": "确认就是这个。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，你的研究选题已经确定。接下来我们可以进入实验设计阶段，思考如何改变触发距离阈值并收集准确率数据。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"门开太久提醒器\",\"retainedFeature\":\"距离触发阈值影响响应\",\"classroomProxy\":\"不同触发距离阈值\",\"researchQuestion\":\"触发距离阈值是否影响门禁提醒准确率？\"},\"variables\":{\"independent\":\"触发距离阈值\",\"dependent\":\"提醒准确率\"},\"snapshot\":\"原始兴趣：门开太久提醒器\\n保留特征：距离触发阈值影响响应\\n课堂代理：不同触发距离阈值\\n研究问题：触发距离阈值是否影响门禁提醒准确率？\"}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-door-reminder-distance-v5-10255bb7b6",
+      "sourceKind": "persona",
+      "personaId": "engineering-door-reminder-distance",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "medium",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "门开太久提醒器",
+        "retainedFeature": "距离触发阈值影响响应",
+        "classroomProxy": "不同触发距离阈值",
+        "researchQuestion": "触发距离阈值是否影响门禁提醒准确率？",
+        "independentVariable": "触发距离阈值",
+        "dependentDirection": "提醒准确率"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-plant-light-auto-duration-v5-eb51ab7bf1-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-补光灯时长-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-plant-light-auto-duration-v5-eb51ab7bf1"
+    ],
+    "qualityNotes": "在阶段1以低投入学生对话示范保留工程兴趣并转化为课堂代理，引导确认自变量与因变量方向，脚手架精简不替代学生决策，同时映射主题、输出快照和变量，确保蒸馏样本的行为聚焦。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个给植物自动补光的灯，研究补光时长会不会影响植物生长。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的想法很有探索性。校园条件下，搭建自动补光灯涉及控制电路和编程，我们可以先简化：用定时器设置不同补光时长，研究时长对植物生长的影响，你觉得这样聚焦可行吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[]}"
+      },
+      {
+        "from": "human",
+        "value": "嗯，可以，我就想研究定时补光时长是不是影响绿豆幼苗生长。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，我们用绿豆种子做快速观测实验。接下来你需要明确观察哪些生长指标，比如株高、叶片数量等。你能先说说打算记录哪些变化吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议观察：株高、叶片数\"]}"
+      },
+      {
+        "from": "human",
+        "value": "就看看长得高不高，多不多吧。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，那我们确认：研究问题定为“定时补光时长是否影响绿豆幼苗生长？”，自变量是定时补光时长，因变量是幼苗生长情况（株高、叶片数）。阶段1完成。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"自动补光植物灯\",\"retainedFeature\":\"补光时长自动控制影响植物\",\"classroomProxy\":\"不同定时补光时长\",\"researchQuestion\":\"定时补光时长是否影响绿豆幼苗生长？\"},\"snapshot\":\"绿豆幼苗不同补光时长生长对比实验\",\"variables\":{\"independent\":\"定时补光时长\",\"dependent\":\"幼苗生长情况\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-plant-light-auto-duration-v5-eb51ab7bf1",
+      "sourceKind": "persona",
+      "personaId": "engineering-plant-light-auto-duration",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "theme_loss"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "自动补光植物灯",
+        "retainedFeature": "补光时长自动控制影响植物",
+        "classroomProxy": "不同定时补光时长",
+        "researchQuestion": "定时补光时长是否影响绿豆幼苗生长？",
+        "independentVariable": "定时补光时长",
+        "dependentDirection": "幼苗生长情况"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:theme_loss"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-fan-temperature-threshold-v5-16cfbcb428-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-温控风扇阈值-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "safety",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-fan-temperature-threshold-v5-16cfbcb428"
+    ],
+    "qualityNotes": "学生主动提出自变量和研究问题，导师仅追问因变量定义与安全约束，不使用选择题，全程开放提问推动确认；阶段1完成时输出完整theme_mapping、snapshot和自变量声明，示范了工程主题下的认知负荷控制、安全硬约束和代理变量转化的教学行为。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个温度高了就自动开风扇的装置，但想研究触发温度不同会不会影响它开得准不准。自变量就是温度触发阈值吧？我确定研究问题就是温度触发阈值是否影响温控风扇响应准确率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已经把研究问题聚焦在“温度触发阈值是否影响温控风扇响应准确率”，自变量是温度触发阈值，方向很清晰。接下来，你打算如何定义和测量“响应准确率”呢？比如，用什么方法判断风扇是否在期望阈值准确启动？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以设想模拟升温与记录偏差的方法\",\"考虑怎样获取温度‑启动对比数据\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我可以用热水杯靠近传感器模拟升温，用秒表记录风扇实际启动时的温度，再和设定阈值比较，看偏差大不大。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个方案用热水杯模拟升温，记录启动温度与阈值偏差，可以给出准确率的评估。但安全方面需要特别注意：风扇必须使用低压供电（如5V USB），严禁使用220V市电。你能确认你的实验会使用低压USB风扇吗？以及记录方式，是否已有数据记录表？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认低压设备与传感器型号\",\"记录表可先用手写笔记\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我用的就是5V USB小风扇，传感器是DS18B20，供电安全。记录我先用笔记本手写。没问题。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好！我们已经明确研究问题“温度触发阈值是否影响温控风扇响应准确率？”，自变量是温度触发阈值，因变量方向是响应准确率。测量方法用热水杯模拟升温并记录实际启动温度与阈值偏差。安全上确认使用低压USB供电风扇。选题确认已完成，下一步将进入实验设计阶段，请准备好记录表格。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"温度高了自动开风扇\",\"retainedFeature\":\"温度触发阈值影响响应\",\"classroomProxy\":\"不同温度触发阈值\",\"researchQuestion\":\"温度触发阈值是否影响温控风扇响应准确率？\"},\"snapshot\":\"原始兴趣：温度高了自动开风扇\\n保留特征：温度触发阈值影响响应\\n课堂代理：不同温度触发阈值\\n研究问题：温度触发阈值是否影响温控风扇响应准确率？\",\"variables\":{\"independent\":\"温度触发阈值\",\"dependent\":\"响应准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-fan-temperature-threshold-v5-16cfbcb428",
+      "sourceKind": "persona",
+      "personaId": "engineering-fan-temperature-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "温度高了自动开风扇",
+        "retainedFeature": "温度触发阈值影响响应",
+        "classroomProxy": "不同温度触发阈值",
+        "researchQuestion": "温度触发阈值是否影响温控风扇响应准确率？",
+        "independentVariable": "温度触发阈值",
+        "dependentDirection": "响应准确率",
+        "safetyNotes": [
+          "用低压风扇，不用220V市电"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:safety_softness"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v5-f71b476dc5-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念型-智慧校园节能-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-high-concept-smart-campus-energy-v5-f71b476dc5"
+    ],
+    "qualityNotes": "通过连续开放问题引导学生将‘灯光自动管理’的兴趣聚焦到‘灯具关闭策略影响模拟能耗’的研究问题，保留‘调节策略影响能耗’的核心机制，未使用选项菜单，确认阶段完整输出theme_mapping、snapshot和自变量定义，体现学生主体性与认知负荷控制。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个智慧校园节能的项目，最让我好奇的是教室灯光怎么自动管理来省电。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提到灯光自动管理能省电，这个想法很好。我们暂时把“自动”这个技术实现先放一放，回到你观察到的真实场景：在教室里，哪些行为或管理方式会影响灯具的实际能耗呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我觉得最明显的是下课关灯，或者没人时关灯，还有可能根据不同区域调暗一些。不同做法耗电应该不一样。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提到了几种具体的操作方式：定时关闭、感应关闭、分区调节。这些都可以看作不同的灯具关闭策略。那么，我们可否这样问：如果我们在教室里模拟这些策略，灯具关闭策略是否会影响模拟能耗？我们可以设计实验来验证。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，这个思路很清晰，我们就研究灯具关闭策略是否影响教室模拟能耗，自变量就是关闭策略，因变量是能耗。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们确认选题。研究问题：灯具关闭策略是否影响教室模拟能耗？自变量是灯具关闭策略，因变量将通过模拟测量的能耗数值来表现。接下来请确认这份选题确认书。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"智慧校园节能\",\"retainedFeature\":\"行为/参数调节影响能耗\",\"classroomProxy\":\"不同灯具关闭策略\",\"researchQuestion\":\"灯具关闭策略是否影响教室模拟能耗？\"},\"snapshot\":\"研究问题：灯具关闭策略是否影响教室模拟能耗？\",\"variables\":{\"independent\":\"灯具关闭策略\",\"dependent\":\"模拟能耗\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-high-concept-smart-campus-energy-v5-f71b476dc5",
+      "sourceKind": "persona",
+      "personaId": "high-concept-smart-campus-energy",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "智慧校园节能",
+        "retainedFeature": "行为/参数调节影响能耗",
+        "classroomProxy": "不同灯具关闭策略",
+        "researchQuestion": "灯具关闭策略是否影响教室模拟能耗？",
+        "independentVariable": "灯具关闭策略",
+        "dependentDirection": "模拟能耗"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-smartedu-0124-v5-3269d02873-v1",
+    "source": "distill_dsv4",
+    "scenario": "跨学科实践活动3 水质检测及自制净水器-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-smartedu-0124-v5-3269d02873"
+    ],
+    "qualityNotes": "该样本在阶段1通过聚焦单一操控变量，避免一次处理多个因素，有效控制认知负荷；保留工程制作兴趣，转化为变量探究，体现主题保真；以连续提问引导学生明确自变量与因变量，保持学生代理。确认环节输出完整的theme_mapping和变量框架。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我想做一个自制净水器，用沙子、石子、棉花和活性炭分别试试，还想看看两层和三层过滤效果有什么不同，哪种出水最干净。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的方案包含材料种类和层数两个变动因素，要想清楚探究问题，我们需要先确定操控哪一个变量。你更想比较不同材料种类，还是比较不同过滤层数的影响？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以考虑哪种变量更容易在学校条件下控制与测量。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想比较不同材料种类，比如沙子、石子、棉花，看哪个过滤效果最好。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们以过滤材料种类为操控变量。接下来你打算怎么判断过滤效果的好坏？用水的浑浊度变化还是有其他指标？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议采用肉眼观察透明度的变化，或简单记录过滤前后水样的颜色深浅。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "看水变清的程度，浑浊的污水过滤后越清效果越好。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们已经明确：以过滤材料种类为自变量，通过观察滤液浑浊度变化评估效果。下面进入方案设计阶段，请确认以上研究框架。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"跨学科实践活动3 水质检测及自制净水器\",\"retainedFeature\":\"把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。\",\"classroomProxy\":\"把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。\",\"researchQuestion\":\"不同过滤材料种类（沙子、石子、棉花）会怎样影响自制净水器的过滤效果？\"},\"snapshot\":\"自变量：过滤材料种类\\n因变量：水样浑浊度\",\"variables\":{\"independent\":\"过滤材料种类\",\"dependent\":\"滤液澄清程度\",\"controlled\":[\"过滤层数\",\"原水浑浊度\",\"过滤水量\"]}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-smartedu-0124-v5-3269d02873",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0124",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "跨学科实践活动3 水质检测及自制净水器",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-high-concept-low-carbon-commute-v5-236ca73708-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念型-低碳出行-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-high-concept-low-carbon-commute-v5-236ca73708"
+    ],
+    "qualityNotes": "阶段1通过单问题聚焦，引导学生将低碳出行兴趣提炼为模拟出行方式能耗差的课堂代理，不使用选择框，在确认时完整输出theme_mapping、snapshot和自变量定义，体现了主题忠实度和认知负荷控制。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究低碳出行，特别想知道不同出行方式到底哪个更省能耗。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你对出行方式的能耗差异很感兴趣。为了把这个想法变成课堂实验，你打算用什么方式来模拟不同的出行方式呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "可以用不同数量的橡皮筋来代表能耗，或者设计几种拉动重物的模拟出行方式。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个思路把出行方式转化为了可操作的模拟。那我们先明确：你要改变的是哪种模拟出行方式，以及你要观察的能耗结果。自变量和因变量可以怎么定义？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是实验中你主动改变的条件。\",\"因变量是你要测量或观察的结果。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "自变量是模拟的出行方式，因变量就是模拟单次通勤的能耗，可以用消耗的橡皮筋数量表示。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们的研究问题就可以定为：出行方式是否影响模拟单次通勤能耗？自变量是模拟出行方式，因变量是模拟单次通勤能耗。保留了低碳出行的核心差异，也变成了可操作的实验。课题方向确认。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":false,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"低碳出行\",\"retainedFeature\":\"出行方式能耗差异\",\"classroomProxy\":\"不同模拟出行方式对应的\\\"能耗\\\"（如橡皮筋数/重量）\",\"researchQuestion\":\"出行方式是否影响模拟单次通勤能耗？\"},\"snapshot\":\"研究问题：出行方式是否影响模拟单次通勤能耗？\",\"variables\":{\"independent\":\"出行方式\",\"dependent\":\"模拟单次通勤能耗\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-high-concept-low-carbon-commute-v5-236ca73708",
+      "sourceKind": "persona",
+      "personaId": "high-concept-low-carbon-commute",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "低碳出行",
+        "retainedFeature": "出行方式能耗差异",
+        "classroomProxy": "不同模拟出行方式对应的\"能耗\"（如橡皮筋数/重量）",
+        "researchQuestion": "出行方式是否影响模拟单次通勤能耗？",
+        "independentVariable": "出行方式（模拟）",
+        "dependentDirection": "模拟单次通勤能耗"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-high-concept-ai-recognition-threshold-v5-55dd9c27d8-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念型-AI识别阈值-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-high-concept-ai-recognition-threshold-v5-55dd9c27d8"
+    ],
+    "qualityNotes": "通过开放提问引导学生将工程兴趣转化为研究问题，保留阈值机制并映射为可测自变量，完成阶段1确认时输出完整theme_mapping与独立变量，避免直接给选项，控制认知负荷并强化主体性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个跟AI有关的项目，最好能识别东西。我最感兴趣的是AI怎么判断一个东西该不该被识别，比如识别阈值会影响判断。我们能用不同颜色或亮度匹配阈值来模拟吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你对阈值影响判断的关注很精准。如果我们把“识别阈值”作为自变量，你希望研究它影响什么具体结果？请试着用一句话概括研究问题，比如：识别阈值是否影响______？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试用“识别阈值是否影响分拣准确率”的句式来表述\",\"把因变量想成你可以测量或计数的表现指标\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想研究识别阈值是否影响分拣准确率。阈值不同，分拣正确率就会变化。自变量就是识别阈值，因变量是分拣准确率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"问题很清晰。那么，自变量“识别阈值”在实验中具体怎么定义和改变？比如你可以设定几个不同的判断界限，用颜色或亮度来代表。请描述你想用的阈值水平。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑用“低、中、高”三个水平来区分识别门槛\",\"每个阈值对应一种亮度或颜色匹配的严格程度\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我打算设定3个阈值：低阈值，只要稍微接近目标颜色就识别；中阈值，要求颜色匹配度较高；高阈值，必须非常匹配才识别。我们用不同颜色纸片来测试分拣准确率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们已经把AI图像识别的判断机制转化为颜色亮度匹配阈值的课堂实验。你的研究问题、自变量与因变量均已明确。请核对下面的选题确认书，然后我们进入设计阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"AI图像识别\",\"retainedFeature\":\"识别阈值影响准确率\",\"classroomProxy\":\"不同颜色/亮度匹配阈值\",\"researchQuestion\":\"识别阈值是否影响分拣准确率？\"},\"snapshot\":\"研究识别阈值（低/中/高共3水平）对不同颜色纸片分拣准确率的影响，通过设定匹配阈值来模拟AI判断策略\",\"variables\":{\"independent\":\"识别阈值（低/中/高）\",\"dependent\":\"分拣准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-high-concept-ai-recognition-threshold-v5-55dd9c27d8",
+      "sourceKind": "persona",
+      "personaId": "high-concept-ai-recognition-threshold",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "theme_loss"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "AI图像识别",
+        "retainedFeature": "识别阈值影响准确率",
+        "classroomProxy": "不同颜色/亮度匹配阈值",
+        "researchQuestion": "识别阈值是否影响分拣准确率？",
+        "independentVariable": "识别阈值",
+        "dependentDirection": "分拣准确率"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:engineering_flattening",
+        "failureMode:theme_loss"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-high-concept-mars-light-v5-3b5038ff80-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念降级型-火星基地植物-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "structure_compliance",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-high-concept-mars-light-v5-3b5038ff80"
+    ],
+    "qualityNotes": "在变量混乱场景下，通过开放性提问引导学生澄清因变量，保留火星基地主题映射，确认时完整输出theme_mapping、snapshot、variables.independent，全程未给出选项，维持学生主导。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个和太空有关的项目，最好有点像火星基地。我最感兴趣的是火星基地里植物怎么活下来，因为那里条件都要人工控制。我想保留人工控制光照这个特点，用不同人工光照时长看看绿豆发芽会不会不一样。我确定研究不同人工光照时长是否影响绿豆发芽和早期生长，要改变的是人工光照时长。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已明确要改变的是人工光照时长。那么，你觉得我们该观察绿豆的哪些变化来判断光照时长的影响呢？比如要看它长得好不好，我们可以记录什么？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "发芽数量、苗的高度，还有叶子颜色？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，这些都是观察生长的指标。我们把它们归为“发芽和早期生长情况”作为因变量。那能否一句话概括你要研究的问题呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "不同人工光照时长是否影响绿豆发芽和早期生长？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"清楚了，你的研究问题就是“不同人工光照时长是否影响绿豆发芽和早期生长？”。请你确认这个选题，我们将为你记录。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"火星基地植物生存\",\"retainedFeature\":\"基地环境条件需要人工控制\",\"classroomProxy\":\"不同人工光照时长对绿豆发芽和早期生长的影响\",\"researchQuestion\":\"不同人工光照时长是否影响绿豆发芽和早期生长？\"},\"snapshot\":\"研究问题：不同人工光照时长是否影响绿豆发芽和早期生长？\",\"variables\":{\"independent\":\"人工光照时长\",\"dependent\":\"发芽和早期生长情况\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-high-concept-mars-light-v5-3b5038ff80",
+      "sourceKind": "persona",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "火星基地植物生存",
+        "retainedFeature": "基地环境条件需要人工控制",
+        "classroomProxy": "不同人工光照时长",
+        "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+        "independentVariable": "人工光照时长",
+        "dependentDirection": "发芽和早期生长情况",
+        "safetyNotes": [
+          "人工光源用LED，不用高压灯具"
+        ],
+        "mustKeepTerms": [
+          [
+            "火星"
+          ],
+          [
+            "基地"
+          ],
+          [
+            "人工",
+            "控制"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "人工",
+            "光照"
+          ],
+          [
+            "光照",
+            "时长"
+          ]
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-smartedu-0143-v5-a7150172b8-v1",
+    "source": "distill_dsv4",
+    "scenario": "机器人舞台-百年征程 未来可期-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-smartedu-0143-v5-a7150172b8"
+    ],
+    "qualityNotes": "认知负荷控制：每轮只聚焦一个开放问题，从三选一到确定因变量方向，避免选项菜单；学生代理：学生自主选择自变量和因变量方向；转化推理：将“做一个自动装置”转化为可测试的参数-性能研究；主题保真：保留红船元素但聚焦工程实验。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我对机器人舞台挺感兴趣的，但不知道怎么设计实验。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们聚焦一个问题：改变一个可调参数，测试装置表现。你更想调整传感器阈值、结构参数还是程序规则？请三选一作为自变量。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想红外传感器、马达速度等可调参数。\",\"选择你最想探索的一个因素。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想选传感器阈值，比如红外触发距离。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的。自变量定为传感器阈值。你想观察装置哪方面的变化？比如成功率、响应时间还是误判次数？请确定因变量方向。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"成功率：完成任务的比例；响应时间：动作快慢。\",\"选一个你关心的效果。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我关心成功率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"研究问题确认：不同红外传感器阈值会怎样影响自动装置的成功率？自变量：传感器阈值，因变量方向：成功率。选题已明确，请确认。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"机器人舞台-百年征程 未来可期\",\"retainedFeature\":\"把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。\",\"classroomProxy\":\"把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。\",\"researchQuestion\":\"不同红外传感器阈值会怎样影响自动装置的成功率？\"},\"snapshot\":\"研究问题：不同红外传感器阈值对自动装置成功率的影响。自变量：红外传感器阈值，因变量：成功率。\",\"variables\":{\"independent\":\"传感器阈值\",\"dependent\":\"成功率、响应时间或误判次数\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-smartedu-0143-v5-a7150172b8",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0143",
+      "subject": "STEM",
+      "expectedTransformation": {
+        "originalInterest": "机器人舞台-百年征程 未来可期",
+        "retainedFeature": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+        "classroomProxy": "把“做一个自动装置”转化为“改变一个可调参数，测试装置表现”。",
+        "researchQuestion": "不同传感器阈值或结构参数会怎样影响自动装置的稳定性和准确性？",
+        "independentVariable": "传感器阈值、结构参数或程序规则（三选一）",
+        "dependentDirection": "成功率、响应时间或误判次数",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v5-f8ff6d97b8-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-生态瓶平衡-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-ecology-bottle-balance-v5-f8ff6d97b8"
+    ],
+    "qualityNotes": "阶段1三次对话逐步收敛：首轮开放引导学生描述核心机制，第二轮追问代理表述，第三轮确认研究问题并输出完整选题快照与变量定义，全程无选项菜单，学生保留原始兴趣表述且自变量界定清晰",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个生态瓶，观察里面的微型生态系统怎么自己维持平衡，感觉特别有意思。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个方向很有探究价值。要从复杂的生态瓶里发现稳定的规律，你觉得哪个因素最能代表生物数量的比例关系？比如你最先关注到生产者与消费者的数量变化？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我觉得生物数量比例最关键。种类太多我不好控制，就只看水草和小鱼吧。我想保留“生物数量比例影响系统平衡”这个特点，用不同水草与小鱼数量比例来研究。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，你提取了核心机制并找到了课堂里可操作的代理变量。接下来我们可以把想法拧成一个具体问题：你想研究的是水草与小鱼的数量比例是否会影响什么？比如生态瓶能稳定维持多久？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，我就想研究水草与小鱼数量比例是否影响生态瓶存活天数。我要改变的是水草和小鱼的比例，观察能活几天。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这样我们就明确了：水草与小鱼数量比例作为自变量，生态瓶存活天数作为因变量。你的研究问题聚焦很清楚。我们暂时把选题锁定为“水草与小鱼数量比例是否影响生态瓶存活天数”，如果后续有细化再调整。请确认这是你下一步想探究的方向。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[\"评估比例变化的范围，后续可以设计梯度如1:2、1:1、2:1。\",\"注意控制其他条件如光照、水温保持不变。\"],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"生态瓶/微型生态系统\",\"retainedFeature\":\"生物数量比例影响系统稳定性\",\"classroomProxy\":\"不同水草与小鱼数量比例\",\"researchQuestion\":\"水草与小鱼数量比例是否影响生态瓶存活天数？\"},\"snapshot\":\"研究问题：水草与小鱼数量比例是否影响生态瓶存活天数、自变量：水草与小鱼数量比例、因变量：生态瓶存活天数\",\"variables\":{\"independent\":\"水草与小鱼数量比例\",\"dependent\":\"生态瓶存活天数\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-ecology-bottle-balance-v5-f8ff6d97b8",
+      "sourceKind": "persona",
+      "personaId": "ecology-bottle-balance",
+      "subject": "biology_ecology",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "生态瓶/微型生态系统",
+        "retainedFeature": "生物数量比例影响系统稳定性",
+        "classroomProxy": "不同水草与小鱼数量比例",
+        "researchQuestion": "水草与小鱼数量比例是否影响生态瓶存活天数？",
+        "independentVariable": "水草与小鱼数量比例",
+        "dependentDirection": "生态瓶存活天数"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-safety-bread-mold-preservative-v5-5d84841677-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-面包防腐-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "safety",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-safety-bread-mold-preservative-v5-5d84841677"
+    ],
+    "qualityNotes": "该样本训练了安全风险降级（从消毒剂到安全物理方法），保留原始兴趣的防腐机制，通过开放式追问逐步聚焦到明确的研究问题，确认阶段完整输出stage1_confirmed、theme_mapping、snapshot、independent变量，体现了transformation reasoning，同时控制了认知负荷，每轮只提一个核心问题。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我想研究食物怎么防腐。我想到一个点子，能不能在面包上喷消毒剂看看会不会发霉，这样能杀死细菌吧？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的想法是从杀菌入手，但消毒剂接触食物并不安全。食物防腐还有很多安全方法，比如改变温度、水分等，你能想到哪些生活中用的防腐方式呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我知道可以放冰箱冷藏，或者把面包晒干，还有用真空袋抽真空。这些应该没危险，但不知道哪个更有效。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提出了三种安全方法。如果我们想比较它们，你觉得用什么方法来判断哪种防腐效果更好呢？比如观察面包的什么变化？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，我确定研究不同防腐处理（冷藏/干燥/真空）是否影响面包发霉速度，要改变的是防腐处理方式。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，你的研究问题已明确：不同防腐处理（冷藏、干燥、真空密封）是否影响面包发霉速度？自变量是防腐处理方式，因变量是发霉速度。接下来，我们将进入设计实验阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"食物怎么防腐\",\"retainedFeature\":\"防腐方式抑制微生物\",\"classroomProxy\":\"不同防腐处理（冷藏/干燥/真空密封）\",\"researchQuestion\":\"不同防腐处理是否影响面包发霉速度？\"},\"snapshot\":\"学生最初想用消毒剂看面包发霉，经过安全降级，改为比较冷藏、干燥、真空密封三种处理方法，研究它们对面包发霉速度的影响。\",\"variables\":{\"independent\":\"防腐处理方式\",\"dependent\":\"发霉速度\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-safety-bread-mold-preservative-v5-5d84841677",
+      "sourceKind": "persona",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物怎么防腐",
+        "retainedFeature": "防腐方式抑制微生物",
+        "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+        "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+        "independentVariable": "防腐处理方式",
+        "dependentDirection": "发霉速度",
+        "safetyNotes": [
+          "发霉食物只观察不食用，可能产生毒素",
+          "避免吸入霉菌孢子"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v5-7eb8c686c0-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "stage_discipline",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-variable-confusion-apple-browning-v5-7eb8c686c0"
+    ],
+    "qualityNotes": "通过开放问题引导学生自查控制变量并确认变量设定，防止因学生急于进入数据表而冲淡阶段边界；保留学生原始机制猜想，聚焦自变量的教学确认，体现代理质量和认知负荷控制。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究苹果切开变色，变量怎么设？是不是自变量就是不同处理方式，比如泡盐水、柠檬汁，因变量是褐变快慢？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已经有了很清晰的研究问题和变量方向。为了确保实验稳定，除了处理方式和褐变速度，你觉得哪些条件需要保持一致，才不会干扰结果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"哪些因素可能影响苹果褐变，需要控制住？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "需要苹果品种相同、切片厚度一致、放在同样温度下观察，时间也相同。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，品种、厚度、温度和观察时间作为控制变量非常合理。现在我们先把变量体系确认清楚，再进入记录表格设计。你需要我帮你把自变量、因变量和控制变量总结一下吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认阶段边界，先不上数据表格。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，帮我总结一下变量，我确认后就可以进入下一步。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"研究问题：不同处理是否影响苹果切面褐变速度？自变量：抗褐变处理方式（盐水浸泡、柠檬汁、不处理）。因变量：褐变速度。控制变量：苹果品种、切片厚度、环境温度、观察时间。请确认是否准确，我们将在下一步设计数据表格。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"苹果切开变色\",\"retainedFeature\":\"隔绝氧气可延缓褐变\",\"classroomProxy\":\"不同抗褐变处理（盐水浸泡/柠檬汁/不处理）\",\"researchQuestion\":\"不同处理是否影响苹果切面褐变速度？\"},\"snapshot\":\"学生初步提出变量混淆，经引导补充控制变量后确认了自变量、因变量和控制变量体系，阶段边界已明确。\",\"variables\":{\"independent\":\"抗褐变处理方式\",\"dependent\":\"褐变速度\",\"controlled\":[\"苹果品种\",\"切片厚度\",\"环境温度\",\"观察时间\"]}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-variable-confusion-apple-browning-v5-7eb8c686c0",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-engineering-bridge-load-v5-bb117f2393-v1",
+    "source": "distill_dsv4",
+    "scenario": "工程项目型-纸桥承重-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-engineering-bridge-load-v5-bb117f2393"
+    ],
+    "qualityNotes": "样本控制认知负荷，仅询问一个核心开放问题；保留原主题的工程约束与机制；通过确认书避免代理漂移；强化学生主体性，不做选择题；阶段1确认时输出完整映射，体现跨学科整合。重点训练在高概念主题下保持工程味道、代理品质与主题忠实度。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个能承重的纸桥，是不是桥的形状会影响它能承受的重量？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到桥的形状可能影响承重，这个观察很关键。在工程里，桥身结构形式（例如桁架、拱形、筒形）确实是影响承载能力的重要因素。你希望重点比较哪几种桥身结构形式？可以结合你见过的桥梁来思考。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以想想平板桥、拱桥、桁架桥这些常见形态。\",\"每种结构在传力方式上各有什么特点？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我确定研究桥身结构形式（如三角桁架、筒形、平板）是否影响纸桥承重，要改变的是结构形式。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，你已明确想探究桥身结构形式对纸桥承重的影响。我帮你整理为研究问题：桥身结构形式是否影响纸桥承重？自变量是桥身结构形式，因变量是承重能力。请确认以上是否准确，确认后进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认自变量、因变量和问题是否与你设想一致。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "没问题，我确认。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"确认完成。我们已锁定研究问题与变量。现在进入下一阶段，一起设计实验数据表格。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"纸桥承重\",\"retainedFeature\":\"结构形式影响承重能力\",\"classroomProxy\":\"不同桥身结构形式\",\"researchQuestion\":\"桥身结构形式是否影响纸桥承重？\"},\"snapshot\":\"纸桥承重实验：探究桥身结构形式对承重能力的影响\",\"variables\":{\"independent\":\"桥身结构形式\",\"dependent\":\"承重能力\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-engineering-bridge-load-v5-bb117f2393",
+      "sourceKind": "persona",
+      "personaId": "engineering-bridge-load",
+      "subject": "physics_motion",
+      "studentType": "engineering_project",
+      "difficulty": "hard",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "纸桥承重",
+        "retainedFeature": "结构形式影响承重能力",
+        "classroomProxy": "不同桥身结构形式",
+        "researchQuestion": "桥身结构形式是否影响纸桥承重？",
+        "independentVariable": "桥身结构形式",
+        "dependentDirection": "承重能力"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-smartedu-0148-v5-b32572ec41-v1",
+    "source": "distill_dsv4",
+    "scenario": "欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月-蒸馏样本5",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-smartedu-0148-v5-b32572ec41"
+    ],
+    "qualityNotes": "第一阶段聚焦工程设计参数分解，通过单轮一问避免认知过载，将探月着陆兴趣转化为可测试的设计参数（缓冲材料），并在第三次交互完成confirm，保留学生代理感，不提供选项。确认输出完整theme_mapping、snapshot、independent变量。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我最喜欢听欧阳自远院士讲嫦娥探月了，我想做一个和着陆器有关的模型。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提到的是一个很好的工程方向。很多着陆器都靠缓冲腿吸收冲击力，我们能试着把其中一个设计要素变成可调节的参数。比如你想改变着陆腿的缓冲材料还是它的形状？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想改变缓冲材料，试试用海绵、泡沫和弹簧，看哪个让着陆器更稳。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个参数很适合在课堂上测试。你的想法已经接近一个可操作的问题：改变缓冲材料，考察着陆稳定性。我们需要明确“更稳”具体用什么指标来描述，比如着陆后的倾倒次数还是振动幅度？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想用什么数据表示“稳定”：是倾倒次数还是晃动的角度？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "就用倾倒次数吧。每测5次，记录倾倒几次。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这样我们就有了明确的研究框架。你从欧阳院士的探月故事出发，把工程制作聚焦到“缓冲材料如何影响着陆稳定性”，自变量是缓冲材料（海绵、泡沫、弹簧），因变量是倾倒次数。我们确认一下这个选题。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"欧阳自远院士讲嫦娥探月，制作着陆器模型\",\"retainedFeature\":\"工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果\",\"classroomProxy\":\"改变着陆缓冲材料，测试对稳定性的影响\",\"researchQuestion\":\"改变着陆缓冲材料会怎样影响着陆器的倾倒次数？\"},\"snapshot\":\"选题确认：研究着陆缓冲材料对倾倒次数的影响，材料为自变量，倾倒次数为因变量。\",\"variables\":{\"independent\":\"缓冲材料（海绵、泡沫、弹簧）\",\"dependent\":\"作品表现指标（成功率、距离、速度、稳定性等）\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-smartedu-0148-v5-b32572ec41",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0148",
+      "subject": "科学",
+      "expectedTransformation": {
+        "originalInterest": "欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月",
+        "retainedFeature": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+        "classroomProxy": "工程制作类主题需要先拆成一个可改变的设计参数，再用测试数据比较效果。",
+        "researchQuestion": "围绕「欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月」，改变一个设计参数会怎样影响作品表现？",
+        "independentVariable": "一个可调的设计参数（材料、尺寸、角度、程序阈值等）",
+        "dependentDirection": "作品表现指标（成功率、距离、速度、稳定性等）",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v6-546b18e17c-v1",
+    "source": "distill_dsv4",
+    "scenario": "现实问题抽象型-教室遮光降温-蒸馏样本6",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-real-world-classroom-shade-heat-v6-546b18e17c"
+    ],
+    "qualityNotes": "通过安全提醒将直射太阳降级为台灯模拟，保护学生动机；逐轮聚焦变量抽象，不使用选项，由学生自主命名自变量和因变量，完成主题映射。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究教室夏天太热，能不能直接用太阳光来晒纸盒，然后盖不同东西看温度变化？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"用太阳光是个直观的办法，但直射高温可能有烫伤风险，而且时间难控制。我们可以用台灯代替太阳，既安全又能稳定模拟光照。你觉得可以接受吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"台灯照纸盒，安全可控。\",\"考虑不同材料盖在盒顶。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，那用台灯照纸盒，然后盖不同材料，比如黑布、白纸。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这个办法保留了遮挡阳光降温的关键。那么，实验中你想改变什么条件（自变量）？又要测量什么结果（因变量）？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是遮光材料，因变量是温度变化。\",\"明确改变和测量的对象，实验才能操作。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "改变遮光材料，测量不同材料下纸盒内的温度变化。这样能看出哪个更隔热。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好！我们从“教室夏天太热”出发，保留“遮挡阳光可降温”，用台灯照覆盖不同遮光材料的纸盒作为课堂代理。研究问题：遮光材料是否影响纸盒内温度变化？自变量遮光材料，因变量纸盒内温度变化。确认这个方向，下一步可以设计实验细节。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"教室夏天太热\",\"retainedFeature\":\"遮挡阳光可降温\",\"classroomProxy\":\"不同遮光材料盖纸盒\",\"researchQuestion\":\"遮光材料是否影响纸盒内温度变化？\"},\"snapshot\":\"原始兴趣：教室夏天太热\\n保留特征：遮挡阳光可降温\\n课堂代理：不同遮光材料盖纸盒\\n研究问题：遮光材料是否影响纸盒内温度变化？\",\"variables\":{\"independent\":\"遮光材料\",\"dependent\":\"纸盒内温度变化\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-real-world-classroom-shade-heat-v6-546b18e17c",
+      "sourceKind": "persona",
+      "personaId": "real-world-classroom-shade-heat",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "教室夏天太热",
+        "retainedFeature": "遮挡阳光可降温",
+        "classroomProxy": "不同遮光材料盖纸盒",
+        "researchQuestion": "遮光材料是否影响纸盒内温度变化？",
+        "independentVariable": "遮光材料",
+        "dependentDirection": "纸盒内温度变化"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:cooperative",
+        "failureMode:theme_loss"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v6-fdf32cfd19-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-垃圾分类装置-蒸馏样本6",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "interdisciplinary_integration",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-over-broad-trash-sorting-v6-fdf32cfd19"
+    ],
+    "qualityNotes": "本例训练导师在阶段1避免代劳和选题菜单，通过三个回合逐步引导学生将原始‘智能垃圾分类’兴趣转化为可操作的课堂代理实验，明确自变量、因变量方向及控制策略，保持‘材料物理属性差异’的原始特征，最终产出主题映射和变量确认书。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想看看不同材质的小球在斜面上的滚动会不会真的影响它们归位的准确度，但不确定怎么开始。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你抓住了‘材料物理属性差异可被分拣’这个特征，可以从自变量入手。如果只改变小球材质，你觉得需要挑选哪几种材质来比较？这样能直接回应你的猜想。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"材质种类不宜多，建议2-3种差异明显的材质。\",\"可以回想垃圾分拣中常见的塑料、金属、玻璃等。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "那就用玻璃球、塑料球和金属球吧，这三种材质差异够明显了。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，这三种材质确实能代表垃圾分拣中的常见类型。下一步，归位准确率这个因变量，你打算怎么测量？比如用目标区域格子还是距离偏差？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用斜面底端画格子，看小球停在哪个区域。\",\"归位成功可定义为落入目标收集格。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我可以把斜面底部分成几个格子，最靠近正确收集口的格子算高分，远的算低分，多次试验看准确率。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这样定量测量就清晰了，并且保留了自动分拣的评判机制。现在我们把整个思路串起来：你从‘智能垃圾分类’出发，抓住材料属性差异，用不同材质小球的斜面滚动作为课堂代理，研究问题定为‘材质是否影响小球在分拣斜面上的归位？’。自变量是小球材质（玻璃/塑料/金属），因变量是归位准确率（格子得分）。请确认这份选题快照，我们会以此进入实验设计。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"智能垃圾分类\",\"retainedFeature\":\"材料物理属性差异可被分拣\",\"classroomProxy\":\"不同材质小球的滚动差异\",\"researchQuestion\":\"材质是否影响小球在分拣斜面上的归位？\"},\"snapshot\":\"原始兴趣：智能垃圾分类\\n保留特征：材料物理属性差异可被分拣\\n课堂代理：不同材质小球的滚动差异\\n研究问题：材质是否影响小球在分拣斜面上的归位？\",\"variables\":{\"independent\":\"小球材质\",\"dependent\":\"归位准确率\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-over-broad-trash-sorting-v6-fdf32cfd19",
+      "sourceKind": "persona",
+      "personaId": "over-broad-trash-sorting",
+      "subject": "water_environment",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "engineering_flattening"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "智能垃圾分类",
+        "retainedFeature": "材料物理属性差异可被分拣",
+        "classroomProxy": "不同材质小球的滚动差异",
+        "researchQuestion": "材质是否影响小球在分拣斜面上的归位？",
+        "independentVariable": "小球材质",
+        "dependentDirection": "归位准确率"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:engineering_flattening"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v6-dff2e1fdca-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-泥沙沉降-蒸馏样本6",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-variable-confusion-turbidity-settle-v6-dff2e1fdca"
+    ],
+    "qualityNotes": "在变量混乱型场景中，导师通过开放提问聚焦影响因素，保留学生原始表述并确认变量，最终完成选题确认，保持学生主体性，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想研究泥水怎么变清，但不知道该改变什么"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你想探究泥水变清的过程，这很有意思。你留意过泥水变清时，有哪些因素可能让它变清得更快或更慢吗？从你的经验出发，可能会是什么呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回忆一下，泥水放久了会怎样变化？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "是时间吧？放久了就更清"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你发现静置时间会影响泥水变清，这是一个很好的观察。那我们是不是可以研究“静置时间是否影响泥水的浊度”呢？浊度就是水的浑浊程度。你同意这个研究方向吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"浊度可以表示水的清澈程度，越清浊度越低。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，自变量是静置时间，因变量是浊度。我确定研究静置时间是否影响泥水浊度，要改变的是静置时间。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们已经明确了研究问题：静置时间是否影响泥水浊度。你的自变量是静置时间，因变量是浊度。这样我们的研究方向就清晰了。请确认以上信息，完成选题确认。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"泥水变清\",\"retainedFeature\":\"静置时间影响沉降程度\",\"classroomProxy\":\"不同静置时间\",\"researchQuestion\":\"静置时间是否影响泥水浊度？\"},\"snapshot\":\"研究静置时间对泥沙沉降的影响，观察不同静置时间下泥水浊度的变化。\",\"variables\":{\"independent\":\"静置时间\",\"dependent\":\"浊度\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-variable-confusion-turbidity-settle-v6-dff2e1fdca",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-turbidity-settle",
+      "subject": "water_environment",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "泥水变清",
+        "retainedFeature": "静置时间影响沉降程度",
+        "classroomProxy": "不同静置时间",
+        "researchQuestion": "静置时间是否影响泥水浊度？",
+        "independentVariable": "静置时间",
+        "dependentDirection": "浊度"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p1-smartedu-0154-v6-fa5a82501d-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素-蒸馏样本6",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-smartedu-0154-v6-fa5a82501d"
+    ],
+    "qualityNotes": "样本通过单一开放问题引导模糊历史兴趣落地为物理实验变量，避免选项，确认时提供完整theme_mapping、snapshot和变量定义，保持学习者主导性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我对张衡的全面才能很感兴趣，可不知道怎样通过实验来探究背后的影响因素。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"张衡发明地动仪，检测地震。我们可以构建一个简易摆锤模型：改变摆长或重物重量，观察‘震动’检测的灵敏度。你认为哪个条件改变后更容易让模型摆动？我们不妨从这个角度思考一个可探究的问题。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想想生活中类似的摆动装置\",\"地动仪核心是惯性摆\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想改变重物重量，看看对摆动灵敏度的影响。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好的方向。我们可以这样定义：自变量是重物的质量，因变量是摆锤在模拟震动下的摆动角度或启动所需的最小强度。这样问题就是：‘改变重物质量如何影响摆锤检测微小震动的灵敏度？’请你确认这个研究问题是否可行。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"用角度或位移来测量灵敏度\",\"考虑安全，使用小质量重物\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "这个研究问题很清晰，我确认。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已明确研究问题是‘改变重物质量如何影响摆锤检测微小震动的灵敏度？’。自变量：重物质量；因变量：摆动灵敏度（如最小启动角度）。安全方面，实验使用小质量物体，在教师指导下操作。现在进入第二阶段，设计数据表格。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素\",\"retainedFeature\":\"围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？\",\"classroomProxy\":\"围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？\",\"researchQuestion\":\"围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？\"},\"snapshot\":\"将张衡全面发展影响因素转化为地动仪模型实验，自变量为重物质量，因变量为摆动灵敏度，材料易得且低风险。\",\"variables\":{\"independent\":\"重物质量\",\"dependent\":\"可观察或可测量的结果\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-smartedu-0154-v6-fa5a82501d",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0154",
+      "subject": "科学",
+      "expectedTransformation": {
+        "originalInterest": "探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素",
+        "retainedFeature": "围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-cooperative-light-color-v4-8cdf66e4ac-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-光色与绿豆发芽-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-cooperative-light-color-v4-8cdf66e4ac"
+    ],
+    "qualityNotes": "在phase2设计中，先温和纠正潜在强光风险，建议用彩色玻璃纸+LED替代；然后按‘因变量测量→控制变量→数据表’递进，每轮只推一个核心问题，避免过度提问；最终输出带notes列的完整data_table_schema并确认阶段完成，良好控制认知负荷与结构纪律。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我打算设四个组：红光、蓝光、绿光、白光，各照射10颗绿豆。因变量就看每天发芽了几颗，数一数发芽数。控制温度、水量、绿豆品种一样。每天记录一次，做7天，好了帮我生成数据表吧"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"四个颜色的分组很清晰。不过用光时要注意安全——别用220V强光灯具，可以用彩色玻璃纸包住手机手电筒或LED小灯，既安全又易控制。现在我们需要把“发芽数”说得更明确一些：你准备怎么判断一颗绿豆算“发芽”了？每天在什么时间记录？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以想想胚根露头或某长度作为发芽标准。\",\"记录时间最好固定，比如每天晚饭后。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，我用手机手电筒蒙不同颜色的玻璃纸当光源。发芽标准：只要看到胚根突破种皮就算发芽，不量长度。每天晚饭后7点准时数一遍发了多少颗。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"用玻璃纸处理手机手电筒既安全又能保证颜色不同，思路很棒。发芽标准和固定记录时间也定得很清楚，这会让数据更可靠。接下来我们需要照顾一个容易被忽略的控制变量：四个组的光照强度要不要保持一致？环境光怎么挡住？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以试试手机里的照度APP大致调整光强。\",\"用纸箱把各组隔开，避免互相干扰。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "对，应该保持光照强度一致。我可以用手机测光APP把每个光源调到差不多同一水平。四个纸箱分别放，箱子内侧贴黑纸，外面再罩一层，避免环境光影响。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"光照强度统一、环境光隔离都用纸箱+测光APP解决，控制变量很到位。现在我们可以把刚才梳理的全部内容整理到一张数据表中，这样每天记录就不会乱。你想在表里记录哪些项目？要不要加一列备注，方便记意外情况？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"通常要记组别、天数、发芽数。\",\"备注列可以用来写温度波动、霉变等观察。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "肯定要分光和天的列，还有发芽颗数，再加一列备注。请直接帮我生成可以填7天、四个组的数据表结构吧。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"根据你的设计，我整理出下面的数据表结构。表里有组别、实验天数、发芽数以及备注列，最多可以填200行，足够四个组各7天用。请核对无误后就按这个表格每天记录。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"group\",\"title\":\"组别\",\"type\":\"text\",\"required\":true},{\"key\":\"day\",\"title\":\"实验天数\",\"type\":\"number\",\"required\":true},{\"key\":\"germinated_count\",\"title\":\"发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-cooperative-light-color-v4-8cdf66e4ac",
+      "sourceKind": "persona",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "光照对植物的影响",
+        "retainedFeature": "光的不同属性会影响植物",
+        "classroomProxy": "不同颜色的光（红蓝绿白）",
+        "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+        "independentVariable": "光的颜色",
+        "dependentDirection": "发芽速度/发芽数",
+        "safetyNotes": [
+          "避免使用220V强光灯具，用LED或手电筒"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:over_questioning"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-fuzzy-water-amount-v4-f109b89be1-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-浇水多少-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-fuzzy-water-amount-v4-f109b89be1"
+    ],
+    "qualityNotes": "在变量混乱的学生背景下，通过澄清自变量/因变量定义、确认控制变量、引导数据表设计，逐步推进阶段2并完成确认，未提前分析结论，数据表schema规范，认知负荷控制良好，安全提醒到位。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我打算研究每天浇水量不同对绿豆发芽的影响。我设三组：2ml、5ml、10ml，每组10颗绿豆。记录每天发芽数，算发芽率。温度和光照一样。记录5天，可以开始做吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的思路很清晰。我们先确认自变量就是每天浇水量（2ml,5ml,10ml），因变量发芽率你是打算用最后累计发芽数除以10计算，对吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "是的，自变量就是浇水量。发芽率按第5天累计发芽数除以10。温度和光照我会保持一致。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，计算方式明确了。那么每天你都需要记录每组新发芽的颗数，记录5天。接下来我们设计一个数据记录表，便于整理数据，可以吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "可以，我可以自己画表，但想参考你的设计。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们可以这样设计：每行记录一天一组观察，列包含天数、组别、浇水量、种子总数、当日发芽数、累计发芽率，再加备注。你确认后我生成正式数据表框架。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，这个结构可以，我们就按这个记录。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"数据表框架已生成，请按照表中的列每天记录。注意安全，避免水洒到电源插座。进入实验操作吧！\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"day\",\"title\":\"天数\",\"type\":\"number\",\"required\":true},{\"key\":\"group\",\"title\":\"组别\",\"type\":\"text\",\"required\":true},{\"key\":\"water_ml\",\"title\":\"浇水量(ml)\",\"type\":\"number\",\"required\":true},{\"key\":\"total_seeds\",\"title\":\"种子总数\",\"type\":\"number\",\"required\":true},{\"key\":\"daily_germinated\",\"title\":\"当日发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"germination_rate\",\"title\":\"累计发芽率(%)\",\"type\":\"number\",\"required\":false},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-fuzzy-water-amount-v4-f109b89be1",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "种子发芽",
+        "retainedFeature": "水分多少影响发芽",
+        "classroomProxy": "不同浇水量",
+        "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+        "independentVariable": "每天浇水量",
+        "dependentDirection": "发芽率"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-smartedu-0065-v4-fd0f17d918-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究「第1节 植物生长素」中的影响因素-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-smartedu-0065-v4-fd0f17d918"
+    ],
+    "qualityNotes": "该样本训练模型在阶段2中通过轻量提示控制认知负荷，逐步引导学生确定自变量梯度、因变量测量、控制变量及安全注意事项，最终输出符合结构要求的data_table_schema，包含备注列和maxRows=200，符合STEM教学阶段纪律和智慧教育平台标准。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "就看看不同光照时间吧，每天照几个钟头？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，你已选定光照时长作为自变量。我们需要设计几个水平，比如每天照光3小时、6小时、9小时，你觉得这样划分可以吗？也可以自己定，但至少2个水平，建议3个以便观察趋势。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议设3个梯度，如3h、6h、9h光照，保持梯度间隔均匀。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "行，就3、6、9小时吧，那种子发芽数怎么数？算发芽个数吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"可以记录每天发芽种子数，最终计算发芽率，或统计总发芽数。还需要确定观察周期，比如每天同一时间计数，连续观察7天。你认为哪种方式更方便？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"测量发芽个数，建议连续观察7天，每天记录新增发芽数。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "水的量要都一样吗？还有什么要一样的？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"是的，浇水量、温度、土壤、花盆、种子品种都需要保持一致，才能确保是光照影响。另外，使用灯光时注意距离，避免发热烫伤，实验期间定期检查。请你列出需要控制的变量。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"控制变量：水量、温度、土壤、花盆、种子品种等，并注意灯具发热安全。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "就是要记录每天的光照时间、发芽数，还有备注情况对吧？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已明确实验的自变量、因变量和控制变量，并注意到灯具安全。我们整理出记录表格，表头包含日期、花盆编号、光照时长、发芽数、备注。请每天固定时间观察并记录，阶段2完成，接下来可准备实施。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"title\":\"日期\",\"type\":\"text\",\"required\":true},{\"key\":\"pot_id\",\"title\":\"花盆编号\",\"type\":\"text\",\"required\":true},{\"key\":\"light_hours\",\"title\":\"光照时长\",\"type\":\"text\",\"required\":true},{\"key\":\"germination_count\",\"title\":\"发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-smartedu-0065-v4-fd0f17d918",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0065",
+      "subject": "生物",
+      "expectedTransformation": {
+        "originalInterest": "探究「第1节 植物生长素」中的影响因素",
+        "retainedFeature": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+        "classroomProxy": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+        "researchQuestion": "不同光照/水量/温度条件是否会影响植物生长或种子发芽情况？",
+        "independentVariable": "光照时长、水量或环境温度（三选一）",
+        "dependentDirection": "发芽数、株高或叶片数量",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-high-concept-mars-light-v4-80c9252aa6-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念降级型-火星基地植物-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-high-concept-mars-light-v4-80c9252aa6"
+    ],
+    "qualityNotes": "紧扣火星基地光照控制主题，按自变量梯度→因变量测量→控制变量→数据表顺序推进，避免一次给出过多信息；追问发芽和幼苗高度操作定义，强化测量客观性；引导个体记录以保留数据细节，同时处理行数超限问题保持认知负荷可控；安全提醒LED散热；确认消息完整输出data_table_schema含notes列，maxRows=200，符合阶段2结构要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我准备设0小时、4小时、8小时、12小时人工光照，每组10颗绿豆。观察每天是否发芽和幼苗生长情况。绿豆品种、水量、温度尽量一样。每天固定时间记录，做7天。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"光照梯度可行。0小时组怎么遮光？其他组光源统一LED，光照强度如何保持一致？另外，你说的“发芽”和“生长”较模糊，能否用胚根突破种皮定义为发芽，幼苗用高度测量？这样才好设计数据表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"发芽以胚根突破种皮为标准\",\"幼苗高度用直尺测，单位毫米\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "0小时组用黑纸袋完全遮光，其他组都用一样的LED灯，放在相同距离。发芽就看破皮出根，幼苗每天量从基部到最高叶尖的高度。绿豆同一袋，等量水，室温约25度。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"控制得很好。除了你说的变量，还需注意培养皿位置随机摆放，避免温差。你打算记录发霉等异常吗？建议数据表按每粒绿豆记录，包括日期、光照时长组别、编号、是否发芽、幼苗高度、备注。这样利于分析。安全上，LED长时间用注意散热，别紧贴纸张。你看这个表结构合适吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可加温度计监控LED升温\",\"异常情况记在备注列\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我会每组旁放温度计，记录温度。按每粒记录就每粒一行，但要记7天，4组共40粒，每天一行就280行，你刚说最多200行，会不会超？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"280行确实略超，我们可以合并为每天一组一行，记录该组发芽粒数和平均幼苗高度，这样只有28行，但会丢失个体差异。你希望保留个体信息还是简化？如果保留个体，实际280行我们可以允许超出，后续分析时你分阶段处理。设计列：日期、光照时长、绿豆编号、发芽（是/否）、幼苗高度(mm)、温度(°C)、备注。maxRows设为200，但你可实际记录280行，确认后进入实验阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"推荐保留个体数据\",\"若超出行数可手动追加\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "那我还是保留每粒的数据，超了我就加行。确认。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"确认完成。你明确了光照时长梯度、测量指标和控制变量。以下是你实验的数据表结构。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"title\":\"日期\",\"type\":\"text\",\"required\":true},{\"key\":\"group\",\"title\":\"光照时长组别\",\"type\":\"text\",\"required\":true},{\"key\":\"seed_id\",\"title\":\"绿豆编号\",\"type\":\"number\",\"required\":true},{\"key\":\"germination\",\"title\":\"是否发芽\",\"type\":\"text\",\"required\":true},{\"key\":\"height_mm\",\"title\":\"幼苗高度(mm)\",\"type\":\"number\",\"required\":true},{\"key\":\"temperature\",\"title\":\"温度(°C)\",\"type\":\"number\",\"required\":false},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-high-concept-mars-light-v4-80c9252aa6",
+      "sourceKind": "persona",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "火星基地植物生存",
+        "retainedFeature": "基地环境条件需要人工控制",
+        "classroomProxy": "不同人工光照时长",
+        "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+        "independentVariable": "人工光照时长",
+        "dependentDirection": "发芽和早期生长情况",
+        "safetyNotes": [
+          "人工光源用LED，不用高压灯具"
+        ],
+        "mustKeepTerms": [
+          [
+            "火星"
+          ],
+          [
+            "基地"
+          ],
+          [
+            "人工",
+            "控制"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "人工",
+            "光照"
+          ],
+          [
+            "光照",
+            "时长"
+          ]
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v4-31b56b8926-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-酸雨与植物-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-safety-acid-rain-plant-v4-31b56b8926"
+    ],
+    "qualityNotes": "本样本训练在阶段2中聚焦安全提醒和设计细化，通过单问题推动自变量梯度确认、因变量定义、控制变量思考，并在确认时输出符合规范的数据表结构，避免安全软化。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我打算设置三组：纯水pH7、弱酸pH5、较强酸pH3，都用白醋调配。每组放10颗绿豆，每天浇等量对应溶液，记录发芽数和幼苗状态，温度光照保持一样，记录5天。这样可以吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好的设计框架。安全方面请务必佩戴护目镜和手套，只使用白醋调配，远离强酸。现在我们聚焦自变量：你选择的pH7、5、3三个梯度，能说说为什么选定这些数值吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：考虑不同酸雨的典型pH范围。\",\"提示：对照和梯度设置的理由。\"]}"
+      },
+      {
+        "from": "human",
+        "value": "pH7是中性对照，pH5代表常见的弱酸雨，pH3则模拟较重的污染酸雨。三个水平可以看不同程度的影响。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"梯度覆盖了对照和两个强度，很合理。接下来我们明确因变量：你提到记录发芽数和幼苗状态，能具体说说怎样判定“发芽”和衡量“幼苗状态”吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"例如：胚根突破种皮算发芽，幼苗状态可用株高和叶片颜色描述。\"]}"
+      },
+      {
+        "from": "human",
+        "value": "发芽以胚根伸出种皮2mm以上为准，每天数一次。幼苗状态我打算测量株高，并拍照记录叶色、是否有黄斑或枯萎。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"测量方法很具体。现在考虑控制变量：你如何确保温度、光照和浇水量在几组间完全一致？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：可以使用恒温箱、固定窗台位置、用滴管定量浇水。\"]}"
+      },
+      {
+        "from": "human",
+        "value": "我会放在恒温箱里，设定25℃，放在同一窗台确保光照一样，每天上午9点用滴管给每组加入10毫升对应溶液。如果有异常也记下来。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"设计已经清晰：pH7/5/3三组，每组10粒，恒温25℃、相同光照，定量浇液并记录发芽数和株高、叶色变化。我们整理出数据记录表结构，请你确认后进入实验。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"title\":\"日期\",\"type\":\"text\",\"required\":true},{\"key\":\"group\",\"title\":\"组别(pH)\",\"type\":\"text\",\"required\":true},{\"key\":\"pH\",\"title\":\"pH值\",\"type\":\"number\",\"required\":true},{\"key\":\"germination_count\",\"title\":\"发芽数\",\"type\":\"number\",\"required\":true},{\"key\":\"seedling_height\",\"title\":\"幼苗株高(cm)\",\"type\":\"number\",\"required\":false},{\"key\":\"seedling_condition\",\"title\":\"幼苗状态描述\",\"type\":\"text\",\"required\":false},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200},\"stage2_confirmed\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-safety-acid-rain-plant-v4-31b56b8926",
+      "sourceKind": "persona",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "酸雨对植物的危害",
+        "retainedFeature": "酸性程度影响植物生长",
+        "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+        "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+        "independentVariable": "稀酸溶液pH",
+        "dependentDirection": "发芽和生长情况",
+        "safetyNotes": [
+          "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+          "佩戴护目镜和手套",
+          "不直接接触或闻溶液"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v4-bbaac13908-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-生态瓶平衡-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-ecology-bottle-balance-v4-bbaac13908"
+    ],
+    "qualityNotes": "在阶段2中，先肯定学生自变量的梯度设计，然后依次聚焦因变量操作定义、控制变量确认、数据表构建，每一步只推进一个核心问题，控制认知负荷。因变量采用浑浊与否和存活天数两个课堂代理，紧扣主题。对话中融入了鱼类福利的安全提醒，并要求记录异常。数据表模式包含必需的日期、组别、水温、浑浊、鱼存活及备注列，maxRows=200，符合结构要求。没有提前分析结论，严守阶段边界。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我设三组：1草1鱼、3草1鱼、5草1鱼，每组用同样大的瓶子。记录水变浑浊时间和鱼存活天数，光照温度保持一样。每天观察一次，记录14天，可以生成数据表了。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你提出的自变量梯度（1草1鱼、3草1鱼、5草1鱼）非常清晰，能有效检验生产者密度对系统的影响。接下来我们需要明确因变量的测量标准。你提到“水变浑浊时间”和“鱼存活天数”，请先说明：怎样算水变浑浊？是出现可见悬浮物，还是需要界定一个浊度等级？鱼存活天数从放入当天算起，还是另有起始规则？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可考虑用目测悬浮物判断浑浊，每天同一时间观察。\",\"实验需关注鱼的行为，若出现倒伏或急游应立即终止。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "水变浑浊就是能看到明显悬浮物、不再清澈。鱼存活天数按死亡那天算，放入当天第0天。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"明确了，因变量为每天记录浑浊（是/否）和鱼的状态，死亡时记录存活天数。现在请确认你计划控制的变量：光照、温度要保持一致，你打算如何操作？比如放置位置、温度监控频率？另外，瓶子规格和加水量是否需要统一记录？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用温度计每天记录实际温度，确保组间差异小于1℃。\",\"蒸发后加等量放置过的自来水，保持水量一致。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我用2升的透明塑料瓶，放在实验室同一窗台，每天用温度计测一次，温度大概25度。我每天会检查水位，蒸发多就加等量放置过的自来水。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"控制很到位，变量已经清晰。现在我们可以设计记录表了。每天观察14天，3组共42行数据。表头建议包括：日期、组别、水温、浑浊、鱼存活、备注。你有其他想添加的字段吗？请列出你拟定的表格标题。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"日期一致方便对比，每组每天一行。\",\"备注栏用于记录水华、鱼体色变化等异常。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，我设计表头：日期、组别、水温、浑浊、鱼存活、备注。可以吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这样完全满足实验记录需要。为规范数据格式，我生成了字段要求，请按此表格每天填入数据。完成后我们将进入生态瓶制作与观察阶段。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"title\":\"日期\",\"type\":\"text\",\"required\":true},{\"key\":\"group\",\"title\":\"组别\",\"type\":\"text\",\"required\":true},{\"key\":\"water_temp\",\"title\":\"水温(℃)\",\"type\":\"number\",\"required\":true},{\"key\":\"turbidity\",\"title\":\"浑浊\",\"type\":\"text\",\"required\":true},{\"key\":\"fish_alive\",\"title\":\"鱼存活\",\"type\":\"text\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-ecology-bottle-balance-v4-bbaac13908",
+      "sourceKind": "persona",
+      "personaId": "ecology-bottle-balance",
+      "subject": "biology_ecology",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "生态瓶/微型生态系统",
+        "retainedFeature": "生物数量比例影响系统稳定性",
+        "classroomProxy": "不同水草与小鱼数量比例",
+        "researchQuestion": "水草与小鱼数量比例是否影响生态瓶存活天数？",
+        "independentVariable": "水草与小鱼数量比例",
+        "dependentDirection": "生态瓶存活天数"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-premature-shade-plant-height-v4-94e54f0bc3-v1",
+    "source": "distill_dsv4",
+    "scenario": "细节过早型-遮阴与株高-蒸馏样本4",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-premature-shade-plant-height-v4-94e54f0bc3"
+    ],
+    "qualityNotes": "逐步引导数据表设计，避免过早生成表格或结论。在第二、三轮对话中反复确认测量细节与控制变量，第四轮给出完整data_table_schema并要求确认，体现阶段2的确认流程。加入了直尺使用的安全提醒，符合安全要求。每轮只聚焦一个核心问题，控制认知负荷。schema包含notes列并设置maxRows=200。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我设三组：不遮阴、半遮阴、重遮阴，每组10颗绿豆，每天量苗高，水量温度品种保持一样，记录7天，可以生成数据表了"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你设计的三个遮阴梯度很清晰。但测量株高时，具体是从土面量到茎尖还是最高叶片顶端？每天测量时间要固定，比如早上8点，否则生长有差异。水源和温度控制需要一致，你用自来水还是纯净水？温度如何维持？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议用软尺从土面量到茎尖\",\"固定测量时间减少误差\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我用直尺从土表面量到植株最高点，每天早上9点测。自来水浇，所有盆放室内同一位置，温度差不多。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"直尺量最高点可行，记得每次测量同一个起点。自来水矿物质稳定，位置固定。现在我们可以设计数据记录表了。计划包含日期、遮阴组别、绿豆个体编号、株高数值和备注列，共5列。每天每颗苗记录一行，7天三组共210行，我们限200行够吗？你同意这个结构吗？记录时注意安全，直尺尖端避免刺伤。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"数据表可包含日期、组别、编号、株高、备注\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "同意这个结构，210行可能会超，但200行也够，我们先这样。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"数据表结构如下，请确认：Date（日期，文本，必填）；Shade（遮阴组，文本，必填，可选：无遮阴/半遮阴/重遮阴）；PlantID（编号，文本，必填）；Height_mm（株高，数字，毫米，必填）；Notes（备注，文本，选填）。最多200行记录。确认无误后我们进入实验。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"title\":\"日期\",\"type\":\"text\",\"required\":true},{\"key\":\"shade\",\"title\":\"遮阴组\",\"type\":\"text\",\"required\":true},{\"key\":\"plant_id\",\"title\":\"编号\",\"type\":\"text\",\"required\":true},{\"key\":\"height_mm\",\"title\":\"株高\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      },
+      {
+        "from": "human",
+        "value": "确认，没问题。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"确认完毕，阶段2数据表设计已完成。下一步我们可以准备实验材料了。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-premature-shade-plant-height-v4-94e54f0bc3",
+      "sourceKind": "persona",
+      "personaId": "premature-shade-plant-height",
+      "subject": "biology_ecology",
+      "studentType": "premature_details",
+      "difficulty": "medium",
+      "failureModes": [
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "植物长不高",
+        "retainedFeature": "光照强弱影响株高",
+        "classroomProxy": "不同遮阴程度",
+        "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+        "independentVariable": "遮阴程度",
+        "dependentDirection": "幼苗株高"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:premature_details",
+        "failureMode:premature_stage2"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-smartedu-0074-v5-d98f0474ac-v1",
+    "source": "distill_dsv4",
+    "scenario": "《探究影响物质溶解快慢的常见因素》(提交）-蒸馏样本5",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-smartedu-0074-v5-d98f0474ac"
+    ],
+    "qualityNotes": "工程导向学生，通过参数化思维引导定义自变量梯度、因变量测量指标和控制变量，逐步构建数据表格；安全提醒融入对话，确认输出data_table_schema含notes列，符合阶段2纪律；认知负荷控制得当，单轮聚焦一个问题。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想改变温度，看看温度高低对溶解快慢有没有影响。自变量就是温度。我打算测室温、40℃和60℃三个温度，就像调一个参数。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已经选定温度作为自变量，并设定了三个梯度。梯度获取可以借助温水调节，使用温度计校准。提醒：加水时小心烫伤。现在思考，怎样测量溶解快慢才能比较不同温度的影响？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：比较完全溶解所需时间，或单位时间内溶解的量\",\"安全：使用温水加热，避免明火，戴手套操作\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我可以用完全溶解所需的时间来比较。开始溶解后计时，直到固体完全消失看不见为止，记录秒数。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"用完全溶解时间作为因变量可行。但需要固定每次实验的溶质种类、质量，还有水的体积。判断标准要一致，比如最后一粒溶质消失的时刻。请列出你认为必须保持不变的条件。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"控制变量：溶质类型和质量、水的体积、是否搅拌、容器类型\",\"测量时用秒表，人眼判断可能有误差，建议重复实验取平均值\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我要保持糖的种类和重量一样，都是5克白砂糖，水量都是100毫升，都不搅拌，容器用同样的烧杯。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"控制变量设计合理：溶质5g白砂糖，水100mL，不搅拌，同种烧杯。建议将糖全部倒入水中时启动秒表。接下来需要把这些方案整理成数据表，便于实验记录。请确认一下表格需要哪些列？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"需要列：实验序号、温度（℃）、溶解时间（s）、备注\",\"备注列可记录异常现象或重复实验编号\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，表格应该有实验编号、温度、溶解时间、备注。我打算每个温度做三次，所以9行。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"数据表格结构确认。表格包含实验编号、温度(℃)、溶解时间(s)和备注列，用于记录重复序号或异常。每个温度重复3次，共9行数据。请按此表在实验中记录。现在阶段2完成，可以进入实验操作。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"experiment_id\",\"title\":\"实验编号\",\"type\":\"text\",\"required\":true},{\"key\":\"temperature\",\"title\":\"温度（℃）\",\"type\":\"number\",\"required\":true},{\"key\":\"dissolve_time\",\"title\":\"溶解时间（s）\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-smartedu-0074-v5-d98f0474ac",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0074",
+      "subject": "科学",
+      "expectedTransformation": {
+        "originalInterest": "《探究影响物质溶解快慢的常见因素》(提交）",
+        "retainedFeature": "围绕「《探究影响物质溶解快慢的常见因素》(提交）」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「《探究影响物质溶解快慢的常见因素》(提交）」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「《探究影响物质溶解快慢的常见因素》(提交）」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-cooperative-dough-fermentation-v5-d320e721ac-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-面团发酵-蒸馏样本5",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-cooperative-dough-fermentation-v5-d320e721ac"
+    ],
+    "qualityNotes": "样本突出安全提醒（禁止热水），按自变量→因变量→控制变量→数据表的顺序单步推进，避免过度提问；确认阶段2时输出符合规范的data_table_schema，包含notes列，并提示后续记录动作。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我设三组：2g、5g、8g酵母，加到等量面粉里"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你设计的酵母量梯度（2g,5g,8g）很清晰。接下来要考虑怎样测量面团发酵体积。建议用带刻度的透明容器，读数要统一基准。同时提醒你，和面必须用室温清水，禁止用热水，以免烫伤并确保酵母活性。你计划隔多久记录一次体积？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"测量体积可用排水法或直接读取刻度。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "记录30/60/90分钟时面团体积，水温水量保持一样"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"记录间隔30分钟到90分钟，很好。水温水量控制一致很关键。还有哪些变量需要保持不变？比如各组的干面粉量、揉面时间、发酵环境温度和容器形状。请补充你的控制变量方案。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"控制变量包括原材料、操作过程、环境条件。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "面粉都是200g，揉面3分钟，发酵温度都用室温，容器一样"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"全部变量已理清：自变量（酵母量）、因变量（体积）、控制变量（水温、水量、面粉200克、揉面3分钟、室温、容器一致）。现在要设计数据记录表，表内需包含组名、酵母量、测量时间点、体积记录、备注。如果同意，请回复“同意”或提出修改。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "同意"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"数据表结构已确认。你现在可以按此表开始记录实验。注意每次测量要等容器稳定再读数，并记录备注中任何异常情况。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"group\",\"title\":\"组别\",\"type\":\"text\",\"required\":true},{\"key\":\"yeast_amount\",\"title\":\"酵母添加量(g)\",\"type\":\"number\",\"required\":true},{\"key\":\"time\",\"title\":\"测量时间点(min)\",\"type\":\"number\",\"required\":true},{\"key\":\"volume\",\"title\":\"面团体积(ml)\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-cooperative-dough-fermentation-v5-d320e721ac",
+      "sourceKind": "persona",
+      "personaId": "cooperative-dough-fermentation",
+      "subject": "food_chemistry",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "面团发酵",
+        "retainedFeature": "酵母用量影响发酵速度",
+        "classroomProxy": "不同酵母添加量",
+        "researchQuestion": "酵母添加量是否影响面团发酵体积？",
+        "independentVariable": "酵母添加量",
+        "dependentDirection": "面团发酵体积"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:over_questioning"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-safety-bread-mold-preservative-v5-f723205a58-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-面包防腐-蒸馏样本5",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-safety-bread-mold-preservative-v5-f723205a58"
+    ],
+    "qualityNotes": "在安全风险型场景中按'自变量梯度→因变量测量→控制变量→数据表'推进，每轮只聚焦一个核心问题，避免分析超前；确认时输出data_table_schema并嵌入安全提醒，控制认知负荷，严格阶段纪律。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我想做面包防腐实验。设四组：常温敞开、冷藏、干燥剂保存、真空密封，用同样大小的面包片。每天观察一次，记录是否发霉和霉斑面积，记录7天。这样可以开始了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的自变量“防腐处理方式”包含了四种梯度，很清晰。但需明确因变量“发霉速度”具体如何测量：是记录每天霉斑面积，还是首次出现霉斑的天数？另外，处理霉面包时务必戴手套口罩，不要闻嗅，完成后密封丢弃，确保安全。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我打算每天测量霉斑面积，用透明方格纸覆盖面包，数被霉斑占据的格子数来估算面积。这样行吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"用方格纸数格子是很好的量化方法。为了公平比较，除了处理方式，需确保面包大小、来源、初始新鲜度一致，且环境温度尽量恒定（如室温25℃）。冷藏组可放4℃冰箱，干燥剂组可用食品干燥包，真空密封组需用包装袋抽气。这些细节明确了，才能减少干扰。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，我按你说的控制变量。记录表格我想应该有日期、处理组、霉斑面积（格子数）、备注。每天一行，四组分别记录。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你设想的记录表很完整，包含了日期、处理组、霉斑面积和备注。为了统一，我们可以这样列：第几天、处理组别、霉斑面积（格子数）、备注（颜色变化、气味等）。每组每天一条记录，7天×4组共28行。你同意用这些字段作为正式记录表吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "同意，就按这些字段。这样我们就可以开始观察了。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"自变量与因变量已明确，控制措施已设定。现确认数据记录表：每行记录某组某天的霉斑面积，共4列——天数、处理组、面积（格子数）、备注。实验时戴好口罩手套，霉面包密封丢弃，勿食勿闻。请按此表记录7天观察。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"day\",\"title\":\"第几天\",\"type\":\"number\",\"required\":true},{\"key\":\"treatment_group\",\"title\":\"防腐处理组\",\"type\":\"text\",\"required\":true},{\"key\":\"mold_area\",\"title\":\"霉斑面积（格子数）\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-safety-bread-mold-preservative-v5-f723205a58",
+      "sourceKind": "persona",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物怎么防腐",
+        "retainedFeature": "防腐方式抑制微生物",
+        "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+        "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+        "independentVariable": "防腐处理方式",
+        "dependentDirection": "发霉速度",
+        "safetyNotes": [
+          "发霉食物只观察不食用，可能产生毒素",
+          "避免吸入霉菌孢子"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p2-variable-confusion-apple-browning-v5-ebf264b6ce-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本5",
+    "phase": 2,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p2-variable-confusion-apple-browning-v5-ebf264b6ce"
+    ],
+    "qualityNotes": "在变量混乱型情境中严格按自变量梯度-因变量测量-控制变量-数据表顺序推进，不给结论；每轮只聚焦一个核心问题，控制对话长度；引导低投入学生明确量化测量方式；确认时输出完整data_table_schema，包含备注列与maxRows=200；安全提醒嵌入对话不堆叠。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我设三组：不处理、淡盐水泡、柠檬汁涂，苹果品种和切片厚度保持一样。每10分钟拍照记录褐变程度，记录30分钟。可以生成数据表了。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"自变量是抗褐变处理方式。先确认操作细节：淡盐水浓度和浸泡时间？柠檬汁是否稀释？这影响实验稳定性。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"浓度建议：5%盐水浸泡1分钟\",\"柠檬汁可原液涂抹\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "淡盐水用1勺盐加一杯水，泡30秒；柠檬汁直接挤在切面上，不稀释。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"清楚了。接下来需要把褐变程度转成数字记录，你准备怎么评分？比如用1-5分，1分没变色，5分完全棕变。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"制作简单评分表：1=无褐变，5=完全褐变\",\"每10分钟拍照后立即打分记录\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "用1到5分，1分没变色，5分全棕，每10分钟评一次。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"控制变量如品种、厚度已固定，温度、光照也尽量一致。现在设计数据表，请确认列：处理组、时间（分钟）、褐变评分(1-5)、备注。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"备注栏记录切片异常或干扰\",\"拍照后立即评分，避免延迟\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "好的，就这些列。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"确认完成。变量明确，数据表已设计：处理组、时间、褐变评分及备注。安全提醒：使用刀具切苹果时小心，选用钝头水果刀。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"group\",\"title\":\"处理组\",\"type\":\"text\",\"required\":true},{\"key\":\"time\",\"title\":\"时间（分钟）\",\"type\":\"number\",\"required\":true},{\"key\":\"browning_score\",\"title\":\"褐变评分(1-5)\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}],\"minRows\":1,\"maxRows\":200}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p2-variable-confusion-apple-browning-v5-ebf264b6ce",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0088-v2-e2fe776abf-v1",
+    "source": "distill_dsv4",
+    "scenario": "任务一 探析结构稳定性-学习任务单-蒸馏样本2",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0088-v2-e2fe776abf"
+    ],
+    "qualityNotes": "通过安全提醒与如实记录指引，强化真实实验、异常观察意识，杜绝代笔编造数据，符合阶段3动手操作前引导规范。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我准备好了三种形状的结构模型：三角形、正方形、拱形，现在可以测试它们的承重能力了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们开始测试。请先确保桌面平整，用手护住模型底部，缓慢增加重物。每次记录承重：放上重物后等3秒，如果模型变形或发出响声立即停止。数据要如实记录，特别是异常情况。你可以在记录表里写下每次测试的原始数据。开始吧，先测三角形模型。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"轻放重物，不堆叠\",\"观察细微变形和异响\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0088-v2-e2fe776abf",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0088",
+      "subject": "STEM",
+      "expectedTransformation": {
+        "originalInterest": "任务一 探析结构稳定性-学习任务单",
+        "retainedFeature": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "classroomProxy": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "researchQuestion": "不同结构形状会怎样影响模型的承重能力？",
+        "independentVariable": "结构形状或支撑方式",
+        "dependentDirection": "最大承重质量",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P3",
+        "source:topic-library"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0116-v2-34bcaf6795-v1",
+    "source": "distill_dsv4",
+    "scenario": "水质检测及自制净水器1-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0116-v2-34bcaf6795"
+    ],
+    "qualityNotes": "引导学生自主观察数据趋势、比较组别差异，培养工程思维；通过异常点引发对实验误差和因果推论局限的思考；使用简洁表述控制认知负荷；留下下一步行动让学生主导，保持 agency。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天的浑浊度数据：A组始终保持很低，B组缓慢上升，C组第三天出现异常高值。是不是我的C组材料有问题？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到A组过滤效果最好、C组最差的趋势，以及C组的异常点，这很好。请尝试在坐标系里标出各组的浑浊度变化，并比较它们的差别。这个异常点提醒我们可能需要检查C组实验时是否混入额外杂质，或者是否测量错误。接下来你打算怎样核实这个异常值？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以将三组数据画成折线图，观察整体趋势。\",\"重复测量异常样本，或检查记录是否准确。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0116-v2-34bcaf6795",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0116",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "水质检测及自制净水器1",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P4",
+        "source:topic-library"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0124-v2-70a522d806-v1",
+    "source": "distill_dsv4",
+    "scenario": "跨学科实践活动3 水质检测及自制净水器-蒸馏样本2",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0124-v2-70a522d806"
+    ],
+    "qualityNotes": "在数据分析阶段通过提示学生描述数据趋势、比较组间差异并关注异常值，强化证据推理和变量关系讨论，同时避免越俎代庖给出结论，保持学生主导分析。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们记录了三天数据：A组浑浊度从0变到2，B组从1到5，C组从2到6，第三天C组有个样本显得特别浑浊，可能操作时漏了滤层。我不太会分析这些数据。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我们先从整体趋势入手。你能说说各组数值在三天里分别是怎样变化的吗？另外，关于那个异常样本，当时你观察到滤层有什么特别吗？记下这些观察会更利于后续推断。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着比较每组的增加量和变化速度\",\"回想异常样品在过滤时是否有不一样的步骤\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0124-v2-70a522d806",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0124",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "跨学科实践活动3 水质检测及自制净水器",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P4",
+        "source:topic-library"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0088-v2-d9868eac0a-v1",
+    "source": "distill_dsv4",
+    "scenario": "任务一 探析结构稳定性-学习任务单-蒸馏样本2",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0088-v2-d9868eac0a"
+    ],
+    "qualityNotes": "阶段5报告框架引导：提供完整六部分结构，dataSummary基于已有实验记录提炼，留白材料、步骤和分析核心部分并附提示，避免代写结论，强调异常点需学生自主解释。对话和框架均未使用替代性表述，符合STEM表达和结构合规要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们测完了不同结构形状的承重能力，记录了三天数据，现在能帮我把报告写出来吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们基于你的实验数据，先整理出报告的基本框架。请你查看每个栏目，其中材料、步骤和分析部分需要你根据实际操作补充细节，数据总结已按你的记录呈现。特别留意第三天C组的异常值，分析时说明可能原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回忆实验时使用的材料与工具，列出清单\",\"分析异常数据时，检查实验条件是否保持一致\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同结构形状对模型承重能力的影响。\",\"hypothesis\":\"若改变结构形状，则模型最大承重质量会发生变化，因为不同形状的受力分布不同。\",\"materials\":\"待学生补充：请列出实验中所用的全部材料及模型制作方法。\",\"procedure\":\"待学生补充：请描述实验步骤，包括如何改变自变量、控制变量及测量因变量。\",\"dataSummary\":\"实验记录了三天，每天测量形状A、B、C的承重质量：第一天：A=0，B=1，C=2；第二天：A=1，B=3，C=4；第三天：A=2，B=5，C=6（其中一个样本异常）。可见A和B承重能力逐渐增加，C第三天出现异常。\",\"analysis\":\"待学生补充：根据数据，初步趋势表明形状B的承重能力最强，形状A最弱。但第三天C组出现异常样本，可能由制作失误或测量误差导致。请结合控制变量分析，判断异常是否影响结论，并提出下一步验证计划。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0088-v2-d9868eac0a",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0088",
+      "subject": "STEM",
+      "expectedTransformation": {
+        "originalInterest": "任务一 探析结构稳定性-学习任务单",
+        "retainedFeature": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "classroomProxy": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+        "researchQuestion": "不同结构形状会怎样影响模型的承重能力？",
+        "independentVariable": "结构形状或支撑方式",
+        "dependentDirection": "最大承重质量",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P5",
+        "source:topic-library"
+      ],
+      "batchId": "distill-dsv4-batch500"
+    }
+  }
+]

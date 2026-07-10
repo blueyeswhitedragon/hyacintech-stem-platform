@@ -12,7 +12,7 @@ class OpenAICompatibleProvider implements LLMProvider {
     const useJsonFormat = options?.useJsonFormat !== false; // default true
     const url = `${this.config.baseURL}/chat/completions`;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 30_000);
+    const timer = setTimeout(() => controller.abort(), this.config.timeoutMs ?? 30_000);
 
     try {
       const response = await fetch(url, {
@@ -97,13 +97,15 @@ export function validateConfig(): ConfigValidation {
     return { valid: false, provider: null, model: null, issues };
   }
 
-  const model = process.env.LLM_MODEL ?? (providerType === 'deepseek' ? 'deepseek-chat' : 'gpt-4o');
+  const model = process.env.LLM_MODEL ?? (providerType === 'deepseek' ? 'deepseek-v4-pro' : 'gpt-4o');
 
   return { valid: true, provider: providerType, model, issues: issues.length > 0 ? issues : [] };
 }
 
 export function createLLMProvider(): LLMProvider {
   const config = validateConfig();
+  const maxTokens = process.env.LLM_MAX_TOKENS ? Number(process.env.LLM_MAX_TOKENS) : undefined;
+  const timeoutMs = process.env.LLM_TIMEOUT_MS ? Number(process.env.LLM_TIMEOUT_MS) : undefined;
 
   if (!config.valid) {
     throw new LLMError('bad_config', config.issues.join(' '), 500);
@@ -117,6 +119,8 @@ export function createLLMProvider(): LLMProvider {
       apiKey,
       baseURL: process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1',
       model: config.model!,
+      maxTokens,
+      timeoutMs,
     });
   }
 
@@ -124,8 +128,10 @@ export function createLLMProvider(): LLMProvider {
     const apiKey = process.env.DEEPSEEK_API_KEY!;
     return new OpenAICompatibleProvider({
       apiKey,
-      baseURL: process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com/v1',
+      baseURL: process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com',
       model: config.model!,
+      maxTokens,
+      timeoutMs,
     });
   }
 

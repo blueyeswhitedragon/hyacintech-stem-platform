@@ -1,0 +1,192 @@
+[
+  {
+    "id": "stem-transcript-qwen-smoke-persona-8043ec4ccc-p1-v1",
+    "source": "transcript_qwen-smoke",
+    "scenario": "高概念降级型",
+    "phase": 1,
+    "rubricTargets": [
+      "proxy_quality",
+      "structure_compliance",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "data/blind-eval/transcript-qwen-smoke.json:persona-高概念降级型:p1"
+    ],
+    "qualityNotes": "Auto-converted clean transcript phase 1 segment. Failure modes: theme_loss, proxy_drift, weak_confirmation_doc. Includes expectedTransformation metadata. Tier: gold_candidate. Reasons: difficulty:hard; studentType:high_concept; failureMode:theme_loss; failureMode:proxy_drift; failureMode:weak_confirmation_doc; phase1:high-value-subject:high_concept_interdisciplinary.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我想做一个和太空有关的项目，最好有点像火星基地"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"太棒了！火星基地是一个非常酷的主题。在火星基地这种极端环境下，你觉得最让你觉得难办或者最关键的挑战是什么？是资源有限、环境恶劣，还是必须完全依靠人工控制？\\n\\n试着想一想：如果要把这个最核心的困难带到我们的教室里，我们能用什么安全、简单的方法来模拟它？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先找一找：这个主题里最特别的限制条件是什么？\",\"试着把原主题翻译成一句话：我想保留……这个特点，在课堂里用……来模拟。\",\"当你想到一个代理条件时，再问自己：它和原来的主题有什么关系？\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我最感兴趣的是火星基地里植物怎么活下来，因为那里条件都要人工控制"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"抓住了关键点！火星基地里植物生存的核心挑战确实是“资源受限”和“必须人工控制环境”。\\n\\n在教室里，我们无法复制火星的重力或大气，但我们可以模拟“人工控制”这个特征。比如，我们可以控制光照的时长、光照的强弱，或者模拟不同的温度区间。你觉得在火星基地里，哪一个“人工控制”的条件对植物存活最关键，也是我们在教室里最容易改变和观察的？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考一下：火星上植物生长最大的限制因素是什么？（光照、水、温度、空气？）\",\"在教室里，哪个条件最容易人为改变，同时又能模拟火星基地的“人工控制”特征？\",\"试着把“人工控制环境”翻译成具体的操作：比如“每天开灯几小时”或“把植物放在不同温度的地方”。\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我想保留人工控制光照这个特点，用不同人工光照时长看看绿豆发芽会不会不一样"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"非常棒的转化！你成功地把“火星基地人工控制环境”这个高概念，落地成了“不同人工光照时长”这个可操作的课堂代理。\\n\\n现在你的研究思路已经很清晰了：通过改变每天给绿豆照射灯光的时间长短，来观察这对绿豆的发芽情况有什么影响。这完全符合“保留原主题特征、具体、可探究”的要求。\\n\\n请确认一下，你的研究问题是否可以表述为：“不同的人工光照时长是否会影响绿豆的发芽情况？”\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"snapshot\":\"原始兴趣：火星基地里植物怎么活下来\\n\\n保留的情境特征：环境条件必须完全依靠人工控制\\n\\n课堂代理：使用不同时长的人工光照来模拟光照管理策略\\n\\n研究问题：不同的人工光照时长是否会影响绿豆的发芽情况？\\n\\n要改变的（自变量方向）：每天的人工光照时长\\n\\n想观察/比较的现象：绿豆的发芽情况（具体测量方式留待方案设计阶段确定）\",\"theme_mapping\":{\"originalInterest\":\"火星基地里植物怎么活下来\",\"retainedFeature\":\"环境条件必须完全依靠人工控制\",\"classroomProxy\":\"使用不同时长的人工光照来模拟光照管理策略\",\"researchQuestion\":\"不同的人工光照时长是否会影响绿豆的发芽情况？\"},\"variables\":{\"independent\":\"人工光照时长\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "qwen-smoke",
+      "transcriptSchemaVersion": 2,
+      "scenarioId": "persona-高概念降级型",
+      "scenarioKind": "persona",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "火星基地植物生存",
+        "retainedFeature": "基地环境条件需要人工控制",
+        "classroomProxy": "不同人工光照时长",
+        "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+        "independentVariable": "人工光照时长",
+        "dependentDirection": "发芽和早期生长情况",
+        "safetyNotes": [
+          "人工光源用LED，不用高压灯具"
+        ],
+        "mustKeepTerms": [
+          [
+            "火星"
+          ],
+          [
+            "基地"
+          ],
+          [
+            "人工",
+            "控制"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "人工",
+            "光照"
+          ],
+          [
+            "光照",
+            "时长"
+          ]
+        ]
+      },
+      "clean": true,
+      "violationRules": [],
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc",
+        "phase1:high-value-subject:high_concept_interdisciplinary"
+      ],
+      "batchId": "qwen-smoke"
+    }
+  },
+  {
+    "id": "stem-transcript-qwen-smoke-phase4-data-analysis-p4-v1",
+    "source": "transcript_qwen-smoke",
+    "scenario": "阶段4数据分析",
+    "phase": 4,
+    "rubricTargets": [
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "data/blind-eval/transcript-qwen-smoke.json:phase4-data-analysis:p4"
+    ],
+    "qualityNotes": "Auto-converted clean transcript phase 4 segment. Tier: silver. Reasons: clean:routine.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "这是我收集的数据，帮我看看有什么规律"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，你已经完成了数据收集。现在我们要一起看看这些数据背后藏着什么科学故事。\\n\\n首先，请尝试把原始数据整理成更清晰的表格，并计算每一组每天的**平均值**。\\n\\n然后，我们可以思考：\\n1. 随着时间推移，各组的数据变化趋势是怎样的？\\n2. 不同组别之间的差异是否明显？\\n3. 有没有哪天的数据看起来特别“突兀”？\\n\\n你可以先告诉我，你打算用哪种方式来展示这些数据？\\n\\n提示：你可以尝试画折线图或柱状图，观察**因变量**随时间的变化。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试计算每组每天的平均发芽数\",\"观察各组数据随时间的变化趋势\",\"注意是否有异常数据点\"],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我发现白光组发芽最快，绿光组最慢，这说明什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到了不同光照条件下**发芽速度**的差异，这是一个非常关键的发现！\\n\\n不过，在得出结论前，我们需要先确认几个问题：\\n1. 你的实验组别（A、B、C、D）分别对应什么颜色的光？\\n2. 数据中是否有某一天的数值明显偏离整体趋势（异常值）？\\n3. 这种差异是否在所有重复实验中都是一致的？\\n\\n请先告诉我各组对应的具体光照条件，我们再一起分析数据背后的原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认每组实验对应的光照颜色\",\"检查数据中是否存在异常值\",\"思考差异是否由光照引起\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "qwen-smoke",
+      "transcriptSchemaVersion": 2,
+      "scenarioId": "phase4-data-analysis",
+      "scenarioKind": "phase4",
+      "clean": true,
+      "violationRules": [],
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "clean:routine"
+      ],
+      "batchId": "qwen-smoke"
+    }
+  },
+  {
+    "id": "stem-transcript-qwen-smoke-phase5-report-p5-v1",
+    "source": "transcript_qwen-smoke",
+    "scenario": "阶段5报告成型",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "data/blind-eval/transcript-qwen-smoke.json:phase5-report:p5"
+    ],
+    "qualityNotes": "Auto-converted clean transcript phase 5 segment. Tier: silver. Reasons: clean:routine.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "开始报告成型"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"欢迎进入报告成型阶段！我已根据你前几个阶段的探究内容，自动生成了报告框架。请在右侧面板查看，并补充结论与反思部分。\\n\\n你的研究主题是“不同颜色光对绿豆发芽速度的影响”。根据你提供的数据，白光组的发芽速度明显快于其他组，而绿光组最慢，这很有趣。\\n\\n现在请你根据这些数据，尝试撰写报告的结论部分，回答你的研究问题，并思考实验的局限性。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"结论应直接回应假设，指出哪种颜色的光最有利于发芽。\",\"反思时可以思考为什么绿光效果最差，以及实验过程中是否有未控制好的变量。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同颜色的光（红、蓝、绿、白）对绿豆发芽速度的影响。\",\"hypothesis\":\"假设不同颜色的光会影响绿豆的发芽速度，其中白光可能效果最好，绿光可能效果最差。\",\"materials\":\"绿豆种子、红/蓝/绿/白光光源、培养皿、水、尺子、记录表。\",\"procedure\":\"1. 准备四组绿豆，分别置于红、蓝、绿、白光下。\\n2. 每天定时浇水，保持水量一致。\\n3. 记录每天每组的发芽数量，持续5天。\",\"dataSummary\":\"实验记录了5天内四组绿豆的发芽情况。第5天时，白光组发芽9粒，蓝光组8粒，红光组7粒，绿光组仅4粒。\",\"analysis\":\"数据显示白光组的发芽率最高，且每天发芽数增长最快；绿光组发芽最慢。红光和蓝光介于两者之间，但蓝光略优于红光。这表明光质对绿豆发芽有显著影响。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "qwen-smoke",
+      "transcriptSchemaVersion": 2,
+      "scenarioId": "phase5-report",
+      "scenarioKind": "phase5",
+      "clean": true,
+      "violationRules": [],
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "clean:routine"
+      ],
+      "batchId": "qwen-smoke"
+    }
+  }
+]

@@ -20,6 +20,7 @@ import type {
   Stage2Column,
   Stage2RiskAnnotation,
   Stage5Sections,
+  ThemeMapping,
 } from './stageData';
 
 /** stage5 报告框架预填字段（不含学生自填的 conclusion/reflection）。 */
@@ -46,6 +47,7 @@ export interface ChatResponse {
   // 阶段1：学生确认研究问题后
   stage1_confirmed?: boolean;
   snapshot?: string; // 《探究问题确认书》纯文本
+  theme_mapping?: ThemeMapping;
   variables?: { independent: string; dependent?: string; controlled?: string[] };
   // 阶段2：方案成型
   data_table_schema?: { columns: Stage2Column[]; minRows: number; maxRows: number };

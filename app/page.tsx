@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { getCurrentUser } from './lib/session';
+import { dashboardForRole, roleLabel } from './lib/roles';
 
 export default async function Home() {
   const user = await getCurrentUser();
-  const dashboard = user?.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
+  const dashboard = user ? dashboardForRole(user.role) : '/student/dashboard';
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -15,7 +16,7 @@ export default async function Home() {
           </div>
           {user ? (
             <Link href={dashboard} className="text-sm text-blue-600 hover:underline">
-              {user.displayName}（{user.role === 'teacher' ? '教师' : '学生'}）→ 进入
+              {user.displayName}（{roleLabel(user.role)}）→ 进入
             </Link>
           ) : (
             <div className="flex items-center gap-3 text-sm">
@@ -45,7 +46,7 @@ export default async function Home() {
                 href={dashboard}
                 className="px-6 py-3 bg-white border border-blue-500 text-blue-600 rounded-lg font-medium hover:bg-blue-50"
               >
-                进入我的{user.role === 'teacher' ? '工作台' : '主页'}
+                进入我的{user.role === 'student' ? '主页' : '工作台'}
               </Link>
             ) : (
               <Link

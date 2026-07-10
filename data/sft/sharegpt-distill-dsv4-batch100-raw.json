@@ -1,0 +1,1219 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-07-09T06:41:20.825Z",
+  "planFile": "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json",
+  "records": [
+    {
+      "taskId": "p1-engineering-solar-car-angle-v1-ef0d013ae6",
+      "generatedAt": "2026-07-09T06:42:07.961Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-太阳能小车光强-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"通过开放提问引导学生将'太阳能小车跑得快'兴趣逐步聚焦为'光源距离影响行驶速度'的研究问题，避免使用ask_choice和ABC选项，确保cognitive_load_control和student_agency。在确认环节输出theme_mapping、snapshot和variables.independent，完整保留原始机制并建立课堂代理，同时嵌入安全提示，训练学生对代理质量和转化推理的掌握。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个太阳能小车，让它跑得快。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你这个想法很棒！太阳能小车速度确实可能受光照强度影响。我们可以把它变成一个可研究的科学问题。你想想，如果要在教室里安全测试，可以用什么方式改变照射到小车的光强呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试试考虑光源与太阳能板之间的距离变化。\",\"距离变化如何影响光照强度？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想研究光强对太阳能小车速度的影响，是不是改变光源距离就可以？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好的方向！光源距离是改变光强的简单方法。那么，你预期的自变量就是“光源距离”，因变量是“行驶速度”对吗？另外，课堂实验需要注意安全，我们使用LED光源，避免直视强光。你确定这个研究问题吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试写出研究问题：光源距离是否影响太阳能小车行驶速度？\",\"考虑如何测量行驶速度。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究光源距离是否影响太阳能小车行驶速度，要改变的是光源距离。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，我们已经明确了研究问题：光源距离是否影响太阳能小车行驶速度？自变量是光源距离，因变量是行驶速度。课堂代理实验是改变光源与太阳能小车的距离，测量速度变化。安全提示：使用LED光源，避免强光直射眼睛。我们开始设计实验吧。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"接下来，我们需要设计数据收集方法。\",\"请思考怎样测量小车速度。\"],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"太阳能小车跑得快\",\"retainedFeature\":\"光强影响太阳能板输出\",\"classroomProxy\":\"光源与小车的不同距离（改变光强）\",\"researchQuestion\":\"光源距离是否影响太阳能小车行驶速度？\"},\"snapshot\":\"学生确定了研究问题，自变量为光源距离，因变量为行驶速度，拟用LED光源安全测试。\",\"variables\":{\"independent\":\"光源距离\"}}}]}}"
+    },
+    {
+      "taskId": "p1-safety-circuit-brightness-v1-b995f2bc0e",
+      "generatedAt": "2026-07-09T06:46:18.288Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-电路与灯泡亮度-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"safety\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"助手在安全风险场景下，通过开放提问引导学生从‘直接接插座’转向安全干电池实验，并逐步聚焦研究变量。在第一轮制止危险并抛出开放问题，第二轮追问控制变量，第三轮确认提供完整theme_mapping与变量定义，全程未使用选项菜单，控制了认知负荷，体现了学生代理与安全倡导。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究灯泡亮度，想直接接家里的插座试试。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"直接使用插座非常危险，我们必须在课堂上用干电池做实验。如果用干电池，你觉得哪些因素会影响灯泡的亮度呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以从电池数量或灯泡类型等角度来想。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那我用干电池做，研究串联电池数对亮度的影响。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个方法不错，改变电池数量看亮度变化。那么，除了电池数量，还有哪些条件需要保持不变，才能让对比更有说服力呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试试列出需要固定的条件，比如灯泡型号和连接方式。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对，我确定研究串联电池数是否影响小灯泡亮度，要改变的是串联电池数。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，研究问题‘串联电池数是否影响小灯泡亮度？’已确定，自变量是串联电池数，因变量是灯泡亮度。下一步我们来设计实验步骤。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"灯泡亮不亮\",\"retained_feature\":\"电池数影响电压和亮度\",\"classroom_proxy\":\"串联电池数\",\"research_question\":\"串联电池数是否影响小灯泡亮度？\",\"independent_variable\":\"串联电池数\",\"dependent_variable\":\"灯泡亮度\",\"control_variables\":[],\"safety_notes\":[\"只用干电池，严禁220V市电\",\"避免短路，注意发热\"]},\"snapshot\":\"学生确定研究串联电池数对灯泡亮度的影响，自变量是串联电池数，因变量是灯泡亮度，已识别安全要求。\",\"variables\":{\"independent\":{\"name\":\"串联电池数\",\"unit\":\"节\",\"levels\":[]}}}}]}}"
+    },
+    {
+      "taskId": "p1-engineering-watering-threshold-v1-9cbed14e99",
+      "generatedAt": "2026-07-09T06:47:18.811Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-自动浇花器-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"structure_compliance\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"安全风险从220V降级为低压供电，保留自动判断干湿触发浇水的核心机制；代理变量聚焦湿度阈值，避免毛细/虹吸等非工程指标；一轮只推动一个核心问题，不使用选项菜单；确认阶段完整输出stage1_confirmed、theme_mapping、snapshot和variables.independent；保持学生原始兴趣并引导定义可控变量。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个自动浇花器，最好能根据土壤干湿自己浇水。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你想用土壤干湿来自动控制浇水，这个想法很实用。我们用湿度传感器检测干湿，但研究的关键在于：触发浇水的干湿标准如果不同，会怎样影响浇水效果？注意安全，建议用低压水泵或电池供电。你觉得，我们可以把“湿度触发阈值”作为自变量来研究吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考改变什么参数会让浇水时机变化？\",\"用电池或USB供电，避免220V交流电。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那我想研究土壤湿度阈值不同，会不会影响自动浇花器的浇水效果。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，湿度阈值是自变量。那么怎么衡量“浇水效果”？我们可以定义浇水准确率：在模拟土壤达到设定阈值时，水泵是否准确启动浇透，且未过度或不足。这样因变量就是浇水准确率。你觉得可行吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"用什么指标来判定浇水是否恰到好处？\",\"可以用模拟土壤和传感器读数来测试。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究不同湿度阈值对自动浇花器浇水准确率的影响，要改变的是湿度阈值。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认选题：研究不同湿度触发阈值对自动浇花器浇水准确率的影响。自变量是湿度阈值，因变量是浇水准确率。安全上只使用低压供电。接下来需要想实验材料和步骤，你有什么想法？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如何设置不同的湿度阈值？\",\"需要哪些传感器和器材？\"],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"自动浇花器\",\"retainedFeature\":\"自动判断干湿并触发浇水\",\"classroomProxy\":\"不同湿度触发阈值\",\"researchQuestion\":\"湿度触发阈值是否影响自动浇花器浇水准确率？\"},\"snapshot\":\"自动浇花器由湿度传感器、控制器、水泵组成，通过设定不同湿度阈值，测试每次浇水的准确率。低电压供电安全。\",\"variables\":{\"independent\":\"湿度触发阈值\",\"dependent\":\"浇水准确率\"}}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0023-v1-5047a410b3",
+      "generatedAt": "2026-07-09T06:47:55.330Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究弹性势能的影响因素-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"通过开放式追问引导学生区分自变量和因变量，避免使用选项，强制在第三轮确认时输出完整主题映射与变量定义，确保认知负荷可控且代理质量高。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想探究弹性势能的影响因素，比如弹簧的劲度系数、形变量这些。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你提到了劲度系数和形变量，这很好。如果我们把这些当成可能改变的条件，你觉得改变其中一个条件后，可以观察到什么具体的变化来反映弹性势能的大小呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"弹性势能的变化可通过弹簧恢复时释放的能量来观察，比如推动小车的距离。\",\"思考你打算改变什么，同时保持其他条件不变。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得可以改变形变量，看弹簧能弹多远。但劲度系数不同也会影响吧？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的想法很接近了。如果把形变量作为你主动改变的量（自变量），那弹簧弹出的距离（因变量）就反映了弹性势能的变化。建议你暂时固定劲度系数，专注于一个自变量，实验会更清晰。你觉得这样可以吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是实验中主动改变的因素，比如形变量。\",\"因变量是因自变量改变而发生变化的量，比如弹出距离。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我就研究形变量如何影响弹簧弹出小车的距离。这样自变量是形变量，因变量是小车滑行距离。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"非常清晰！你的研究问题可以总结为：改变弹簧形变量，观察它对小车弹出距离的影响。现在我把这个选题记录下来，并确认进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"探究弹性势能的影响因素\",\"research_question\":\"改变弹簧形变量，如何影响小车弹出距离？\",\"independent_var\":\"弹簧形变量\",\"dependent_var\":\"小车滑行距离\"},\"snapshot\":\"研究问题：改变弹簧形变量，观察其对小车弹出距离的影响；自变量为形变量，因变量为滑行距离。\",\"variables\":{\"independent\":[\"弹簧形变量\"]}}}]}}"
+    },
+    {
+      "taskId": "p1-engineering-alarm-sensitivity-v1-a390dfa660",
+      "generatedAt": "2026-07-09T06:48:50.710Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-倾斜报警器灵敏度-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"该样本训练模型在阶段1使用轻量脚手架，仅通过单个开放提问引导学生澄清自变量的操作定义和因变量的测量方法，避免提供选项菜单；最终确认时正确输出stage1_confirmed、theme_mapping、snapshot和variables.independent，强化认知负荷控制与学生主体性。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我之前确定研究倾斜触发角度阈值是否影响报警器响应准确率，我想知道应该从哪开始设计实验？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，我们先明确一下：你的自变量是倾斜触发角度阈值，你打算怎么设置不同的阈值来测试？比如会设置哪几个角度？因变量响应准确率，你准备用什么方法测量？说一说你的初步想法。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想可以用什么工具改变角度\",\"准确率通常要重复测试多次\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算用可调支架，设置5度、10度、15度三个阈值，每个阈值下倾倒报警器20次，看它是不是只在超过设定角度时报警，然后算准确率。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个设计很清晰。再确认一下：自变量“倾斜触发角度阈值”的三个水平就是5°、10°、15°，因变量“响应准确率”通过计数正确响应次数除以总次数得到。这样研究问题可以表述为“不同倾斜触发角度阈值对报警器响应准确率的影响”。你觉得这个表述准确吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"是的，我就是这个意思。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，我已经帮你确认了这个工程探究选题。接下来可以进入实验设计阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回顾你的自变量和因变量操作定义\"],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_theme\":\"防倾倒报警器触发灵敏度\",\"transformed_theme\":\"倾斜触发角度阈值与响应准确率\"},\"snapshot\":{\"research_question\":\"不同倾斜触发角度阈值对报警器响应准确率的影响\",\"independent_variable\":\"倾斜触发角度阈值（5°, 10°, 15°）\",\"dependent_variable\":\"响应准确率（正确报警次数/总倾倒次数）\",\"control_variables\":\"倾倒速度、环境条件等\"},\"variables\":{\"independent\":\"倾斜触发角度阈值\"}}}]}}"
+    },
+    {
+      "taskId": "p1-engineering-sorting-color-sensor-v1-977e8bf54c",
+      "generatedAt": "2026-07-09T06:49:30.170Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-颜色分拣装置-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"本样本训练导师在阶段1通过开放提问引导学生明确研究问题和变量，保留学生原始兴趣特征，没有使用选项菜单，维护了学生自主性和认知负荷控制，避免了工程扁平化和代理漂移，体现了项目跨学科整合。确认阶段输出完整的theme_mapping、snapshot和自变量定义，确保后续实验设计有坚实起点。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个能自动分拣不同颜色小球的装置，应该怎么开始？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的想法很有趣！自动分拣装置涉及识别和机械控制。你想研究其中的哪个方面？比如，是影响分拣准确率的因素，还是识别速度？请说说你的初步研究问题。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想研究识别灵敏度不同会不会影响分拣准确率。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你关注的是识别灵敏度对准确率的影响，这可以定义自变量和因变量。自变量是颜色识别灵敏度，因变量是分拣准确率。研究问题可以表述为：颜色识别灵敏度是否影响分拣装置准确率？你同意这样概括吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究颜色识别灵敏度是否影响分拣装置准确率，要改变的是识别灵敏度。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"太好了！研究问题已确认：颜色识别灵敏度是否影响分拣装置准确率？变量为识别灵敏度和准确率。接下来我们会设计实验来验证。你对此有何初步设想？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"自动颜色分拣装置\",\"retainedFeature\":\"颜色识别阈值影响分拣\",\"classroomProxy\":\"不同颜色识别灵敏度设置\",\"researchQuestion\":\"颜色识别灵敏度是否影响分拣装置准确率？\",\"independentVariable\":\"颜色识别灵敏度\",\"dependentDirection\":\"分拣准确率\"},\"snapshot\":\"研究颜色识别灵敏度对自动颜色分拣装置分拣准确率的影响\",\"variables\":{\"independent\":\"颜色识别灵敏度\"}}}]}}"
+    },
+    {
+      "taskId": "p1-engineering-door-reminder-distance-v1-938ca6fed2",
+      "generatedAt": "2026-07-09T06:50:05.629Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-门禁提醒距离-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"本样本在阶段1引导学生将工程想法转化为可研究的问题，通过一个开放问题推动学生自主聚焦触发距离，避免直接提供选题，确认时完整输出theme_mapping和变量，确保转换推理质量。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个门开太久会提醒的装置。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很有意思的想法！如果我们要把它变成一个可以研究的科学问题，你觉得哪些因素可能会影响这个提醒器的准确率呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想研究触发距离不同会不会影响提醒准不准。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，触发距离确实可能是关键因素。那我们初步把研究问题定为“触发距离阈值是否影响门禁提醒准确率？”可以吗？我们将改变触发距离阈值作为自变量。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"你可以思考一下如何测量提醒准确率，但先确认研究问题。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究触发距离阈值是否影响门禁提醒准确率，要改变的是触发距离阈值。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"太好了，研究问题已确认。自变量是触发距离阈值，因变量是提醒准确率。我们已记录了相关实验映射。接下来我们可以进入实验设计阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"门开太久提醒器\",\"retainedFeature\":\"距离触发阈值影响响应\",\"classroomProxy\":\"不同触发距离阈值\",\"researchQuestion\":\"触发距离阈值是否影响门禁提醒准确率？\",\"independentVariable\":\"触发距离阈值\",\"dependentDirection\":\"提醒准确率\"},\"snapshot\":\"从原始兴趣“门开太久提醒器”转化为可探究的实验问题，聚焦触发距离阈值对提醒准确率的影响，通过改变距离阈值来观察准确率变化。\",\"variables\":{\"independent\":\"触发距离阈值\"}}}]}}"
+    },
+    {
+      "taskId": "p1-engineering-plant-light-auto-duration-v1-b71393ff43",
+      "generatedAt": "2026-07-09T06:50:33.385Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-补光灯时长-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"该训练样本展示在阶段1面对一次给出大量细节的学生时，如何通过一个核心开放问题将注意力聚焦到自变量与因变量的明确界定上，不使用选项菜单。在确认时完整提供了theme_mapping、snapshot、variables.independent，且保留了原始兴趣中的机制约束，有效控制了认知负荷并未造成工程平化或主题丢失。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究补光时长不同会不会影响植物生长，可以用自动补光灯定时。我想用绿豆，感觉绿豆长得快。我想知道帮它多照一会儿会不会长更高，或者叶子更多。我确定研究定时补光时长是否影响绿豆幼苗生长，要改变的是定时补光时长。我家里有灯，但没买绿豆，还没选怎么测。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你想把问题的焦点放在定时补光时长上，这一点很清晰。为了帮我们把研究问题变成可以实际测量和观察的内容，可以先回答一个问题：当你比较不同的补光时长时，你打算通过绿豆幼苗的哪些具体表现来判断“生长是否受影响”？比如你会看高度、叶片数量，还是其他容易记录的变化？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考你最容易观察到的植物变化，例如高度变化。\",\"不必一口气列出所有指标，先选最让你好奇的一项。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我最想看它长多高，每天用尺子量一下茎的高度。另外也可以数真叶的数量，不过可能长得没那么快。嗯，我想每天量一次，应该可以吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好的思路，你提到了株高和真叶数，这些都是可以量化的生长指标。现在我们差不多可以把研究问题完整表述出来：比较不同的定时补光时长，看绿豆幼苗的株高和真叶数会不会有明显差异。在你最终确定下来之前，我有最后一个确认：作为自变量，你打算设定哪几档补光时长？比如每天4小时、8小时、12小时，还是完全依靠你手头灯的定时功能来选取？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑你现有灯具的定时档位，选择容易实现的时长梯度。\",\"建议至少设置三档，包括较短和较长的时长。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我这灯可以设4小时、8小时、12小时和一直亮，我觉得去掉一直亮，用4、8、12小时做三组比较合理。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这样我们就把第一阶段的核心信息理清了。你的研究问题是“定时补光时长是否影响绿豆幼苗生长？”，自变量是定时补光时长（4h、8h、12h），因变量是幼苗株高和真叶数。我帮你整理了确认书，等下进入设计阶段时就能直接用来规划数据记录表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"自动补光植物灯\",\"retained_feature\":\"补光时长自动控制影响植物\",\"classroom_proxy\":\"不同定时补光时长\"},\"snapshot\":{\"research_question\":\"定时补光时长是否影响绿豆幼苗生长？\",\"independent_label\":\"定时补光时长\",\"dependent_direction\":\"幼苗生长情况\"},\"variables\":{\"independent\":{\"name\":\"定时补光时长\",\"units\":\"小时\",\"levels\":[\"4\",\"8\",\"12\"],\"type\":\"categorical\"},\"dependent\":[{\"name\":\"株高\",\"units\":\"cm\",\"instrument\":\"直尺\"},{\"name\":\"真叶数\",\"units\":\"片\",\"instrument\":\"目视计数\"}]}}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0028-v1-42a458b725",
+      "generatedAt": "2026-07-09T06:51:22.635Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究蒸发快慢的影响因素-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"阶段1引导学生在开放问题中确定自变量和因变量，不使用选项菜单，强化学生主动性，并确保安全提醒，最后确认时完备输出theme_mapping、snapshot和variables.independent。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究东西干得快慢受什么影响，比如晾衣服有时候干得快有时候慢，跟什么有关呢？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好！蒸发快慢确实和很多因素有关。你想改变其中一个条件，然后观察蒸发快慢的变化吗？比如改变温度、风的大小或者水暴露的面积。你打算先研究哪个因素呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想试试温度。把两杯相同多的水放在不同温度的地方，看看哪杯干得快。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个思路很清楚，把温度作为你要改变的条件，然后观察蒸发快慢（比如比较水位下降程度或干燥时间）。在开始前，我们需要考虑安全问题：不要使用高温热水以免烫伤，可以用温水或室温差异。你觉得这个方案可行吗？如果同意，我们就确定下来，可以吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"用浅盘加水更好观察蒸发量\",\"可记录相同时间后的水位变化\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我同意这个方案。就这么研究温度对蒸发快慢的影响。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认：研究问题为“改变温度会如何影响蒸发快慢？”自变量是温度，因变量是蒸发快慢（可观察水位变化）。已经提醒了安全使用温水。现在开始设计实验，请进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"探究蒸发快慢的影响因素\",\"research_question\":\"改变温度会如何影响蒸发快慢？\",\"independent_variable\":\"温度\",\"dependent_variable\":\"蒸发快慢（水位下降速度）\"},\"snapshot\":\"通过设置不同温度的环境，比较相同水量、相同容器、相同时间内的蒸发量，观察温度影响。\",\"variables\":{\"independent\":\"温度\"}}}]}}"
+    },
+    {
+      "taskId": "p1-high-concept-smart-campus-energy-v1-5c2592c088",
+      "generatedAt": "2026-07-09T06:51:49.043Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-智慧校园节能-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"通过单步开放提问保留学生原始表述中的机制线索，不裁剪特征；确认时输出 theme_mapping/snapshot/variables.independent，实现代理转化与变量外化的有效训练。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个智慧校园节能的项目，我最感兴趣的是教室灯光怎么自动管理来省电。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个想法很有意思。如果我们在课堂上用一个小规模模拟来研究，你最想保留的‘调节管理策略影响能耗’这个特点，可以用什么具体的方式来体现呢？比如，你觉得哪些灯具控制策略值得试一试？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想保留‘调节管理策略影响能耗’这个特点，用不同灯具关闭策略来模拟，比如常亮、午休关灯、分区关灯这些。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你把特征落在‘灯具关闭策略’上，很贴近教室实际。那么针对这些策略，你能试着把探究的问题写成一句‘……是否影响……’的问句吗？这样可以帮我们聚焦自变量和因变量。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着用‘灯具关闭策略’作为你改变的条件，用量化的能耗结果作为观察对象。\",\"问题格式：______是否影响______？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究灯具关闭策略是否影响教室模拟能耗，要改变的是灯具关闭策略。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，你的研究问题很清晰。我把它整理成一个课堂可操作的代理实验框架：在模拟教室内，改变‘灯具关闭策略’（常亮、午休关闭、分区关闭），测量‘模拟能耗’。这样既保留了调节策略影响能耗的核心特征，又可以在课堂上用数据验证。下面是我们确认的问题转化记录，你核对一下。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"智慧校园节能\",\"retained_feature\":\"调节管理策略影响能耗\",\"classroom_proxy\":\"不同灯具关闭策略对模拟能耗的影响\"},\"snapshot\":{\"research_question\":\"灯具关闭策略是否影响教室模拟能耗？\",\"independent_variable\":\"灯具关闭策略\",\"dependent_variable\":\"模拟能耗\"},\"variables\":{\"independent\":\"灯具关闭策略\",\"dependent\":\"模拟能耗\"}}}]}}"
+    },
+    {
+      "taskId": "p1-high-concept-city-cooling-roof-v1-5aa574380e",
+      "generatedAt": "2026-07-09T06:53:07.917Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-城市降温屋顶-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"安全风险温和降级：将危险实地楼顶测量引导至安全的教室模型盒实验。代理质量：学生主动选择黑白纸代表不同表面材质，保留吸热特征。认知负荷控制：每轮只推进一个核心问题，先定代理方式，再问研究问题，最后确认变量。学生主导：所有选择由学生做出，教师仅提供安全边界和聚焦提问。主题保持：始终围绕城市降温屋顶材质影响，未偏移。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究城市热岛效应，给城市降温。我能去楼顶测量不同屋顶材质的温度吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"楼顶实地测量有坠落和高温风险，我们不这样做。在教室里可以用模型盒来模拟，既安全又能聚焦表面材质的影响。你认为在模型盒上，可以用什么来表示不同的屋顶材质呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以考虑白纸、黑纸、铝箔等不同颜色和反光特性的材料。\",\"只要保证光照条件一样就可以对比。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我会用光滑的黑纸和白纸，贴在盒盖上，然后用台灯照，看里面温度变化。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"用黑纸和白纸代表不同屋顶材质是个清晰的代理。你能用一句话说出想验证的研究问题吗？还有，你打算测量盒内的什么来反映降温效果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着把\\\"材质\\\"作为改变量，把\\\"温度\\\"作为观察量。\",\"测量盒内空气温度是常见的反映吸热效果的指标。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我的研究问题是：屋顶表面材质是否影响模型盒内温度？自变量是屋顶表面材质，我要测量盒内温度。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"已确认，原始兴趣“城市热岛降温”，保留“表面材质影响吸热”，代理为不同屋顶模型表面材质。研究问题：屋顶表面材质是否影响模型盒内温度？自变量：屋顶表面材质。下一步可设计实验方案，控制光照等条件。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以开始考虑需要哪些实验材料和如何测量温度。\",\"设计实验步骤时注意控制变量，比如光照距离和盒内初始温度。\"],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"原始兴趣\":\"城市热岛降温\",\"保留特征\":\"表面材质影响吸热\",\"课堂代理\":\"不同屋顶模型表面材质\",\"研究问题\":\"屋顶表面材质是否影响模型盒内温度？\"},\"snapshot\":\"已选择用模型盒模拟，用不同表面材质的盒盖代表屋顶，研究问题与自变量已确定，准备进入实验设计。\",\"variables\":{\"independent\":\"屋顶表面材质\"}}}]}}"
+    },
+    {
+      "taskId": "p1-high-concept-low-carbon-commute-v1-8111935dc6",
+      "generatedAt": "2026-07-09T06:54:11.606Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-低碳出行-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"该样本在阶段1通过提问引导学生将模糊环保兴趣收敛到可操作的模拟实验，在发现变量混淆时及时提供一句话澄清，确保自变量/因变量定义准确，同时不使用选项，维持学生主导权，保持主题忠实。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究低碳出行，看看不同出行方式的能耗差别到底有多大。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个想法很有意思。你能想到用什么可测量的指标来表示“能耗”吗？比如能用橡皮筋的数量或物体的重量来反映吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：想想你能在实验中数什么或称什么。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想让不同的模拟出行方式（比如步行、自行车、汽车）对应不同的橡皮筋数量，测量哪个用得多就是能耗大。这是我改变的东西。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"等一下，你说改变橡皮筋数量，可是你之前想研究的是不同出行方式的影响。能不能再明确一下：哪个是你主动改变的因素，哪个是你测量的结果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考：改变的是出行方式，测量的是能耗指标。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"哦，我明白了。我想改变的是模拟的出行方式（比如不同方式的模型），然后测量它们完成同一段路程需要的橡皮筋数或重量，那就是能耗。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"现在清晰了：您改变模拟出行方式，测量橡皮筋数作为能耗。研究问题：出行方式是否影响模拟单次通勤能耗？确认后我们进入设计阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"低碳出行\",\"retained_feature\":\"出行方式能耗差异\",\"classroom_proxy\":\"不同模拟出行方式对应的能耗（橡皮筋数/重量）\",\"research_question\":\"出行方式是否影响模拟单次通勤能耗？\"},\"snapshot\":\"用不同模拟出行方式代表实际出行，测量完成同一距离所用橡皮筋数量来反映单次通勤能耗。\",\"variables\":{\"independent\":\"模拟出行方式\"}}}]}}"
+    },
+    {
+      "taskId": "p1-high-concept-ai-recognition-threshold-v1-0bcabd6343",
+      "generatedAt": "2026-07-09T06:54:55.514Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-AI识别阈值-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"第一轮用开放式提问推动学生聚焦识别机制；第二轮给出一个轻量脚手架hint，指向颜色亮度代理转化而不给菜单，保留学生决策权；第三轮完整输出stage1确认结构，包括theme_mapping、snapshot、变量，体现从原始兴趣到课堂代理的稳健衔接，控制认知负荷，强化跨学科整合与代理质量。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个跟AI有关的项目，最好能识别东西，比如让摄像头认出哪些是苹果。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你这个想法源自AI怎么判断一个东西该不该被识别。你观察到的识别过程里，是什么决定了最终判断是“认出来”还是“忽略”？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好像是设定一个阈值，超过才认。我见过人脸识别调高阈值才能通过，不然容易误认。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你抓住了“阈值”这个关键机制。在课堂条件下，你想用什么方式模拟这个阈值对准确率的影响？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"是否可以用不同颜色深浅或亮度匹配阈值，让简单装置做出分拣判断？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"可以用不同颜色深浅来对应阈值高低，然后看能不能正确分拣物品。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"研究问题明确了：识别阈值是否影响分拣准确率？你的自变量是识别阈值。接下来我们把它转化成具体的课堂任务。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"AI图像识别\",\"retainedFeature\":\"识别阈值影响准确率\",\"classroomProxy\":\"不同颜色/亮度匹配阈值\",\"researchQuestion\":\"识别阈值是否影响分拣准确率？\"},\"snapshot\":\"学生打算用不同颜色深浅模拟识别阈值，研究阈值对分拣准确率的影响，自变量为识别阈值，因变量为分拣准确率。\",\"variables\":{\"independent\":\"识别阈值\",\"dependent\":\"分拣准确率\",\"controlled\":[]}}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0048-v1-3cff5463fd",
+      "generatedAt": "2026-07-09T06:55:44.654Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究「初中化学实验的设计与评价（中考专题复习）」中的影响因素-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"该训练样本展示了助教在阶段1通过开放式提问引导一名配合但需保留自主表述的学生，从模糊兴趣逐步聚焦到一个具体的实验变量组合，不使用选择题，仅用少量提示控制认知负荷；并在确认阶段输出完整的主题映射、研究快照和自变量定义，体现了学生能动性和转化推理过程。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我对中考专题复习中实验的设计与评价这部分感兴趣，但不知道从哪个点切入，好像有很多影响因素。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的兴趣很契合中考要求。我们可以先尝试把问题具体化：如果以某个熟悉的化学实验为基础，改变其中一个条件，观察结果会有什么不同？你想到的实验有哪些？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想想实验室制取气体或物质性质实验\",\"哪些条件容易在课堂上调整？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"嗯，比如用过氧化氢分解制氧气，改变加入的二氧化锰的质量，看气泡产生的快慢？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个想法很好，抓住了催化剂用量这个可改变的条件，冒泡快慢可以反映反应速率。要考虑安全性和材料易得吗？想以此作为你的探究问题吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得方案安全、药品也容易找到，就用催化剂用量作为自变量，观察气泡产生的快慢，这就是我的研究问题吧？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认采纳这个探究：在过氧化氢分解反应中，改变二氧化锰用量，观察气泡产生速率的快慢。你的研究问题已记录。接下来我们要设计实验细节。\",\"next_action_type\":\"continue\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"subject\":\"化学\",\"topic\":\"实验的设计与评价\",\"curriculum\":\"初中化学中考专题复习\"},\"snapshot\":{\"research_question\":\"改变二氧化锰用量如何影响过氧化氢分解产生氧气的速率？\",\"independent_variable\":\"二氧化锰的质量\",\"dependent_variable\":\"气泡产生的快慢（观察）\"},\"variables\":{\"independent\":\"二氧化锰的质量\"}}}]}}"
+    },
+    {
+      "taskId": "p1-cooperative-light-color-v1-194bab9fd9",
+      "generatedAt": "2026-07-09T06:56:54.266Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"配合型-光色与绿豆发芽-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"导师每轮只提出一个核心开放问题，未使用选择题，保持认知负荷可控；通过问题引导学生将“光照影响”转化为“光的颜色”这一可操作代理变量，保留原始兴趣中的机制特征；学生自行提出具体变量和研究对象，确保主导性；确认阶段输出完整选课确认书，包含自变量、因变量方向及研究问题。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我对植物生长很感兴趣，想研究光照对植物的影响\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你觉得光的不同颜色，比如红色或蓝色，会不会让植物有不一样的表现呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想研究不同颜色的光对绿豆发芽速度的影响\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你已经聚焦到颜色了，很好。在你的实验里，你具体要控制和改变的条件是哪一项呢？是光的颜色本身吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我确定研究不同颜色的光（红、蓝、绿、白）对绿豆发芽的影响，要改变的就是光的颜色\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，已经理清了自变量是光的颜色（红蓝绿白），因变量可以观察绿豆的发芽速度，用每天发芽的种子数来量化。这样研究问题就清晰了：不同颜色的光是否影响绿豆发芽速度？我这里整理了一份确认书。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"光照对植物的影响\",\"retained_feature\":\"光的不同属性会影响植物\",\"classroom_proxy\":\"不同颜色的光（红蓝绿白）\",\"research_question\":\"不同颜色的光是否影响绿豆发芽速度？\"},\"snapshot\":{\"research_question\":\"不同颜色的光是否影响绿豆发芽速度？\",\"independent_variable\":\"光的颜色\",\"dependent_variable\":\"发芽速度（每天发芽数）\",\"groups\":[\"红光\",\"蓝光\",\"绿光\",\"白光（对照组）\"]},\"variables\":{\"independent\":\"光的颜色\"}}}]}}"
+    },
+    {
+      "taskId": "p1-fuzzy-water-amount-v1-b7e0b120dd",
+      "generatedAt": "2026-07-09T06:57:40.520Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-浇水多少-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"structure_compliance\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"阶段1逐层确认选题，不提供选项，每轮只问一个核心问题，最终生成完整确认书，包含theme_mapping、snapshot和variables.independent。控制了认知负荷，保留学生关于浇水影响发芽的原始兴趣机制。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做点跟种子发芽有关的实验，就是平时浇水嘛，浇多浇少好像不一样。哦，那我想研究每天浇水量不同会不会影响绿豆发芽，对，要改变的是每天浇水量，看发芽率。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你提出了“每天浇水量不同是否影响绿豆发芽率”的问题，很清晰。我们先明确一下：你计划怎么测量发芽率呢？（比如发芽种子占总数的百分比）\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"发芽率通常用发芽种子数÷总种子数计算。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"嗯，发芽率就是发芽的种子占全部种子的百分比，我准备每组用10颗绿豆，看几天后有几颗发芽，算百分比。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，发芽率用百分比。接下来说说浇水量：你打算设置哪几种不同的浇水量呢？比如每天10毫升、20毫升这样。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以设置3-5个梯度，例如10ml、20ml、30ml。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算设三个组，每天浇10毫升、20毫升、30毫升，每个组10颗绿豆，放在一样的环境，观察一周，算发芽率。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，你的实验设计已经比较完整。我们来确认：研究问题：每天浇水量不同是否影响绿豆发芽率？自变量：每天浇水量（10ml、20ml、30ml）；因变量：发芽率（百分比）。控制条件如相同环境。确认无误的话，我们进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"种子发芽\",\"retained_feature\":\"水分多少影响发芽\",\"classroom_proxy\":\"不同浇水量\",\"research_question\":\"每天浇水量不同是否影响绿豆发芽率？\",\"independent_variable\":\"每天浇水量\",\"dependent_direction\":\"发芽率\"},\"snapshot\":{\"research_question\":\"每天浇水量不同是否影响绿豆发芽率？\",\"independent_variable\":\"每天浇水量\",\"levels\":[\"10ml\",\"20ml\",\"30ml\"],\"dependent_variable\":\"发芽率\",\"measurement\":\"百分比\",\"sample_size_per_group\":10,\"controlled\":\"相同环境、绿豆品种\"},\"variables\":{\"independent\":\"每天浇水量\"}}}]}}"
+    },
+    {
+      "taskId": "p1-all-at-once-salt-germination-v1-eb99ecd474",
+      "generatedAt": "2026-07-09T06:58:43.157Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"一次给全型-盐水浓度与发芽-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"仅在确认轮输出stage1_confirmed；前两轮通过单一开放问题逐步引导学生细化发芽标准与蒸发控制，避免选项菜单与多问题轰炸，保留盐分影响渗透吸水的机制；最终映射准确呈现了原始兴趣、保留特征、课堂代理及自变量。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我要研究不同浓度的盐水对绿豆种子发芽率的影响。自变量是盐水浓度（0%、1%、3%、5%），因变量是发芽率，控制变量是温度、水量、种子品种。请直接确认。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的选题很好，盐水浓度直接影响种子吸水渗透，很适合探究。为了让发芽率数据可靠，你打算怎样判断一颗种子已经“发芽”？这会影响计数标准。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"发芽标准可以设定为胚根长度≥5mm或突破种皮\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算以胚根突破种皮且长度达到5毫米作为发芽标准，每组用30颗绿豆，放在铺有滤纸的培养皿里，每天滴加相同数量的对应浓度盐水，连续观察5天。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你明确了发芽标准和每组种子数，很好。不过每天滴加盐水时，水分蒸发可能会让溶液浓度改变，影响渗透吸水这个关键机制。你准备怎么控制蒸发呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用保鲜膜封口，但要注意透气\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我会用保鲜膜封口，每个皿扎几个小孔透气，并放在25℃恒温箱里，每天定时用量筒补充蒸发掉的水分，保持各皿加液量一致。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的实验设计很完整：用不同浓度盐水处理绿豆，观察发芽率。自变量是盐水浓度（0%、1%、3%、5%），因变量是发芽率，通过胚根突破种皮且达5mm计为发芽。你已考虑每日补液、封口防蒸发、恒温控制。这个研究能很好体现盐分通过渗透吸水影响种子萌发的机制。现在请开始实验并记录数据，每皿发芽数按天记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"盐水浓度对种子的影响\",\"retained_feature\":\"盐分浓度影响渗透吸水\",\"classroom_proxy\":\"不同浓度盐水与绿豆发芽率对照实验\"},\"snapshot\":\"配制0%、1%、3%、5%盐水，每组30颗绿豆于培养皿，恒温25℃，每天加等量盐溶液，封口，5天记录胚根≥5mm的发芽数\",\"variables\":{\"independent\":\"盐水浓度\",\"dependent\":\"发芽率\",\"controlled\":\"温度、水量、种子品种、培养天数\"}}}]}}"
+    },
+    {
+      "taskId": "p1-high-concept-mars-light-v1-c903ea1c60",
+      "generatedAt": "2026-07-09T06:59:44.612Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念降级型-火星基地植物-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"structure_compliance\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"该样本训练导师在阶段1通过渐进式提问引导学生明确自变量和观察指标，完成主题映射和高概念降级确认，强化了研究问题的结构化表达，突出了变量定义和代理质量的训练。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个和太空有关的项目，最好有点像火星基地。我最感兴趣的是火星基地里植物怎么活下来，因为那里条件都要人工控制。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"听起来你对火星基地的人工环境控制很感兴趣。如果要把它变成一项课堂探究，你最先想到可以改变哪些环境条件来观察植物生长？可以结合你提到的“光照”来说说看。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"光照、温度、水分\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得可以保留人工控制光照的特点，用不同的人工光照时长看看绿豆发芽会不会不一样。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个思路很好，我们就把“不同人工光照时长”作为你实验的自变量。你打算怎么观察绿豆发芽和早期生长情况？能具体说说你会记录哪些表现吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"发芽率、苗高、根长\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究不同人工光照时长是否影响绿豆发芽和早期生长，要改变的就是人工光照时长，然后观察发芽率和苗高变化。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你已经明确了自变量和观察指标。现在我们一起把这个探究整理成研究问题：“不同人工光照时长是否影响绿豆发芽和早期生长？” 主题映射和变量记录如下，你可以核对一下。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"火星基地植物生存\",\"retained_feature\":\"基地环境条件需要人工控制\",\"classroom_proxy\":\"不同人工光照时长\"},\"snapshot\":\"研究问题：不同人工光照时长是否影响绿豆发芽和早期生长？自变量：人工光照时长。因变量：发芽和早期生长情况。\",\"variables\":{\"independent\":\"人工光照时长\",\"dependent\":\"发芽和早期生长情况\"}}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0054-v1-59f9854143",
+      "generatedAt": "2026-07-09T07:00:51.643Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"课题２ 学习开展化学实验探究-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"阶段1探究，学生初始提出危险材料（酒精），导师温和纠正并替代为有色水，逐步明确自变量（火力）与因变量（蒸馏水颜色），仅用开放问题推动，未使用选择题，最终输出确认信息含stage1_confirmed和variables。符合认知负荷控制、代理质量和主题忠实度。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我想做蒸馏实验，看看加热酒精会有什么变化，家里有医用酒精。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的探究方向很有意思，但酒精易挥发且可燃，直接加热很危险。我们可以试试更安全的材料，比如加了色素的水。你想通过蒸馏探究什么，比如改变什么条件，观察什么变化呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以改变加热温度或时间\",\"可以观察收集液的颜色或体积\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那就用加了几滴酱油的水，把加热调成小火和大火，看看收集的蒸馏水颜色深浅有什么不同。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个方案很清晰！这样一来，研究问题就是：火力大小如何影响蒸馏水澄清度？自变量是加热火力（小火或大火），因变量是蒸馏水的颜色深浅。你觉得这样定义准确吗？还需要补充吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得很准确，就这么定了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，你的研究问题已确认：火力大小会影响蒸馏水的澄清程度。我已经记录在案，后面我们可以具体规划实验步骤和数据记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"confirm_info\":{\"stage1_confirmed\":true,\"theme_mapping\":{\"subject\":\"化学\",\"unit\":\"蒸馏实验探究\",\"inquiry_type\":\"investigation\"},\"snapshot\":{\"research_question\":\"火力大小如何影响蒸馏水的澄清度？\",\"independent_variable\":\"加热火力\",\"dependent_variable\":\"蒸馏水的澄清度\"},\"variables\":{\"independent\":\"加热火力\"}}}}]}}"
+    },
+    {
+      "taskId": "p1-ecology-bottle-balance-v1-8e7551cb2e",
+      "generatedAt": "2026-07-09T07:01:30.935Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"过度宏大型-生态瓶平衡-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"样本在阶段1完全避免 ask_choice 和 options 菜单，通过单核心开放问题澄清变量定义，引导学生从原始兴趣'生态瓶平衡'聚焦到课堂代理'水草与小鱼数量比例对存活天数的影响'。第二回合针对变量混乱给出两条精简 hints 协助区分自变量与因变量，保持低认知负荷。确认时输出完整的 stage1_confirmed、theme_mapping、snapshot 和 variables.independent，确保主题转换透明且保真。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想用生态瓶研究微型生态系统的平衡。之前我养过水草和鱼，发现数量比例不对劲的时候鱼很容易死。我想设计实验，但不知道具体该注意些什么。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你抓住了一个关键点：生产者与消费者的数量比例。我们可以把这个比例设为自变量，观察它对系统稳定性的影响。那你打算用什么指标来衡量“稳定性”呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"稳定性就是看生态瓶能维持多久吧？我计划改变水草和小鱼的数量，比如 1 草 2 鱼、2 草 1 鱼，然后记录它们能存活的天数。不过我不太确定哪个是变量，哪个是结果。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你提到了两个重要变量。为了理清思路，你觉得哪个是你主动改变的条件，哪个是你需要观察记录的结果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量：你主动改变的水草与小鱼数量比例。\",\"因变量：你测量的结果，例如存活天数。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我明白了，我主动改变的是水草与小鱼的数量比例，这个就是自变量；然后我观察结果是它们能存活的天数，那是因变量。其他像水量、光照和容器大小都要保持不变才对。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"非常清楚。现在我们已经确定了研究问题：水草与小鱼数量比例是否影响生态瓶存活天数。接下来我们可以进入实验设计，先列出需要控制不变的条件。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"生态瓶/微型生态系统\",\"retained_feature\":\"生物数量比例影响系统稳定性\",\"classroom_proxy\":\"不同水草与小鱼数量比例\"},\"snapshot\":{\"research_question\":\"水草与小鱼数量比例是否影响生态瓶存活天数？\",\"independent_variable\":\"水草与小鱼数量比例\",\"dependent_variable\":\"生态瓶存活天数\",\"controlled_variables\":[\"水量\",\"光照\",\"容器大小\",\"温度\"]},\"variables\":{\"independent\":[{\"name\":\"水草与小鱼数量比例\",\"description\":\"不同水草与小鱼的数量比值，例如 1:1、2:1 等\"}]}}}]}}"
+    },
+    {
+      "taskId": "p1-premature-shade-plant-height-v1-0ff49424be",
+      "generatedAt": "2026-07-09T07:02:25.300Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"细节过早型-遮阴与株高-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"stage_discipline\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"训练导师在阶段1面对过早列举操作细节的学生，坚持用一句话研究问题作为脚手架，不提供选项，不代设变量；确认时完整输出theme_mapping、snapshot和自变量，确保阶段纪律与认知负荷控制。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究植物为什么长不高，我打算用黑布遮70%、用LED补光16小时、每天浇20ml水、室温25度，测5天。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你一下子想到了很多具体操作，很好。我们先退一步：你究竟想探究哪个因素影响植物长高？能用一句话说清楚你的研究问题吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想看遮阴程度是不是影响绿豆幼苗长高。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"嗯，那么你的研究问题可以明确为：遮阴程度是否影响绿豆幼苗的株高？你想改变的是遮阴程度，测量的是株高，对吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对，我确定研究遮阴程度是否影响绿豆幼苗株高，要改变的是遮阴程度。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，我们把研究问题定为：遮阴程度是否影响绿豆幼苗株高？自变量是遮阴程度，因变量是株高。我帮你记录在案，进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"research_question\":\"遮阴程度是否影响绿豆幼苗株高？\",\"independent_variable\":\"遮阴程度\",\"dependent_variable\":\"幼苗株高\"},\"snapshot\":\"学生将原始‘植物长不高’的问题，通过课堂代理转化为探究遮阴程度对绿豆株高影响的实验，明确自变量为遮阴程度。\",\"variables\":{\"independent\":\"遮阴程度\"}}}]}}"
+    },
+    {
+      "taskId": "p1-fuzzy-yogurt-temperature-v1-559098c2f1",
+      "generatedAt": "2026-07-09T07:03:33.337Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-酸奶与温度-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"引导学生从模糊兴趣中提取观察指标，每轮只问一个核心问题；第三轮确认时提供完整的theme_mapping和变量，保留学生表述；未使用ask_choice或options，控制认知负荷，避免多问，强化学生表达权。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我想做个跟吃的东西有关的实验，比如牛奶、酸奶。不知道能不能研究温度对它的影响？哦对，我想知道酸奶放在不同温度下会怎么样。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你提到温度对酸奶的影响，这是个很好的方向。在你想的实验中，酸奶放在不同温度下，你主要想观察它的哪些变化呢？比如你会不会关心它变坏的速度？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对，就是想知道温度越高是不是酸奶坏得越快。我要改变存放的温度，然后看变质快慢。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你计划怎么判断酸奶已经变质了呢？是根据气味、颜色，还是有其他方法？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算闻气味，如果变酸臭就是坏了，还可以看有没有变色或者长毛。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"我们把问题聚焦为“存放温度是否影响酸奶变质快慢”，自变量是存放温度，因变量是变质快慢。你已经想到通过气味和外观来判断变质。实验思路很清晰，阶段1确认！\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"食物保存\",\"retainedFeature\":\"温度影响微生物活动\",\"classroomProxy\":\"不同存放温度\",\"researchQuestion\":\"存放温度是否影响酸奶变质快慢？\"},\"snapshot\":\"研究问题：存放温度是否影响酸奶变质快慢？自变量：存放温度，因变量：变质快慢。\",\"variables\":{\"independent\":\"存放温度\"}}}]}}"
+    },
+    {
+      "taskId": "p1-cooperative-dough-fermentation-v1-f8bf90855e",
+      "generatedAt": "2026-07-09T07:04:16.801Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"配合型-面团发酵-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"学生兴趣模糊，通过单轮聚焦问题引导其自主生成体积代理指标，避免多问题轰炸；确认阶段完整输出theme_mapping、snapshot和自变量定义，体现代理质量与转化推理。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我对做面包时的面团发酵很感兴趣，想研究发酵。我看到酵母加得多，面发得快，但不知道具体怎么控制，在学校里怎么做实验呢？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的观察很到位！酵母用量确实影响发酵。在教室环境里，我们可能会受器材限制。你觉得发酵快慢可以用什么容易观察到的结果来代表呢？比如面团膨胀的大小，或者产生的气泡多少？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考一下，什么变化最容易用简单工具测量或观察？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我之前做过面包，发酵后面团会变大很多，用体积变化来衡量发酵效果可以吗？不同酵母量面团膨胀的体积不一样。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"体积变化是个很好的替代指标，而且可以用量杯之类的工具测量。那我们的研究思路就是：改变酵母添加量，观察对面团发酵体积的影响。要确保其他条件相同，比如面粉量、水温、发酵时间。你觉得这个研究问题清楚了吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"注意控制变量，除了酵母量其他都要不变。\",\"先确认问题，我们再细化实验步骤。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"清楚了，我想研究酵母添加量是否影响面团发酵体积，自变量是酵母添加量，因变量是体积变化。我们可以准备实验了吧？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很棒！你的研究问题已经清晰了。我们确认选题：研究酵母添加量是否影响面团发酵体积？自变量是酵母添加量，因变量是发酵体积。下一步可以设计实验细节了。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"面团发酵\",\"retained_feature\":\"酵母用量影响发酵速度\",\"classroom_proxy\":\"不同酵母添加量\",\"research_question\":\"酵母添加量是否影响面团发酵体积？\",\"independent_variable\":\"酵母添加量\",\"dependent_variable\":\"面团发酵体积\"},\"snapshot\":{\"what_we_know\":[\"酵母用量影响发酵速度\",\"面团体积变化可以体现发酵效果\"],\"what_we_need\":[\"具体添加多少克酵母的不同水平\",\"保持面粉量、水温、时间等不变的方法\"]},\"variables\":{\"independent\":\"酵母添加量\",\"dependent\":\"面团发酵体积\"}}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0059-v1-881a1ef9a0",
+      "generatedAt": "2026-07-09T07:04:57.998Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究「植物生长」中的影响因素-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"阶段1确认：导师聚焦单自变量选择，不提供选项，维持学生代理；逐步收敛到研究问题；稳定输出theme_mapping、snapshot和variables。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究植物生长的影响因素，比如光照、水、温度，都感觉挺有趣的。我们是不是可以种豆子，看看哪个长得快？可能还要控制土壤和盆的大小。我可以从家里带绿豆。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你给出了好几个可能的影响因素。为了让实验更聚焦，我们先确定一个你优先想研究的因素。比如侧重光照时长，设计对比实验，看种子发芽情况。你愿意先选定光照时长作为自变量吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"选择你最可控、观察变化最明显的因素\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那就先研究光照吧，我可以每天给不同组照不同时间的光，对比发芽数。需要用多少颗种子？每天记录啥？要不要测高度？感觉都可以。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好，光照时长作为自变量。现在我们需要明确观察指标：你是想记录每天的发芽总数，还是测量幼苗高度？建议先选一个，这样实验更容易管理。你觉得用发芽数可以吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"发芽数便于计数，前期观察更敏感\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那就记录发芽数吧，每天数一数发芽的颗数。但是温度和水也要保持一致吧？我会把其他条件控制好。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"非常清晰：研究问题聚焦于不同光照时长对绿豆种子发芽数的影响。水量、温度等控制不变，这符合对照实验要求。现在帮你确认研究框架，保存到平台。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"后续可以讨论光照时长分几组、如何测量\"],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"探究植物生长的影响因素\",\"research_question\":\"不同光照时长对绿豆种子发芽数的影响\",\"classroom_proxy\":\"用绿豆种子进行光照时长对比实验，计数发芽数\"},\"snapshot\":\"我们将研究不同光照时长对绿豆发芽数的影响，自变量为光照时长，因变量为发芽数，其他条件保持一致\",\"variables\":{\"independent\":\"光照时长\",\"dependent\":\"发芽数\"}}}]}}"
+    },
+    {
+      "taskId": "p1-variable-confusion-apple-browning-v1-c56b526ad4",
+      "generatedAt": "2026-07-09T07:05:35.003Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"变量混乱型-苹果褐变-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"stage_discipline\",\"stem_fit\",\"student_agency\",\"teaching_guidance\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"训练阶段一确认流程：第一轮用开放提问引导学生自主提出处理方式，避免给出选项菜单；第二轮聚焦因变量测量而不急于推进阶段二；第三轮输出完整stage1确认结构，包含theme_mapping、snapshot、variables.independent，同时phase_complete为true，示范了变量混乱型主题下的确认规范。\",\"conversations\":[{\"from\":\"human\",\"value\":\"苹果切开会变褐色，我想研究这个，但不太清楚怎么设变量。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你观察到苹果变色现象很有趣。如果像你说的可能与空气有关，那么我们能改变什么条件来观察变色速度的变化？请说说你心中想比较的处理方式。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以从日常方法入手，比如用盐水、柠檬汁浸泡是否有效？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我猜是和空气有关，那我想用不同处理隔绝空气看看。比如盐水浸泡、柠檬汁、不处理。这样做自变量是处理方式，因变量是褐变快慢，这样对吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"对，你已经抓住了核心：自变量是处理方式，因变量是褐变速度。那么我们能准确比较褐变快慢吗？你打算怎么判断或记录变色程度？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用颜色等级、拍照定时记录等方法。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我确定研究不同处理是否影响苹果切面褐变速度，要改变的是处理方式。可以定时观察颜色变化来比较。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认成功！你的研究问题是：不同抗褐变处理（盐水浸泡、柠檬汁、不处理）是否影响苹果切面褐变速度？自变量是处理方式，因变量是褐变速度。接下来将进入数据记录设计。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"苹果切开变色\",\"retainedFeature\":\"隔绝氧气可延缓褐变\",\"classroomProxy\":\"不同抗褐变处理（盐水浸泡/柠檬汁/不处理）\",\"researchQuestion\":\"不同处理是否影响苹果切面褐变速度？\",\"independentVariable\":\"抗褐变处理方式\",\"dependentDirection\":\"褐变速度\"},\"snapshot\":\"自变量：处理方式（盐水浸泡、柠檬汁、不处理），因变量：褐变速度（通过定时观察颜色变化比较）。\",\"variables\":{\"independent\":\"抗褐变处理方式\",\"dependent\":\"褐变速度\"}}}]}}"
+    },
+    {
+      "taskId": "p1-cooperative-paper-airplane-distance-v1-c80397b17e",
+      "generatedAt": "2026-07-09T07:06:25.761Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"配合型-纸飞机飞行距离-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"expression\",\"proxy_quality\",\"structure_compliance\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"通过开放提问引导学生从宽泛的'折法'聚焦到机翼折法，建立自变量和因变量，不使用选项，最终确认时包含完整阶段结构。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究纸飞机怎么折才能飞得更远。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你提到的‘怎么折’范围比较大。折法包含机翼形状、重心、尾部翘起等许多方面。你希望从哪个具体折法入手，来研究它对飞行距离的影响呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考折法具体有哪些方面。\",\"你对哪种变化最感兴趣？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得机翼的折法，比如平翼和上翘的翼，可能对飞行距离影响大。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，那就是比较不同机翼折法的纸飞机，看哪个飞得远。我们把机翼折法当作自变量，飞行距离作为因变量。研究问题可以定为‘机翼折法是否影响纸飞机飞行距离’。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认自变量和因变量。\",\"研究问题可用‘是否影响’表述。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"是的，就这么研究。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认，研究问题：机翼折法是否影响纸飞机飞行距离？自变量是机翼折法，因变量是飞行距离。接下来进入实验设计。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"纸飞机飞得远\",\"retained_feature\":\"机翼形状影响升力\",\"proxy\":\"不同机翼折法\",\"research_question\":\"机翼折法是否影响纸飞机飞行距离？\"},\"snapshot\":{\"question\":\"机翼折法是否影响纸飞机飞行距离？\",\"independent_variable\":\"机翼折法\",\"dependent_variable\":\"飞行距离\"},\"variables\":{\"independent\":\"机翼折法\"}}}]}}"
+    },
+    {
+      "taskId": "p1-fuzzy-vehicle-ramp-angle-v1-2268913c24",
+      "generatedAt": "2026-07-09T07:07:23.709Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-小车与斜面-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"在安全风险情景下，通过单轮一核心问题的聚焦引导，温和纠正不安全操作并给出安全替代方案，最终完成主题映射与变量确认，体现了认知负荷控制、学生代理及转化推理。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做跟小车有关的实验。我发现小车从斜坡滑下时，角度不同滑得好像不一样远。我想研究斜面角度对小车下滑距离的影响。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个想法很有探究性！我们可以把真实下坡转换成安全的教室实验。你计划怎样改变斜面角度并测量小车滑行的距离呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我准备用几本书垫高木板一端，书的本数代表角度大小，然后让小车从同一位置下滑，用卷尺测量从斜坡底到停止点的距离。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"用书本垫高是简单可行的。为了安全，我们可以在小车滑行路径终点放置软垫，避免冲撞。现在我们把研究聚焦为：斜面角度是否影响小车下滑距离。请你确认一下，自变量是斜面角度（用垫高书本数体现），因变量是下滑距离，对吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对的，自变量是斜面角度，因变量是下滑距离。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，我们明确了研究问题：斜面角度对小车下滑距离的影响。自变量是斜面角度，因变量是下滑距离。接下来在阶段2我们会设计数据表格。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"小车下坡\",\"retained_feature\":\"坡度影响下滑加速度\",\"classroom_proxy\":\"不同斜面角度\",\"research_question\":\"斜面角度是否影响小车下滑距离？\"},\"snapshot\":{\"key_observations\":\"小车从不同角度斜面下滑距离不同。\"},\"variables\":{\"independent\":\"斜面角度\",\"dependent\":\"下滑距离\",\"controlled\":[\"小车种类\",\"起始位置\",\"斜面材料\"]}}}]}}"
+    },
+    {
+      "taskId": "p1-all-at-once-parachute-area-v1-4cd6d2bbdd",
+      "generatedAt": "2026-07-09T07:08:34.125Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"一次给全型-降落伞面积-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"学生在首次对话中直接给出完整变量和请求确认，导师没有过度追问，仅使用一个开放问题澄清‘下落时间测量标准’，降低认知负荷。确认时完整输出 theme_mapping、snapshot 和 variables.independent，保留学生原始兴趣表述，体现学生能动性和代理质量。确认后提示下一阶段，聚焦一个核心问题。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我要研究不同伞面面积对降落伞下落时间的影响。自变量是伞面面积（100cm²、400cm²、900cm²），因变量是下落时间，控制变量是材料、载荷、下落高度。请直接确认。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的变量设计很清晰。为了确保测量一致，你打算用什么工具和标准来记录下落时间？比如从何处释放、如何判断开始与结束？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算从固定高度2米释放，用手机秒表计时，从松手瞬间到落地停止。每次重复3次取平均。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，你明确了测量方法。现在确认你的研究主题：探究降落伞伞面面积对下落时间的影响。自变量为伞面面积（100 cm²、400 cm²、900 cm²），因变量为下落时间，通过2米释放、手机秒表计时，重复3次取平均。控制变量包括伞面材料、载荷和释放高度。阶段1完成，我们将进入实验设计。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"原始兴趣\":\"降落伞下落快慢\",\"保留特征\":\"伞面面积影响空气阻力\",\"课堂代理\":\"不同伞面面积\",\"研究问题\":\"降落伞伞面面积是否影响下落时间？\"},\"snapshot\":{\"自变量\":\"伞面面积（100cm²、400cm²、900cm²）\",\"因变量\":\"下落时间\",\"控制变量\":\"材料、载荷、下落高度\"},\"variables\":{\"independent\":\"伞面面积\"}}},{\"from\":\"human\",\"value\":\"好的，谢谢老师！接下来我们做什么？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"阶段1已完成，接下来你需要设计实验步骤和数据记录表。请先思考：你打算按什么顺序测试不同面积的降落伞，以减少环境变化带来的误差？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以随机顺序测试不同面积\",\"每次测试前检查伞面是否完好\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0065-v1-f4e8dff2d9",
+      "generatedAt": "2026-07-09T07:09:12.866Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究「第1节 植物生长素」中的影响因素-蒸馏样本1\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"低投入学生通过追问细化自变量与因变量，保留原始兴趣，确认阶段结构化输出变量与主题映射，不使用选择题，脚手架轻量，符合phase1 inquiry范式。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想探究不同光照条件下绿豆种子的发芽情况。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，观察光照对发芽的影响是个很好的切入点。为了让实验更具体，你能说说打算比较哪两种光照条件吗？比如是光照时长不同还是每天照明的时间段不同？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以考虑比较每天光照8小时和4小时\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"光照时长，每天照8小时和4小时，看发芽数。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"每天8小时和4小时的对比很清晰，用发芽数当指标也容易记录。接下来需要控制其他条件，比如温度、水量要一致。你觉得可以怎么保证呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"所有组放在相同室温下，每天浇等量的水\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"所有组放窗台，每天浇一样的水。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这样控制变量很规范。研究问题可定为‘不同光照时长对绿豆种子发芽数的影响’。自变量光照时长（8h/4h），因变量发芽数。假设：光照越长发芽数越多。为你存档。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":\"通过光照时长模拟光照变化，联系植物生长素分布与向光性，探究环境因素调控生长。\",\"snapshot\":\"研究问题：不同光照时长（8h/4h）对绿豆种子发芽数的影响。自变量：每天光照时长；因变量：发芽粒数；控制变量：温度、水量、种子品种；假设：光照8小时组发芽数更多。\",\"variables\":{\"independent\":\"光照时长（8小时/4小时）\",\"dependent\":\"发芽数\",\"controlled\":[\"温度\",\"水量\",\"种子品种\"]}}}]}}"
+    },
+    {
+      "taskId": "p1-over-broad-vehicle-fuel-v1-a1dc408ea4",
+      "generatedAt": "2026-07-09T07:09:36.991Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\n  \"record\": {\n    \"scenario\": \"过度宏大型-新能源车续航-蒸馏样本1\",\n    \"phase\": 1,\n    \"rubricTargets\": [\"cognitive_load_control\", \"proxy_quality\", \"student_agency\", \"theme_fidelity\", \"transformation_reasoning\"],\n    \"qualityNotes\": \"本例训练避免直接给菜单，用开放问题引导学生在能量来源维度上构建课堂代理，保留兴趣中心特征。三轮对话逐步确认代理方案、自变量和因变量，最后输出完整的 theme_mapping 与 snapshot，保障学生主体表述。\",\n    \"conversations\": [\n      {\n        \"from\": \"human\",\n        \"value\": \"老师，我想知道新能源汽车怎么才能跑得更远。\"\n      },\n      {\n        \"from\": \"gpt\",\n        \"value\": {\n          \"dialogue\": \"你关注的是能量如何影响行驶距离，这是个很好的方向。在课堂条件下，我们不能测试真车，但可以用简单模型模拟‘能量储备影响续航’这一核心特征。你觉得可以用什么方式来保留这个本质呢？\",\n          \"next_action_type\": \"text_input\",\n          \"options\": [],\n          \"hints\": [\"比如用某种存储能量的装置来驱动一个小车。\"],\n          \"phase_complete\": false\n        }\n      },\n      {\n        \"from\": \"human\",\n        \"value\": \"真车做不了，那我用橡皮筋动力小车模拟吧。我想保留‘能量储备影响续航’这个特点，用不同橡皮筋数量模拟。\"\n      },\n      {\n        \"from\": \"gpt\",\n        \"value\": {\n          \"dialogue\": \"这个想法很好，橡皮筋的圈数可以模拟不同的能量储备。为了把想法变成可操作的研究问题，请你试着明确：我们要改变什么（自变量），观测什么来反映‘续航’（因变量）？\",\n          \"next_action_type\": \"text_input\",\n          \"options\": [],\n          \"hints\": [\"你可以从‘橡皮筋数量’和‘小车行驶的距离’来考虑。\"],\n          \"phase_complete\": false\n        }\n      },\n      {\n        \"from\": \"human\",\n        \"value\": \"我确定研究橡皮筋数量是否影响动力小车行驶距离，要改变的是橡皮筋数量。\"\n      },\n      {\n        \"from\": \"gpt\",\n        \"value\": {\n          \"dialogue\": \"确认选题：研究橡皮筋数量对动力小车行驶距离的影响，自变量是橡皮筋数量，因变量是行驶距离。下面我把课题映射和变量信息记录一下。\",\n          \"next_action_type\": \"text_input\",\n          \"options\": [],\n          \"hints\": [],\n          \"phase_complete\": true,\n          \"stage1_confirmed\": true,\n          \"theme_mapping\": {\n            \"original_interest\": \"新能源汽车续航\",\n            \"retained_feature\": \"能量来源影响续航\",\n            \"classroom_proxy\": \"不同橡皮筋数量（模拟能量储备）\",\n            \"research_question\": \"橡皮筋数量是否影响动力小车行驶距离？\"\n          },\n          \"snapshot\": \"学生选择用橡皮筋动力小车模拟新能源汽车续航问题，保留‘能量储备影响行驶距离’的核心特征，以橡皮筋数量为自变量、小车行驶距离为因变量开展探究。\",\n          \"variables\": {\n            \"independent\": \"橡皮筋数量\"\n          }\n        }\n      }\n    ]\n  }\n}"
+    },
+    {
+      "taskId": "p1-cooperative-thermal-insulation-v2-6561fc8517",
+      "generatedAt": "2026-07-09T07:10:24.868Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\": {\"scenario\": \"配合型-保温材料-蒸馏样本2\", \"phase\": 1, \"rubricTargets\": [\"cognitive_load_control\", \"expression\", \"proxy_quality\", \"structure_compliance\", \"student_agency\", \"theme_fidelity\", \"transformation_reasoning\"], \"qualityNotes\": \"教师通过单一开放问题引导学生从模糊兴趣转向可控代理实验，保留了隔热机制约束，确认时输出完整theme_mapping、snapshot与变量定义，避免使用选项菜单，体现了高认知负荷控制与结构合规性。\", \"conversations\": [{\"from\": \"human\", \"value\": \"我对保温杯保温很感兴趣，想研究保温的原理，但不知道从哪儿开始做实验。\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"保温的关键在于材料隔热。请你想一想，如果要在教室里用不同材料包住热水容器，观察降温快慢，你会最先考虑用哪几种常见材料来测试呢？\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [\"想想家里或文具里容易找到的隔热或反光材料，比如棉花、铝箔或泡沫。\"], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"我会选棉花、锡纸和泡沫，这三种材料身边都有，也常听说它们能隔热。\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"很好的选择。那我们把研究问题聚焦为‘包覆材料是否影响热水降温速度？’你改变的材料是自变量，降温快慢是因变量。热水会控制在60-70度以保证安全。你觉得这样设计能回答你最初的困惑吗？\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [\"回忆一下，保温杯的保温层是不是也在用类似原理？\"], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"可以，这样就能比较不同材料的隔热效果，和保温杯的道理应该相通。\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"确认了！研究问题是‘包覆材料是否影响热水降温速度？’自变量是包覆材料（棉花、锡纸、泡沫），因变量是降温速度。我们接下来会规划数据收集。\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [], \"phase_complete\": true, \"stage1_confirmed\": true, \"theme_mapping\": {\"original\": \"保温杯保温\", \"feature\": \"材料隔热性能差异\", \"proxy\": \"不同包覆材料\", \"question\": \"包覆材料是否影响热水降温速度？\"}, \"snapshot\": {\"materials\": [\"烧杯×3\", \"温度计\", \"棉花\", \"锡纸\", \"泡沫\", \"60-70℃热水\", \"计时器\"], \"procedure\": \"将等量热水倒入三个相同烧杯，分别用棉花、锡纸、泡沫包裹，每2分钟记录温度，共记录20分钟，重复一次。\"}, \"variables\": {\"independent\": \"包覆材料\", \"dependent\": \"降温速度\", \"controlled\": [\"初始水温\", \"环境温度\", \"测量间隔\", \"烧杯规格\"]}}}]}}"
+    },
+    {
+      "taskId": "p1-real-world-classroom-shade-heat-v2-27d1848bc1",
+      "generatedAt": "2026-07-09T07:11:32.926Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"现实问题抽象型-教室遮光降温-蒸馏样本2\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"学生在一次表达中提供了大量细节，助教通过逐步引导提取研究问题、变量及控制条件，严格避免一次性认知过载；成功通过主题映射保留原始兴趣中的‘遮挡降温’核心，将教室场景代理为纸盒实验，并强化学生自主性，未给任何选项菜单。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我想研究教室夏天太热的问题，不知道能不能做成实验。我想保留“遮挡阳光以后变凉”这个特点，用台灯照纸盒代替。我想研究不同遮光材料会不会影响纸盒内温度变化，要改变的是遮光材料。这样可以吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的想法很清晰！用台灯照射盖不同遮光材料的纸盒，观察温度变化，来探究遮光效果。这很好地把教室问题转化成了实验室可操作的课题。接下来，请用一句话写出你的研究问题，并明确你要测量的结果（因变量）。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：研究问题可写成‘……是否影响……’\",\"因变量是你测量或观察的结果\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我的研究问题是：遮光材料是否会影响纸盒内的温度变化？我要测量纸盒内的温度上升幅度。我想用温度计记录每次照灯后的温度。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"非常棒！遮光材料是你的自变量，温度上升幅度是你要测量的因变量。这构成了清晰的研究框架。为了让实验公平，你还需要保持哪些条件不变呢？请说出至少两个需要控制的变量。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"例如纸盒尺寸、灯具距离、照射时间\",\"保持这些不变才能公平比较材料效果\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我要保持纸盒大小一样、台灯距离一样、照射时间一样，还有室内起始温度尽量一致。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你考虑得很周全！现在你的研究设计已经明确：研究问题——遮光材料是否影响纸盒内温度变化；自变量——遮光材料；因变量——纸盒内温度上升幅度；控制变量——纸盒大小、灯距、照射时间、起始温度。我们成功从‘教室太热’过渡到可操作的实验框架。确认完成，进入阶段2设计实验步骤。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"教室夏天太热\",\"retained_feature\":\"遮挡阳光可降温\",\"proxy\":\"不同遮光材料盖纸盒，用台灯照射\",\"research_question\":\"遮光材料是否影响纸盒内温度变化？\"},\"snapshot\":\"本实验探究遮光材料对纸盒内温度变化的影响。自变量为遮光材料，因变量为盒内温度上升幅度，控制纸盒大小、灯距、照射时间、起始温度。\",\"variables\":{\"independent\":\"遮光材料\",\"dependent\":\"纸盒内温度上升幅度\"}}}]}}"
+    },
+    {
+      "taskId": "p1-engineering-waterproof-material-v2-3e4c980bdc",
+      "generatedAt": "2026-07-09T07:12:11.888Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-防水材料-蒸馏样本2\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"阶段1通过开放问题引导学生从模糊需求‘做防水的东西’中提取变量，保留材料表面影响渗水的机制，不提供选项，确认时输出完整theme_mapping和独立变量。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个防水的东西，让东西不渗水。可是我不知道从哪儿开始研究。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你想解决渗水问题，可以先从材料表面入手。给纸板涂上不同物质，渗水速度可能会变。你最先想试什么涂层？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试试比较蜡和食用油的防水效果\",\"生活中还有哪些防水涂层材料？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想测试蜡、油和凡士林，把它们涂在硬纸板上，看哪个最不容易渗水。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你提出了三种涂层，自变量就是涂层材料，因变量是纸板的渗水时间。要测量渗水时间，可以滴水后计时。你愿意把这个作为研究问题吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我确定研究涂层材料是否影响纸板渗水时间。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认选题：涂层材料是否影响纸板渗水时间？自变量是涂层材料（蜡、油、凡士林），因变量为渗水时间。我们现在进入实验设计。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"做防水的东西\",\"retainedFeature\":\"材料表面影响渗水\",\"classroomProxy\":\"不同涂层材料\",\"researchQuestion\":\"涂层材料是否影响纸板渗水时间？\",\"independentVariable\":\"涂层材料\",\"dependentDirection\":\"渗水时间\"},\"snapshot\":\"用蜡、油、凡士林分别涂覆纸板表面，滴水并记录液体完全渗透所需时间，比较三种涂层的防水性能。\",\"variables\":{\"independent\":\"涂层材料\",\"dependent\":\"渗水时间\",\"controlled\":[]}}}]}}"
+    },
+    {
+      "taskId": "p1-smartedu-0074-v2-159af67115",
+      "generatedAt": "2026-07-09T07:13:12.550Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"《探究影响物质溶解快慢的常见因素》(提交）-蒸馏样本2\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"训练学生将工程作品导向的探究兴趣转化为设计参数（搅拌速度）与表现指标（溶解时间），强化代理变量映射，通过三轮开放对话维持认知负荷与主体性。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究搅拌速度会不会影响方糖溶解快慢。用两杯同温水，放一块方糖，一杯快搅一杯慢搅，比谁先完全化开。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你计划比较不同搅拌速度。快搅和慢搅具体怎么定义？用工具还是手动控制？请描述操作方法。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用搅拌圈数/秒或搅拌器档位来量化速度。\",\"如果手动搅拌，保持力度和幅度一致，避免引入另一个变量。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想用筷子搅拌，快搅每秒3圈，慢搅每秒1圈。但慢搅时可能不均匀，这会影响结果吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你注意到了均匀性问题。那么在测量时，如何判断方糖“完全溶解”？用肉眼还是其他方法？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以以最后可见糖粒消失为终点，多次测量取平均减少误差。\",\"如果慢搅不均匀，可考虑改用磁力搅拌器或延长观察间隔。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算一直观察，直到看不到任何糖粒，用秒表记时间到秒，每组重复3次取平均。这样应该可靠。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好。你明确了自变量搅拌速度，因变量完全溶解用时，并考虑了重复测量。阶段1聚焦完成，接下来可以细化实验步骤。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"《探究影响物质溶解快慢的常见因素》(提交）\",\"retained_feature\":\"围绕「《探究影响物质溶解快慢的常见因素》(提交）」，改变一个条件会怎样影响观察结果？\",\"classroom_proxy\":\"探究改变搅拌速度对方糖溶解快慢的影响\",\"research_question\":\"改变搅拌速度会怎样影响方糖溶解的时间？\",\"independent_variable\":\"搅拌速度\",\"dependent_direction\":\"方糖溶解完所用的时间\",\"safety_notes\":[\"使用玻璃杯小心碰撞\",\"避免猛烈搅拌溅水\"]},\"snapshot\":{\"research_question\":\"改变搅拌速度会怎样影响方糖溶解的时间？\",\"independent_variable\":\"搅拌速度\",\"dependent_variable\":\"方糖完全溶解所需的时间（秒）\",\"controlled_variables\":[\"水温\",\"水量\",\"方糖种类与大小\",\"容器形状\"],\"safety_notes\":[\"使用温水防烫，避免搅拌水溅出\"]},\"variables\":{\"independent\":[\"搅拌速度\"]}}}]}}"
+    },
+    {
+      "taskId": "p1-low-effort-egg-drop-v2-b2e0b88f68",
+      "generatedAt": "2026-07-09T07:13:45.356Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"偷懒型-鸡蛋包装防摔-蒸馏样本2\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"在安全风险场景下温和提醒（戴手套、垫报纸），保留学生原始想法；通过单一开放问题逐步聚焦自变量“缓冲材料”；确认时输出完整 theme_mapping、snapshot 和 variables.independent，并保持学生主导权。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想研究鸡蛋怎么包装摔不碎，但我不知道怎么设实验。就用不同材料包鸡蛋从同一个高度落下看碎不碎吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的想法很直观！不过鸡蛋碎会脏乱，实验时记得戴手套、在下面垫报纸，好不好？我们先明确一下：你打算用哪些不同的缓冲材料？比如身边容易找到的，说说看。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想家里或教室里能安全取得的材料。\",\"可以举出2-3种你最先想到的。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"用报纸、泡沫和棉花包鸡蛋试试，行吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这三种都挺常见的。接下来我们得让比较变公平：你打算怎么确保每次实验的其他条件一样？比如鸡蛋大小、落下高度——能说说你的想法吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考哪些条件需要不变化，以保证只比较材料。\",\"观察破裂这件事，怎么记录才清楚？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我明白了，我会用同一个鸡蛋，从桌子一样的高处松手，每次只换包装材料，记下来破没破。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，你已经把自变量固定为缓冲材料，因变量是鸡蛋是否破裂。实验前记得把桌面和地面铺上报纸，戴手套。你的选题确认如下：研究问题——缓冲材料是否影响鸡蛋从高处落下是否破裂？下一步我们设计记录表。\",\"next_action_type\":\"transition_to_phase2\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"originalInterest\":\"鸡蛋防摔包装\",\"retainedFeature\":\"缓冲材料吸收冲击\",\"classroomProxy\":\"不同缓冲材料包鸡蛋\",\"researchQuestion\":\"缓冲材料是否影响鸡蛋从高处落下是否破裂？\"},\"snapshot\":\"学生计划用报纸、泡沫、棉花包住同一个鸡蛋，从桌子同一高度松手，记录是否破裂，比较缓冲效果。\",\"variables\":{\"independent\":\"缓冲材料\",\"dependentDirection\":\"是否破裂\"}}}]}}"
+    },
+    {
+      "taskId": "p1-cooperative-water-filter-v2-8f8b6bcc37",
+      "generatedAt": "2026-07-09T07:14:31.128Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\": {\"scenario\": \"配合型-净水过滤材料-蒸馏样本2\", \"phase\": 1, \"rubricTargets\": [\"cognitive_load_control\", \"expression\", \"proxy_quality\", \"structure_compliance\", \"student_agency\", \"theme_fidelity\", \"transformation_reasoning\"], \"qualityNotes\": \"本样本针对变量混乱学生，通过三轮对话引导其逐步澄清自变量与因变量，始终用开放提问，未提供选项，最终输出标准阶段确认字段。训练关键行为：认知负荷控制、一句话聚焦、结构合规、变换推理。\", \"conversations\": [{\"from\": \"human\", \"value\": \"我对把脏水变清感兴趣，想研究净水，但不太确定具体要改什么。\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"你想观察净化效果，这很有趣。我们需要先明确：实验中你打算改变哪一样东西（比如不同的过滤材料），然后观察水发生什么变化（比如浑浊程度）？用一句话说说你的想法，这能帮我们确定变量。\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [\"提示：想想你要比较的‘原因’和观察到的‘结果’。\"], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"我想改变过滤的材料，比如试试沙子、棉花和活性炭，然后看哪种材料出来的水更清澈。\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"很好！你明确了要改变的因素是过滤材料，要观察的结果是水的澄清程度。这样我们的研究问题可以写为‘过滤材料是否影响浑水澄清程度？’。你觉得这个表述符合你的想法吗？\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"是的，我完全同意这个研究问题。过滤材料就是我要改变的自变量。\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"选题已确认：研究问题为‘过滤材料是否影响浑水澄清程度？’，自变量是过滤材料，因变量是澄清程度。安全提醒：净化后的水不可饮用，仅用于观察。接下来整理实验材料与安全准备。\", \"next_action_type\": \"phase_transition\", \"options\": [], \"hints\": [], \"phase_complete\": true, \"stage1_confirmed\": true, \"theme_mapping\": {\"original_interest\": \"把脏水变清\", \"retained_feature\": \"过滤材料拦截杂质\", \"classroom_proxy\": \"不同过滤材料\", \"research_question\": \"过滤材料是否影响浑水澄清程度？\"}, \"snapshot\": {\"independent_variable\": \"过滤材料\", \"dependent_variable\": \"澄清程度\", \"safety_notes\": [\"净化后的水不可饮用，仅观察\"]}, \"variables\": {\"independent\": \"过滤材料\"}}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-oil-separation-v1-d8cd4f5e93",
+      "generatedAt": "2026-07-09T07:15:39.575Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-油污分离装置-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"样本训练学生在阶段2中明确自变量、因变量代理，构建数据表格时引入notes列，避免工程扁平化，控制代理漂移，并强调控制变量一致性。通过学生确认表格完成阶段2。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三组：棉花、海绵、吸油纸，同样大小材料，在水面铺等量食用油，记录吸附前后油面积/重量，油量和水量保持一样，每组测3次取平均，可以生成数据表了\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"自变量吸附材料很清晰。因变量你倾向于用面积变化还是重量变化来量化除油效率？这会影响数据记录。请选定一种并说明原因。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"面积变化的测量更容易标准化，减少称重误差\",\"考虑材料本身吸水可能影响重量测量\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我选择测量吸附前后油面积，用面积减少百分比作为除油效率。控制变量包括：水量固定500毫升、油量10毫升、材料5x5厘米、接触时间30秒、水温室温。这样设计表格应该包含材料、初始面积、剩余面积、除油效率等列。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"明确用面积减少百分比，很好。控制变量覆盖全面。现在我给出数据表结构：列包括吸附材料、初始油面积(cm²)、剩余油面积(cm²)、除油效率(%)、备注。每组3次重复，表格支持最多200行。请确认是否满足需求。\",\"data_table_schema\":{\"columns\":[{\"key\":\"material\",\"label\":\"吸附材料\",\"type\":\"text\",\"required\":true},{\"key\":\"initial_area\",\"label\":\"初始油面积(cm²)\",\"type\":\"number\",\"required\":true},{\"key\":\"remaining_area\",\"label\":\"剩余油面积(cm²)\",\"type\":\"number\",\"required\":true},{\"key\":\"efficiency\",\"label\":\"除油效率(%)\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"label\":\"备注\",\"type\":\"text\",\"required\":false}],\"maxRows\":200},\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"若需记录重复编号可在notes中标注\",\"确认材料尺寸单位一致\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"确认，表格结构没问题。我们就用这个。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，实验设计确认完成。你的数据表格已就绪，进入实验阶段时请按此结构记录数据。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"material\",\"label\":\"吸附材料\",\"type\":\"text\",\"required\":true},{\"key\":\"initial_area\",\"label\":\"初始油面积(cm²)\",\"type\":\"number\",\"required\":true},{\"key\":\"remaining_area\",\"label\":\"剩余油面积(cm²)\",\"type\":\"number\",\"required\":true},{\"key\":\"efficiency\",\"label\":\"除油效率(%)\",\"type\":\"number\",\"required\":true},{\"key\":\"notes\",\"label\":\"备注\",\"type\":\"text\",\"required\":false}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-smartedu-0018-v1-f69464bf80",
+      "generatedAt": "2026-07-09T07:16:16.003Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究光合作用的影响因素-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"四轮对话按自变量梯度、因变量测量、控制变量、数据表结构逐步推进，每轮聚焦一个核心问题；最终确认时输出标准data_table_schema，含notes列和maxRows=200，并提供安全提示。对话简短，认知负荷控制良好，符合阶段2不提前分析结论的纪律。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我们研究光合作用，可以改变什么条件？有哪些因素可选？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"可以探究光照强度、CO₂浓度、温度等。你更想先聚焦哪一个自变量？选一个能让实验设计更清晰。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议从易控制、易测量的因素入手\",\"可用台灯距离或CO₂发生器调节\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想知道光照强度变化怎样影响光合作用速率。但具体怎么设置不同强度？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"可以用台灯离植物的不同距离表示强度，如10cm、20cm、30cm；也可用不同瓦数的LED灯。需保持水温、CO₂浓度等其他条件相同。你倾向哪种方式？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"LED灯不易发热，减少温度干扰\",\"记录灯与容器的垂直距离，保持稳定\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得用距离调节比较简单。那怎么测量光合作用速率呢？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"可用水生植物如黑藻，观察并计数每分钟产生的气泡数，或记录叶片上浮时间。两种方法都能反映氧气释放速率。你打算选用哪种？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"气泡法：连续计数3次取平均更稳定\",\"叶片法需先抽气使叶片沉底\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想用气泡法，计数每分钟气泡数。那还需要控制哪些变量，数据表怎么设计？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，请确认以下设计：自变量为光照距离(cm)，因变量为每分钟气泡数。控制水温（如25℃）、CO₂浓度（用等量NaHCO₃）、光照时间等。数据表如下，确认后进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认无误后即可进入阶段3\",\"若有疑问可继续修改\"],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"distance_cm\",\"type\":\"number\",\"label\":\"光照距离(cm)\"},{\"key\":\"bubbles_per_min\",\"type\":\"number\",\"label\":\"每分钟气泡数\"},{\"key\":\"replicate\",\"type\":\"number\",\"label\":\"重复次数\"},{\"key\":\"notes\",\"type\":\"text\",\"label\":\"备注\"}],\"maxRows\":200},\"risks\":[\"使用LED灯，避免灯头发热影响水温\",\"玻璃容器轻拿轻放，防止割伤\"]}}]}}"
+    },
+    {
+      "taskId": "p2-variable-confusion-turbidity-settle-v1-6389a51fa2",
+      "generatedAt": "2026-07-09T07:17:03.213Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"变量混乱型-泥沙沉降-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"针对一次给出过多细节的变量混乱学生，分三步推进：先确认自变量梯度并嵌入安全提醒，再明确因变量测量方案，最后强化控制变量并引导设计数据表。最终生成包含notes列和maxRows=200的标准data_table_schema，严格遵循阶段2确认要求，避免跨越分析，符合gold_candidate标准。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我搅拌同浊度泥水，静置后分别在5/15/30/60分钟取上层水测浊度。泥水量、初始浊度、容器保持一样。记录4个时间点，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"感谢你的详细计划！我们先聚焦自变量“静置时间”。你选了5、15、30、60分钟，这些梯度能体现沉降过程，但若加上0分钟作为初始浊度，基线会更完整。你能确认是否加入0分钟吗？另外，取上层水样时，小心用滴管轻吸，避免搅动底部沉淀。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以增加0分钟初始浊度作为起点\",\"取水样时用滴管轻吸，勿搅动沉淀\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好，我把0分钟也加入，实验时间点变成0、5、15、30、60分钟。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"自变量梯度就明确了。现在看因变量“浊度”的测量。你计划用浊度计还是比色法？用什么单位如NTU？测量前要轻摇水样保持均匀。请简要说明你的测量方案，确保读数可靠。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议使用浊度计，单位为NTU\",\"测量前轻轻混匀水样\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我用浊度计测NTU，每个时间点取三个平行样，测三次取平均，这样更准确。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"因变量测量方案很清楚。控制变量方面，泥水量、初始浊度、容器保持一致，这很好。另外环境温度也会影响沉降速度，建议记录室温并尽量保持恒定。现在可以设计数据表了，你准备怎么安排表格列？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"保持实验期间室温稳定并记录\",\"表格包含时间、平行读数、平均值和备注\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"表格要有时间、读数1、读数2、读数3、平均浊度，还有备注列记录异常。可以帮我生成表吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，这是数据表结构。包含列：时间(min)、浊度读数1(NTU)、读数2、读数3、平均浊度(NTU)，以及备注列记录任何异常。你可以在实验中填入每次测量值。表格最多200行，足够多次试验。确认后我们就进入实验阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"time_min\",\"type\":\"number\",\"label\":\"静置时间(min)\"},{\"key\":\"reading1_ntu\",\"type\":\"number\",\"label\":\"浊度读数1(NTU)\"},{\"key\":\"reading2_ntu\",\"type\":\"number\",\"label\":\"浊度读数2(NTU)\"},{\"key\":\"reading3_ntu\",\"type\":\"number\",\"label\":\"浊度读数3(NTU)\"},{\"key\":\"average_ntu\",\"type\":\"number\",\"label\":\"平均浊度(NTU)\"},{\"key\":\"notes\",\"type\":\"text\",\"label\":\"备注\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-solar-car-angle-v1-7dd6496c9e",
+      "generatedAt": "2026-07-09T07:18:08.834Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-太阳能小车光强-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"逐步推进自变量梯度→控制变量→数据表schema。安全提醒融入dialogue。确认时输出完整data_table_schema，包含notes列和maxRows=200。未提前分析结论，严格遵循阶段2要求。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设了三组不同距离：10cm、20cm、30cm。同一辆太阳能小车，记录通过固定50cm距离的时间来算速度。光源保持垂直照射，小车朝向固定。每组测3次取平均。可以设计数据表了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"自变量距离梯度很清晰，用时间算速度直接有效。要让结果可靠，需列出所有控制变量，如光源类型、路面、小车电量、环境光。安全上，我们用LED光源，避免强光直射。你想好哪些条件要固定了吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"小车每次充满电，避免太阳能板输出波动。\",\"实验时关窗帘，保持环境光恒定。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"控制变量：使用同一盏LED台灯，亮度最高不变；小车用同一辆并充满电；路面铺硬纸板；关窗帘；光源高度15cm，垂直照射。每次计时用同一秒表。这样可以吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"控制变量考虑得很全面，实验可重复性会高。接下来定数据表结构。建议列：光源距离(cm)、试次编号、通过时间(s)、计算速度(cm/s)，再加备注列记录异常或观察。每组3次共9行。这样的设计你同意吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"备注列可记录小车偏移或光源抖动等异常。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"需要备注列，记录每次实验的异常，比如小车跑歪了。数据表就这些列，没补充了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，数据表草案：列包括光源距离(cm)、试次、时间(s)、速度(cm/s)、备注。最大行数200，方便日后扩展。你确认吗？一旦同意我们就完成设计阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"确认，就这样。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"数据表确认。列：光源距离(cm)、试次、时间(s)、速度(cm/s)、备注。最大行数200，可记录所有试次。设计阶段结束，可进入实验操作，记得及时填写备注。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"maxRows\":200,\"columns\":[{\"key\":\"distance_cm\",\"type\":\"number\"},{\"key\":\"trial\",\"type\":\"number\"},{\"key\":\"time_s\",\"type\":\"number\"},{\"key\":\"speed_cm_s\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}]}}}]}}"
+    },
+    {
+      "taskId": "p2-safety-circuit-brightness-v1-e5bcc14bd2",
+      "generatedAt": "2026-07-09T07:19:12.708Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-电路与灯泡亮度-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"该条样本训练agent在阶段2聚焦因变量测量方法、控制变量确认与数据表设计，同时嵌入实验室安全提示，避免直接跳结论，维持认知负荷控制。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三组：1节、2节、3节干电池串联，同一规格小灯泡\\n记录灯泡两端电压和目测亮度，导线和灯泡保持一样\\n每组测1次，可以生成数据表了\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的自变量梯度设计得很清晰。我们聚焦因变量测量：亮度怎么记录？可定1-5级（很暗到很亮），同时用电压表测灯泡两端电压。安全第一：只用电池，禁市电，接线牢固防短路，导线发烫立即断电。你计划如何执行？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"亮度分级可用1-5数值代替文字\",\"测量前检查电池盒和灯泡座是否拧紧\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，亮度我打算分五级：很暗、较暗、正常、较亮、很亮。电压用万用表测。接线我会确保牢固。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"控制变量需明确：灯泡型号、导线材质长度、电池型号电量都要一致。你已计划同灯泡同导线，电池是否统一新电池？数据表设计：试验编号、电池节数、电压、亮度等级、备注。备注记录发热或异常。你同意这样的表结构吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用同一批次新电池，减少内阻差异\",\"数据表预留备注列，随时记录观察\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对，都用新电池同品牌。表格我同意这样设计。可以确认数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"表格确认。列：试验编号（text）、电池节数（number）、电压（number）、亮度（text）、备注（text），最大行数200。安全提醒：实验过程中注意导线温度，若烫手立即停止。阶段2完成，可以开始实验填数据。记得先断电再换电池节数。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"断开电路再改变电池数量，避免火花\"],\"phase_complete\":true,\"stage2_confirmed\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"trial\",\"type\":\"text\"},{\"key\":\"batteries\",\"type\":\"number\"},{\"key\":\"voltage\",\"type\":\"number\"},{\"key\":\"brightness\",\"type\":\"text\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200},\"risks\":[\"严禁使用220V市电，仅限干电池\",\"避免电池正负极直接短接，防止烧毁\"]}},{\"from\":\"human\",\"value\":\"收到，我会注意安全，断开再操作，数据记录好。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，注意安全，期待你的实验数据。完成后我们进入数据分析阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-watering-threshold-v1-ca4675601f",
+      "generatedAt": "2026-07-09T07:20:09.450Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-自动浇花器-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"分步推进阈值定义→因变量判断标准→控制初始湿度→数据表schema，避免认知过载。在对话中嵌入低压安全提醒，未使用220V或禁止代理术语。因变量清晰区分误浇与漏浇，代理质量高。严格停留在阶段2设计，无提前分析。数据表schema包含notes列和maxRows=200，结构完整。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我打算设三个阈值：低、中、高，每种测10次。因变量看该浇水时有没有浇、不该浇时有没有误浇。控制同一个传感器、同一种土壤、同种水泵。每次记土壤状态、阈值、是否启动水泵和判断是否正确，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的设计思路清晰！自变量梯度、重复次数、控制变量都有了雏形。我们先把阈值定义具体化：低、中、高具体是湿度读数的百分之几？另外，实验必须用低压水泵或电池，不用220V市电，安全第一。你想好用哪三个具体阈值了吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"湿度阈值可以是传感器读数的30%、50%、70%。\",\"用低压水泵，避免触电风险。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"阈值用传感器读数百分比，设30%、50%、70%。我用的是低压水泵，放心。浇水成功就是水泵按阈值启动，并且土壤湿度值上升。这样判断对吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"对，还需要明确‘误浇’（不该浇时启动）和‘漏浇’（该浇时未启动）的判定标准。每次测试前土壤初始湿度应相同，减少干扰。你准备怎么保证初始湿度一致？重复10次可以接受。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"误浇：湿度低于阈值却启动水泵。漏浇：高于阈值不启动。\",\"测试前统一加水或烘干土壤达到相同读数。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，误浇是湿度没到阈值但泵启动，漏浇是到了阈值却没启动。每次都把土壤湿度调到一样的基准值再开始。数据表需要包含这些列：阈值、试验序号、土壤初始状态、泵是否启动、判断结果，还要加个备注列吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"备注列很必要，可以记录意外情况或传感器抖动。现在设计已完整：阈值30%、50%、70%，每种10次，共30行实验。控制初始湿度一致。数据表可以这样组织，我帮你整理出schema。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"数据表包含threshold、trial_number、soil_initial_state、pump_activated、watering_judgment、notes。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那么我们就按这个表格做实验？可以确认阶段二完成了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，实验设计确认。数据表结构如下：threshold（湿度阈值）、trial_number（试验序号）、soil_initial_state（初始湿度）、pump_activated（水泵启动）、watering_judgment（判断正确/误浇/漏浇）、notes（备注），最多200行。请按此记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"threshold\",\"type\":\"categorical\"},{\"key\":\"trial_number\",\"type\":\"integer\"},{\"key\":\"soil_initial_state\",\"type\":\"numeric\"},{\"key\":\"pump_activated\",\"type\":\"boolean\"},{\"key\":\"watering_judgment\",\"type\":\"categorical\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-smartedu-0023-v1-d43a409a6d",
+      "generatedAt": "2026-07-09T07:20:47.784Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究弹性势能的影响因素-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"在阶段2通过四轮对话逐步推进变量澄清、梯度设置、控制变量与数据表确认，避免提前分析结论；对话简洁、安全提醒融入引导，hints控制认知负荷，最终输出符合规范的数据表schema。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我还是不太清楚自变量和因变量到底是什么。我们研究弹性势能，但它看不见，怎么变成可以做的实验？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"弹性势能看不见，但它的效果可以测量。想想改变某个条件后，会出现什么可观察的变化？比如影响橡皮筋拉伸长度时，会观察到弹射距离变化。那么，你打算改变什么条件？观察什么结果？请先想一个你感兴趣的条件和对应的可测结果。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是实验中人为改变的条件，比如拉伸长度。\",\"因变量是因自变量变化而改变的结果，如弹射距离。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想改变橡皮筋的伸长量，看看弹射出去的小球能飞多远。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，你的自变量是橡皮筋伸长量，因变量是弹射距离。现在要考虑设置几个不同的伸长量梯度？比如5cm、10cm、15cm，每个梯度重复几次？另外，如何准确测量弹射距离？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"设置3-5个梯度便于观察趋势。\",\"每个梯度重复3次取平均值减少误差。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我设4个梯度：5cm、10cm、15cm、20cm，每个梯度测3次。但怎样保证每次拉伸准确？弹射的小球重量要不要一样？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好。控制变量包括使用同一种橡皮筋、同一质量的弹丸、固定发射角度。测量时用卷尺并让弹丸落地不动再读数。安全提醒：弹射方向不可对人，建议用纸团代替硬物。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可用弹簧测力计校验每次拉伸长度。\",\"记录数据时立即填入表格，避免遗忘。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"明白了，那数据表该怎么设计？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这是你的数据记录表。拉伸长度是自变量，每个梯度一行，记录三次弹射距离及平均值。如有异常情况记在备注栏。实验时注意安全，弹射方向避开人。确认无误后开始记录数据吧。\",\"next_action_type\":\"table_input\",\"options\":[],\"hints\":[\"每个梯度独立一行，共4行数据。\",\"平均值自动计算，先确保原始数据准确。\"],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"trial\",\"name\":\"实验序号\",\"type\":\"number\"},{\"key\":\"stretch_length\",\"name\":\"拉伸长度(cm)\",\"type\":\"number\"},{\"key\":\"distance1\",\"name\":\"弹射距离1(cm)\",\"type\":\"number\"},{\"key\":\"distance2\",\"name\":\"弹射距离2(cm)\",\"type\":\"number\"},{\"key\":\"distance3\",\"name\":\"弹射距离3(cm)\",\"type\":\"number\"},{\"key\":\"average_distance\",\"name\":\"平均距离(cm)\",\"type\":\"number\"},{\"key\":\"notes\",\"name\":\"备注\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-alarm-sensitivity-v1-3320a8e433",
+      "generatedAt": "2026-07-09T07:21:23.437Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-倾斜报警器灵敏度-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"通过阶梯式提问确认自变量梯度与因变量测量，引导控制变量及数据表列设计，加入安全提醒与备注列，最终给出含notes列及maxRows=200的data_table_schema，未提前分析结论，低投入学生获得轻量脚手架。\",\"conversations\":[{\"from\":\"human\",\"value\":\"设三个角度：15度、30度、45度，每个测10次，看报警对不对。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你把三个倾斜角度当作不同的触发阈值，想检验报警器是否准确响应。那么，报警正确与否就是你要测量的结果。你准备怎样记录每次的实际倾角和警报状态？请简单说说。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以使用量角器或手机传感器测量实际倾角\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"每次把装置斜过去，用手机量角器测角度，记下报警器响没响，再判断对错。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这样测量实际倾角与警报状态，就可以计算准确率了。为了比较不同阈值，实验中哪些条件需要保持不变？比如传感器、蜂鸣器或安装方式。请列几个关键控制变量。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"保持传感器型号、蜂鸣器和固定位置不变可减少干扰\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"传感器和蜂鸣器不换，安装位置也固定。角度到了阈值就该响，没到就不该响。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你已经明确控制变量和判断标准。接下来我们需要一个数据记录表。我建议至少包括：设定阈值、实际倾角、是否报警、判断是否正确。另外加一列“备注”记录异常情况。请确认数据表就按这几列设计。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"备注列可记下手机测量误差或装置抖动\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"确认，就这些列。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，实验设计确认。正式测试前请固定好装置，避免倾倒摔落。每次测试后立即记录，防止混淆。现在为你生成数据记录表，涵盖设定阈值、实际倾角、报警状态、判断正确、备注，最多200行。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"set_threshold_deg\",\"label\":\"设定阈值(°)\",\"type\":\"number\"},{\"key\":\"actual_tilt_deg\",\"label\":\"实际倾角(°)\",\"type\":\"number\"},{\"key\":\"alarm_triggered\",\"label\":\"是否报警\",\"type\":\"boolean\"},{\"key\":\"judge_correct\",\"label\":\"判断正确\",\"type\":\"boolean\"},{\"key\":\"notes\",\"label\":\"备注\",\"type\":\"text\"}],\"maxRows\":200}}}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-sorting-color-sensor-v1-e8f472a3f8",
+      "generatedAt": "2026-07-09T07:22:39.852Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-颜色分拣装置-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"蒸馏样本：严格按照自变量量化-因变量定义-控制变量-数据表架构顺序推进。认知负荷控制：每次只解决一个核心问题，对话简短集中。安全提醒只保留一条关键点并融入备注列，避免堆砌。通过0/1记录分拣正确性防止工程简化，数据表架构包含notes列且maxRows=200，符合阶段要求。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三个灵敏度：低、中、高，每个测10次，看该分到A色时有没有分对，传感器位置和小球大小保持一样。每次记录小球颜色、灵敏度、分拣结果是否正确，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"思路清晰！低、中、高灵敏度具体如何设定？是用传感器阈值参数吗？比如阈值30、50、70。明确量化后，实验可重复性更好。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"灵敏度需设定具体数值，比如传感器阈值30-50-70，以便控制自变量。\",\"请描述你用的传感器型号和设定方式。但不要太冗长，若不清楚可先暂定。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我可以在颜色传感器里设置阈值：低灵敏度阈值为30，中为50，高为70（都是0-100的范围）。然后看它识别红色小球的分拣是否准确。每次测试若分对红色就记正确，否则错误。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"明白，自变量已量化。因变量记录是否正确，可转化为准确率。建议每次测试记0（错误）或1（正确），最后计算10次正确比例。控制条件保持传感器位置、小球大小及光照一致。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用0、1记录是否正确，便于计算准确率。\",\"确认传感器位置、小球大小、环境光照保持一致。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对，每次记录正确为1，错误为0。传感器位置固定，小球大小一样，我用箱子罩住避免外面光线干扰。还有什么要注意？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"注意安全：分拣机构的移动部件不要用手碰，传感器固定防撞。将控制条件和安全提醒记在数据表备注列。现在可以整理各列：试验编号、目标颜色、灵敏度、是否正确（0/1）、备注。满足需求吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"避免手靠近分拣机构。备注记录光照、温度及安全提醒。\",\"数据表至少包含这5列，以便后续分析。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，就按这样，数据表列：试验编号、目标颜色、灵敏度、是否正确、备注。我们来设计整个表。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"同意。数据表架构如下：列有trial（编号）、target_color（目标颜色）、sensitivity（灵敏度）、is_correct（是否正确，0/1）、notes（备注）。灵敏度使用原值30、50、70。准备就绪，可以开始实验。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"trial\",\"type\":\"number\"},{\"key\":\"target_color\",\"type\":\"text\"},{\"key\":\"sensitivity\",\"type\":\"number\"},{\"key\":\"is_correct\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-door-reminder-distance-v1-8b06927dc3",
+      "generatedAt": "2026-07-09T07:23:24.789Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-门禁提醒距离-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"样本遵循阶段2推进：先让学生陈述初步设计，导师通过单一开放问题引导控制变量思考并嵌入安全提醒；随后聚焦数据表设计，逐步完善直至确认输出结构化schema。对话中避免一次性堆砌问题，控制认知负荷，强调工程试验中的安全规范，结构完整符合评分要求。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我计划设三个距离阈值：5cm、10cm、20cm，每个测10次，看门开/关时装置有没有正确响应。传感器位置我会用尺子定位保持一致。每次记录门状态、阈值、是否正确提醒，这样我可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很棒，你已经有了自变量梯度、重复次数和控制传感器位置的意识。为了更可靠地测试，除位置外，还有哪些因素可能干扰提醒准确率？如何控制它们？另外，操作时注意手不要被门夹到，传感器固定牢固。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"光照变化会影响红外传感器吗？\",\"门的开合角度是否恒定？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我可以保证在同样光照下测试，用同一扇门，每次开门到最大角度。传感器每次用双面胶固定在门框同一标记处。这样应该可以了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，你控制了光照和开门角度。现在需要设计数据记录表。你的表会包含哪些列？比如试验编号、阈值设置、门状态、是否提醒、备注等。尝试列出，我会帮你完善成结构化表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"别忘了加备注列记录异常\",\"建议用布尔类型表示是否提醒\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我列一下：试验编号，距离阈值(cm)，门状态(开/关)，是否正确提醒(是/否)，备注。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的表头不错。我帮你整理成标准数据表结构：包含试验编号(整数)、距离阈值(数值)、门状态(枚举)、提醒正确(布尔)、备注(文本)，最多200行。这个结构满足需求吗？还需要增加什么？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以增加时间戳列\",\"是否需要单独记录环境条件？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"可以，就按这个表，我可以开始实验了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，表结构已确定。现在你可以按照设计进行实验，请务必把每次测试的观察记录在备注列。完成后我们进入数据分析阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"trial_index\",\"label\":\"试验编号\",\"type\":\"integer\"},{\"key\":\"distance_threshold_cm\",\"label\":\"距离阈值(cm)\",\"type\":\"number\"},{\"key\":\"door_state\",\"label\":\"门状态\",\"type\":\"enum\",\"enumValues\":[\"开\",\"关\"]},{\"key\":\"alarm_correct\",\"label\":\"是否正确提醒\",\"type\":\"boolean\"},{\"key\":\"notes\",\"label\":\"备注\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-engineering-plant-light-auto-duration-v1-b757c296e6",
+      "generatedAt": "2026-07-09T07:24:43.248Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-补光灯时长-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"训练阶段二实验设计确认，针对学生一次性提供过多细节，按自变量梯度→因变量测量→控制变量→数据表结构推进，嵌入用电安全提醒，生成含备注的data_table_schema，避免分析结论，保留工程味，控制认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我设三组：每天2小时、4小时、6小时补光，每组种10颗绿豆，记录每天苗高，品种、水量、温度都保持一致，连续记录7天，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你抓住了变量设计关键。我们先停在实验设计：需要明确自变量梯度、因变量测量和控制条件。注意用电安全，灯具和定时器要防水、远离水源。请说说准备用什么工具测苗高，何时测？记录单株还是取平均？这样方便构建数据表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"苗高测量工具和测量时间要统一\",\"考虑记录单株数据还是取组平均\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"用直尺每天中午12点测每个植株从土面到生长点的高度，单位厘米。温度用空调控在25℃，水量每天每盆浇50毫升，品种同一袋绿豆。记录每个植株苗高，后期可算平均。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"建议数据表按每天每组记录平均苗高，既能反映趋势又控制行数。结构包含补光时长、天数、平均苗高、测量株数、温度、水量、备注。温度25度、水量50毫升保持一致。数据表列：group_id, day, avg_height, num_plants, temperature, water_ml, notes。你确认这个框架，我们就生成正式数据表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"确认测量单位厘米和毫升统一\",\"控制变量是否还有光照以外因素\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"表结构没问题，我确认。我们开始记录吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认，这是生成的数据表结构。实验前再提醒：定时器选国标认证，灯具固定远离植物防烫，线路不缠绕。准备好记录第一天了吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录时注意每天同一时间测量\",\"异常情况记入备注栏\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"准备好了，现在就记录。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"阶段二实验设计完成。最终数据表定义如下，maxRows 200。可以开始实验，第一天数据用备注记录特殊情况。安全要点已附，放心动手。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"开始记录第一天的苗高\",\"遇异常请记入notes\"],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"group_id\",\"type\":\"categorical\",\"values\":[\"2h\",\"4h\",\"6h\"]},{\"key\":\"day\",\"type\":\"integer\"},{\"key\":\"avg_height_cm\",\"type\":\"float\"},{\"key\":\"num_plants\",\"type\":\"integer\"},{\"key\":\"temperature_c\",\"type\":\"float\"},{\"key\":\"water_ml\",\"type\":\"integer\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-smartedu-0028-v1-77b54c8604",
+      "generatedAt": "2026-07-09T07:25:30.636Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究蒸发快慢的影响因素-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"该样本训练导师在阶段2按自变量梯度->因变量测量->控制变量->数据表顺序引导，每轮只推进一个核心问题，安全提醒嵌入对话，不堆叠指令，最终确认时输出包含notes列的data_table_schema，maxRows为200。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，探究蒸发快慢，我想改变温度，但具体温度梯度怎么设置？使用热水会不会有危险？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你可以设置三组温度梯度：室温（约20℃）、40℃、60℃。使用温热水时请戴手套，避免直接触碰，并在教师监督下进行。准备三个相同杯子，各倒入等量水。你计划用什么工具测温度和时间？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用温度计和计时器，确保数据可靠\",\"注意防烫，准备隔热手套\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我可以用温度计监测水温，电子秤称量水杯质量变化来反映蒸发快慢。还有哪些变量需要保持不变？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"使用电子秤称量实验前后质量差是个好方法。需要保持不变的控制变量：同种水、初始水量相同、容器形状大小一致、无风环境、避免阳光直射。每组实验时长也要一致，比如30分钟。这些你能做到吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录环境条件，如室温、湿度变化\",\"用相同材质的杯子减少差异\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"可以控制。我们准备三个一样的玻璃杯，各倒200毫升水，在室内无风处，同时开始计时。需要再准备数据表记录哪些内容？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"数据表需记录：温度梯度组别、初始质量、实验后质量、质量减少量、环境条件、备注。你尝试设计一个表格，包含以上列和注释列，我们确认后开始实验。你希望表格包含哪些关键列？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"表格列示例：组别、温度(℃)、初质量(g)、末质量(g)、减少量(g)、备注\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想的表格：第一列组别（室温、40℃、60℃），第二列初始水温，第三列初始质量，第四列30分钟后质量，第五列质量减少量，第六列环境条件，第七列备注。这样行吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，表格设计合理。我帮你整理为规范的列定义。请确认以下数据表结构：组别、温度(℃)、初始质量(g)、最终质量(g)、质量减少量(g)、环境条件、备注。最大记录行数200，方便后续分析。准备开始实验吧。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"group\",\"type\":\"text\"},{\"key\":\"temperature\",\"type\":\"number\"},{\"key\":\"initial_mass\",\"type\":\"number\"},{\"key\":\"final_mass\",\"type\":\"number\"},{\"key\":\"mass_loss\",\"type\":\"number\"},{\"key\":\"environment\",\"type\":\"text\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-high-concept-smart-campus-energy-v1-8533f76419",
+      "generatedAt": "2026-07-09T07:26:22.567Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-智慧校园节能-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"逐步聚焦自变量梯度→因变量测量→控制变量→数据表设计，安全提醒嵌入对话与risks，不提前分析，最终输出data_table_schema含notes列、maxRows=200，hints精炼且贴合课堂代理，符合阶段2结构规范，防止proxy_drift和theme_loss。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我打算设三组：常亮、人走即关、按时段开关，用同一套灯泡，记录一天累计亮灯时长作为能耗代理。灯泡和教室布局一样，记录3天取平均，这个设计可行吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"三组策略区分度好，自变量梯度清晰。因变量测量需要明确：累计亮灯时长是通过真实开灯计时获得，还是用时间表模拟？如果是真实实验，请务必先请老师检查电路安全，确保在监护下进行。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"使用计时插座或秒表逐排记录\",\"真实实验前请老师确认线路负荷\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我们打算真实开灯，用三排教室灯，每排接一个计时插座，记录每排累计通电时长再求和。老师已经检查过电路，同意在无课时进行。这样可以吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"测量方案可行。请固定每天的测试时段（如8:00–16:00），并保证三个策略在完全相同的时间范围内测试。控制变量方面，请确保每次测试时窗帘状态一致，避免自然光干扰。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"统一测试开始和结束时间\",\"用相同窗帘状态保持光照条件一致\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"时间定为8:00到16:00，每天同样的日程；每排5盏灯，全开共15盏，统一40W LED；室内窗帘关闭。还需要控制什么？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"做得很好。还需要明确策略的执行规则，比如‘人走即关’是否依赖红外传感器还是人工判断；‘按时段开关’的具体时段表。这会影响数据记录一致性。接下来请列出数据表中需要记录的变量，包括策略、日期、重复次数、每排时长、总能耗，以及备注列。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"人走即关：规定人员离开教室即手动关灯\",\"按时段开关：如课间休息时段自动关闭\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，变量包括：试验策略、日期、重复编号、每排累计时长（分）、总时长（时）、总能耗（Wh）、备注。还需要什么？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"变量齐全。现在确认数据表结构：策略、日期、重复为分组变量；每排时长、总时长为过程量；总能耗为因变量。备注记录异常情况。数据表支持最多200行，满足3策略×3天重复。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"strategy\",\"type\":\"string\"},{\"key\":\"date\",\"type\":\"string\"},{\"key\":\"replicate\",\"type\":\"number\"},{\"key\":\"row1_duration_min\",\"type\":\"number\"},{\"key\":\"row2_duration_min\",\"type\":\"number\"},{\"key\":\"row3_duration_min\",\"type\":\"number\"},{\"key\":\"total_hours\",\"type\":\"number\"},{\"key\":\"energy_wh\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200},\"risks\":\"真实开灯实验需教师监护，确保电路不超负荷；计时插座使用前检查接地。\"}}]}}"
+    },
+    {
+      "taskId": "p2-high-concept-city-cooling-roof-v1-52013eadbd",
+      "generatedAt": "2026-07-09T07:27:08.736Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-城市降温屋顶-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"该样本展示了在安全风险下温和纠正且不阻碍推进的SFT行为。对话分4轮依次聚焦：测量与安全替代、控制变量、数据表设计、阶段确认。第4轮确认时完整输出data_table_schema（含notes列且maxRows=200）。每轮一个核心问题，无提前分析，符合stage_discipline。安全提醒嵌入对话且提供可操作的LED替代方案。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三组：黑纸、白纸、铝箔覆盖的纸盒顶，同样大小，灯照相同时间，记录盒内温度，灯和距离保持一样，每隔5分钟记录一次，记录30分钟，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的分组和测量计划很清晰。在动手前，我们检查一下安全：如果用传统白炽灯泡靠近纸盒，有纸盒被引燃的风险。可以换成LED冷光台灯吗？LED发热很少，且可以固定灯臂，保持30厘米距离，这样既能保证光照稳定又安全。你打算用什么温度计来测盒内温度？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"推荐使用带探头的数字温度计，探头能固定在盒内中心位置。\",\"若只有普通灯，确认用LED灯泡，且灯架稳固不倾倒。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我用LED台灯，距离固定30厘米。数字温度计探头从侧壁小孔伸进去，放在盒子中央。这样应该安全了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"用LED光源且固定距离，安全多了。现在考虑控制变量：三组纸盒除了表面材质不同，其他条件要一致。你打算怎样让三个盒子在实验前温度相同？还有，读取温度时是三个同时读还是依次读？这会影响到数据的时间同步。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"实验前将三个盒子放在室内同一位置静置至少30分钟，使初始温度一致。\",\"读取时可快速依次读取并轮换顺序，抵消时间差。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我先让三个盒子在室内放半小时到室温，然后一起开LED灯，每隔5分钟快速读三个温度，每次读取顺序轮换：黑、白、铝，下次铝、黑、白这样。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个读取与轮换策略可以很好地减少系统误差。接下来我们把整个方案整理成一张数据记录表。表里需要记录时间、三个盒子的实测温度，并且留出备注栏，方便记下实验中的异常情况，比如灯位变动、室温波动等。请看看下面的表格结构：\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"这个表很清楚，刚好用来记录。我们现在的设计可以算完成了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"可以。阶段2的设计部分完成，你有一份含控制变量和安全措施的数据表，可以直接进入阶段3动手操作。之后如果需要，还可以微调。以下是确认的数据表结构，请保存。\",\"next_action_type\":\"confirm\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"time_min\",\"type\":\"number\",\"header\":\"时间（分钟）\"},{\"key\":\"temp_black\",\"type\":\"number\",\"header\":\"黑纸盒温度（℃）\"},{\"key\":\"temp_white\",\"type\":\"number\",\"header\":\"白纸盒温度（℃）\"},{\"key\":\"temp_foil\",\"type\":\"number\",\"header\":\"铝箔盒温度（℃）\"},{\"key\":\"notes\",\"type\":\"text\",\"header\":\"备注\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-high-concept-low-carbon-commute-v1-0690ccae67",
+      "generatedAt": "2026-07-09T07:27:53.655Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念型-低碳出行-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"阶段2推进清晰，聚焦自变量梯度→因变量代理→控制变量→数据表。学生直接给出行方式和配重，导师引导澄清橡皮筋代理，避免代理漂移。安全提醒融入对话，不堆叠步骤。最终确认时输出完整data_table_schema并包含notes列。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三组：步行/公交/自驾三种模拟（用不同配重小车跑同一路径）记录跑完路径的能量消耗代理值，路径和小车保持一样每组测3次取平均，可以生成数据表了\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的思路很清晰！为了让代理更准确，我需要确认你的能量消耗代理是什么。是记录橡皮筋拉伸次数，还是小车配重？这会直接影响因变量的测量重复性。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我们用橡皮筋推动小车，记录跑完全程橡皮筋被拉开的次数作为能耗代理\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，橡皮筋拉伸次数是一个可操作的代理。接下来请明确三种出行方式的准确设置：步行对应轻配重？公交和自驾如何区分配重或摩擦力？这样我们才能确定自变量的三个水平。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"步行：无额外配重；公交：车身加一个小砝码；自驾：加一个大砝码。路径用同一段直尺，每次释放位置相同。我们将在橡皮筋拉伸后释放小车，记录拉伸次数。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这样自变量梯度就清楚了。需要再确认一个安全点：释放小车时确保轨道尽头有阻挡，避免飞出桌面。现在我们可以梳理控制变量：路径长度、小车底盘、橡皮筋型号、释放手法都保持一致。你要每组重复3次取平均，这个设计很好。接下来我为你生成数据表结构，请确认。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，控制变量都会记录，橡皮筋也统一用同品牌同型号。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"完美。根据你的方案，我生成了数据表结构。请按表头记录每次实验的橡皮筋拉伸次数，并在备注栏注明任何异常或观察。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"出行方式\",\"type\":\"categorical\"},{\"key\":\"配重\",\"type\":\"text\"},{\"key\":\"重复次数\",\"type\":\"number\"},{\"key\":\"橡皮筋拉伸次数\",\"type\":\"number\"},{\"key\":\"平均值\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-high-concept-ai-recognition-threshold-v1-f2a1278dd9",
+      "generatedAt": "2026-07-09T07:28:47.766Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\n  \"record\": {\n    \"scenario\": \"高概念型-AI识别阈值-蒸馏样本1\",\n    \"phase\": 2,\n    \"rubricTargets\": [\n      \"cognitive_load_control\",\n      \"interdisciplinary_integration\",\n      \"safety\",\n      \"stage_discipline\",\n      \"stem_fit\",\n      \"structure_compliance\",\n      \"theme_fidelity\"\n    ],\n    \"qualityNotes\": \"该样本训练导师在面对低投入学生时，通过轻量脚手架逐步构建实验设计，精确引导自变量梯度定义、因变量测量标准化、控制变量明确化，最后确认时输出完整数据表schema并融入安全提醒，严格遵循阶段2规程，维护主题保真度，避免工程化扁平化。\",\n    \"conversations\": [\n      {\n        \"from\": \"human\",\n        \"value\": \"我设三个阈值：低、中、高，用颜色传感器分拣彩色卡片。看该识别时有没有识别、不该识别时有没有误识别，传感器和卡片保持一样。每组测10次，可以生成数据表了。\"\n      },\n      {\n        \"from\": \"gpt\",\n        \"value\": {\n          \"dialogue\": \"你的框架很清晰。我们可以把自变量“识别阈值”具体化为三个等级，比如用颜色匹配容差来区分。请考虑：低阈值对应多大容差？高阈值又该多严格？因变量“分拣准确率”是统计正确拣出的比例，还是也包含误识别的错误率？另外，虽然传感器和卡片一样，但环境光线、传感器距离需固定。接下来我们可先确定这些操作定义，再设计数据表。\",\n          \"next_action_type\": \"text_input\",\n          \"options\": [],\n          \"hints\": [\n            \"尝试用RGB颜色空间的欧氏距离定义阈值\",\n            \"准确率可定义为正确拣出数除以总测试次数\"\n          ],\n          \"phase_complete\": false\n        }\n      },\n      {\n        \"from\": \"human\",\n        \"value\": \"低阈值容差为30（颜色差异大也能识别），中阈值15，高阈值5（要很接近才识别）。准确率就是正确分拣的次数占比。我控制传感器距卡片20cm，关窗帘保持室内光。\"\n      },\n      {\n        \"from\": \"gpt\",\n        \"value\": {\n          \"dialogue\": \"定义很到位。三个阈值梯度明确，控制条件合理。现在我们需要一个数据表来系统记录。表里至少要包含试验序号、阈值水平、识别是否成功、是否发生误识别，以及备注列记录异常情况。另外，安全方面注意传感器LED可能有强光，操作中避免直视光源。你现在能试着列出具体的列标题吗？\",\n          \"next_action_type\": \"text_input\",\n          \"options\": [],\n          \"hints\": [\n            \"建议包括试验序号、阈值、正确性、误识别标志、备注\"\n          ],\n          \"phase_complete\": false\n        }\n      },\n      {\n        \"from\": \"human\",\n        \"value\": \"列标题：试验号、阈值（低中高）、识别成功（是/否）、误识别（是/否）、备注。每组10次，一共30行。\"\n      },\n      {\n        \"from\": \"gpt\",\n        \"value\": {\n          \"dialogue\": \"完美，我已经为你建立了数据表结构。现在我把最终的数据表 schema 呈现出来，它包含试验号、阈值水平、识别成功、误识别和备注列，最大行数200。操作时请一定避免直视传感器 LED。那么，实验设计阶段就完成了，你可以开始记录了。\",\n          \"next_action_type\": \"text_input\",\n          \"options\": [],\n          \"hints\": [],\n          \"phase_complete\": true,\n          \"data_table_schema\": {\n            \"columns\": [\n              { \"key\": \"trial\", \"type\": \"number\", \"header\": \"试验号\" },\n              { \"key\": \"threshold\", \"type\": \"text\", \"header\": \"阈值水平\" },\n              { \"key\": \"correct\", \"type\": \"boolean\", \"header\": \"识别成功\" },\n              { \"key\": \"false_positive\", \"type\": \"boolean\", \"header\": \"误识别\" },\n              { \"key\": \"notes\", \"type\": \"text\", \"header\": \"备注\" }\n            ],\n            \"maxRows\": 200\n          },\n          \"risks\": [\n            \"操作时避免直视传感器LED光源\"\n          ]\n        }\n      }\n    ]\n  }\n}"
+    },
+    {
+      "taskId": "p2-smartedu-0048-v1-85b0a18d8e",
+      "generatedAt": "2026-07-09T07:29:40.759Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究「初中化学实验的设计与评价（中考专题复习）」中的影响因素-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"样本在阶段2以过氧化氢分解实验为载体，按自变量梯度→因变量测量→控制变量→数据表构建推进，对话中自然融入戴手套等安全提醒，学生保持主动表述，最终确认时给出含notes列的data_table_schema，认知负荷可控，符合探究范式。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想探究影响过氧化氢分解速率的因素，比如浓度不同会怎样影响产生氧气的快慢。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好的方向。过氧化氢分解实验安全可控。你想改变的条件是过氧化氢溶液的浓度，那打算测试几个浓度值呢？另外，分解速率可以通过测量收集一定量氧气的时间来评估，你觉得怎样？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议设置3个浓度，如5%、10%、15%\",\"测量氧气体积可用排水集气法或带刻度的注射器\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想设置5%、10%、15%三个浓度，用排水集气法收集10mL氧气，记录所需时间。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"思路清晰。不过要确保其它条件相同，比如过氧化氢溶液体积、催化剂（如二氧化锰）的用量、温度。实验时需戴手套，防止腐蚀。你准备如何控制这些变量？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"每次用相同体积的H2O2溶液\",\"固定催化剂质量并保持室温\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我计划每次用10mL过氧化氢溶液，加入0.5g二氧化锰，在室温下进行。我会戴手套操作。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这样的控制很到位。接下来需要设计数据表，方便记录。你想记录哪些数据？至少包括浓度、时间，可能还需几次重复求平均，再加一列备注记录异常情况。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议重复3次，计算平均值\",\"备注可记录气泡产生快慢等现象\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我想记录浓度、第1次时间、第2次时间、第3次时间、平均时间，还有现象备注。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，数据表已经明确了。我会把它整理成一份表格模板，方便你记录。接下来可以开始实验，若有问题随时调整。\",\"next_action_type\":\"confirm\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"concentration\",\"type\":\"string\",\"label\":\"浓度\"},{\"key\":\"trial1\",\"type\":\"number\",\"label\":\"第1次时间(s)\"},{\"key\":\"trial2\",\"type\":\"number\",\"label\":\"第2次时间(s)\"},{\"key\":\"trial3\",\"type\":\"number\",\"label\":\"第3次时间(s)\"},{\"key\":\"average\",\"type\":\"number\",\"label\":\"平均时间(s)\"},{\"key\":\"notes\",\"type\":\"text\",\"label\":\"现象备注\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-cooperative-light-color-v1-9d2d2f6bf7",
+      "generatedAt": "2026-07-09T07:30:29.894Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"配合型-光色与绿豆发芽-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"严格按自变量梯度→因变量测量→控制变量→数据表推进，每轮仅提出一个开放问题，不堆叠选项。安全提醒融入dialogue，确认时输出符合规范的data_table_schema（含notes列，maxRows=200），未提前分析结论。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我想研究不同颜色的光对绿豆发芽的影响。我打算分四组：红光、蓝光、绿光、白光，每组放10颗绿豆。这样分可以吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的分组抓住了光的颜色这个关键，思路很清晰。不过我想确认一下，你打算用什么材料实现纯红、纯蓝、纯绿、纯白光，避免它们混色呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以用彩色滤光纸、LED灯带或手机屏幕显色。\",\"注意光源强度要大致一致，否则会多出一个变量。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算用现成的红、蓝、绿、白LED灯条，每组上方固定一个，这样颜色很纯。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"LED是安全又方便的工具，能比较好地控制颜色。那我们接着想一想，怎么判断不同颜色的光对发芽的影响，你想观察和记录什么指标呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察每天发芽的种子数。\",\"也可以记录发芽的快慢，比如哪天开始露白。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我就每天数一数发了芽的种子，连续看7天，最后比一比每组总共多少颗发了芽。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"每天数数是个直观的方法。不过绿豆可能不是同一天发芽的，要想比较快慢，需要把每天的发芽数分别记下来，这样能画出变化曲线。你同意吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"设计表格记录每日发芽数，再计算累计发芽率。\",\"记录时要分清是‘当天新发芽’还是‘累计发芽’。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"同意，我就记每天新发芽的颗数。温度、水量、绿豆品种这些都控制一样，四组放同一房间。那帮我生成一个数据记录表吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的设计考虑得很周全。记得LED光源别直视，可以加遮光板。数据表可以这样设计：日期、光色组、当日新发芽数、备注。你每天填入观察结果，7天最多记录200行。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"每天固定时间记录，光照周期也保持一致。\",\"备注可以记录种子异常、水量调整等情况。\"],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"type\":\"date\",\"label\":\"日期\"},{\"key\":\"light_color\",\"type\":\"text\",\"label\":\"光色组\"},{\"key\":\"new_germinated\",\"type\":\"number\",\"label\":\"当日新发芽数\"},{\"key\":\"notes\",\"type\":\"text\",\"label\":\"备注\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-fuzzy-water-amount-v1-cdb77bb8d1",
+      "generatedAt": "2026-07-09T07:31:24.354Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-浇水多少-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"transformation_reasoning\"],\"qualityNotes\":\"按自变量梯度→因变量测量→控制变量→数据表顺序推进，每轮聚焦一个核心问题，提供排水、污染等安全提示；确认后输出含notes列的data_table_schema，maxRows=200，避免提前下结论，严守阶段边界。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三组：每天2ml、5ml、10ml，每组10颗绿豆。记录每天发芽数，算发芽率。温度和光照保持一样。记录5天，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"每天浇水量梯度明确。为确保种子不因积水腐烂，你准备用什么容器？容器底部是否有孔排水？提醒：建议使用带排水孔的育苗盘，并在盘底铺吸水纸保持湿度。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"为避免烂种，每天浇水量应保持土壤湿润而非水淹。\",\"使用带排水孔的容器可减少霉菌风险。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我用一次性塑料杯，底部扎几个小孔，放棉花垫底，每杯10颗绿豆，每天用量杯浇水。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"棉花垫底能保湿，小孔排水很好。接下来确认因变量测量：发芽的标准是什么？你是记录每天新发芽的种子数量，还是记录总发芽数？发芽率计算分母是10颗吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议明确发芽标准，如胚根突破种皮≥2mm。\",\"记录时区分新发芽和已发芽植株。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"发芽标准是看到白色根尖出来就算，每天数一下新增发芽数，算累计发芽率=累计发芽数/10。光照用自然光，室温大约25度。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"控制变量设定：自然光照、室温25°C保持恒定。还需确保所有杯子接受光照一致，避免阳光直射差异。安全提醒：发芽过程避免用手触摸种苗，以防污染。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"每天转动杯子的方位，使光照均匀。\",\"操作时洗手或用镊子夹取种子。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，会注意均匀光照和不碰种子。现在可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认信息完整。我将为你创建数据表结构：每天记录每组的累计发芽数、新增发芽数、发芽率，并设备注列记录异常。最多200行。确认无误后我们就进入下一阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"maxRows\":200,\"columns\":[{\"key\":\"day\",\"type\":\"number\"},{\"key\":\"group\",\"type\":\"text\"},{\"key\":\"cumulative_germination\",\"type\":\"number\"},{\"key\":\"new_germination\",\"type\":\"number\"},{\"key\":\"germination_rate\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}]}}}]}}"
+    },
+    {
+      "taskId": "p2-all-at-once-salt-germination-v1-6a6c35a6ef",
+      "generatedAt": "2026-07-09T07:32:34.328Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"一次给全型-盐水浓度与发芽-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"在学生一次给出完整实验规划时，导师依次聚焦自变量浓度、发芽判定标准、控制变量补充，单一问题推进，避免信息过载；确认时输出含notes列的data_table_schema，结构化支持记录；最后融入安全提醒。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我想研究不同浓度盐水对绿豆发芽率的影响。我计划设置四个浓度组，每组20颗绿豆，放在25℃室温下，每天浇10毫升对应浓度的盐水，连续观察5天，记录每天的发芽数。我需要一个数据记录表，能帮我设计吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的实验思路很清晰。我们先聚焦一个关键细节：你打算设置哪四个具体的盐水浓度？例如 0%（纯水对照）、0.5%、1%、1.5%，或其他比例？请给出明确的浓度值，这样才能设计数据表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"为保证对比，建议设置一个纯水对照组。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我打算用0%蒸馏水作为对照，然后是0.5%氯化钠溶液、1.0%、1.5%，都使用食盐配制。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，浓度梯度明确了。接下来，你如何判断种子是否发芽？比如胚根突破种皮并达到一定长度（如2mm）时才算发芽。请说明你的发芽判定标准。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"统一标准可减少观测误差。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"当胚根冒出种皮，长度超过2毫米就算发芽，每天统计一次。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的实验设计已基本成型：自变量盐水浓度（0%、0.5%、1.0%、1.5%），因变量发芽数，控制变量包括温度、水量、天数。还需补充种子质量和光照条件吗？我先基于现有信息生成数据记录表，你看看是否符合需求。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请补充种子质量和光照等控制变量。\"],\"data_table_schema\":{\"columns\":[{\"key\":\"day\",\"type\":\"number\",\"label\":\"天数\"},{\"key\":\"concentration\",\"type\":\"text\",\"label\":\"盐水浓度\"},{\"key\":\"germinated_today\",\"type\":\"number\",\"label\":\"当日发芽数\"},{\"key\":\"cumulative_germinated\",\"type\":\"number\",\"label\":\"累计发芽数\"},{\"key\":\"notes\",\"type\":\"text\",\"label\":\"备注\"}],\"maxRows\":200},\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"还需要控制种子都挑选饱满的，光照放在室内自然光下。这个表可以，就按这个来记录。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，已纳入种子质量和光照条件。实验设计正式确认，数据记录表符合要求。请开始实验，注意配制盐水时避免皮肤直接接触高浓度溶液，操作后洗手。祝顺利。\",\"next_action_type\":\"none\",\"options\":[],\"hints\":[],\"phase_complete\":true}}]}}"
+    },
+    {
+      "taskId": "p2-high-concept-mars-light-v1-85e103988f",
+      "generatedAt": "2026-07-09T07:33:35.090Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念降级型-火星基地植物-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"引导工程导向学生将‘长势’转化为可量化的发芽率、茎高、叶片数，强化控制变量并明确安全降级（LED），在确认环节提供规范数据表，完整展现阶段2确认文档。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我打算设0小时、4小时、8小时、12小时人工光照，每组10颗绿豆，观察发芽和长势，绿豆品种、水量、温度保持一致，每天记录1次，做7天。可以开始设计数据表了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的梯度设计很清晰！要把‘长势’变成可测指标，比如每天统计发芽数、测量茎高和叶片数，这样数据才能对比。另外，人工光源务必用LED，避免烫伤。我们先定测量指标。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"用毫米尺测量茎高，为每颗种子编号。\",\"确定每天记录的具体时间点，保持固定。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我每天记录每颗种子的发芽与否，用直尺测量从土表到顶芽的茎高，数真叶数量。它们行吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这些测量指标可行。控制变量除了品种、水量、温度，还需要统一花盆、土壤量和光源距离。每天定时定量浇水，用温度计监控，LED灯距固定20厘米，防止过热。现在可以设计记录表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我准备用同一批种子，相同花盆和土壤，每天同一时间浇等量水，温度保持室温，LED灯距离20厘米。数据表就按你说的，加上日期和分组就行。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"控制条件考虑周全。数据表示例：日期、组别、光照时长、种子编号、发芽状态、茎高、叶片数、备注。每行记录单颗种子单次观察，7天共280行。请确认是否满足需求。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"明白了，数据表涵盖了我需要的所有信息。没问题，就用这个表。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"确认方案：光照四个水平，每组10颗，测量发芽、茎高、叶片数，控制品种、水分、温度、灯距。数据表已生成，包含所有字段和备注栏。现在可以进入实验阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"type\":\"date\"},{\"key\":\"group\",\"type\":\"text\"},{\"key\":\"light_hours\",\"type\":\"number\"},{\"key\":\"seed_id\",\"type\":\"number\"},{\"key\":\"germinated\",\"type\":\"boolean\"},{\"key\":\"stem_height_mm\",\"type\":\"number\"},{\"key\":\"leaf_count\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-smartedu-0054-v1-f640e15f05",
+      "generatedAt": "2026-07-09T07:34:12.131Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\": {\"scenario\": \"课题２ 学习开展化学实验探究-蒸馏样本1\", \"phase\": 2, \"rubricTargets\": [\"cognitive_load_control\", \"safety\", \"stage_discipline\", \"stem_fit\", \"structure_compliance\"], \"qualityNotes\": \"温和纠正学生使用浓硫酸的危险方案，引导至安全的水+食盐蒸馏实验。逐步推进自变量梯度（加热时间）、因变量测量（目测颜色深浅）、控制变量（水量、初始水温、冷却条件）和数据表设计。最后一条确认时输出包含notes列的data_table_schema，符合阶段纪律。控制了认知负荷，一次只推动一个核心设计要点。\", \"conversations\": [{\"from\": \"human\", \"value\": \"我想用浓硫酸和食盐加热制取HCl气体，看不同温度下产量变化，这样符合“改变一个条件看影响”吧？\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"浓硫酸和食盐反应会产生有毒的氯化氢气体，在教室里风险太大。我们可以改成用食盐溶液进行蒸馏，观察不同加热时间下馏出液的浑浊度变化，同样能看到一个条件改变的影响，而且安全、材料易得。\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [\"如果改变加热时间，你会设置哪几个时长？\", \"因变量可以用目测颜色深浅来表示，怎么记录更可靠？\"], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"那好，就用食盐水蒸馏。我想用酒精灯外焰、内焰来区分加热强度，再比较蒸馏出的水清不清。\", \"from\": \"gpt\", \"value\": {\"dialogue\": \"火焰大小不太好标准化，不如改用同一个火焰但加热不同时间，比如5分钟、10分钟、15分钟，这样自变量梯度更可控。因变量可以用手机拍照对比颜色深浅，但要统一拍照距离和光线。\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [\"加热时间可以设3~4个梯度，每个梯度重复两次更可靠。\", \"控制变量注意每次用同样的水量和初始水温。\"], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"那就设加热时间5、10、15分钟，每个做两次。测量用拍照对比颜色深浅，控制变量都用100毫升食盐水，初始水温20度，冰水冷却。安全上我会戴手套和护目镜。\", \"from\": \"gpt\", \"value\": {\"dialogue\": \"这些设计很清晰！控制变量和重复都考虑到了。接下来我们整理一个记录表：每一行是一次实验，列包括加热时间、颜色深浅印象、备注。你可以在备注里写观察到的异常现象。加热时注意防烫，不能将烧杯口对准人。\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [], \"phase_complete\": false}}, {\"from\": \"human\", \"value\": \"嗯，表就按加热时间、颜色深浅、备注来记录，一次实验一行。我觉得可以了。\", \"from\": \"gpt\", \"value\": {\"dialogue\": \"好，我们确认一下数据表结构。表中自变量是加热时间（分钟），因变量记录为颜色深浅描述，再加备注列用于安全记录和异常情况。每次实验填一行，最多200行，足够多次尝试和重复。\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [], \"phase_complete\": true, \"data_table_schema\": {\"columns\": [{\"key\": \"heating_time_min\", \"type\": \"number\", \"header\": \"加热时间（分钟）\"}, {\"key\": \"color_intensity\", \"type\": \"text\", \"header\": \"颜色深浅描述\"}, {\"key\": \"notes\", \"type\": \"text\", \"header\": \"备注/异常记录\"}], \"maxRows\": 200}}}]}}"
+    },
+    {
+      "taskId": "p2-ecology-bottle-balance-v1-2c035f8bb6",
+      "generatedAt": "2026-07-09T07:35:19.482Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"过度宏大型-生态瓶平衡-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"在阶段2中，学生变量混乱，导师通过追问将其因变量聚焦于“存活天数”，明确测量操作；在确认控制变量后逐步构建包含notes列且maxRows=200的数据表schema；同时强调鱼的人道终点，避免痛苦，确保安全。整个过程分步推进，控制认知负荷，符合阶段2设计确认规范。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我设了三组：1草1鱼、3草1鱼、5草1鱼，都用同样大的玻璃瓶，水量500mL，放在相同光照和室温下。每天观察14天，记录水变浑浊时间和鱼存活天数。这样就可以设计记录表了吧？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的自变量梯度很清晰。但研究问题关注的是存活天数，同时记录浑浊时间会让因变量变复杂。建议只把存活天数作为因变量，浑浊情况作为备注观察。另外，你需要提前定好死亡判断标准，比如鱼侧翻不动超过1分钟、触碰无反应就算死亡，这样才有一致的测量。请说说你对死亡标准的想法，然后我们控制其他变量并设计表格。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"因变量建议只选存活天数，浑浊作为备注。\",\"定好死亡标准，确保测量一致。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好，我就只记录存活天数，浑浊写进备注。死亡标准就按您说的，侧翻不动1分钟无反应算死亡。控制变量我注意：同批小鱼、同种水草、水量500mL、室温25℃、自然光，不喂食，水用晾过的自来水。如果鱼明显不行了我就提前结束。这样可以设计表格了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"死亡标准明确，控制变量覆盖了物种、水量、温光和喂食，很全面。请再确认：每天同一时间观察，如果鱼死亡，记录死亡当天的日期，存活天数就从实验开始算到死亡日。我会给你一个表格结构，包括日期、组别、比例、鱼存活状态和备注，每天填一行。先看看这个结构是否可行，你还有补充吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"每天同一时间观察，死亡时记录日期。\",\"表格含日期、组别、比例、状态、备注。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"没问题，我每天下午4点观察。表格结构如您所说，我同意。请确认一下我们正式的数据表，好吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，这是实验记录表，每天每组填一行。确认后我们就进入实验准备阶段。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"type\":\"date\",\"label\":\"观察日期\"},{\"key\":\"group\",\"type\":\"text\",\"label\":\"实验组别\"},{\"key\":\"ratio\",\"type\":\"text\",\"label\":\"水草:鱼比例\"},{\"key\":\"fish_status\",\"type\":\"text\",\"label\":\"鱼存活状态\"},{\"key\":\"notes\",\"type\":\"text\",\"label\":\"备注\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-premature-shade-plant-height-v1-8d85177153",
+      "generatedAt": "2026-07-09T07:36:16.502Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"细节过早型-遮阴与株高-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"学生提出三组遮阴梯度实验计划，导师未直接代劳生成数据表，而是通过追问行定义、个体编号与备注列引导自主设计，最终确认结构并输出标准化data_table_schema，包含notes列和maxRows=200。全过程严守阶段2职责，只推进数据表结构，不涉及分析结论，控制认知负荷，符合STEM教学阶段纪律。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我打算设三组：不遮阴、半遮阴、重遮阴，每组10颗绿豆。每天量苗高，水量温度品种保持一致，记录7天。应该可以生成数据表了吧？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你选了三组遮阴梯度，思路清晰。但生成数据表前，我们先把它设计清楚：每一行代表什么？哪些列能帮你有效对比三组？请先描述一下你打算怎么组织数据。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"想一想数据表里一行是代表一天还是一颗苗？\",\"除了苗高，还要记什么固定条件？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"每行可以记录一天的数据，包括日期、组别，还有苗高平均值。控制变量每天记录温度、浇水量。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"分组平均值会丢失个体差异，你每组有10颗苗，可以给每颗编号，单独记录每颗苗高吗？这样后期分析更灵活。另外，需要记录个体的异常情况，比如断苗。你觉得呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议增加'植株编号'列，每颗苗一行。\",\"再加一列'备注'记录异常或观察现象。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那我把每颗苗都编号，每天分别测量，记录每颗苗高、浇水量、温度，还有备注。这样表就细了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，这样数据会更扎实。那列的排列顺序我们可以约定：日期、组别、植株编号、苗高(cm)、浇水量(ml)、温度(°C)、备注。还需要其他变量吗？如果赞同，我们就用这个结构生成模板。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"没问题，就这么定，生成数据表吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，数据表结构已确认。记录时记得每天同步填写，保持单位一致。下面是标准数据表模板，你可以在电子表格中复制使用。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"type\":\"date\",\"unit\":\"YYYY-MM-DD\"},{\"key\":\"group\",\"type\":\"enum\",\"values\":[\"不遮阴\",\"半遮阴\",\"重遮阴\"]},{\"key\":\"plant_id\",\"type\":\"integer\",\"range\":\"1-10\"},{\"key\":\"height_cm\",\"type\":\"number\",\"unit\":\"cm\"},{\"key\":\"water_ml\",\"type\":\"number\",\"unit\":\"ml\"},{\"key\":\"temp_celsius\",\"type\":\"number\",\"unit\":\"°C\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-fuzzy-yogurt-temperature-v1-41dcaa66c8",
+      "generatedAt": "2026-07-09T07:37:07.757Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-酸奶与温度-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"该样本逐步引导学生从模糊想法到可操作的实验设计，在阶段2中依次处理自变量量化、因变量操作化、控制变量确认，最终给出完整数据表，同时融入安全提醒，避免一次性提问过多，控制认知负荷，符合gold_candidate标准。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想看看温度对酸奶变质的影响，打算放三个地方：冰箱冷藏、室内阴凉、暖气片旁边。每天早晚各看一次，记录气味和结块，连续3天。老师觉得这个方案行吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的思路很清晰，用温度梯度、定时观察和控制变量的方法。需要补两个关键点：一是用温度计测出三个位置的实际温度，让自变量可测量；二是定义“变质快慢”的具体指标，比如什么时候出现异味或结块。观察时安全第一，变质酸奶不能吃，闻气味用手扇。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请用温度计测量冷藏、室内、暖气旁的温度，并列出你想观察的变质特征。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"测过了，冰箱4度，室内25度，暖气片旁边大概35度。变质我看这些：闻起来有酸臭味、表面结块、颜色从白变黄。控制变量我用同一品牌同一天开封的原味酸奶。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"自变量梯度很具体，因变量指标也可操作。把变质快慢量化为“从开始到任一指标出现的时间”，就能比较不同温度的效果。控制变量想到品牌和开封时间很好，再确认一下每个样品量是否一致，容器相同。下一步，我们把这些设计成一张数据记录表。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察指标可以合并为“是/否”标记，并记录出现变质的时刻，这样就能算出变质速度。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那我每天9点和21点观察，哪个指标先出现就记录变质，并记下时间。表格想包括温度、观察时间、是否变质、气味、结块、颜色和备注，这样够吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很完整！温度、时间、变质标记和备注都能还原实验。提醒一下：变质样品务必只观察不食用，闻的时候扇闻。我们一起来把表格确定下来，方便你后续记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"请给每个列定义一下内容，比如气味列是描述性文字，是否变质用“是/否”，观察时间可以用“小时”做单位。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我重新整理：温度（℃）、观察时间（h）、是否变质（是/否）、气味描述、结块描述、颜色描述、备注。每天早晚两次，一共6个时间点。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"设计完备，控制变量和观察指标都已明确。下面这张数据表可以直接用于记录，记得定时观察并如实备注异常。现在可以进入收集数据阶段了。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"temperature\",\"type\":\"number\",\"unit\":\"°C\"},{\"key\":\"time\",\"type\":\"number\",\"unit\":\"h\"},{\"key\":\"spoiled\",\"type\":\"boolean\"},{\"key\":\"odor\",\"type\":\"text\"},{\"key\":\"curdling\",\"type\":\"text\"},{\"key\":\"color\",\"type\":\"text\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200},\"risks\":[\"变质酸奶不可食用，只观察不品尝。闻气味用扇闻法，不直接凑近。\"]}}]}}"
+    },
+    {
+      "taskId": "p2-cooperative-dough-fermentation-v1-5199bc5d00",
+      "generatedAt": "2026-07-09T07:38:03.748Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"配合型-面团发酵-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"阶段2方案设计，教师通过追问控制变量、平行组和安全提醒，推动学生细化实验方案，最终确认数据表格schema含备注列且maxRows=200，结构合规，单轮聚焦一个核心问题，保护认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想用2克、5克、8克酵母加到等量面粉里，记录30、60、90分钟面团体积，水温水量一样，可以开始了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的自变量梯度设计得不错！除了水温和水量，哪些因素还会影响发酵？比如面粉种类、揉面时间，你打算怎么控制？另外，准备如何准确测量面团体积？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记得让面团在同样的室温下发酵。\",\"考虑测量工具的精度。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我用同一种高筋面粉，揉面都是5分钟，室温25度，体积用量杯看膨胀高度来估算。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"方案更具体了。引入平行组能减少偶然误差，你愿意每组设置两个面团取平均吗？另外，酵母多时面团膨胀快可能溢出，建议用大碗并垫托盘。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑设置平行组，每组两个面团，取平均增加可靠性。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好，那我每组做两个面团。表格里要记组别、时间、体积，还需要什么？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"建议增加备注列记录现象，如表面光滑度、气泡情况。请参考这个表格模板，是否满足你的需求？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"表格预留备注栏，便于记录异常现象。\"],\"phase_complete\":false,\"data_table_schema\":{\"columns\":[{\"key\":\"group\",\"type\":\"text\"},{\"key\":\"yeast_amount_g\",\"type\":\"number\"},{\"key\":\"time_min\",\"type\":\"number\"},{\"key\":\"volume_ml\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}},{\"from\":\"human\",\"value\":\"这个表格很清楚，我就按这个记录。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"方案完整，你现在可以开始实验了。如果需要修改表格，可在实验中记录备注。祝你顺利！\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"数据表最多支持200行，记录时注意单位。\"],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"group\",\"type\":\"text\"},{\"key\":\"yeast_amount_g\",\"type\":\"number\"},{\"key\":\"time_min\",\"type\":\"number\"},{\"key\":\"volume_ml\",\"type\":\"number\"},{\"key\":\"notes\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p2-smartedu-0059-v1-02083cb2b0",
+      "generatedAt": "2026-07-09T07:39:12.405Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究「植物生长」中的影响因素-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"该样本训练助手在阶段2逐步引导聚焦一个自变量，理清因变量与控制变量，最终输出规范的数据表schema，控制认知负荷并嵌入安全提醒。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我们已经确定研究不同光照、水量、温度对种子发芽的影响。我想设计实验，把绿豆分成几组，分别给予不同光照、不同水量和不同温度，观察发芽数。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的想法涉及光照、水分和温度等多个因素。我们刚进入实验设计阶段，先聚焦一个自变量会让因果关系更清晰。你打算最先研究哪个因素？例如光照时长，容易控制梯度。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以选光照时长，设置如每天6h、12h、18h\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那我先研究光照时长，每天给绿豆不同光照时间。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"自变量已确定为光照时长。现在需要明确因变量的测量：你是用发芽数、株高还是叶片数？测量频率呢？例如每天固定时间记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议用发芽数，因为观察简单\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我用发芽数作为指标，每天傍晚记录一次。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"控制变量同样关键。如温度、浇水量、土壤类型等需要保持一致。你如何确保这些条件在实验组间没有差异？请简要说明。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"例如所有盆放在同一室内，每天浇等量水\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我会用相同大小的花盆和土壤，放在相同温度的房间里，每天早上浇50毫升水，确保水量和温度一致。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"实验设计已完成：自变量光照时长，因变量发芽数，控制变量温度、浇水量、土壤。现在开始实验记录，请按照表格每天填入数据。表格包含日期、光照时长(h)、发芽数、备注。表格已准备好，你可以点击开始记录。安全提醒：若使用人造光源，建议用LED灯，远离易燃物，需成人监护。\",\"data_table_schema\":{\"columns\":[{\"key\":\"date\",\"title\":\"日期\",\"type\":\"date\"},{\"key\":\"light_hours\",\"title\":\"光照时长 (h)\",\"type\":\"number\"},{\"key\":\"germination_count\",\"title\":\"发芽数\",\"type\":\"number\"},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\"}],\"maxRows\":200},\"phase_complete\":true,\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"点击表格开始记录\"]}}]}}"
+    },
+    {
+      "taskId": "p2-variable-confusion-apple-browning-v1-7ccd616138",
+      "generatedAt": "2026-07-09T07:40:19.492Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"变量混乱型-苹果褐变-蒸馏样本1\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"在阶段二通过分层提问引导学生依次澄清因变量量化、控制变量精确化和数据表结构，最终给出含备注列的数据表schema，同时植入安全提醒，避免过早分析结论，符合结构合规与认知负荷控制。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三组：不处理、淡盐水泡、柠檬汁涂，苹果品种和切片厚度保持一样。每10分钟拍照记录褐变程度，记录30分钟。可以生成数据表了\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你已经确定了自变量处理方式和一些控制变量，思路清晰。不过因变量“褐变速度”该怎么测量呢？单靠拍照不易比较，需要一种量化方法，比如根据褐变面积或颜色深浅定级。请设计一个可重复的评分标准。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以给褐变程度分几个等级吗？\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我可以把褐变程度分成1到5级，0是无褐变，5是完全褐变，看照片给分。温度就室温25度吧，盐水浓度我家里随便调的，应该没事。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"褐变分级很好。不过盐水浓度是重要的控制变量，如果不固定，结果可能不可比。你能否确定一个浓度？比如用1%食盐水（10克盐溶于1升水），浸泡时间也固定5分钟，这样结果更可靠。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"浓度需精确，否则影响结论\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"好的，我就用1%盐水泡5分钟，柠檬汁现挤。苹果用红富士，切片5毫米。那数据表要记录什么？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"控制变量明确了。数据表建议包含：处理组、时间点（0,10,20,30分钟）、褐变等级（0-5）、备注。别忘了0分钟作为基准。你可以用表格把实验设计整理出来，确认后我们进入实验。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"备注列记录意外观察\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"那就这样定了。我需要一个数据表模板，请帮我生成吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"实验方案确认。数据表已包含处理组、时间(min)、褐变等级和备注列，建议记录200行以内。安全注意：切苹果时小心刀具，在成人监护下操作。现在可以开始实验了。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"columns\":[{\"key\":\"treatment\",\"title\":\"处理组\",\"type\":\"text\"},{\"key\":\"time\",\"title\":\"时间(min)\",\"type\":\"number\"},{\"key\":\"browning_level\",\"title\":\"褐变等级\",\"type\":\"number\",\"min\":0,\"max\":5},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\"}],\"maxRows\":200}}}]}}"
+    },
+    {
+      "taskId": "p3-high-concept-mars-light-v1-569e456ce7",
+      "generatedAt": "2026-07-09T07:40:53.297Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念降级型-火星基地植物-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"proxy_quality\",\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"在阶段3启动节点，教师用火星基地舱室类比光照时长，保持高概念语境，避免主题流失。安全提醒简洁，仅3条关键点，符合‘只保留1条安全提醒+1个立即记录动作’要求，未堆叠步骤。两条提示指向对照组和定时器，强化记录习惯与控制变量意识，教学引导合理。对话未替学生编造数据，强调确认与自主记录。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我的‘火星基地’植物光照实验都准备好了，绿豆、LED灯、三个光照时长组（4h，8h，12h），现在可以开始了吗？模拟火星基地要注意什么？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"欢迎进入‘火星基地植物’实验！用不同光照时长模拟基地不同舱室，想法很好。开始前，请确认安全要点：使用LED光源，避免直视强光；灯距叶片应保持20厘米以上；电源远离水。你理解这些要求了吗？确认后，记录你的三组光照设置、种子数量和观察起点，即可启动。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如果忘记对照组，发芽率会受室温干扰。\",\"用定时器控制光周期，减少人为误差。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-safety-acid-rain-plant-v1-8ca518628f",
+      "generatedAt": "2026-07-09T07:41:10.517Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-酸雨与植物-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"强调实验操作前安全核验与记录先行，阻止学生直接浇灌导致不可逆损伤。用1条安全提醒+1个立即记录动作推动行为，避免步骤堆叠。dialogue嵌入安全约束并指向自变量的实测证据，为后续分析奠基。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们组把不同pH的白醋溶液都配好了，四个杯子标签也贴了，现在可以直接往绿豆上浇了吧？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"停一下，操作前必须先做两件事：戴好护目镜和手套，这是安全底线。然后把每杯溶液的实际pH试纸读数记在实验记录单上，写明“2024-04-10 实测pH值”。配好的溶液和标签完全一致吗？确认后再浇，一次性浇完不能反悔。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"护目镜和手套须全程佩戴\",\"用pH试纸实测并记录，对比标签\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-smartedu-0012-v1-22191ce4d3",
+      "generatedAt": "2026-07-09T07:41:31.264Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"《控制变量法在初中化学实验探究中的应用》-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"针对学生提出的危险操作（浓硫酸），导师温和纠正并给出低风险替代方案（稀盐酸与碳酸钙），仅用1条安全提醒和1个立即记录动作，避免步骤堆叠；引导聚焦自变量梯度、控制变量和起始数据记录，训练模型的安全干预与阶段纪律。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我想用浓硫酸滴在锌粒上，看看温度变化，可以吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"浓硫酸强腐蚀且放热剧烈，课堂探究不宜使用。建议改用稀盐酸与碳酸钙反应，控制盐酸浓度观察气泡速率，既安全又符合控制变量法。请先记录烧杯质量、盐酸浓度和碳酸钙质量，戴好护目镜，确认安全后开始实验。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录起始数据如盐酸浓度和碳酸钙质量\",\"确保除自变量外其他条件不变\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-premature-shade-plant-height-v1-59aae2fa50",
+      "generatedAt": "2026-07-09T07:41:56.820Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"细节过早型-遮阴与株高-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"学生在阶段3过早给出总结性观测结果，导师点明需基于原始记录表逐株记录，强调真实数据、异常描述和安全提醒，并引导立即执行测量与记录动作，杜绝杜撰。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，遮阴实验今天开始测了，我三盆绿豆放不同地方：全阴角落、半阴窗台、全日照阳台。全阴苗已经有5厘米高了，半阴的才3厘米，全日照的最高，有8厘米。我是不是可以直接下结论写报告了？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"现在还不能写结论。需要你先在原始记录表里逐株记录每盆幼苗的实际高度，用尺子量基土表面到最高叶尖。还要记录异常，比如倒伏、发黄。让阳光直晒的设计可能有花盆倾倒风险，观察时别碰遮阴物，安全第一。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"测量高度请统一从泥土表面量到最高叶尖\",\"记录时不要移动花盆或改变遮阴位置\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-fuzzy-yogurt-temperature-v1-a97d6a9ee7",
+      "generatedAt": "2026-07-09T07:42:16.799Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-酸奶与温度-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"针对低投入学生，精准输出单条安全提醒与立即记录动作，严格控制认知负荷，不代劳、不追问，防止 over_questioning。\",\"conversations\":[{\"from\":\"human\",\"value\":\"好的，我先闻一下气味，然后把看到的记下来。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"安全第一：只观察不食用。闻气味时用手轻轻扇动，不要直接把鼻子凑近容器口。现在请记录室温下酸奶的初始颜色、气味和质地，如实写入笔记栏。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"用简单词语描述气味，如“酸味”“奶味”“异味”。\",\"质地可描述为“光滑”“结块”“有水分析出”等。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-smartedu-0016-v1-1391d46605",
+      "generatedAt": "2026-07-09T07:42:38.150Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"实验开始前通过安全提醒和记录准备，强化规范操作意识，要求学生先记录原水特性，落实真实记录和异常记录训练目标。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我准备好了材料，可以开始做净水实验了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"可以开始。但操作前请先确认安全：佩戴口罩和手套，明矾溶液避免接触皮肤和眼睛，实验废液不要随意倾倒。然后请先记录未过滤的原水浑浊度和颜色，作为对照。现在请描述你观察到原水的外观，并确认安全防护已做好。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"浑浊度可用肉眼或简易浊度计判断，记录时注明时间。\",\"异常颗粒或颜色变化要如实记录，不要忽略。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-safety-bread-mold-preservative-v1-6538db9086",
+      "generatedAt": "2026-07-09T07:42:57.021Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-面包防腐-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"关键训练点：在实验启动瞬间嵌入单一关键安全提醒与即时记录动作，避免多步骤堆叠；通过ask_choice强化安全确认，同时要求立即记录初始状态，防止编造数据。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我已经把面包片分成了三组，一组放进冰箱冷藏，一组用干燥剂密封保存，还有一组抽真空密封，现在要怎么开始观察？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你已经开始操作了，很好。请记住一条最关键的安全规则：发霉的面包只观察、不食用，并且打开容器时要避免吸入霉菌孢子。现在，请你立刻在实验记录表里写下每组面包的初始状态，比如颜色、质地、有无可见霉斑，最好拍张照片。\",\"next_action_type\":\"ask_choice\",\"options\":[\"我已知晓安全事项，已记录初始状态，可以开始观察了\",\"我需要再检查一下我的初始记录\"],\"hints\":[\"可以把冷藏、干燥、真空三组分别记作A、B、C组\",\"拍照时放一把尺子参考大小\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-variable-confusion-apple-browning-v1-016d628f66",
+      "generatedAt": "2026-07-09T07:43:31.628Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"变量混乱型-苹果褐变-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生在实验阶段先关注安全与真实记录，防止因数据收集冲动跳过初始状态记录或忽略异常观察；对话中嵌入单条安全提醒并推动立即记录动作，避免给学生替写数据。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我已经切好了9片苹果，厚度差不多，分别泡在盐水、柠檬汁和清水里，每种3片。我打算每10分钟观察一次，用0-5分记录褐变程度。现在可以开始计时了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"准备工作很充分，变量控制也到位。在开始计时前，先为每一片苹果记录第0分钟的初始颜色和状态。切苹果时务必请成年人帮忙，安全第一。准备好记录表后就可以启动计时，每10分钟如实填写，有任何意外斑点或损伤都记在备注栏里。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录时为每片苹果编号，防止混淆处理组\",\"出现异常斑点请立即在备注栏写明，勿事后补记\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p3-smartedu-0020-v1-a4f200a1d9",
+      "generatedAt": "2026-07-09T07:43:53.425Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究影响光合作用的因素（实验）-蒸馏样本1\",\"phase\":3,\"rubricTargets\":[\"safety\",\"stage_discipline\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"本样本训练导师在实验开始前给予关键安全提醒，并立即引导学生记录初始实验条件，避免直接操作而忽略数据记录，符合阶段3要求的安全与真实记录规范。dialogue简洁，未堆叠步骤，hints提供记录方向。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我的实验材料都按方案准备好了，可以开始做光合作用的变量控制实验了吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"在动手之前，请一定注意安全：使用剪刀处理植物叶片时要格外小心，防止划伤。现在请先记录当前的初始条件，比如环境温度、光照强度等，确保从实验起点就留下真实数据。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议记录温度、光照、水深等初始数据。\",\"观察时注意叶片上浮的规律性变化。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-safety-acid-rain-plant-v1-224c6adf7d",
+      "generatedAt": "2026-07-09T07:44:37.260Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-酸雨与植物-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"在阶段4中，导师引导学生描述发芽趋势，比较组间差异，提出除pH外其他因素的可能性，避免将相关性等同于因果；强调必须基于完整数据记录，注意异常值，并引导学生计划下一步测量以增强证据；同时内嵌操作安全提醒，确保学生穿戴防护。符合认知负荷控制（一次性聚焦比较与原因分析）、安全（提醒防护）、STEM契合（数据解读）、学生自主性（不直接给答案）和教学引导（提供结构化问题而非结论）。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们发现发芽数：第一天 group_a 0，b 1，c 2；第二天 a 1，b 3，c 4；第三天 a 2，b 5，c 6。但是酸度更高（pH更低）的组发芽反而更多，这和我们想的酸雨危害好像相反？是不是醋溶液反而有帮助？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的直觉很敏锐。先把数据画成折线图，看看三天里各组的增速差异。group_a 增长较慢，b、c 较快，但第三天有一个异常样本，不能匆忙下结论。除了pH，溶液中的醋酸根离子也可能影响种子代谢。建议下一步测量幼苗株高，并检查原始种子的饱满度是否一致。操作时一定要戴好护目镜和手套，避免醋液溅出。现在先思考：这种相反趋势可能有哪些混杂因素？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：注意区分pH和溶液成分的影响。\",\"思考：为什么第三天有异常样本？\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-smartedu-0012-v1-832ba80eae",
+      "generatedAt": "2026-07-09T07:45:02.929Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"《控制变量法在初中化学实验探究中的应用》-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"导师在回应中温和纠正学生尝试浓硫酸的危险想法，提供安全的替代方案，同时推进数据分析任务，聚焦趋势描述和组间比较，避免直接给出因果结论。提问引导学生自行发现差异，给予适度提示，保持学生主动性。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，每天数值都在增加，是不是时间越长反应越多？我还想试试用更浓的硫酸，感觉会更快。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你观察到了各组随时间上升的趋势，但浓硫酸有危险，不建议自行配制。我们可以改用不同浓度的食醋或维生素C溶液，同样控制其他条件，这样更安全。请先用现有数据比较一下a、b、c三组的增长快慢，你有什么发现？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"计算每组从第1天到第3天的差值\",\"说明哪一组变化最大，可能和什么条件有关\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-premature-shade-plant-height-v1-44e78ac4db",
+      "generatedAt": "2026-07-09T07:45:38.633Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"细节过早型-遮阴与株高-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stage_discipline\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生从过早结论回到数据趋势描述与组间比较，并强调相关性不意味因果，鼓励提出可验证的下一步问题，控制认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我发现遮阴最强的那组C株高最高，组A光照好反而最矮。所以遮阴越多，株高越长，这是因为植物想逃出阴影。是不是这个道理？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你善于从数据中寻找规律。能否先用一句话描述三天来各组株高的变化趋势？再比较组间差异。我们目前只能说遮阴程度与株高有关联，还不能断定遮阴是唯一原因。接着想，如果继续遮阴，茎的粗细或叶色会怎样？你可以提出一个下一步想验证的问题。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"从第1天到第3天，各组株高均增长，组C增长最大。\",\"对比组间增长速率，尝试解释差异可能原因。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-fuzzy-yogurt-temperature-v1-a7c0549057",
+      "generatedAt": "2026-07-09T07:46:05.056Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-酸奶与温度-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"阶段4数据趋势引导，用学生自己的观察作为起点，以轻量追问推动相关与因果区分，并指向异常数据的验证，不代替学生下结论，控制认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"C组变质最快，B组中等，A组最慢，温度越高变质越快？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你看到了C组得分增加最快，A组最慢，确实显示温度越高变质越快。但这只是相关性，还不能确定因果，因为微生物活动还受其他因素影响。接下来可以关注第三天C组的异常记录，你觉得可能是什么原因造成的？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考还有哪些变量可能干扰微生物繁殖？\",\"判断异常值是偶然还是规律，可以重复实验。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-smartedu-0016-v1-985d547477",
+      "generatedAt": "2026-07-09T07:46:31.835Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生描述各组浑浊度变化趋势，比较B、C组与A组的差异，提醒关注异常样本而不直接归因，启发思考验证实验，强化数据驱动推理。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我记录了三天的数据，感觉有些奇怪，为什么每一组的浑浊度都在增加？A组好像变化不大，B组和C组上升很快，还有一个异常样本，我有点搞不懂。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"我看到数据了。A组从0到2变化平缓，B组从1到5，C组从2到6并有一个异常样本。你能先描述各组浑浊度的变化快慢，再比较哪组增长最快吗？这能帮你区分不同过滤材料的差异。之后我们讨论异常样本是否影响结论，以及是否需要补充实验来验证。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试算各组浑浊度的日均变化量\",\"异常样本可能由测量误差或装置故障引起，你能想到哪些排查方法？\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-safety-bread-mold-preservative-v1-c3b8b79897",
+      "generatedAt": "2026-07-09T07:46:58.654Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-面包防腐-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"safety\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"在阶段4数据分析中，以学生观察为起点，引导其对比各防腐处理组的发霉趋势，指出异常样本可能干扰结论并需要谨慎归因，同时明确安全操作（不触碰、密封丢弃、防孢子），用一个开放问题推动学生思考实验改进，避免直接给出最终判断。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，看了三天记录，冷藏组几乎没霉变，干燥和真空密封组都长了，但第三天真空密封组反而比干燥组霉变更多。这个异常样本是不是影响了结果？干燥效果好过真空吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你能注意到三组的差异，真不错！冷藏确实明显抑制霉变。干燥和真空密封在第三天出现逆转，但异常样本提醒我们不要匆忙下结论。可能是因为那个袋口没封严或初始带菌量不同。安全提醒：别再触碰发霉面包，密封丢弃，开窗防孢子。如果重做实验，你打算怎样减少这类干扰，更公平地对比干燥和真空效果呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"注意异常样本出现的那袋面包的保存细节\",\"想想样本间初始带菌量是否一致\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-variable-confusion-apple-browning-v1-57b882e89e",
+      "generatedAt": "2026-07-09T07:47:26.932Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"变量混乱型-苹果褐变-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stage_discipline\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"学生观察了数据并猜测盐水隔绝氧气是原因，但暴露了因果归因倾向和变量混淆（例如质疑实验意义）。导师通过聚焦趋势描述、异常值检验和机制多解性引导，既控制认知负荷又不否认知情，指向证据缺口，促进学生自主分析下一步。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我记录了三天数据：第一天不处理的苹果开始变褐，盐水处理的还白，柠檬汁处理的有点变黄；第二天盐水处理的稍微变黄，柠檬汁的变褐明显，不处理的变得很黑了；第三天一个盐水样本黑了，其他正常。我发现盐水好像最能防止褐变，可能是因为盐水里的盐把氧气隔开了。但是为什么柠檬汁也有点防褐变，却没盐水好？而且盐水泡过的苹果吃起来咸，会影响口感。是不是这种实验没意义？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"通过你的观察，数据确实显示了盐水组的褐变程度最低。不过，在确认“盐水隔绝氧气是原因”之前，我们需要先仔细比较组间的变化趋势是否一致，特别要关注那个异常样本。你可以先说一下，三天里各组褐变速度有没有明显的拐点？之后我们再思考除了隔绝氧气，盐水还可能通过什么机制起作用，以及为什么柠檬汁也有一定效果。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较每组颜色变化趋势，注意第三天异常样本可能干扰。\",\"除了氧气，盐水和柠檬汁的pH、维生素C含量也可能影响褐变。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-smartedu-0020-v1-8e9563a402",
+      "generatedAt": "2026-07-09T07:47:51.947Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究影响光合作用的因素（实验）-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生在分析数据时描述趋势和组间差异，避免绝对因果推论，提示异常值处理思路，并提出下一步可视化分析建议，以控制认知负荷并保持探究主动权。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们记录了三天里三个实验组光合作用产生的气泡数量（单位：个/分钟），数据在这里：Day1 A组0 B组1 C组2；Day2 A组1 B组3 C组4；Day3 A组2 B组5 C组6，Day3的C组有一个样本气泡数异常高，我们不确定该怎么处理，也不确定趋势说明什么。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"拿到数据后，我们先一起梳理观察到的现象。你能试着描述一下三组气泡数随时间变化的共同趋势吗？组间的差异在哪里？试着比较增长率。关于Day3的异常值，你觉得可能是什么原因引起的？在得出结论前，我们还需要检查实验控制条件是否一致。接下来，你可以把数据画成折线图，看看斜率是否稳定，这能帮我们判断不同处理对光合速率的影响。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"气泡数增加可能反映光合速率上升，但需考虑环境波动\",\"异常值可能是读数错误或生物个体差异\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5",
+      "generatedAt": "2026-07-09T07:48:10.807Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-小车与斜面-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生描述趋势、检查异常数据，不直接给结论，提出下一步验证问题，控制单轮认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们小组做了三天实验，三种不同斜面角度（A、B、C）。角度越大，下滑距离好像越远。但第三天有一个数据记录异常，我不确定是不是我们测量错了。这个能说明角度越大距离越远吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你注意到角度与下滑距离之间似乎存在正向趋势，这很好。但我们需要先检查异常数据可能的原因，再判断整体趋势。你可以把三天各组的数据在表格里对比一下，看看除了第三天异常，其他天趋势是否一致。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着用平均值或最大值来看整体趋势。\",\"异常数据可能来自释放手法不一致，想一想如何控制。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-all-at-once-parachute-area-v1-4ff4db80a9",
+      "generatedAt": "2026-07-09T07:48:39.968Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"一次给全型-降落伞面积-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"stem_fit\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"温和纠正学生错误因果推断与危险提议，提供安全替代方案；通过引导描述趋势、比较组间差异和解释可能原因，提出下一步分析异常样本与多次测量的任务，避免直接下结论，控制认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我看了我们记录的数据，好像伞面面积越大，下落时间越长，这应该就是因果关系吧？我觉得我们可以亲自从教学楼二楼跳下来测试一下，这样最准确。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"从数据看，伞面面积增加确实伴随着更长的下落时间，但这只是相关性，还不能断定因果关系。我们绝对不能真人跳楼，这非常危险。安全替代方案：用不同面积的伞模型在室内高处多次释放，并记录更精确的时间。你可以对比各组间的差异，比如A到B增大了很多，B到C增大不明显，可能有什么因素在影响？下一步可以分析异常样本，并考虑多次测量取平均值。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较面积增加倍数与下落时间增加倍数是否一致。\",\"除面积外，空气密度、伞形等因素也可能影响结果。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-smartedu-0023-v1-cc162c4a12",
+      "generatedAt": "2026-07-09T07:49:03.945Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\": {\"scenario\": \"探究弹性势能的影响因素-蒸馏样本1\", \"phase\": 4, \"rubricTargets\": [\"cognitive_load_control\", \"stem_fit\", \"student_agency\", \"teaching_guidance\"], \"qualityNotes\": \"该样本在阶段4澄清自变量与因变量，引导学生观察趋势与组间差异，聚焦异常数据的可能原因，不直接给出结论，符合认知负荷控制和学生能动性要求。\", \"conversations\": [{\"from\": \"human\", \"value\": \"老师，我记录了三天数据，group_a、b、c分别变化，但我分不清哪个是自变量，哪个是因变量，能帮我看看趋势吗？\"}, {\"from\": \"gpt\", \"value\": {\"dialogue\": \"在实验中，自变量是人为改变的条件（如不同处理组），因变量是测量的结果。请你先观察数据，描述每个组在三天内的变化趋势，再比较组间差异。注意到day3的异常样本，这可能是什么原因？\", \"next_action_type\": \"text_input\", \"options\": [], \"hints\": [\"group_a三天从0到2，说明什么？\", \"异常样本可能源于记录错误或实验条件突变，想想怎么验证？\"], \"phase_complete\": false}}]}}"
+    },
+    {
+      "taskId": "p4-over-broad-vehicle-fuel-v1-4560b3d424",
+      "generatedAt": "2026-07-09T07:49:24.387Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"过度宏大型-新能源车续航-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"stem_fit\",\"student_agency\",\"teaching_guidance\",\"theme_fidelity\"],\"qualityNotes\":\"低投入学生：提供轻量趋势描述脚手架，引导比较组间差异并推测原因，不替代结论，突出异常数据，强调相关性非因果。控制认知负荷，保持主题一致性。\",\"conversations\":[{\"from\":\"human\",\"value\":\"小车数据我记完了，但看不懂这些数字是什么意思。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"看到你记录了三天数据，能描述一下橡皮筋增多时行驶距离的变化趋势吗？试着把观察写出来，再推测可能原因。别急着下结论，只是猜测。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察group_a、b、c在同一天的差距\",\"思考橡皮筋数量如何影响动力\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p4-cooperative-thermal-insulation-v1-1f8e13b4d7",
+      "generatedAt": "2026-07-09T07:50:01.413Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"配合型-保温材料-蒸馏样本1\",\"phase\":4,\"rubricTargets\":[\"cognitive_load_control\",\"expression\",\"stem_fit\",\"structure_compliance\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生在描述趋势与比较组间差异时关注异常值，避免将相关性断定为因果，并要求学生提出下一步分析问题，保持 student_agency。hints 提供异常值复核和统计方法，控制认知负荷。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我们测量了三天水降温的度数，发现包覆不同材料确实影响降温快慢。比如A组降温度数最小，C组最大。但是第三天记录时，一组有个杯子温度下降得特别少，和其他重复不一样，这怎么办？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你观察到的趋势很清晰。A组降温最小，C组最大，这与我们预测的材料隔熱性能差异一致。那个异常值需要特别关注。你觉得可能是什么原因导致了第三次测量的偏差？我们可以先检查记录是否准确，再决定是否保留该数据点。下一步，你打算如何比较各组的降温稳定性？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"异常值可能是人为误差或包覆失效，建议复核原始记录。\",\"可以计算每组平均降温值，观察整体趋势。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p5-high-concept-mars-light-v1-8fee7d975a",
+      "generatedAt": "2026-07-09T07:50:41.943Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念降级型-火星基地植物-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"proxy_quality\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"在阶段5提供报告框架，purpose/hypothesis/dataSummary已根据研究问题和数据填充，材料和步骤留白让学生回忆，分析部分提供趋势引导但避免直接下结论，强调证据缺口，保留火星基地术语。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我观察了绿豆5天的发芽情况，也记了数据，但我不太会写实验报告，你能帮我整理一下吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，我们按照科学报告框架来整理。你已经有研究问题、假设和部分数据，我帮你搭好了基本结构。请你补充实验材料和具体步骤，并根据数据分析结果，说明光照对发芽的影响。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回顾你用了哪些器材，步骤分几步？\",\"数据中，光照越长发芽数是否越高？有没有异常点？\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同人工光照时长对绿豆发芽和早期生长的影响，为火星基地人工控制光照提供参考。\",\"hypothesis\":\"如果每天光照时长越长，绿豆发芽越早，发芽总数也越多。\",\"materials\":\"\",\"procedure\":\"\",\"dataSummary\":\"5天数据：0h组发芽3粒，4h组7粒，8h组9粒，12h组9粒。随光照增加，发芽数明显提高。\",\"analysis\":\"\"}}}]}}"
+    },
+    {
+      "taskId": "p5-safety-acid-rain-plant-v1-d7d90a0163",
+      "generatedAt": "2026-07-09T07:51:23.353Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-酸雨与植物-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"safety\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"强化安全写作与工程参数转化：在报告框架中预设安全措施栏目，引导学生将自变量pH作为设计参数，因变量发芽数转为发芽率这一表现指标，同时要求标注异常数据，培养严谨表达。防止安全软化。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们的实验数据已经记录三天了，看出酸度高的组发芽少，现在要写报告，该怎么组织？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这是一份实验报告框架，请根据你的实验过程和记录填写每个部分，特别要写明安全操作。先完成初稿，我们再讨论改进。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回忆实验中哪个安全步骤最关键？\",\"尝试把发芽数转化为发芽率，更便于工程设计评价。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同酸度的稀酸溶液（白醋调配）对绿豆发芽数量和生长情况的影响。\",\"hypothesis\":\"如果稀酸溶液的pH值降低，酸性增强，那么绿豆发芽数量会减少，因为酸性环境可能抑制种子萌发所需的酶活性。\",\"materials\":\"绿豆种子、白醋、水、pH试纸（或pH计）、三个培养皿、棉花或吸水纸、护目镜、手套、滴管、标签纸。\",\"procedure\":\"1. 用白醋和水调配三种不同pH的稀酸溶液（例如pH≈3、5、7），用pH试纸确认；2. 在每个培养皿中铺好棉花，放入10粒绿豆种子；3. 分别滴加对应的稀酸溶液，保持湿润但不浸泡；4. 盖上培养皿，放在相同光照和室温环境下；5. 每天观察发芽数量并记录，持续3天。实验全程佩戴护目镜和手套，不直接接触溶液。\",\"dataSummary\":\"设计表格记录每天各组的发芽数，例如：| 天数 | 组A(pH≈3) | 组B(pH≈5) | 组C(pH≈7) | 备注 |，并填入实际数据。\",\"analysis\":\"根据数据趋势分析：pH值越低，发芽数越少，说明酸度增强确实抑制了绿豆发芽。请解释可能的生物学原因，并注意标记异常数据点。\"}}}]}}"
+    },
+    {
+      "taskId": "p5-smartedu-0012-v1-f494dda2a4",
+      "generatedAt": "2026-07-09T07:52:07.548Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"《控制变量法在初中化学实验探究中的应用》-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"该样本训练AI在阶段5提供结构化报告模板，以框架+提示+预留填写位的方式推动学生自主完成实验报告，避免替学生直接给出结论；融入已有研究问题和数据摘要，引导学生分析异常样本，强化证据意识和表述规范。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我比较了不同组的发芽趋势，但不知道怎么写成完整的实验报告，能帮我搭个框架吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这是你的报告结构，数据摘要栏已填入你记录的结果。请按各栏提示，用自己的话完成目的、假设、材料、步骤和分析段落。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先完善目的和假设，对照你最初的研究问题。\",\"分析异常时，思考光照是否唯一变量。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"本实验旨在探究______对______的影响。请根据你的研究问题完成。\",\"hypothesis\":\"你预测当______（自变量）改变时，因变量______会如何变化？请表述你的假设。\",\"materials\":\"回顾实验，你使用了哪些材料和设备？请列出关键器材。\",\"procedure\":\"你如何设置对照组和实验组？请简述操作步骤，确保控制变量。\",\"dataSummary\":\"这里是你记录的数据：\\n第1天：A组0，B组1，C组2\\n第2天：A组1，B组3，C组4\\n第3天：A组2，B组5，C组6（一个异常样本）\\n请用你自己的话总结数据趋势。\",\"analysis\":\"请分析数据：不同组别之间有什么差异？异常样本可能对你的结论有什么影响？你的实验是否验证了假设？请完成分析。\"}}}]}}"
+    },
+    {
+      "taskId": "p5-premature-shade-plant-height-v1-edc5b7e0e8",
+      "generatedAt": "2026-07-09T07:53:14.055Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"细节过早型-遮阴与株高-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"针对变量混淆学生，澄清自变量为遮阴程度，因变量为株高；提供报告框架但留空需学生填写；仅基于已有数据提供摘要；强调指向证据与局限，避免直接下结论。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我分析了数据，发现遮阴越多，绿豆长得越高。我想写报告，但不确定实验目的怎么写，还有我的假设是光照会影响植物高度，这个对吗？自变量是光照吗？因变量是株高吧？我有点乱。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你正确识别了自变量和因变量。现在请用我提供的报告框架整理你的研究。先填写实验目的、假设、使用的材料和步骤。数据摘要我已根据你的原始记录生成，请核对。分析部分需要你结合数据和植物知识来写，不要直接下结论，要指向证据和可能的局限。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是你改变的条件，因变量是你测量的结果。\",\"分析时注意比较不同组的变化趋势，并提及异常数据。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"研究遮阴程度是否影响绿豆幼苗株高。\",\"hypothesis\":\"请在此填写你的假设，例如：如果遮阴程度越高，则幼苗株高越高。\",\"materials\":\"请列出实验中用到的材料，如绿豆种子、花盆、土壤、遮阳网（不同透光率）、直尺等。\",\"procedure\":\"请逐步描述实验步骤，包括：如何分组、如何设置遮阴、每天如何测量株高、记录频率等。\",\"dataSummary\":\"实验记录了三天的株高数据（单位：厘米）：\\n第1天：A组0，B组1，C组2；\\n第2天：A组1，B组3，C组4；\\n第3天：A组2，B组5，C组6，其中第3天C组出现一个样本异常。\\n趋势：遮阴程度高的组株高增长更快。\",\"analysis\":\"请根据数据摘要分析遮阴程度对株高的影响，说明你的发现，比较各组差异，结合植物生长知识解释，并讨论异常样本的可能原因和实验的局限。\"}}}]}}"
+    },
+    {
+      "taskId": "p5-fuzzy-yogurt-temperature-v1-6f726332df",
+      "generatedAt": "2026-07-09T07:53:45.351Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-酸奶与温度-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"cognitive_load_control\",\"expression\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"student provides low effort response; tutor scaffolds report with structured sections without writing content; prompts student to fill data summary and explain anomaly; hints focus on data evidence and plausible cause; avoids over-questioning and conclusion-drawing; keeps cognitive load low with stepwise fill.\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，温度高的酸奶变质快，数据我都看了，但报告怎么写啊？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的数据确实显示温度与变质速度有关。我帮你搭好报告框架，包含目的、假设、材料、步骤、数据摘要与分析。你把每天每组的数值填入摘要，并解释异常样本。从“目的”和“假设”开始填，我会检查。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"对照表格，描述温度从低到高变质指标的变化趋势。\",\"异常样本出现在哪组哪天？可能是什么原因？\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"请写出研究问题（探究______对______的影响）\",\"hypothesis\":\"请写下你的假设（如果______，那么______）\",\"materials\":\"请列出所用材料（酸奶、存放环境等）\",\"procedure\":\"请简述放置和观察的步骤\",\"dataSummary\":\"请填入第1天到第3天A、B、C三组的变质数值，并标出异常样本\",\"analysis\":\"根据数据趋势，解释温度如何影响变质；说明异常样本的可能原因及实验局限\"}}}]}}"
+    },
+    {
+      "taskId": "p5-smartedu-0016-v1-0ae26e6f35",
+      "generatedAt": "2026-07-09T07:54:28.883Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"生成报告框架，提供purpose/hypothesis/materials/procedure/dataSummary/analysis六部分模板，保留分析缺口，强调基于数据、不替学生下结论，引导学生补充并关注异常数据。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我把实验数据整理好了，现在需要写一篇完整的探究报告。但我不太清楚报告应该包括哪些部分，您能帮我梳理一下框架吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"梳理报告框架：你需要写六部分——目的、假设、材料、步骤、数据摘要、分析。数据摘要描述各组浑浊度变化趋势，分析时关注第三天异常点。请先尝试填写每部分，我们再一起完善。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回顾自变量与因变量，确保目的明确\",\"对比各组数据，寻找规律和异常\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同过滤材料或过滤层数对自制净水器过滤效果的影响。\",\"hypothesis\":\"假设增加过滤层数/使用活性炭等材料能降低浑浊度，提高净水效果。\",\"materials\":\"活性炭、明矾、滤纸、塑料瓶、浑浊水样、量筒、烧杯等。\",\"procedure\":\"1. 配置相同浑浊度的水样；2. 设置A/B/C三组不同过滤材料或层数；3. 每天测量一次过滤后水的浑浊度，记录数据。\",\"dataSummary\":\"三天数据：A组浑浊度从0发展到2；B组从1到5；C组从2到6，整体呈上升趋势。第三天C组数据出现异常。\",\"analysis\":\"数据趋势与假设不一致，可能是实验操作误差或材料本身效果不佳。异常数据需进一步分析原因，建议重复实验验证。\"}}}]}}"
+    },
+    {
+      "taskId": "p5-safety-bread-mold-preservative-v1-a5038874f2",
+      "generatedAt": "2026-07-09T07:55:05.677Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-面包防腐-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"safety\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"在阶段5提供六段报告框架，强调安全提醒，引导学生用数据证据和原理进行分析，不直接给定结论，符合 scaffold 教学。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们观察完了三天数据，冷藏组发霉最少，干燥组发霉好像快一点。我是不是该写实验报告了？但我不知道怎么把数据解释清楚，而且安全方面也要写在报告里吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"嗯，写报告时，我们需要包括六个部分：实验目的、假设、材料、步骤、数据总结和分析。你可以按照这个框架补充内容。在分析部分，要结合抑制微生物的原理来解释哪种防腐方法更有效。另外，安全提醒一定要写在报告里，比如发霉面包不能食用、避免吸入孢子。现在请先试着填写目的和假设部分，有不清楚的随时问我。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"分析时比较各组发霉等级变化趋势\",\"防腐原理联系微生物生长条件\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"（待填写：说明探究不同防腐处理对面包发霉速度的影响）\",\"hypothesis\":\"（待填写：提出你对哪种处理最有效的预测及理由）\",\"materials\":\"（待填写：列出使用的面包、保鲜袋、密封罐、冰箱等材料）\",\"procedure\":\"（待填写：描述如何设置冷藏组、干燥组、真空密封组并观察记录）\",\"dataSummary\":\"（待填写：概述三天发霉等级数据，可提及一个异常样本）\",\"analysis\":\"（待填写：结合数据解释哪种方式最有效，讨论防腐原理，并指出异常可能原因）\"}}}]}}"
+    },
+    {
+      "taskId": "p5-variable-confusion-apple-browning-v1-cc9337c89e",
+      "generatedAt": "2026-07-09T07:55:58.132Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"变量混乱型-苹果褐变-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"teaching_guidance\"],\"qualityNotes\":\"阶段5提供报告框架，各节留白引导学生填充实验细节与数据分析，避免直接代写完整报告；框架紧密贴合研究问题与已有数据，未编造材料；重点纠正变量混乱与过早跳到阶段2的问题。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我的苹果褐变实验数据记录好了，但报告不知道怎么写，可以帮我整理一下吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"当然可以。我们一起来搭建实验报告。我已经准备了报告模板，你需要根据你的实验过程和数据来填充每个部分。重点关注数据趋势和异常分析。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"分析部分请写出三种处理褐变速度的快慢顺序。\",\"解释第3天异常数据可能的原因，如测量误差或样本差异。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同抗褐变处理（盐水浸泡、柠檬汁涂抹、不处理）对苹果切面褐变速度的影响。\",\"hypothesis\":\"你认为哪种处理最能延缓褐变？请写下你的假设。\",\"materials\":\"请列出实验所需材料：苹果、小刀、盘子、盐水（浓度？）、柠檬汁、计时器、记录表等。\",\"procedure\":\"请详细写出实验步骤：\\n1. 将苹果切成大小相同的三块；\\n2. 分别进行处理（A组不处理、B组浸泡盐水、C组涂抹柠檬汁）；\\n3. ……（请补充）\",\"dataSummary\":\"三天的评分数据如下：\\n第1天 A=0 B=1 C=2\\n第2天 A=1 B=3 C=4\\n第3天 A=2 B=5 C=6（C组出现一个异常点）\\n初步看，各组评分均随时间上升……（请继续描述趋势）\",\"analysis\":\"请分析数据回答研究问题：哪种处理最能延缓褐变？注意第3天C组异常值可能的原因。结合你的假设，讨论结果是否支持假设，并指出实验的局限。\"}}}]}}"
+    },
+    {
+      "taskId": "p5-smartedu-0020-v1-f795bc5031",
+      "generatedAt": "2026-07-09T07:56:15.790Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"探究影响光合作用的因素（实验）-蒸馏样本1\",\"phase\":5,\"rubricTargets\":[\"expression\",\"stem_fit\",\"structure_compliance\"],\"qualityNotes\":\"阶段5给出报告框架与证据缺口，引导学生用自己的语言填充purpose至analysis六个部分，要求引用数据、不代写结论，同时保持对话简洁。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我已经比对了三天三个组的数据，但写报告时不知道从哪里下笔，你能给我一个框架吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这是你的报告框架，每个部分都留了需要你补全的空缺，请把观察和推理填进去，并确保引用的数据来自实验记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先看purpose，用一句话说明你想探究什么。\",\"dataSummary里对比三个组三天的变化趋势，不要只列数字。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究……（请写明你改变的条件与想观察的结果）\",\"hypothesis\":\"如果……，那么……（请根据你的猜测写出假设）\",\"materials\":\"……（请列出你真正用到的材料，不要编造）\",\"procedure\":\"1. 准备……\\\\n2. 设置三个实验组……\\\\n3. 每天记录……（请补全步骤）\",\"dataSummary\":\"group_a 的三天数据为……，group_b 为……，group_c 为……（请描述总体趋势和异常点）\",\"analysis\":\"从数据看，……的变化引起了……的变化，可能的原因是……（请结合光合作用原理给出解释，并指出局限）\"}}}]}}"
+    },
+    {
+      "taskId": "p6-smartedu-0009-v1-79bd08ab5b",
+      "generatedAt": "2026-07-09T07:56:54.012Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"化学实验探究-蒸馏样本1\",\"phase\":6,\"rubricTargets\":[\"expression\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生在反思蒸馏误差基础上提出具体改进，延伸迁移应用，保持学生主体性，推动可执行的下次改进方向。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们蒸馏实验得到馏分的乙醇含量只有80%左右，比理论值低很多。我推测是加热太快导致蒸发不完全，还有冷凝管冷却水温度偏高，冷凝效果不好。我们想改进实验，但不知道具体怎么改比较好？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你们的反思很准确！加热速度和冷却效率确实是蒸馏实验的关键。请你们围绕这两点，提出一个具体的改进方案，比如如何平稳控制加热、如何增强冷凝效果。另外，迁移思考：如果要用蒸馏分离沸点更接近的混合液（如甲醇-水），还需要注意什么？期待你们写出来。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以尝试使用水浴加热代替明火，更易控制温度\",\"冷凝管中通入冰水混合物可提高冷凝效率\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p6-high-concept-mars-light-v1-84e0f11ab2",
+      "generatedAt": "2026-07-09T07:57:17.096Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"高概念降级型-火星基地植物-蒸馏样本1\",\"phase\":6,\"rubricTargets\":[\"expression\",\"proxy_quality\",\"structure_compliance\",\"student_agency\",\"teaching_guidance\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"在阶段6引导反思误差和改进，保持学生主体性，通过提示和学生自主思考，维持火星基地主题，体现了代理变量推理和教学指导。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我的实验报告已经写好了。现在我想总结一下实验中可能存在的误差，以及下一次可以怎么改进。另外，这个人工光照的实验对真正的火星基地植物栽培有什么启示吗？你能给我一些提示吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的报告完成了，很好。现在请回顾实验细节，比如光照是否均匀、浇水时机是否一致，这些都可能带来误差。然后你想想下次怎么改进，并联系火星基地：如果人工光照要模拟火星昼夜变化，需要注意什么？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"光强可能因位置不同而有差异。\",\"火星一昼夜约24小时37分，光照周期与地球接近。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p6-safety-acid-rain-plant-v1-62de28705d",
+      "generatedAt": "2026-07-09T07:57:48.802Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"安全风险型-酸雨与植物-蒸馏样本1\",\"phase\":6,\"rubricTargets\":[\"expression\",\"safety\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"导师引导反思误差来源、改进方向与迁移应用，同时强硬重申安全操作，保持学生主体性，不替代总结。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我分析了不同pH的稀酸溶液对绿豆发芽的影响，数据看起来pH越低发芽率越低。我把报告整理了一下，但不太确定怎么把这些结果用在设计酸雨防护措施上，您能帮我看看吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你的数据很有价值。先思考:发芽率差异可能受哪些误差影响（例如pH测量、种子差异）？如果要迁移至酸雨防护设计，你会重点监控哪个参数？下次实验若需更精确，你计划如何改进？切记:任何酸溶液操作必须全程戴护目镜和手套，仅限白醋调配稀溶液，严禁使用强酸。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑实验中的测量误差和生物差异\",\"如何把你的耐受pH范围转化为防护指标\"],\"phase_complete\":true}}]}}"
+    },
+    {
+      "taskId": "p6-smartedu-0012-v1-2fdae34c53",
+      "generatedAt": "2026-07-09T07:58:12.255Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"《控制变量法在初中化学实验探究中的应用》-蒸馏样本1\",\"phase\":6,\"rubricTargets\":[\"expression\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生反思计时和温度读数误差，温和纠正酸碱安全风险，提出食用白醋替代并讨论控制变量法的跨学科迁移，保持学生主体性，提供可执行的改进方向。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们组用不同温度测维生素C泡腾片溶解时间，数据波动大，可能计时不准或温度计读数有误差。控制变量法只在化学有用吗？下次想改成比较不同酸碱性，用点醋和碱面行吗？怎么改进能更准？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你抓住了计时和温度读数这两个关键误差来源，很好。控制变量法在物理、生物中也常用。酸碱性实验建议优先用食用白醋和小苏打溶液，避免使用强酸强碱。下次改进可以固定搅拌速度、统一温度计插入深度，并用手机秒表反复计时取平均。你打算先定量哪种酸碱条件？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"误差可从测量工具、操作一致性思考。\",\"用食用白醋替代强酸，安全且有效。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p6-premature-shade-plant-height-v1-09adc53484",
+      "generatedAt": "2026-07-09T07:58:37.335Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"细节过早型-遮阴与株高-蒸馏样本1\",\"phase\":6,\"rubricTargets\":[\"expression\",\"stage_discipline\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"通过反问引导反思测量误差的偏差方向、提出控制条件改进方案，并启发迁移应用，同时用hints支撑学生思考，不替学生写完整总结。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我报告写完了。但我发现实验有问题。我设了不同遮阴程度，但量株高时有些苗倒了，扶起来量可能偏高。我只测了一次，数据不准，怎么办？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你发现了测量误差，这很关键。扶起倒苗量高度会让数据偏高还是偏低？下次实验可以怎么固定幼苗避免倒伏？另外，遮阴影响株高这个原理，在农业生产或家庭种花时可能怎样应用？想想看。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"倒伏苗扶起后茎可能弯曲，测量值会比自然高度偏大；试着用竹签和细绳轻轻支撑。\",\"迁移应用：比如菜地间作高矮作物遮光，或者阳台遮阴选择耐阴植物。\"],\"phase_complete\":false}}]}}"
+    },
+    {
+      "taskId": "p6-fuzzy-yogurt-temperature-v1-6d5c3c01ad",
+      "generatedAt": "2026-07-09T07:59:01.839Z",
+      "modelConfig": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "baseURL": "https://api.deepseek.com/v1",
+        "timeoutMs": "180000",
+        "maxTokens": "6000"
+      },
+      "raw": "{\"record\":{\"scenario\":\"模糊型-酸奶与温度-蒸馏样本1\",\"phase\":6,\"rubricTargets\":[\"cognitive_load_control\",\"expression\",\"student_agency\",\"teaching_guidance\"],\"qualityNotes\":\"引导学生在完成报告后进行实验反思，聚焦误差来源，用开放式提问推动学生自主表达，控制认知负荷，提供轻量脚手架，不代替学生解答。\",\"conversations\":[{\"from\":\"human\",\"value\":\"老师，我们实验做完了，报告也写了。接下来还要做什么吗？\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"报告完成了，现在让我们回顾实验过程，想想哪些地方可能有误差。比如靠肉眼和闻气味判断变质，方法是否够准？存放温度是否一直稳定？你觉得本次实验最大的误差来源可能是什么？可以说一点。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察变质的方法是否可靠？\",\"温度控制是否一致？\"],\"phase_complete\":false}}]}}"
+    }
+  ]
+}

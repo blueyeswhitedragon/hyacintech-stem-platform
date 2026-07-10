@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { db } from '@/app/lib/db';
-import { getSession, type UserRole } from '@/app/lib/session';
+import { getSession } from '@/app/lib/session';
+import { isUserRole } from '@/app/lib/roles';
 
 export async function POST(request: Request) {
   let body: { username?: string; password?: string };
@@ -25,10 +26,14 @@ export async function POST(request: Request) {
   }
 
   const session = await getSession();
+  if (!isUserRole(user.role)) {
+    return NextResponse.json({ error: '账号角色无效，请联系管理员' }, { status: 403 });
+  }
+
   session.user = {
     id: user.id,
     username: user.username,
-    role: user.role as UserRole,
+    role: user.role,
     displayName: user.displayName,
   };
   await session.save();

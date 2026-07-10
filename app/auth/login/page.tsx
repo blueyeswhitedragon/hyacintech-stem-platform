@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { dashboardForRole, type UserRole } from '@/app/lib/roles';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function LoginPage() {
         setError(data.error || '登录失败');
         return;
       }
-      const dest = data.user?.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
+      const dest = dashboardForRole(data.user?.role as UserRole);
       router.push(dest);
       router.refresh();
     } catch {

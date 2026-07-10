@@ -14,7 +14,7 @@ model User {
   id           String   @id @default(uuid())
   username     String   @unique
   passwordHash String
-  role         String // "student" | "teacher"
+  role         String // "student" | "teacher" | "annotator" | "reviewer" | "admin"
   displayName  String
   createdAt    DateTime @default(now())
 
@@ -22,6 +22,17 @@ model User {
   classMemberships   ClassMember[]
   studentAssignments StudentAssignment[]
   conversations      Conversation[]
+
+  importedDatasetBatches DatasetBatch[]       @relation("DatasetBatchImporter")
+  createdCampaigns       AnnotationCampaign[] @relation("CampaignCreator")
+  annotationTasks        AnnotationTask[]     @relation("TaskAssignee")
+  annotationRevisions    AnnotationRevision[] @relation("RevisionAuthor")
+  assignedReviewCases    ReviewCase[]         @relation("ReviewCaseAssignee")
+  reviewDecisions        ReviewDecision[]     @relation("DecisionReviewer")
+  createdDatasetReleases DatasetRelease[]     @relation("ReleaseCreator")
+  createdTrainingRuns    TrainingRun[]        @relation("TrainingRunCreator")
+  createdEvaluationRuns  EvaluationRun[]      @relation("EvaluationRunCreator")
+  dataLabAuditLogs       DataLabAuditLog[]    @relation("AuditActor")
 }
 
 model Class {
@@ -90,8 +101,270 @@ model Conversation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user              User               @relation(fields: [userId], references: [id])
   // 1:1 关系的外键持有方是 StudentAssignment.conversationId，此处为虚拟反向关系。
   // （框架2在两侧都写了外键，Prisma 不允许循环 1:1，故只在 StudentAssignment 侧保留 FK。）
   studentAssignment StudentAssignment?
+}
+
+model DatasetBatch {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  sourceType     String
+  sourceFileName String
+  sourceSha256   String   @unique
+  status         String   @default("IMPORTED")
+  manifestJson   String   @default("{}")
+  summaryJson    String   @default("{}")
+  importedById   String
+  importedAt     DateTime @default(now())
+
+  importedBy User            @relation("DatasetBatchImporter", fields: [importedById], references: [id])
+  samples    DatasetSample[]
+}
+
+model DatasetSample {
+  id                 String   @id @default(uuid())
+  batchId            String
+  sourceRecordId     String   @unique
+  familyKey          String
+  phase              Int
+  scenario           String
+  sourceKind         String
+  candidateTier      String
+  rubricTargetsJson  String   @default("[]")
+  autoCheckJson      String   @default("{}")
+  originalRecordJson String
+  createdAt          DateTime @default(now())
+
+  batch        DatasetBatch         @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  tasks        AnnotationTask[]
+  revisions    AnnotationRevision[]
+  reviewCases  ReviewCase[]
+  releaseItems DatasetReleaseItem[]
+
+  @@index([phase])
+  @@index([candidateTier])
+  @@index([familyKey])
+}
+
+model AnnotationCampaign {
+  id                        String    @id @default(uuid())
+  name                      String    @unique
+  status                    String    @default("DRAFT")
+  selectionJson             String    @default("{}")
+  protocol                  String    @default("GOLD_DOUBLE_SILVER_SINGLE")
+  styleQuotaJson            String    @default("{}")
+  goldSlots                 Int       @default(2)
+  silverDoubleReviewPercent Int       @default(30)
+  maxActivePerAnnotator     Int       @default(1)
+  createdById               String
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+  startedAt                 DateTime?
+  completedAt               DateTime?
+
+  createdBy   User             @relation("CampaignCreator", fields: [createdById], references: [id])
+  tasks       AnnotationTask[]
+  reviewCases ReviewCase[]
+  releases    DatasetRelease[]
+}
+
+model AnnotationTask {
+  id             String    @id @default(uuid())
+  campaignId     String
+  sampleId       String
+  slot           Int
+  styleFamily    String?
+  status         String    @default("PENDING")
+  assignedToId   String?
+  draftJson      String    @default("{}")
+  leaseExpiresAt DateTime?
+  submittedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  campaign   AnnotationCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  sample     DatasetSample        @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  assignedTo User?                @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  revisions  AnnotationRevision[]
+
+  @@unique([campaignId, sampleId, slot])
+  @@index([campaignId, status])
+  @@index([assignedToId, status])
+}
+
+model AnnotationRevision {
+  id               String   @id @default(uuid())
+  taskId           String
+  sampleId         String
+  authorId         String
+  version          Int
+  contentJson      String
+  fullRecordJson   String
+  issueTagsJson    String   @default("[]")
+  changeReason     String   @default("")
+  noChange         Boolean  @default(false)
+  parentRevisionId String?
+  createdAt        DateTime @default(now())
+
+  task           AnnotationTask       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  sample         DatasetSample        @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  author         User                 @relation("RevisionAuthor", fields: [authorId], references: [id])
+  parentRevision AnnotationRevision?  @relation("RevisionChain", fields: [parentRevisionId], references: [id], onDelete: SetNull)
+  childRevisions AnnotationRevision[] @relation("RevisionChain")
+  selectedBy     ReviewDecision[]     @relation("SelectedRevision")
+  mergedBy       ReviewDecision[]     @relation("MergedRevision")
+  releaseItems   DatasetReleaseItem[]
+
+  @@unique([taskId, version])
+  @@index([sampleId])
+}
+
+model ReviewCase {
+  id                       String    @id @default(uuid())
+  campaignId               String
+  sampleId                 String
+  triggerReason            String
+  candidateRevisionIdsJson String    @default("[]")
+  status                   String    @default("PENDING")
+  assignedReviewerId       String?
+  assignedAt               DateTime?
+  decidedAt                DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  campaign         AnnotationCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  sample           DatasetSample      @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  assignedReviewer User?              @relation("ReviewCaseAssignee", fields: [assignedReviewerId], references: [id])
+  decision         ReviewDecision?
+
+  @@unique([campaignId, sampleId])
+  @@index([status])
+}
+
+model ReviewDecision {
+  id                 String   @id @default(uuid())
+  reviewCaseId       String   @unique
+  reviewerId         String
+  action             String
+  selectedRevisionId String?
+  mergedRevisionId   String?
+  finalTier          String
+  rubricJson         String   @default("{}")
+  reason             String   @default("")
+  createdAt          DateTime @default(now())
+
+  reviewCase       ReviewCase          @relation(fields: [reviewCaseId], references: [id], onDelete: Cascade)
+  reviewer         User                @relation("DecisionReviewer", fields: [reviewerId], references: [id])
+  selectedRevision AnnotationRevision? @relation("SelectedRevision", fields: [selectedRevisionId], references: [id], onDelete: SetNull)
+  mergedRevision   AnnotationRevision? @relation("MergedRevision", fields: [mergedRevisionId], references: [id], onDelete: SetNull)
+}
+
+model DatasetRelease {
+  id             String    @id @default(uuid())
+  version        String    @unique
+  status         String    @default("DRAFT")
+  campaignId     String?
+  recipeJson     String    @default("{}")
+  summaryJson    String    @default("{}")
+  cleanPath      String?
+  cleanSha256    String?
+  goldPath       String?
+  goldSha256     String?
+  silverPath     String?
+  silverSha256   String?
+  manifestPath   String?
+  manifestSha256 String?
+  createdById    String
+  createdAt      DateTime  @default(now())
+  frozenAt       DateTime?
+
+  campaign     AnnotationCampaign?  @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  createdBy    User                 @relation("ReleaseCreator", fields: [createdById], references: [id])
+  items        DatasetReleaseItem[]
+  trainingRuns TrainingRun[]
+}
+
+model DatasetReleaseItem {
+  id              String   @id @default(uuid())
+  releaseId       String
+  sampleId        String
+  revisionId      String?
+  tier            String
+  weight          Float    @default(1)
+  inclusionReason String
+  recordJson      String
+  createdAt       DateTime @default(now())
+
+  release  DatasetRelease      @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  sample   DatasetSample       @relation(fields: [sampleId], references: [id])
+  revision AnnotationRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
+
+  @@unique([releaseId, sampleId])
+  @@index([tier])
+}
+
+model TrainingRun {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  releaseId      String
+  baseModel      String
+  externalTaskId String?
+  parametersJson String   @default("{}")
+  status         String   @default("DRAFT")
+  modelTag       String?
+  notes          String   @default("")
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  release   DatasetRelease @relation(fields: [releaseId], references: [id])
+  createdBy User           @relation("TrainingRunCreator", fields: [createdById], references: [id])
+}
+
+model EvaluationRun {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  status      String   @default("IMPORTED")
+  modelATag   String
+  modelBTag   String
+  scope       String
+  summaryJson String   @default("{}")
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User                 @relation("EvaluationRunCreator", fields: [createdById], references: [id])
+  artifacts EvaluationArtifact[]
+}
+
+model EvaluationArtifact {
+  id        String   @id @default(uuid())
+  runId     String
+  kind      String
+  tag       String
+  sha256    String
+  jsonData  String
+  createdAt DateTime @default(now())
+
+  run EvaluationRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, kind, tag])
+  @@index([sha256])
+}
+
+model DataLabAuditLog {
+  id          String   @id @default(uuid())
+  actorId     String
+  action      String
+  entityType  String
+  entityId    String
+  payloadJson String   @default("{}")
+  createdAt   DateTime @default(now())
+
+  actor User @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
 }

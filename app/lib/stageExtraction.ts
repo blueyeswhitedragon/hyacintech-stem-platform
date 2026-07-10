@@ -25,6 +25,7 @@ export function extractStageData(
     stageData.stage1 = {
       confirmed: true,
       snapshot: response.snapshot ?? '',
+      themeMapping: response.theme_mapping,
       variables: {
         independent: response.variables.independent,
         // 第一阶段因变量可空（下沉到第二阶段）；控制变量也不强制。

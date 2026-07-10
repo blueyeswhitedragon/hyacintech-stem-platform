@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 3,
+  "createdAt": "2026-07-08T07:08:15.555Z",
+  "scope": "smoke",
+  "judgeLevel": "scenario",
+  "tags": {
+    "A": "qwen-smoke",
+    "B": "dsv4-smoke"
+  },
+  "judgeConfig": {
+    "baseURL": "https://jojocode.com/v1",
+    "model": "claude-opus-4-6",
+    "timeoutMs": 180000,
+    "maxTokens": 2000,
+    "temperature": 0
+  },
+  "summary": {
+    "scenario": {
+      "A": 0,
+      "B": 1,
+      "tie": 0,
+      "inconsistent": 0
+    },
+    "turn": {
+      "A": 0,
+      "B": 0,
+      "tie": 0,
+      "inconsistent": 0
+    },
+    "dimensions": {
+      "teaching_guidance": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "theme_fidelity": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "student_agency": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "proxy_quality": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "transformation_reasoning": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "interdisciplinary_integration": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "cognitive_load_control": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "stage_discipline": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "stem_fit": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "safety": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "structure_compliance": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "expression": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      }
+    }
+  },
+  "scenarioVerdicts": [
+    {
+      "id": "persona-工程项目型",
+      "title": "工程项目型",
+      "winner": "B",
+      "inconsistent": false,
+      "dimensions": {
+        "teaching_guidance": "B",
+        "theme_fidelity": "B",
+        "student_agency": "B",
+        "proxy_quality": "B",
+        "transformation_reasoning": "B",
+        "interdisciplinary_integration": "tie",
+        "cognitive_load_control": "B",
+        "stage_discipline": "B",
+        "stem_fit": "B",
+        "safety": "tie",
+        "structure_compliance": "tie",
+        "expression": "B"
+      },
+      "reasons": {
+        "aAsX": "导师X擅自将学生的湿度传感器+水泵方案替换为棉线毛细现象代理，严重偏离原始机制（proxy-drift），且反复用隐藏ABC式提问（棉线粗细/长度/高度）代替学生自主思考，student_agency和theme_fidelity双失。导师Y保留了学生原始的传感器+阈值方案，代理保真度高，引导节奏简洁，阶段推进合理。",
+        "bAsX": "导师Y擅自将学生的湿度传感器+水泵方案换成棉线毛细吸水代理，严重偏离原始机制（换题），且多轮反复追问同一问题（隐藏ABC式引导），忽视学生已明确表达的意图。导师X忠实保留传感器阈值触发机制，代理保真度高，每轮聚焦一个核心任务，阶段推进流畅，student_agency和theme_fidelity均优。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "Y",
+          "dimensions": {
+            "teaching_guidance": "Y",
+            "theme_fidelity": "Y",
+            "student_agency": "Y",
+            "proxy_quality": "Y",
+            "transformation_reasoning": "Y",
+            "interdisciplinary_integration": "tie",
+            "cognitive_load_control": "Y",
+            "stage_discipline": "Y",
+            "stem_fit": "Y",
+            "safety": "tie",
+            "structure_compliance": "tie",
+            "expression": "Y"
+          },
+          "reason": "导师X擅自将学生的湿度传感器+水泵方案替换为棉线毛细现象代理，严重偏离原始机制（proxy-drift），且反复用隐藏ABC式提问（棉线粗细/长度/高度）代替学生自主思考，student_agency和theme_fidelity双失。导师Y保留了学生原始的传感器+阈值方案，代理保真度高，引导节奏简洁，阶段推进合理。",
+          "preferencePair": {
+            "winnerExcerpt": "用土壤湿度传感器和可设定阈值的控制器(低压供电)来模拟自动判断，驱动小水泵或手动模拟浇水",
+            "loserExcerpt": "通过改变吸水材料（如棉线）的粗细或长度，来模拟不同的\"湿度触发阈值\""
+          }
+        },
+        "bAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "theme_fidelity": "X",
+            "student_agency": "X",
+            "proxy_quality": "X",
+            "transformation_reasoning": "X",
+            "interdisciplinary_integration": "tie",
+            "cognitive_load_control": "X",
+            "stage_discipline": "X",
+            "stem_fit": "X",
+            "safety": "tie",
+            "structure_compliance": "X",
+            "expression": "X"
+          },
+          "reason": "导师Y擅自将学生的湿度传感器+水泵方案换成棉线毛细吸水代理，严重偏离原始机制（换题），且多轮反复追问同一问题（隐藏ABC式引导），忽视学生已明确表达的意图。导师X忠实保留传感器阈值触发机制，代理保真度高，每轮聚焦一个核心任务，阶段推进流畅，student_agency和theme_fidelity均优。",
+          "preferencePair": {
+            "winnerExcerpt": "用土壤湿度传感器和可设定阈值的控制器(低压供电)来模拟自动判断，驱动小水泵或手动模拟浇水",
+            "loserExcerpt": "通过改变吸水材料（如棉线）的粗细或长度，来模拟不同的\"湿度触发阈值\""
+          }
+        }
+      }
+    }
+  ],
+  "turnVerdicts": []
+}

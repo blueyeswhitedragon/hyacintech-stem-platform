@@ -18,7 +18,7 @@ function isWs(ch: string): boolean {
 
 export function repairJson(src: string): string {
   // 弯引号归一
-  let s = src.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+  const s = src.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
 
   let out = '';
   let i = 0;

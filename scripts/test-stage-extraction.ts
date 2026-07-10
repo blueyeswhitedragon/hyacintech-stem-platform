@@ -40,11 +40,18 @@ console.log('extractStageData:');
     base({
       stage1_confirmed: true,
       snapshot: '《确认书》正文',
+      theme_mapping: {
+        originalInterest: '火星基地种菜',
+        retainedFeature: '人工控制光照',
+        classroomProxy: '不同人工光照时长',
+        researchQuestion: '不同人工光照时长是否影响绿豆发芽',
+      },
       variables: { independent: '光照时长', dependent: '株高' },
     }),
     {}
   );
   check('stage1 确认写入 stage1', r.stageData.stage1?.confirmed === true && r.stageData.stage1?.variables.independent === '光照时长');
+  check('stage1 写入 themeMapping', r.stageData.stage1?.themeMapping?.classroomProxy === '不同人工光照时长');
   check('stage1 确认不再自动推进', r.advanceTo === undefined);
 }
 
@@ -134,11 +141,32 @@ console.log('safeParseChatResponse 透传:');
     phase_complete: false,
     stage1_confirmed: true,
     snapshot: 'snap',
+    theme_mapping: {
+      originalInterest: '火星基地种菜',
+      retainedFeature: '人工控制光照',
+      classroomProxy: '不同人工光照时长',
+      researchQuestion: '不同人工光照时长是否影响绿豆发芽',
+    },
     variables: { independent: '温度', dependent: '溶解速度' },
   });
   const p = safeParseChatResponse(raw);
   check('透传 stage1_confirmed', p.stage1_confirmed === true);
+  check('透传 theme_mapping', p.theme_mapping?.retainedFeature === '人工控制光照');
   check('透传 variables', p.variables?.dependent === '溶解速度');
+}
+
+// 7b. 畸形 theme_mapping 被丢弃
+{
+  const raw = JSON.stringify({
+    dialogue: '好的',
+    next_action_type: 'confirmation',
+    phase_complete: false,
+    stage1_confirmed: true,
+    theme_mapping: { originalInterest: '太空', retainedFeature: '人工控制' },
+    variables: { independent: '光照时长' },
+  });
+  const p = safeParseChatResponse(raw);
+  check('畸形 theme_mapping 被丢弃', p.theme_mapping === undefined);
 }
 
 // 8. 畸形 safety_quiz（correct 越界）被丢弃
