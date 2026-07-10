@@ -4,9 +4,21 @@
  * 读写时用 JSON.parse / JSON.stringify 与本结构互转。
  */
 
+export interface ThemeMapping {
+  /** 学生最初提出的宽泛兴趣或高概念主题。 */
+  originalInterest: string;
+  /** 从原始主题中保留下来的真实特征、困难或约束。 */
+  retainedFeature: string;
+  /** 在课堂中安全、可操作地模拟该特征的代理方式。 */
+  classroomProxy: string;
+  /** 最终收敛出的可探究问题。 */
+  researchQuestion: string;
+}
+
 export interface Stage1Data {
   confirmed: boolean;
   snapshot: string; // 纯文本《探究问题确认书》
+  themeMapping?: ThemeMapping;
   variables: {
     independent: string;
     /** 第一阶段只确定自变量方向；因变量的具体测量方式下沉到第二阶段，故此处可空。 */

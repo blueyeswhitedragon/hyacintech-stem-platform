@@ -43,6 +43,26 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
           {item.student.displayName} @{item.student.username} · {item.assignment.class.name} · {item.assignment.title}
         </div>
 
+        {reviewStage === 2 && stageData.stage1?.snapshot && (
+          <section className="bg-white border-2 border-green-300 rounded-lg overflow-hidden">
+            <div className="bg-green-500 text-white px-4 py-2 text-sm font-medium">
+              📋 探究问题确认书（选题定向阶段成果）
+            </div>
+            <div className="p-4 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+              {stageData.stage1.snapshot}
+            </div>
+            {stageData.stage1.variables && (
+              <div className="px-4 pb-3 text-sm text-gray-600">
+                自变量：{stageData.stage1.variables.independent || '—'}
+                {stageData.stage1.variables.dependent ? ` · 因变量：${stageData.stage1.variables.dependent}` : ''}
+                {stageData.stage1.variables.controlled?.length
+                  ? ` · 控制变量：${stageData.stage1.variables.controlled.join('、')}`
+                  : ''}
+              </div>
+            )}
+          </section>
+        )}
+
         {reviewStage === 2 && stageData.stage2 && (
           <section className="bg-white border rounded-lg p-4">
             <h2 className="font-medium mb-3">实验方案 · 数据表结构</h2>

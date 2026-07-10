@@ -3,11 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { dashboardForRole, roleLabel, type UserRole } from '@/app/lib/roles';
 
 interface MeUser {
   id: string;
   username: string;
-  role: 'student' | 'teacher';
+  role: UserRole;
   displayName: string;
 }
 
@@ -33,12 +34,12 @@ export default function AuthNav() {
   if (!loaded) return null;
 
   if (user) {
-    const dashboard = user.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
+    const dashboard = dashboardForRole(user.role);
     return (
       <div className="flex items-center gap-3 text-sm">
         <Link href={dashboard} className="text-gray-600 hover:text-blue-600">
           {user.displayName}
-          <span className="ml-1 text-gray-400">({user.role === 'teacher' ? '教师' : '学生'})</span>
+          <span className="ml-1 text-gray-400">({roleLabel(user.role)})</span>
         </Link>
         <button onClick={handleLogout} className="text-blue-600 hover:underline">
           登出

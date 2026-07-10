@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 3,
+  "createdAt": "2026-07-08T07:09:19.707Z",
+  "scope": "smoke",
+  "judgeLevel": "scenario",
+  "tags": {
+    "A": "qwen-smoke",
+    "B": "dsv4-smoke"
+  },
+  "judgeConfig": {
+    "baseURL": "https://jojocode.com/v1",
+    "model": "claude-opus-4-6",
+    "timeoutMs": 180000,
+    "maxTokens": 2000,
+    "temperature": 0
+  },
+  "summary": {
+    "scenario": {
+      "A": 0,
+      "B": 1,
+      "tie": 0,
+      "inconsistent": 0
+    },
+    "turn": {
+      "A": 0,
+      "B": 0,
+      "tie": 0,
+      "inconsistent": 0
+    },
+    "dimensions": {
+      "teaching_guidance": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "theme_fidelity": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "student_agency": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "proxy_quality": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "transformation_reasoning": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "interdisciplinary_integration": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "cognitive_load_control": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "stage_discipline": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "stem_fit": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "safety": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      },
+      "structure_compliance": {
+        "A": 0,
+        "B": 0,
+        "tie": 1,
+        "inconsistent": 0
+      },
+      "expression": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0
+      }
+    }
+  },
+  "scenarioVerdicts": [
+    {
+      "id": "persona-高概念降级型",
+      "title": "高概念降级型",
+      "winner": "B",
+      "inconsistent": false,
+      "dimensions": {
+        "teaching_guidance": "B",
+        "theme_fidelity": "tie",
+        "student_agency": "B",
+        "proxy_quality": "tie",
+        "transformation_reasoning": "tie",
+        "interdisciplinary_integration": "tie",
+        "cognitive_load_control": "B",
+        "stage_discipline": "tie",
+        "stem_fit": "tie",
+        "safety": "B",
+        "structure_compliance": "tie",
+        "expression": "B"
+      },
+      "reasons": {
+        "aAsX": "导师Y在P1T2虽触发隐藏ABC检查，但实际仅列举条件类别并追问\"为什么选它\"，引导力更强。P2T3中Y追问\"发芽\"操作定义（胚根≥2mm），帮助学生量化因变量，stem_fit更优。P2T4中Y主动提示LED灯安全与定时器防短路，safety更佳。X在P2T1直接建议0/8/16h三个梯度，略有代答倾向；P2T3加粗过多，表达略冗。整体Y认知负荷控制更好，每轮聚焦单一任务，表达更简洁精准。",
+        "bAsX": "导师X在P1T2虽触发隐藏ABC检查，但整体引导更克制，每轮只聚焦一个核心问题，认知负荷控制更好；P2T4明确提示光源安全与定时器防短路，Y未提安全。Y在P2T1直接给出0/8/16三个梯度示例，有代答倾向，P2T3一次追问容器、水量、位置三个细节，认知负荷偏高。Y的transformation_reasoning在P1T3解释更清晰，略胜。综合X更优。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "Y",
+          "dimensions": {
+            "teaching_guidance": "Y",
+            "theme_fidelity": "tie",
+            "student_agency": "Y",
+            "proxy_quality": "tie",
+            "transformation_reasoning": "tie",
+            "interdisciplinary_integration": "tie",
+            "cognitive_load_control": "Y",
+            "stage_discipline": "tie",
+            "stem_fit": "Y",
+            "safety": "Y",
+            "structure_compliance": "tie",
+            "expression": "Y"
+          },
+          "reason": "导师Y在P1T2虽触发隐藏ABC检查，但实际仅列举条件类别并追问\"为什么选它\"，引导力更强。P2T3中Y追问\"发芽\"操作定义（胚根≥2mm），帮助学生量化因变量，stem_fit更优。P2T4中Y主动提示LED灯安全与定时器防短路，safety更佳。X在P2T1直接建议0/8/16h三个梯度，略有代答倾向；P2T3加粗过多，表达略冗。整体Y认知负荷控制更好，每轮聚焦单一任务，表达更简洁精准。",
+          "preferencePair": {
+            "winnerExcerpt": "你打算怎样定义\"发芽\"？是看到胚根突破种皮就算吗？生长方面，除了目测长势，是否考虑测量芽长（如毫米）？",
+            "loserExcerpt": "为了体现\"人工控制\"的对比，建议设置至少3个不同的光照时长组。例如：0小时（完全黑暗）、8小时、16小时。你觉得这三个梯度是否合理？"
+          }
+        },
+        "bAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "theme_fidelity": "tie",
+            "student_agency": "X",
+            "proxy_quality": "tie",
+            "transformation_reasoning": "Y",
+            "interdisciplinary_integration": "tie",
+            "cognitive_load_control": "X",
+            "stage_discipline": "tie",
+            "stem_fit": "tie",
+            "safety": "X",
+            "structure_compliance": "tie",
+            "expression": "X"
+          },
+          "reason": "导师X在P1T2虽触发隐藏ABC检查，但整体引导更克制，每轮只聚焦一个核心问题，认知负荷控制更好；P2T4明确提示光源安全与定时器防短路，Y未提安全。Y在P2T1直接给出0/8/16三个梯度示例，有代答倾向，P2T3一次追问容器、水量、位置三个细节，认知负荷偏高。Y的transformation_reasoning在P1T3解释更清晰，略胜。综合X更优。",
+          "preferencePair": {
+            "winnerExcerpt": "使用人工光源（如LED灯）时避免长时间直视强光，定时器需远离水源，防止短路。",
+            "loserExcerpt": "例如：0小时（完全黑暗）、8小时、16小时。你觉得这三个梯度是否合理？"
+          }
+        }
+      }
+    }
+  ],
+  "turnVerdicts": []
+}

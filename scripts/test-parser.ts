@@ -87,9 +87,18 @@ console.log('variables 回归（dependent 可空）:');
 {
   const raw = JSON.stringify({
     dialogue: '确认', next_action_type: 'confirmation', phase_complete: true,
-    stage1_confirmed: true, snapshot: 'snap', variables: { independent: '光照时长' },
+    stage1_confirmed: true,
+    snapshot: 'snap',
+    theme_mapping: {
+      originalInterest: '火星基地种菜',
+      retainedFeature: '人工控制光照',
+      classroomProxy: '不同人工光照时长',
+      researchQuestion: '不同人工光照时长是否影响绿豆发芽',
+    },
+    variables: { independent: '光照时长' },
   });
   const p = safeParseChatResponse(raw);
+  check('theme_mapping 透传', p.theme_mapping?.classroomProxy === '不同人工光照时长');
   check('仅 independent 透传 variables', p.variables?.independent === '光照时长');
   check('缺 dependent 不丢 variables', p.variables !== undefined && p.variables.dependent === undefined);
 }

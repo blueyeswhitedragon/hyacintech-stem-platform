@@ -1,0 +1,353 @@
+{
+  "schemaVersion": 2,
+  "createdAt": "2026-07-08T06:30:37.785Z",
+  "scope": "smoke",
+  "judgeLevel": "scenario",
+  "tags": {
+    "A": "qwen-smoke",
+    "B": "dsv4-smoke"
+  },
+  "judgeConfig": {
+    "baseURL": "https://jojocode.com/v1",
+    "model": "claude-opus-4-6",
+    "timeoutMs": 180000,
+    "maxTokens": 2000,
+    "temperature": 0
+  },
+  "summary": {
+    "scenario": {
+      "A": 2,
+      "B": 2,
+      "tie": 1,
+      "inconsistent": 1
+    },
+    "turn": {
+      "A": 0,
+      "B": 0,
+      "tie": 0,
+      "inconsistent": 0
+    },
+    "dimensions": {
+      "teaching_guidance": {
+        "A": 2,
+        "B": 1,
+        "tie": 2,
+        "inconsistent": 0
+      },
+      "creative_scaffolding": {
+        "A": 0,
+        "B": 0,
+        "tie": 5,
+        "inconsistent": 0
+      },
+      "stage_discipline": {
+        "A": 1,
+        "B": 1,
+        "tie": 3,
+        "inconsistent": 0
+      },
+      "stem_fit": {
+        "A": 1,
+        "B": 1,
+        "tie": 3,
+        "inconsistent": 0
+      },
+      "safety": {
+        "A": 1,
+        "B": 1,
+        "tie": 3,
+        "inconsistent": 0
+      },
+      "structure_compliance": {
+        "A": 0,
+        "B": 1,
+        "tie": 4,
+        "inconsistent": 0
+      },
+      "expression": {
+        "A": 1,
+        "B": 2,
+        "tie": 2,
+        "inconsistent": 0
+      }
+    }
+  },
+  "scenarioVerdicts": [
+    {
+      "id": "persona-配合型",
+      "title": "配合型",
+      "winner": "B",
+      "inconsistent": false,
+      "dimensions": {
+        "teaching_guidance": "B",
+        "creative_scaffolding": "tie",
+        "stage_discipline": "B",
+        "stem_fit": "tie",
+        "safety": "A",
+        "structure_compliance": "B",
+        "expression": "B"
+      },
+      "reasons": {
+        "aAsX": "导师X在P1阶段多次出现隐藏ABC选项、追问测量方式越界到P2、加粗过多、列表符号不规范等问题，且P1拖了4轮才收敛；导师Y节奏紧凑，P1两轮即完成确认，P2推进高效，表达简洁，阶段边界清晰。X在安全提示上更具体，但整体教学效率和合规性Y更优。",
+        "bAsX": "导师X在P1仅用2轮高效收敛选题，P2推进节奏紧凑，无越界追问；导师Y在P1多出2轮，P1T2-T3出现隐藏ABC选项和越界追问测量方式，P2T2再次列ABC选项，阶段纪律和表达简洁性明显不足。Y在安全提示上略优，但整体效率和合规性X更佳。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "Y",
+          "dimensions": {
+            "teaching_guidance": "Y",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "Y",
+            "stem_fit": "tie",
+            "safety": "X",
+            "structure_compliance": "Y",
+            "expression": "Y"
+          },
+          "reason": "导师X在P1阶段多次出现隐藏ABC选项、追问测量方式越界到P2、加粗过多、列表符号不规范等问题，且P1拖了4轮才收敛；导师Y节奏紧凑，P1两轮即完成确认，P2推进高效，表达简洁，阶段边界清晰。X在安全提示上更具体，但整体教学效率和合规性Y更优。",
+          "preferencePair": {
+            "winnerExcerpt": "P1T2直接确认研究问题清晰并出具确认书，两轮完成选题收敛",
+            "loserExcerpt": "P1T3追问'发芽具体指什么现象'涉及测量方式，属阶段2事项越界；多轮隐藏ABC选项"
+          }
+        },
+        "bAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "X",
+            "stem_fit": "tie",
+            "safety": "Y",
+            "structure_compliance": "X",
+            "expression": "X"
+          },
+          "reason": "导师X在P1仅用2轮高效收敛选题，P2推进节奏紧凑，无越界追问；导师Y在P1多出2轮，P1T2-T3出现隐藏ABC选项和越界追问测量方式，P2T2再次列ABC选项，阶段纪律和表达简洁性明显不足。Y在安全提示上略优，但整体效率和合规性X更佳。",
+          "preferencePair": {
+            "winnerExcerpt": "P1T2直接生成确认书，课题转化链完整，2轮完成选题收敛",
+            "loserExcerpt": "P1T3追问'具体是指什么现象…是看时间快慢、数量多少、高度差异'，越界至P2测量方式且出现隐藏ABC"
+          }
+        }
+      }
+    },
+    {
+      "id": "persona-工程项目型",
+      "title": "工程项目型",
+      "winner": "tie",
+      "inconsistent": true,
+      "dimensions": {
+        "teaching_guidance": "tie",
+        "creative_scaffolding": "tie",
+        "stage_discipline": "tie",
+        "stem_fit": "tie",
+        "safety": "tie",
+        "structure_compliance": "tie",
+        "expression": "tie"
+      },
+      "reasons": {
+        "aAsX": "导师X在P1阶段持续引导学生将抽象的\"湿度阈值\"转化为可操作的课堂代理（棉线粗细/长度），体现了优秀的启发式教学和创意脚手架搭建；Y在P1T2仅两轮就急于出确认书，未充分引导课堂代理转化，且后续P2阶段反复追问具体数值但学生始终未回答，阶段推进效率低。X的结构化字段输出更完整，表达也更清晰稳定。",
+        "bAsX": "导师Y强行用棉线毛细现象替代学生已明确的湿度传感器方案，偏离原始兴趣且增加不必要复杂度，P1拖至4轮才确认；导师X尊重学生意图，用传感器+阈值百分比直接量化，P1仅2轮高效收敛，变量定义清晰，课题转化链更贴合原主题，阶段推进更紧凑。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "creative_scaffolding": "X",
+            "stage_discipline": "X",
+            "stem_fit": "X",
+            "safety": "tie",
+            "structure_compliance": "X",
+            "expression": "X"
+          },
+          "reason": "导师X在P1阶段持续引导学生将抽象的\"湿度阈值\"转化为可操作的课堂代理（棉线粗细/长度），体现了优秀的启发式教学和创意脚手架搭建；Y在P1T2仅两轮就急于出确认书，未充分引导课堂代理转化，且后续P2阶段反复追问具体数值但学生始终未回答，阶段推进效率低。X的结构化字段输出更完整，表达也更清晰稳定。",
+          "preferencePair": {
+            "winnerExcerpt": "在课堂里，我们很难直接模拟复杂的土壤湿度传感器，但我们可以用一种简单的物理现象来代理\"干湿\"这个特征。比如，利用不同材料吸水后重量或体积的变化，或者利用毛细现象的快慢。",
+            "loserExcerpt": "用土壤湿度传感器和可设定阈值的控制器(低压供电)来模拟自动判断，驱动小水泵或手动模拟浇水"
+          }
+        },
+        "bAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "tie",
+            "creative_scaffolding": "X",
+            "stage_discipline": "X",
+            "stem_fit": "X",
+            "safety": "tie",
+            "structure_compliance": "X",
+            "expression": "X"
+          },
+          "reason": "导师Y强行用棉线毛细现象替代学生已明确的湿度传感器方案，偏离原始兴趣且增加不必要复杂度，P1拖至4轮才确认；导师X尊重学生意图，用传感器+阈值百分比直接量化，P1仅2轮高效收敛，变量定义清晰，课题转化链更贴合原主题，阶段推进更紧凑。",
+          "preferencePair": {
+            "winnerExcerpt": "用土壤湿度传感器和可设定阈值的控制器(低压供电)来模拟自动判断，驱动小水泵或手动模拟浇水",
+            "loserExcerpt": "通过改变吸水材料（如棉线）的粗细或长度，来模拟不同的\"湿度触发阈值\""
+          }
+        }
+      }
+    },
+    {
+      "id": "persona-高概念降级型",
+      "title": "高概念降级型",
+      "winner": "B",
+      "inconsistent": false,
+      "dimensions": {
+        "teaching_guidance": "tie",
+        "creative_scaffolding": "tie",
+        "stage_discipline": "tie",
+        "stem_fit": "B",
+        "safety": "B",
+        "structure_compliance": "tie",
+        "expression": "B"
+      },
+      "reasons": {
+        "aAsX": "两位导师在启发引导和创意脚手架上表现相当，但Y在多个细节上更优：P2T3要求学生定义\"发芽\"操作标准（胚根≥2mm），变量量化更严谨；P2T4主动提示光源安全风险；表达更简洁无冗余加粗；X在P2T3触发加粗过多警告且未补充容器等控制变量细节便急于生成表格，阶段收敛略仓促。",
+        "bAsX": "X在因变量操作化上更深入，追问\"发芽\"定义（胚根≥2mm）并引导量化芽长，stem_fit更强；P2T4明确提示光源安全与定时器防短路，Y未提及安全风险；Y多处加粗过多、语气偏夸张（\"太棒了\"反复出现），表达简洁度不如X；P2T1中Y主动给出具体梯度示例，略有代答倾向。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "Y",
+          "dimensions": {
+            "teaching_guidance": "tie",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "Y",
+            "stem_fit": "Y",
+            "safety": "Y",
+            "structure_compliance": "Y",
+            "expression": "Y"
+          },
+          "reason": "两位导师在启发引导和创意脚手架上表现相当，但Y在多个细节上更优：P2T3要求学生定义\"发芽\"操作标准（胚根≥2mm），变量量化更严谨；P2T4主动提示光源安全风险；表达更简洁无冗余加粗；X在P2T3触发加粗过多警告且未补充容器等控制变量细节便急于生成表格，阶段收敛略仓促。",
+          "preferencePair": {
+            "winnerExcerpt": "你打算怎样定义\"发芽\"？是看到胚根突破种皮就算吗？……建议：发芽标准——胚根长度≥2mm",
+            "loserExcerpt": "关于\"幼苗大概长得怎么样\"，为了数据更科学，建议具体化为测量幼苗的平均高度（单位：厘米）。"
+          }
+        },
+        "bAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "tie",
+            "stem_fit": "X",
+            "safety": "X",
+            "structure_compliance": "tie",
+            "expression": "X"
+          },
+          "reason": "X在因变量操作化上更深入，追问\"发芽\"定义（胚根≥2mm）并引导量化芽长，stem_fit更强；P2T4明确提示光源安全与定时器防短路，Y未提及安全风险；Y多处加粗过多、语气偏夸张（\"太棒了\"反复出现），表达简洁度不如X；P2T1中Y主动给出具体梯度示例，略有代答倾向。",
+          "preferencePair": {
+            "winnerExcerpt": "你打算怎样定义\"发芽\"？是看到胚根突破种皮就算吗？……建议：发芽标准——胚根长度≥2mm……使用人工光源时避免长时间直视强光，定时器需远离水源，防止短路。",
+            "loserExcerpt": "建议设置至少3个不同的光照时长组。例如：0小时（完全黑暗）、8小时、16小时。你觉得这三个梯度是否合理？"
+          }
+        }
+      }
+    },
+    {
+      "id": "phase4-data-analysis",
+      "title": "阶段4数据分析",
+      "winner": "A",
+      "inconsistent": false,
+      "dimensions": {
+        "teaching_guidance": "A",
+        "creative_scaffolding": "tie",
+        "stage_discipline": "A",
+        "stem_fit": "tie",
+        "safety": "tie",
+        "structure_compliance": "tie",
+        "expression": "tie"
+      },
+      "reasons": {
+        "aAsX": "导师Y在P4T2中直接给出光合作用、波长吸收、信号机制等详细解释，属于代答而非引导，削弱了学生自主分析的机会。导师X始终用提问推动学生自己确认变量、检查异常值、验证一致性，启发性更强，更符合数据分析阶段让学生自己发现规律的目标。",
+        "bAsX": "导师X在P4T2中过多代答（直接讲解绿光反射、光合作用效率、信号作用等知识），削弱了学生自主分析的空间；导师Y始终用追问引导学生自己核实数据、确认变量对应关系和异常值，更符合启发式教学和数据分析阶段应有的严谨收敛流程。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "X",
+            "stem_fit": "tie",
+            "safety": "tie",
+            "structure_compliance": "tie",
+            "expression": "X"
+          },
+          "reason": "导师Y在P4T2中直接给出光合作用、波长吸收、信号机制等详细解释，属于代答而非引导，削弱了学生自主分析的机会。导师X始终用提问推动学生自己确认变量、检查异常值、验证一致性，启发性更强，更符合数据分析阶段让学生自己发现规律的目标。",
+          "preferencePair": {
+            "winnerExcerpt": "在得出结论前，我们需要先确认几个问题：1.你的实验组别分别对应什么颜色的光？2.数据中是否有某一天的数值明显偏离整体趋势？3.这种差异是否在所有重复实验中都是一致的？",
+            "loserExcerpt": "绿叶植物通常主要吸收红光和蓝光，反射绿光，所以绿光下光合作用效率较低……种子萌发初期并不依赖光合作用，而是消耗自身养分，那光可能起到了信号作用"
+          }
+        },
+        "bAsX": {
+          "winner": "Y",
+          "dimensions": {
+            "teaching_guidance": "Y",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "Y",
+            "stem_fit": "Y",
+            "safety": "tie",
+            "structure_compliance": "tie",
+            "expression": "tie"
+          },
+          "reason": "导师X在P4T2中过多代答（直接讲解绿光反射、光合作用效率、信号作用等知识），削弱了学生自主分析的空间；导师Y始终用追问引导学生自己核实数据、确认变量对应关系和异常值，更符合启发式教学和数据分析阶段应有的严谨收敛流程。",
+          "preferencePair": {
+            "winnerExcerpt": "在得出结论前，我们需要先确认几个问题：1.你的实验组别分别对应什么颜色的光？2.数据中是否有异常值？3.这种差异是否在所有重复实验中都是一致的？",
+            "loserExcerpt": "绿叶植物通常主要吸收红光和蓝光，反射绿光，所以绿光下光合作用效率较低……光可能起到了信号作用，不同颜色的光可能触发不同的萌发机制。"
+          }
+        }
+      }
+    },
+    {
+      "id": "phase5-report",
+      "title": "阶段5报告成型",
+      "winner": "A",
+      "inconsistent": false,
+      "dimensions": {
+        "teaching_guidance": "A",
+        "creative_scaffolding": "tie",
+        "stage_discipline": "tie",
+        "stem_fit": "A",
+        "safety": "tie",
+        "structure_compliance": "tie",
+        "expression": "A"
+      },
+      "reasons": {
+        "aAsX": "导师X结合具体实验数据（白光最快、绿光最慢）给出针对性引导，帮助学生从数据出发撰写结论与反思，启发性更强；导师Y仅给出泛化提示，缺乏与学生实际数据的衔接，教学指导空洞。X的动作设为text_input更符合报告撰写需求。",
+        "bAsX": "导师Y结合具体课题数据（白光最快、绿光最慢）给出个性化引导，提示学生回应假设并思考绿光效果差的原因，启发性更强；动作设为text_input要求学生动手写，而X仅给泛化提示且动作为info，缺乏具体数据锚点，引导深度不足。"
+      },
+      "rawJudgeResponses": {
+        "aAsX": {
+          "winner": "X",
+          "dimensions": {
+            "teaching_guidance": "X",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "tie",
+            "stem_fit": "X",
+            "safety": "tie",
+            "structure_compliance": "tie",
+            "expression": "X"
+          },
+          "reason": "导师X结合具体实验数据（白光最快、绿光最慢）给出针对性引导，帮助学生从数据出发撰写结论与反思，启发性更强；导师Y仅给出泛化提示，缺乏与学生实际数据的衔接，教学指导空洞。X的动作设为text_input更符合报告撰写需求。",
+          "preferencePair": {
+            "winnerExcerpt": "根据你提供的数据，白光组的发芽速度明显快于其他组，而绿光组最慢……反思时可以思考为什么绿光效果最差",
+            "loserExcerpt": "结论要直接回答研究问题，基于数据总结主要发现。反思可以从实验设计的优缺点、可能的误差来源、改进方向等角度展开。"
+          }
+        },
+        "bAsX": {
+          "winner": "Y",
+          "dimensions": {
+            "teaching_guidance": "Y",
+            "creative_scaffolding": "tie",
+            "stage_discipline": "tie",
+            "stem_fit": "Y",
+            "safety": "tie",
+            "structure_compliance": "tie",
+            "expression": "Y"
+          },
+          "reason": "导师Y结合具体课题数据（白光最快、绿光最慢）给出个性化引导，提示学生回应假设并思考绿光效果差的原因，启发性更强；动作设为text_input要求学生动手写，而X仅给泛化提示且动作为info，缺乏具体数据锚点，引导深度不足。",
+          "preferencePair": {
+            "winnerExcerpt": "根据你提供的数据，白光组的发芽速度明显快于其他组，而绿光组最慢……尝试撰写报告的结论部分，回答你的研究问题",
+            "loserExcerpt": "结论要直接回答研究问题，基于数据总结主要发现。反思可以从实验设计的优缺点、可能的误差来源、改进方向等角度展开。"
+          }
+        }
+      }
+    }
+  ],
+  "turnVerdicts": []
+}

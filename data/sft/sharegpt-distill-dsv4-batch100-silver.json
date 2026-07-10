@@ -1,0 +1,2145 @@
+[
+  {
+    "id": "stem-distill-dsv4-p3-high-concept-mars-light-v1-569e456ce7-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念降级型-火星基地植物-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "proxy_quality",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-high-concept-mars-light-v1-569e456ce7"
+    ],
+    "qualityNotes": "在阶段3启动节点，教师用火星基地舱室类比光照时长，保持高概念语境，避免主题流失。安全提醒简洁，仅3条关键点，符合‘只保留1条安全提醒+1个立即记录动作’要求，未堆叠步骤。两条提示指向对照组和定时器，强化记录习惯与控制变量意识，教学引导合理。对话未替学生编造数据，强调确认与自主记录。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我的‘火星基地’植物光照实验都准备好了，绿豆、LED灯、三个光照时长组（4h，8h，12h），现在可以开始了吗？模拟火星基地要注意什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"欢迎进入‘火星基地植物’实验！用不同光照时长模拟基地不同舱室，想法很好。开始前，请确认安全要点：使用LED光源，避免直视强光；灯距叶片应保持20厘米以上；电源远离水。你理解这些要求了吗？确认后，记录你的三组光照设置、种子数量和观察起点，即可启动。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如果忘记对照组，发芽率会受室温干扰。\",\"用定时器控制光周期，减少人为误差。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-high-concept-mars-light-v1-569e456ce7",
+      "sourceKind": "persona",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "火星基地植物生存",
+        "retainedFeature": "基地环境条件需要人工控制",
+        "classroomProxy": "不同人工光照时长",
+        "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+        "independentVariable": "人工光照时长",
+        "dependentDirection": "发芽和早期生长情况",
+        "safetyNotes": [
+          "人工光源用LED，不用高压灯具"
+        ],
+        "mustKeepTerms": [
+          [
+            "火星"
+          ],
+          [
+            "基地"
+          ],
+          [
+            "人工",
+            "控制"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "人工",
+            "光照"
+          ],
+          [
+            "光照",
+            "时长"
+          ]
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-safety-acid-rain-plant-v1-8ca518628f-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-酸雨与植物-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-safety-acid-rain-plant-v1-8ca518628f"
+    ],
+    "qualityNotes": "强调实验操作前安全核验与记录先行，阻止学生直接浇灌导致不可逆损伤。用1条安全提醒+1个立即记录动作推动行为，避免步骤堆叠。dialogue嵌入安全约束并指向自变量的实测证据，为后续分析奠基。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们组把不同pH的白醋溶液都配好了，四个杯子标签也贴了，现在可以直接往绿豆上浇了吧？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"停一下，操作前必须先做两件事：戴好护目镜和手套，这是安全底线。然后把每杯溶液的实际pH试纸读数记在实验记录单上，写明“2024-04-10 实测pH值”。配好的溶液和标签完全一致吗？确认后再浇，一次性浇完不能反悔。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"护目镜和手套须全程佩戴\",\"用pH试纸实测并记录，对比标签\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-safety-acid-rain-plant-v1-8ca518628f",
+      "sourceKind": "persona",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "酸雨对植物的危害",
+        "retainedFeature": "酸性程度影响植物生长",
+        "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+        "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+        "independentVariable": "稀酸溶液pH",
+        "dependentDirection": "发芽和生长情况",
+        "safetyNotes": [
+          "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+          "佩戴护目镜和手套",
+          "不直接接触或闻溶液"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0012-v1-22191ce4d3-v1",
+    "source": "distill_dsv4",
+    "scenario": "《控制变量法在初中化学实验探究中的应用》-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0012-v1-22191ce4d3"
+    ],
+    "qualityNotes": "针对学生提出的危险操作（浓硫酸），导师温和纠正并给出低风险替代方案（稀盐酸与碳酸钙），仅用1条安全提醒和1个立即记录动作，避免步骤堆叠；引导聚焦自变量梯度、控制变量和起始数据记录，训练模型的安全干预与阶段纪律。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我想用浓硫酸滴在锌粒上，看看温度变化，可以吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"浓硫酸强腐蚀且放热剧烈，课堂探究不宜使用。建议改用稀盐酸与碳酸钙反应，控制盐酸浓度观察气泡速率，既安全又符合控制变量法。请先记录烧杯质量、盐酸浓度和碳酸钙质量，戴好护目镜，确认安全后开始实验。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录起始数据如盐酸浓度和碳酸钙质量\",\"确保除自变量外其他条件不变\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0012-v1-22191ce4d3",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0012",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "《控制变量法在初中化学实验探究中的应用》",
+        "retainedFeature": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-premature-shade-plant-height-v1-59aae2fa50-v1",
+    "source": "distill_dsv4",
+    "scenario": "细节过早型-遮阴与株高-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-premature-shade-plant-height-v1-59aae2fa50"
+    ],
+    "qualityNotes": "学生在阶段3过早给出总结性观测结果，导师点明需基于原始记录表逐株记录，强调真实数据、异常描述和安全提醒，并引导立即执行测量与记录动作，杜绝杜撰。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，遮阴实验今天开始测了，我三盆绿豆放不同地方：全阴角落、半阴窗台、全日照阳台。全阴苗已经有5厘米高了，半阴的才3厘米，全日照的最高，有8厘米。我是不是可以直接下结论写报告了？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"现在还不能写结论。需要你先在原始记录表里逐株记录每盆幼苗的实际高度，用尺子量基土表面到最高叶尖。还要记录异常，比如倒伏、发黄。让阳光直晒的设计可能有花盆倾倒风险，观察时别碰遮阴物，安全第一。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"测量高度请统一从泥土表面量到最高叶尖\",\"记录时不要移动花盆或改变遮阴位置\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-premature-shade-plant-height-v1-59aae2fa50",
+      "sourceKind": "persona",
+      "personaId": "premature-shade-plant-height",
+      "subject": "biology_ecology",
+      "studentType": "premature_details",
+      "difficulty": "medium",
+      "failureModes": [
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "植物长不高",
+        "retainedFeature": "光照强弱影响株高",
+        "classroomProxy": "不同遮阴程度",
+        "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+        "independentVariable": "遮阴程度",
+        "dependentDirection": "幼苗株高"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:premature_details",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-fuzzy-yogurt-temperature-v1-a97d6a9ee7-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-酸奶与温度-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-fuzzy-yogurt-temperature-v1-a97d6a9ee7"
+    ],
+    "qualityNotes": "针对低投入学生，精准输出单条安全提醒与立即记录动作，严格控制认知负荷，不代劳、不追问，防止 over_questioning。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "好的，我先闻一下气味，然后把看到的记下来。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"安全第一：只观察不食用。闻气味时用手轻轻扇动，不要直接把鼻子凑近容器口。现在请记录室温下酸奶的初始颜色、气味和质地，如实写入笔记栏。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"用简单词语描述气味，如“酸味”“奶味”“异味”。\",\"质地可描述为“光滑”“结块”“有水分析出”等。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-fuzzy-yogurt-temperature-v1-a97d6a9ee7",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-yogurt-temperature",
+      "subject": "food_chemistry",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物保存",
+        "retainedFeature": "温度影响微生物活动",
+        "classroomProxy": "不同存放温度",
+        "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+        "independentVariable": "存放温度",
+        "dependentDirection": "变质快慢",
+        "safetyNotes": [
+          "变质食物只观察不食用",
+          "闻气味用手扇，不直接凑近"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0016-v1-1391d46605-v1",
+    "source": "distill_dsv4",
+    "scenario": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0016-v1-1391d46605"
+    ],
+    "qualityNotes": "实验开始前通过安全提醒和记录准备，强化规范操作意识，要求学生先记录原水特性，落实真实记录和异常记录训练目标。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我准备好了材料，可以开始做净水实验了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"可以开始。但操作前请先确认安全：佩戴口罩和手套，明矾溶液避免接触皮肤和眼睛，实验废液不要随意倾倒。然后请先记录未过滤的原水浑浊度和颜色，作为对照。现在请描述你观察到原水的外观，并确认安全防护已做好。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"浑浊度可用肉眼或简易浊度计判断，记录时注明时间。\",\"异常颗粒或颜色变化要如实记录，不要忽略。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0016-v1-1391d46605",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0016",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-safety-bread-mold-preservative-v1-6538db9086-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-面包防腐-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-safety-bread-mold-preservative-v1-6538db9086"
+    ],
+    "qualityNotes": "关键训练点：在实验启动瞬间嵌入单一关键安全提醒与即时记录动作，避免多步骤堆叠；通过ask_choice强化安全确认，同时要求立即记录初始状态，防止编造数据。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经把面包片分成了三组，一组放进冰箱冷藏，一组用干燥剂密封保存，还有一组抽真空密封，现在要怎么开始观察？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你已经开始操作了，很好。请记住一条最关键的安全规则：发霉的面包只观察、不食用，并且打开容器时要避免吸入霉菌孢子。现在，请你立刻在实验记录表里写下每组面包的初始状态，比如颜色、质地、有无可见霉斑，最好拍张照片。\",\"next_action_type\":\"ask_choice\",\"options\":[\"我已知晓安全事项，已记录初始状态，可以开始观察了\",\"我需要再检查一下我的初始记录\"],\"hints\":[\"可以把冷藏、干燥、真空三组分别记作A、B、C组\",\"拍照时放一把尺子参考大小\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-safety-bread-mold-preservative-v1-6538db9086",
+      "sourceKind": "persona",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物怎么防腐",
+        "retainedFeature": "防腐方式抑制微生物",
+        "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+        "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+        "independentVariable": "防腐处理方式",
+        "dependentDirection": "发霉速度",
+        "safetyNotes": [
+          "发霉食物只观察不食用，可能产生毒素",
+          "避免吸入霉菌孢子"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-variable-confusion-apple-browning-v1-016d628f66-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-variable-confusion-apple-browning-v1-016d628f66"
+    ],
+    "qualityNotes": "引导学生在实验阶段先关注安全与真实记录，防止因数据收集冲动跳过初始状态记录或忽略异常观察；对话中嵌入单条安全提醒并推动立即记录动作，避免给学生替写数据。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我已经切好了9片苹果，厚度差不多，分别泡在盐水、柠檬汁和清水里，每种3片。我打算每10分钟观察一次，用0-5分记录褐变程度。现在可以开始计时了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"准备工作很充分，变量控制也到位。在开始计时前，先为每一片苹果记录第0分钟的初始颜色和状态。切苹果时务必请成年人帮忙，安全第一。准备好记录表后就可以启动计时，每10分钟如实填写，有任何意外斑点或损伤都记在备注栏里。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"记录时为每片苹果编号，防止混淆处理组\",\"出现异常斑点请立即在备注栏写明，勿事后补记\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-variable-confusion-apple-browning-v1-016d628f66",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0020-v1-a4f200a1d9-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响光合作用的因素（实验）-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0020-v1-a4f200a1d9"
+    ],
+    "qualityNotes": "本样本训练导师在实验开始前给予关键安全提醒，并立即引导学生记录初始实验条件，避免直接操作而忽略数据记录，符合阶段3要求的安全与真实记录规范。dialogue简洁，未堆叠步骤，hints提供记录方向。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我的实验材料都按方案准备好了，可以开始做光合作用的变量控制实验了吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"在动手之前，请一定注意安全：使用剪刀处理植物叶片时要格外小心，防止划伤。现在请先记录当前的初始条件，比如环境温度、光照强度等，确保从实验起点就留下真实数据。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议记录温度、光照、水深等初始数据。\",\"观察时注意叶片上浮的规律性变化。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0020-v1-a4f200a1d9",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0020",
+      "subject": "生物",
+      "expectedTransformation": {
+        "originalInterest": "探究影响光合作用的因素（实验）",
+        "retainedFeature": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-safety-acid-rain-plant-v1-224c6adf7d-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-酸雨与植物-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-safety-acid-rain-plant-v1-224c6adf7d"
+    ],
+    "qualityNotes": "在阶段4中，导师引导学生描述发芽趋势，比较组间差异，提出除pH外其他因素的可能性，避免将相关性等同于因果；强调必须基于完整数据记录，注意异常值，并引导学生计划下一步测量以增强证据；同时内嵌操作安全提醒，确保学生穿戴防护。符合认知负荷控制（一次性聚焦比较与原因分析）、安全（提醒防护）、STEM契合（数据解读）、学生自主性（不直接给答案）和教学引导（提供结构化问题而非结论）。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们发现发芽数：第一天 group_a 0，b 1，c 2；第二天 a 1，b 3，c 4；第三天 a 2，b 5，c 6。但是酸度更高（pH更低）的组发芽反而更多，这和我们想的酸雨危害好像相反？是不是醋溶液反而有帮助？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的直觉很敏锐。先把数据画成折线图，看看三天里各组的增速差异。group_a 增长较慢，b、c 较快，但第三天有一个异常样本，不能匆忙下结论。除了pH，溶液中的醋酸根离子也可能影响种子代谢。建议下一步测量幼苗株高，并检查原始种子的饱满度是否一致。操作时一定要戴好护目镜和手套，避免醋液溅出。现在先思考：这种相反趋势可能有哪些混杂因素？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"提示：注意区分pH和溶液成分的影响。\",\"思考：为什么第三天有异常样本？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-safety-acid-rain-plant-v1-224c6adf7d",
+      "sourceKind": "persona",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "酸雨对植物的危害",
+        "retainedFeature": "酸性程度影响植物生长",
+        "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+        "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+        "independentVariable": "稀酸溶液pH",
+        "dependentDirection": "发芽和生长情况",
+        "safetyNotes": [
+          "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+          "佩戴护目镜和手套",
+          "不直接接触或闻溶液"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0012-v1-832ba80eae-v1",
+    "source": "distill_dsv4",
+    "scenario": "《控制变量法在初中化学实验探究中的应用》-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0012-v1-832ba80eae"
+    ],
+    "qualityNotes": "导师在回应中温和纠正学生尝试浓硫酸的危险想法，提供安全的替代方案，同时推进数据分析任务，聚焦趋势描述和组间比较，避免直接给出因果结论。提问引导学生自行发现差异，给予适度提示，保持学生主动性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，每天数值都在增加，是不是时间越长反应越多？我还想试试用更浓的硫酸，感觉会更快。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到了各组随时间上升的趋势，但浓硫酸有危险，不建议自行配制。我们可以改用不同浓度的食醋或维生素C溶液，同样控制其他条件，这样更安全。请先用现有数据比较一下a、b、c三组的增长快慢，你有什么发现？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"计算每组从第1天到第3天的差值\",\"说明哪一组变化最大，可能和什么条件有关\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0012-v1-832ba80eae",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0012",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "《控制变量法在初中化学实验探究中的应用》",
+        "retainedFeature": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-premature-shade-plant-height-v1-44e78ac4db-v1",
+    "source": "distill_dsv4",
+    "scenario": "细节过早型-遮阴与株高-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stage_discipline",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-premature-shade-plant-height-v1-44e78ac4db"
+    ],
+    "qualityNotes": "引导学生从过早结论回到数据趋势描述与组间比较，并强调相关性不意味因果，鼓励提出可验证的下一步问题，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我发现遮阴最强的那组C株高最高，组A光照好反而最矮。所以遮阴越多，株高越长，这是因为植物想逃出阴影。是不是这个道理？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你善于从数据中寻找规律。能否先用一句话描述三天来各组株高的变化趋势？再比较组间差异。我们目前只能说遮阴程度与株高有关联，还不能断定遮阴是唯一原因。接着想，如果继续遮阴，茎的粗细或叶色会怎样？你可以提出一个下一步想验证的问题。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"从第1天到第3天，各组株高均增长，组C增长最大。\",\"对比组间增长速率，尝试解释差异可能原因。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-premature-shade-plant-height-v1-44e78ac4db",
+      "sourceKind": "persona",
+      "personaId": "premature-shade-plant-height",
+      "subject": "biology_ecology",
+      "studentType": "premature_details",
+      "difficulty": "medium",
+      "failureModes": [
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "植物长不高",
+        "retainedFeature": "光照强弱影响株高",
+        "classroomProxy": "不同遮阴程度",
+        "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+        "independentVariable": "遮阴程度",
+        "dependentDirection": "幼苗株高"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:premature_details",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v1-a7c0549057-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-酸奶与温度-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-fuzzy-yogurt-temperature-v1-a7c0549057"
+    ],
+    "qualityNotes": "阶段4数据趋势引导，用学生自己的观察作为起点，以轻量追问推动相关与因果区分，并指向异常数据的验证，不代替学生下结论，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "C组变质最快，B组中等，A组最慢，温度越高变质越快？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你看到了C组得分增加最快，A组最慢，确实显示温度越高变质越快。但这只是相关性，还不能确定因果，因为微生物活动还受其他因素影响。接下来可以关注第三天C组的异常记录，你觉得可能是什么原因造成的？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"思考还有哪些变量可能干扰微生物繁殖？\",\"判断异常值是偶然还是规律，可以重复实验。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-fuzzy-yogurt-temperature-v1-a7c0549057",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-yogurt-temperature",
+      "subject": "food_chemistry",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物保存",
+        "retainedFeature": "温度影响微生物活动",
+        "classroomProxy": "不同存放温度",
+        "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+        "independentVariable": "存放温度",
+        "dependentDirection": "变质快慢",
+        "safetyNotes": [
+          "变质食物只观察不食用",
+          "闻气味用手扇，不直接凑近"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0016-v1-985d547477-v1",
+    "source": "distill_dsv4",
+    "scenario": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0016-v1-985d547477"
+    ],
+    "qualityNotes": "引导学生描述各组浑浊度变化趋势，比较B、C组与A组的差异，提醒关注异常样本而不直接归因，启发思考验证实验，强化数据驱动推理。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我记录了三天的数据，感觉有些奇怪，为什么每一组的浑浊度都在增加？A组好像变化不大，B组和C组上升很快，还有一个异常样本，我有点搞不懂。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我看到数据了。A组从0到2变化平缓，B组从1到5，C组从2到6并有一个异常样本。你能先描述各组浑浊度的变化快慢，再比较哪组增长最快吗？这能帮你区分不同过滤材料的差异。之后我们讨论异常样本是否影响结论，以及是否需要补充实验来验证。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试算各组浑浊度的日均变化量\",\"异常样本可能由测量误差或装置故障引起，你能想到哪些排查方法？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0016-v1-985d547477",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0016",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-safety-bread-mold-preservative-v1-c3b8b79897-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-面包防腐-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-safety-bread-mold-preservative-v1-c3b8b79897"
+    ],
+    "qualityNotes": "在阶段4数据分析中，以学生观察为起点，引导其对比各防腐处理组的发霉趋势，指出异常样本可能干扰结论并需要谨慎归因，同时明确安全操作（不触碰、密封丢弃、防孢子），用一个开放问题推动学生思考实验改进，避免直接给出最终判断。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，看了三天记录，冷藏组几乎没霉变，干燥和真空密封组都长了，但第三天真空密封组反而比干燥组霉变更多。这个异常样本是不是影响了结果？干燥效果好过真空吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你能注意到三组的差异，真不错！冷藏确实明显抑制霉变。干燥和真空密封在第三天出现逆转，但异常样本提醒我们不要匆忙下结论。可能是因为那个袋口没封严或初始带菌量不同。安全提醒：别再触碰发霉面包，密封丢弃，开窗防孢子。如果重做实验，你打算怎样减少这类干扰，更公平地对比干燥和真空效果呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"注意异常样本出现的那袋面包的保存细节\",\"想想样本间初始带菌量是否一致\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-safety-bread-mold-preservative-v1-c3b8b79897",
+      "sourceKind": "persona",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物怎么防腐",
+        "retainedFeature": "防腐方式抑制微生物",
+        "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+        "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+        "independentVariable": "防腐处理方式",
+        "dependentDirection": "发霉速度",
+        "safetyNotes": [
+          "发霉食物只观察不食用，可能产生毒素",
+          "避免吸入霉菌孢子"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-variable-confusion-apple-browning-v1-57b882e89e-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stage_discipline",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-variable-confusion-apple-browning-v1-57b882e89e"
+    ],
+    "qualityNotes": "学生观察了数据并猜测盐水隔绝氧气是原因，但暴露了因果归因倾向和变量混淆（例如质疑实验意义）。导师通过聚焦趋势描述、异常值检验和机制多解性引导，既控制认知负荷又不否认知情，指向证据缺口，促进学生自主分析下一步。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天数据：第一天不处理的苹果开始变褐，盐水处理的还白，柠檬汁处理的有点变黄；第二天盐水处理的稍微变黄，柠檬汁的变褐明显，不处理的变得很黑了；第三天一个盐水样本黑了，其他正常。我发现盐水好像最能防止褐变，可能是因为盐水里的盐把氧气隔开了。但是为什么柠檬汁也有点防褐变，却没盐水好？而且盐水泡过的苹果吃起来咸，会影响口感。是不是这种实验没意义？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"通过你的观察，数据确实显示了盐水组的褐变程度最低。不过，在确认“盐水隔绝氧气是原因”之前，我们需要先仔细比较组间的变化趋势是否一致，特别要关注那个异常样本。你可以先说一下，三天里各组褐变速度有没有明显的拐点？之后我们再思考除了隔绝氧气，盐水还可能通过什么机制起作用，以及为什么柠檬汁也有一定效果。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较每组颜色变化趋势，注意第三天异常样本可能干扰。\",\"除了氧气，盐水和柠檬汁的pH、维生素C含量也可能影响褐变。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-variable-confusion-apple-browning-v1-57b882e89e",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0020-v1-8e9563a402-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响光合作用的因素（实验）-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0020-v1-8e9563a402"
+    ],
+    "qualityNotes": "引导学生在分析数据时描述趋势和组间差异，避免绝对因果推论，提示异常值处理思路，并提出下一步可视化分析建议，以控制认知负荷并保持探究主动权。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们记录了三天里三个实验组光合作用产生的气泡数量（单位：个/分钟），数据在这里：Day1 A组0 B组1 C组2；Day2 A组1 B组3 C组4；Day3 A组2 B组5 C组6，Day3的C组有一个样本气泡数异常高，我们不确定该怎么处理，也不确定趋势说明什么。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"拿到数据后，我们先一起梳理观察到的现象。你能试着描述一下三组气泡数随时间变化的共同趋势吗？组间的差异在哪里？试着比较增长率。关于Day3的异常值，你觉得可能是什么原因引起的？在得出结论前，我们还需要检查实验控制条件是否一致。接下来，你可以把数据画成折线图，看看斜率是否稳定，这能帮我们判断不同处理对光合速率的影响。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"气泡数增加可能反映光合速率上升，但需考虑环境波动\",\"异常值可能是读数错误或生物个体差异\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0020-v1-8e9563a402",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0020",
+      "subject": "生物",
+      "expectedTransformation": {
+        "originalInterest": "探究影响光合作用的因素（实验）",
+        "retainedFeature": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-小车与斜面-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5"
+    ],
+    "qualityNotes": "引导学生描述趋势、检查异常数据，不直接给结论，提出下一步验证问题，控制单轮认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们小组做了三天实验，三种不同斜面角度（A、B、C）。角度越大，下滑距离好像越远。但第三天有一个数据记录异常，我不确定是不是我们测量错了。这个能说明角度越大距离越远吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你注意到角度与下滑距离之间似乎存在正向趋势，这很好。但我们需要先检查异常数据可能的原因，再判断整体趋势。你可以把三天各组的数据在表格里对比一下，看看除了第三天异常，其他天趋势是否一致。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"试着用平均值或最大值来看整体趋势。\",\"异常数据可能来自释放手法不一致，想一想如何控制。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-vehicle-ramp-angle",
+      "subject": "physics_motion",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "小车下坡",
+        "retainedFeature": "坡度影响下滑加速度",
+        "classroomProxy": "不同斜面角度",
+        "researchQuestion": "斜面角度是否影响小车下滑距离？",
+        "independentVariable": "斜面角度",
+        "dependentDirection": "下滑距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-all-at-once-parachute-area-v1-4ff4db80a9-v1",
+    "source": "distill_dsv4",
+    "scenario": "一次给全型-降落伞面积-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-all-at-once-parachute-area-v1-4ff4db80a9"
+    ],
+    "qualityNotes": "温和纠正学生错误因果推断与危险提议，提供安全替代方案；通过引导描述趋势、比较组间差异和解释可能原因，提出下一步分析异常样本与多次测量的任务，避免直接下结论，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看了我们记录的数据，好像伞面面积越大，下落时间越长，这应该就是因果关系吧？我觉得我们可以亲自从教学楼二楼跳下来测试一下，这样最准确。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"从数据看，伞面面积增加确实伴随着更长的下落时间，但这只是相关性，还不能断定因果关系。我们绝对不能真人跳楼，这非常危险。安全替代方案：用不同面积的伞模型在室内高处多次释放，并记录更精确的时间。你可以对比各组间的差异，比如A到B增大了很多，B到C增大不明显，可能有什么因素在影响？下一步可以分析异常样本，并考虑多次测量取平均值。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"比较面积增加倍数与下落时间增加倍数是否一致。\",\"除面积外，空气密度、伞形等因素也可能影响结果。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-all-at-once-parachute-area-v1-4ff4db80a9",
+      "sourceKind": "persona",
+      "personaId": "all-at-once-parachute-area",
+      "subject": "physics_motion",
+      "studentType": "all_at_once",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "降落伞下落快慢",
+        "retainedFeature": "伞面面积影响空气阻力",
+        "classroomProxy": "不同伞面面积",
+        "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+        "independentVariable": "伞面面积",
+        "dependentDirection": "下落时间"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:all_at_once",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0023-v1-cc162c4a12-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究弹性势能的影响因素-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0023-v1-cc162c4a12"
+    ],
+    "qualityNotes": "该样本在阶段4澄清自变量与因变量，引导学生观察趋势与组间差异，聚焦异常数据的可能原因，不直接给出结论，符合认知负荷控制和学生能动性要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天数据，group_a、b、c分别变化，但我分不清哪个是自变量，哪个是因变量，能帮我看看趋势吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"在实验中，自变量是人为改变的条件（如不同处理组），因变量是测量的结果。请你先观察数据，描述每个组在三天内的变化趋势，再比较组间差异。注意到day3的异常样本，这可能是什么原因？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"group_a三天从0到2，说明什么？\",\"异常样本可能源于记录错误或实验条件突变，想想怎么验证？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0023-v1-cc162c4a12",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0023",
+      "subject": "物理",
+      "expectedTransformation": {
+        "originalInterest": "探究弹性势能的影响因素",
+        "retainedFeature": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-over-broad-vehicle-fuel-v1-4560b3d424-v1",
+    "source": "distill_dsv4",
+    "scenario": "过度宏大型-新能源车续航-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-over-broad-vehicle-fuel-v1-4560b3d424"
+    ],
+    "qualityNotes": "低投入学生：提供轻量趋势描述脚手架，引导比较组间差异并推测原因，不替代结论，突出异常数据，强调相关性非因果。控制认知负荷，保持主题一致性。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "小车数据我记完了，但看不懂这些数字是什么意思。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"看到你记录了三天数据，能描述一下橡皮筋增多时行驶距离的变化趋势吗？试着把观察写出来，再推测可能原因。别急着下结论，只是猜测。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察group_a、b、c在同一天的差距\",\"思考橡皮筋数量如何影响动力\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-over-broad-vehicle-fuel-v1-4560b3d424",
+      "sourceKind": "persona",
+      "personaId": "over-broad-vehicle-fuel",
+      "subject": "physics_motion",
+      "studentType": "over_broad",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "新能源汽车续航",
+        "retainedFeature": "能量来源影响续航",
+        "classroomProxy": "不同橡皮筋数量（模拟能量储备）",
+        "researchQuestion": "橡皮筋数量是否影响动力小车行驶距离？",
+        "independentVariable": "橡皮筋数量",
+        "dependentDirection": "行驶距离"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-cooperative-thermal-insulation-v1-1f8e13b4d7-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-保温材料-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-cooperative-thermal-insulation-v1-1f8e13b4d7"
+    ],
+    "qualityNotes": "引导学生在描述趋势与比较组间差异时关注异常值，避免将相关性断定为因果，并要求学生提出下一步分析问题，保持 student_agency。hints 提供异常值复核和统计方法，控制认知负荷。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我们测量了三天水降温的度数，发现包覆不同材料确实影响降温快慢。比如A组降温度数最小，C组最大。但是第三天记录时，一组有个杯子温度下降得特别少，和其他重复不一样，这怎么办？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察到的趋势很清晰。A组降温最小，C组最大，这与我们预测的材料隔熱性能差异一致。那个异常值需要特别关注。你觉得可能是什么原因导致了第三次测量的偏差？我们可以先检查记录是否准确，再决定是否保留该数据点。下一步，你打算如何比较各组的降温稳定性？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"异常值可能是人为误差或包覆失效，建议复核原始记录。\",\"可以计算每组平均降温值，观察整体趋势。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-cooperative-thermal-insulation-v1-1f8e13b4d7",
+      "sourceKind": "persona",
+      "personaId": "cooperative-thermal-insulation",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "difficulty": "medium",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "保温杯保温",
+        "retainedFeature": "材料隔热性能差异",
+        "classroomProxy": "不同包覆材料",
+        "researchQuestion": "包覆材料是否影响热水降温速度？",
+        "independentVariable": "包覆材料",
+        "dependentDirection": "降温速度",
+        "safetyNotes": [
+          "热水温度控制在60-70℃，避免烫伤"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-safety-acid-rain-plant-v1-d7d90a0163-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-酸雨与植物-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "safety",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-safety-acid-rain-plant-v1-d7d90a0163"
+    ],
+    "qualityNotes": "强化安全写作与工程参数转化：在报告框架中预设安全措施栏目，引导学生将自变量pH作为设计参数，因变量发芽数转为发芽率这一表现指标，同时要求标注异常数据，培养严谨表达。防止安全软化。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们的实验数据已经记录三天了，看出酸度高的组发芽少，现在要写报告，该怎么组织？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这是一份实验报告框架，请根据你的实验过程和记录填写每个部分，特别要写明安全操作。先完成初稿，我们再讨论改进。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回忆实验中哪个安全步骤最关键？\",\"尝试把发芽数转化为发芽率，更便于工程设计评价。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同酸度的稀酸溶液（白醋调配）对绿豆发芽数量和生长情况的影响。\",\"hypothesis\":\"如果稀酸溶液的pH值降低，酸性增强，那么绿豆发芽数量会减少，因为酸性环境可能抑制种子萌发所需的酶活性。\",\"materials\":\"绿豆种子、白醋、水、pH试纸（或pH计）、三个培养皿、棉花或吸水纸、护目镜、手套、滴管、标签纸。\",\"procedure\":\"1. 用白醋和水调配三种不同pH的稀酸溶液（例如pH≈3、5、7），用pH试纸确认；2. 在每个培养皿中铺好棉花，放入10粒绿豆种子；3. 分别滴加对应的稀酸溶液，保持湿润但不浸泡；4. 盖上培养皿，放在相同光照和室温环境下；5. 每天观察发芽数量并记录，持续3天。实验全程佩戴护目镜和手套，不直接接触溶液。\",\"dataSummary\":\"设计表格记录每天各组的发芽数，例如：| 天数 | 组A(pH≈3) | 组B(pH≈5) | 组C(pH≈7) | 备注 |，并填入实际数据。\",\"analysis\":\"根据数据趋势分析：pH值越低，发芽数越少，说明酸度增强确实抑制了绿豆发芽。请解释可能的生物学原因，并注意标记异常数据点。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-safety-acid-rain-plant-v1-d7d90a0163",
+      "sourceKind": "persona",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "酸雨对植物的危害",
+        "retainedFeature": "酸性程度影响植物生长",
+        "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+        "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+        "independentVariable": "稀酸溶液pH",
+        "dependentDirection": "发芽和生长情况",
+        "safetyNotes": [
+          "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+          "佩戴护目镜和手套",
+          "不直接接触或闻溶液"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0012-v1-f494dda2a4-v1",
+    "source": "distill_dsv4",
+    "scenario": "《控制变量法在初中化学实验探究中的应用》-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0012-v1-f494dda2a4"
+    ],
+    "qualityNotes": "该样本训练AI在阶段5提供结构化报告模板，以框架+提示+预留填写位的方式推动学生自主完成实验报告，避免替学生直接给出结论；融入已有研究问题和数据摘要，引导学生分析异常样本，强化证据意识和表述规范。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我比较了不同组的发芽趋势，但不知道怎么写成完整的实验报告，能帮我搭个框架吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这是你的报告结构，数据摘要栏已填入你记录的结果。请按各栏提示，用自己的话完成目的、假设、材料、步骤和分析段落。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先完善目的和假设，对照你最初的研究问题。\",\"分析异常时，思考光照是否唯一变量。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"本实验旨在探究______对______的影响。请根据你的研究问题完成。\",\"hypothesis\":\"你预测当______（自变量）改变时，因变量______会如何变化？请表述你的假设。\",\"materials\":\"回顾实验，你使用了哪些材料和设备？请列出关键器材。\",\"procedure\":\"你如何设置对照组和实验组？请简述操作步骤，确保控制变量。\",\"dataSummary\":\"这里是你记录的数据：\\n第1天：A组0，B组1，C组2\\n第2天：A组1，B组3，C组4\\n第3天：A组2，B组5，C组6（一个异常样本）\\n请用你自己的话总结数据趋势。\",\"analysis\":\"请分析数据：不同组别之间有什么差异？异常样本可能对你的结论有什么影响？你的实验是否验证了假设？请完成分析。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0012-v1-f494dda2a4",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0012",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "《控制变量法在初中化学实验探究中的应用》",
+        "retainedFeature": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-premature-shade-plant-height-v1-edc5b7e0e8-v1",
+    "source": "distill_dsv4",
+    "scenario": "细节过早型-遮阴与株高-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-premature-shade-plant-height-v1-edc5b7e0e8"
+    ],
+    "qualityNotes": "针对变量混淆学生，澄清自变量为遮阴程度，因变量为株高；提供报告框架但留空需学生填写；仅基于已有数据提供摘要；强调指向证据与局限，避免直接下结论。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我分析了数据，发现遮阴越多，绿豆长得越高。我想写报告，但不确定实验目的怎么写，还有我的假设是光照会影响植物高度，这个对吗？自变量是光照吗？因变量是株高吧？我有点乱。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你正确识别了自变量和因变量。现在请用我提供的报告框架整理你的研究。先填写实验目的、假设、使用的材料和步骤。数据摘要我已根据你的原始记录生成，请核对。分析部分需要你结合数据和植物知识来写，不要直接下结论，要指向证据和可能的局限。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"自变量是你改变的条件，因变量是你测量的结果。\",\"分析时注意比较不同组的变化趋势，并提及异常数据。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"研究遮阴程度是否影响绿豆幼苗株高。\",\"hypothesis\":\"请在此填写你的假设，例如：如果遮阴程度越高，则幼苗株高越高。\",\"materials\":\"请列出实验中用到的材料，如绿豆种子、花盆、土壤、遮阳网（不同透光率）、直尺等。\",\"procedure\":\"请逐步描述实验步骤，包括：如何分组、如何设置遮阴、每天如何测量株高、记录频率等。\",\"dataSummary\":\"实验记录了三天的株高数据（单位：厘米）：\\n第1天：A组0，B组1，C组2；\\n第2天：A组1，B组3，C组4；\\n第3天：A组2，B组5，C组6，其中第3天C组出现一个样本异常。\\n趋势：遮阴程度高的组株高增长更快。\",\"analysis\":\"请根据数据摘要分析遮阴程度对株高的影响，说明你的发现，比较各组差异，结合植物生长知识解释，并讨论异常样本的可能原因和实验的局限。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-premature-shade-plant-height-v1-edc5b7e0e8",
+      "sourceKind": "persona",
+      "personaId": "premature-shade-plant-height",
+      "subject": "biology_ecology",
+      "studentType": "premature_details",
+      "difficulty": "medium",
+      "failureModes": [
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "植物长不高",
+        "retainedFeature": "光照强弱影响株高",
+        "classroomProxy": "不同遮阴程度",
+        "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+        "independentVariable": "遮阴程度",
+        "dependentDirection": "幼苗株高"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:premature_details",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-fuzzy-yogurt-temperature-v1-6f726332df-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-酸奶与温度-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-fuzzy-yogurt-temperature-v1-6f726332df"
+    ],
+    "qualityNotes": "student provides low effort response; tutor scaffolds report with structured sections without writing content; prompts student to fill data summary and explain anomaly; hints focus on data evidence and plausible cause; avoids over-questioning and conclusion-drawing; keeps cognitive load low with stepwise fill.",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，温度高的酸奶变质快，数据我都看了，但报告怎么写啊？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的数据确实显示温度与变质速度有关。我帮你搭好报告框架，包含目的、假设、材料、步骤、数据摘要与分析。你把每天每组的数值填入摘要，并解释异常样本。从“目的”和“假设”开始填，我会检查。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"对照表格，描述温度从低到高变质指标的变化趋势。\",\"异常样本出现在哪组哪天？可能是什么原因？\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"请写出研究问题（探究______对______的影响）\",\"hypothesis\":\"请写下你的假设（如果______，那么______）\",\"materials\":\"请列出所用材料（酸奶、存放环境等）\",\"procedure\":\"请简述放置和观察的步骤\",\"dataSummary\":\"请填入第1天到第3天A、B、C三组的变质数值，并标出异常样本\",\"analysis\":\"根据数据趋势，解释温度如何影响变质；说明异常样本的可能原因及实验局限\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-fuzzy-yogurt-temperature-v1-6f726332df",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-yogurt-temperature",
+      "subject": "food_chemistry",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物保存",
+        "retainedFeature": "温度影响微生物活动",
+        "classroomProxy": "不同存放温度",
+        "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+        "independentVariable": "存放温度",
+        "dependentDirection": "变质快慢",
+        "safetyNotes": [
+          "变质食物只观察不食用",
+          "闻气味用手扇，不直接凑近"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0016-v1-0ae26e6f35-v1",
+    "source": "distill_dsv4",
+    "scenario": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0016-v1-0ae26e6f35"
+    ],
+    "qualityNotes": "生成报告框架，提供purpose/hypothesis/materials/procedure/dataSummary/analysis六部分模板，保留分析缺口，强调基于数据、不替学生下结论，引导学生补充并关注异常数据。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我把实验数据整理好了，现在需要写一篇完整的探究报告。但我不太清楚报告应该包括哪些部分，您能帮我梳理一下框架吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"梳理报告框架：你需要写六部分——目的、假设、材料、步骤、数据摘要、分析。数据摘要描述各组浑浊度变化趋势，分析时关注第三天异常点。请先尝试填写每部分，我们再一起完善。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"回顾自变量与因变量，确保目的明确\",\"对比各组数据，寻找规律和异常\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同过滤材料或过滤层数对自制净水器过滤效果的影响。\",\"hypothesis\":\"假设增加过滤层数/使用活性炭等材料能降低浑浊度，提高净水效果。\",\"materials\":\"活性炭、明矾、滤纸、塑料瓶、浑浊水样、量筒、烧杯等。\",\"procedure\":\"1. 配置相同浑浊度的水样；2. 设置A/B/C三组不同过滤材料或层数；3. 每天测量一次过滤后水的浑浊度，记录数据。\",\"dataSummary\":\"三天数据：A组浑浊度从0发展到2；B组从1到5；C组从2到6，整体呈上升趋势。第三天C组数据出现异常。\",\"analysis\":\"数据趋势与假设不一致，可能是实验操作误差或材料本身效果不佳。异常数据需进一步分析原因，建议重复实验验证。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0016-v1-0ae26e6f35",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0016",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+        "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+        "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+        "independentVariable": "过滤材料种类或过滤层数",
+        "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-safety-bread-mold-preservative-v1-a5038874f2-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-面包防腐-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "safety",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-safety-bread-mold-preservative-v1-a5038874f2"
+    ],
+    "qualityNotes": "在阶段5提供六段报告框架，强调安全提醒，引导学生用数据证据和原理进行分析，不直接给定结论，符合 scaffold 教学。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们观察完了三天数据，冷藏组发霉最少，干燥组发霉好像快一点。我是不是该写实验报告了？但我不知道怎么把数据解释清楚，而且安全方面也要写在报告里吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"嗯，写报告时，我们需要包括六个部分：实验目的、假设、材料、步骤、数据总结和分析。你可以按照这个框架补充内容。在分析部分，要结合抑制微生物的原理来解释哪种防腐方法更有效。另外，安全提醒一定要写在报告里，比如发霉面包不能食用、避免吸入孢子。现在请先试着填写目的和假设部分，有不清楚的随时问我。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"分析时比较各组发霉等级变化趋势\",\"防腐原理联系微生物生长条件\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"（待填写：说明探究不同防腐处理对面包发霉速度的影响）\",\"hypothesis\":\"（待填写：提出你对哪种处理最有效的预测及理由）\",\"materials\":\"（待填写：列出使用的面包、保鲜袋、密封罐、冰箱等材料）\",\"procedure\":\"（待填写：描述如何设置冷藏组、干燥组、真空密封组并观察记录）\",\"dataSummary\":\"（待填写：概述三天发霉等级数据，可提及一个异常样本）\",\"analysis\":\"（待填写：结合数据解释哪种方式最有效，讨论防腐原理，并指出异常可能原因）\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-safety-bread-mold-preservative-v1-a5038874f2",
+      "sourceKind": "persona",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物怎么防腐",
+        "retainedFeature": "防腐方式抑制微生物",
+        "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+        "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+        "independentVariable": "防腐处理方式",
+        "dependentDirection": "发霉速度",
+        "safetyNotes": [
+          "发霉食物只观察不食用，可能产生毒素",
+          "避免吸入霉菌孢子"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-variable-confusion-apple-browning-v1-cc9337c89e-v1",
+    "source": "distill_dsv4",
+    "scenario": "变量混乱型-苹果褐变-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stage_discipline",
+      "stem_fit",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-variable-confusion-apple-browning-v1-cc9337c89e"
+    ],
+    "qualityNotes": "阶段5提供报告框架，各节留白引导学生填充实验细节与数据分析，避免直接代写完整报告；框架紧密贴合研究问题与已有数据，未编造材料；重点纠正变量混乱与过早跳到阶段2的问题。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我的苹果褐变实验数据记录好了，但报告不知道怎么写，可以帮我整理一下吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"当然可以。我们一起来搭建实验报告。我已经准备了报告模板，你需要根据你的实验过程和数据来填充每个部分。重点关注数据趋势和异常分析。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"分析部分请写出三种处理褐变速度的快慢顺序。\",\"解释第3天异常数据可能的原因，如测量误差或样本差异。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究不同抗褐变处理（盐水浸泡、柠檬汁涂抹、不处理）对苹果切面褐变速度的影响。\",\"hypothesis\":\"你认为哪种处理最能延缓褐变？请写下你的假设。\",\"materials\":\"请列出实验所需材料：苹果、小刀、盘子、盐水（浓度？）、柠檬汁、计时器、记录表等。\",\"procedure\":\"请详细写出实验步骤：\\n1. 将苹果切成大小相同的三块；\\n2. 分别进行处理（A组不处理、B组浸泡盐水、C组涂抹柠檬汁）；\\n3. ……（请补充）\",\"dataSummary\":\"三天的评分数据如下：\\n第1天 A=0 B=1 C=2\\n第2天 A=1 B=3 C=4\\n第3天 A=2 B=5 C=6（C组出现一个异常点）\\n初步看，各组评分均随时间上升……（请继续描述趋势）\",\"analysis\":\"请分析数据回答研究问题：哪种处理最能延缓褐变？注意第3天C组异常值可能的原因。结合你的假设，讨论结果是否支持假设，并指出实验的局限。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-variable-confusion-apple-browning-v1-cc9337c89e",
+      "sourceKind": "persona",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "difficulty": "medium",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "苹果切开变色",
+        "retainedFeature": "隔绝氧气可延缓褐变",
+        "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+        "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+        "independentVariable": "抗褐变处理方式",
+        "dependentDirection": "褐变速度"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0020-v1-f795bc5031-v1",
+    "source": "distill_dsv4",
+    "scenario": "探究影响光合作用的因素（实验）-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0020-v1-f795bc5031"
+    ],
+    "qualityNotes": "阶段5给出报告框架与证据缺口，引导学生用自己的语言填充purpose至analysis六个部分，要求引用数据、不代写结论，同时保持对话简洁。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已经比对了三天三个组的数据，但写报告时不知道从哪里下笔，你能给我一个框架吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"这是你的报告框架，每个部分都留了需要你补全的空缺，请把观察和推理填进去，并确保引用的数据来自实验记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先看purpose，用一句话说明你想探究什么。\",\"dataSummary里对比三个组三天的变化趋势，不要只列数字。\"],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"探究……（请写明你改变的条件与想观察的结果）\",\"hypothesis\":\"如果……，那么……（请根据你的猜测写出假设）\",\"materials\":\"……（请列出你真正用到的材料，不要编造）\",\"procedure\":\"1. 准备……\\\\n2. 设置三个实验组……\\\\n3. 每天记录……（请补全步骤）\",\"dataSummary\":\"group_a 的三天数据为……，group_b 为……，group_c 为……（请描述总体趋势和异常点）\",\"analysis\":\"从数据看，……的变化引起了……的变化，可能的原因是……（请结合光合作用原理给出解释，并指出局限）\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0020-v1-f795bc5031",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0020",
+      "subject": "生物",
+      "expectedTransformation": {
+        "originalInterest": "探究影响光合作用的因素（实验）",
+        "retainedFeature": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-smartedu-0009-v1-79bd08ab5b-v1",
+    "source": "distill_dsv4",
+    "scenario": "化学实验探究-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-smartedu-0009-v1-79bd08ab5b"
+    ],
+    "qualityNotes": "引导学生在反思蒸馏误差基础上提出具体改进，延伸迁移应用，保持学生主体性，推动可执行的下次改进方向。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们蒸馏实验得到馏分的乙醇含量只有80%左右，比理论值低很多。我推测是加热太快导致蒸发不完全，还有冷凝管冷却水温度偏高，冷凝效果不好。我们想改进实验，但不知道具体怎么改比较好？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你们的反思很准确！加热速度和冷却效率确实是蒸馏实验的关键。请你们围绕这两点，提出一个具体的改进方案，比如如何平稳控制加热、如何增强冷凝效果。另外，迁移思考：如果要用蒸馏分离沸点更接近的混合液（如甲醇-水），还需要注意什么？期待你们写出来。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以尝试使用水浴加热代替明火，更易控制温度\",\"冷凝管中通入冰水混合物可提高冷凝效率\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-smartedu-0009-v1-79bd08ab5b",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0009",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "化学实验探究",
+        "retainedFeature": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-high-concept-mars-light-v1-84e0f11ab2-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念降级型-火星基地植物-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "proxy_quality",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-high-concept-mars-light-v1-84e0f11ab2"
+    ],
+    "qualityNotes": "在阶段6引导反思误差和改进，保持学生主体性，通过提示和学生自主思考，维持火星基地主题，体现了代理变量推理和教学指导。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我的实验报告已经写好了。现在我想总结一下实验中可能存在的误差，以及下一次可以怎么改进。另外，这个人工光照的实验对真正的火星基地植物栽培有什么启示吗？你能给我一些提示吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的报告完成了，很好。现在请回顾实验细节，比如光照是否均匀、浇水时机是否一致，这些都可能带来误差。然后你想想下次怎么改进，并联系火星基地：如果人工光照要模拟火星昼夜变化，需要注意什么？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"光强可能因位置不同而有差异。\",\"火星一昼夜约24小时37分，光照周期与地球接近。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-high-concept-mars-light-v1-84e0f11ab2",
+      "sourceKind": "persona",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "火星基地植物生存",
+        "retainedFeature": "基地环境条件需要人工控制",
+        "classroomProxy": "不同人工光照时长",
+        "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+        "independentVariable": "人工光照时长",
+        "dependentDirection": "发芽和早期生长情况",
+        "safetyNotes": [
+          "人工光源用LED，不用高压灯具"
+        ],
+        "mustKeepTerms": [
+          [
+            "火星"
+          ],
+          [
+            "基地"
+          ],
+          [
+            "人工",
+            "控制"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "人工",
+            "光照"
+          ],
+          [
+            "光照",
+            "时长"
+          ]
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-safety-acid-rain-plant-v1-62de28705d-v1",
+    "source": "distill_dsv4",
+    "scenario": "安全风险型-酸雨与植物-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "safety",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-safety-acid-rain-plant-v1-62de28705d"
+    ],
+    "qualityNotes": "导师引导反思误差来源、改进方向与迁移应用，同时强硬重申安全操作，保持学生主体性，不替代总结。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我分析了不同pH的稀酸溶液对绿豆发芽的影响，数据看起来pH越低发芽率越低。我把报告整理了一下，但不太确定怎么把这些结果用在设计酸雨防护措施上，您能帮我看看吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的数据很有价值。先思考:发芽率差异可能受哪些误差影响（例如pH测量、种子差异）？如果要迁移至酸雨防护设计，你会重点监控哪个参数？下次实验若需更精确，你计划如何改进？切记:任何酸溶液操作必须全程戴护目镜和手套，仅限白醋调配稀溶液，严禁使用强酸。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"考虑实验中的测量误差和生物差异\",\"如何把你的耐受pH范围转化为防护指标\"],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-safety-acid-rain-plant-v1-62de28705d",
+      "sourceKind": "persona",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "difficulty": "hard",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "酸雨对植物的危害",
+        "retainedFeature": "酸性程度影响植物生长",
+        "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+        "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+        "independentVariable": "稀酸溶液pH",
+        "dependentDirection": "发芽和生长情况",
+        "safetyNotes": [
+          "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+          "佩戴护目镜和手套",
+          "不直接接触或闻溶液"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-smartedu-0012-v1-2fdae34c53-v1",
+    "source": "distill_dsv4",
+    "scenario": "《控制变量法在初中化学实验探究中的应用》-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-smartedu-0012-v1-2fdae34c53"
+    ],
+    "qualityNotes": "引导学生反思计时和温度读数误差，温和纠正酸碱安全风险，提出食用白醋替代并讨论控制变量法的跨学科迁移，保持学生主体性，提供可执行的改进方向。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们组用不同温度测维生素C泡腾片溶解时间，数据波动大，可能计时不准或温度计读数有误差。控制变量法只在化学有用吗？下次想改成比较不同酸碱性，用点醋和碱面行吗？怎么改进能更准？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你抓住了计时和温度读数这两个关键误差来源，很好。控制变量法在物理、生物中也常用。酸碱性实验建议优先用食用白醋和小苏打溶液，避免使用强酸强碱。下次改进可以固定搅拌速度、统一温度计插入深度，并用手机秒表反复计时取平均。你打算先定量哪种酸碱条件？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"误差可从测量工具、操作一致性思考。\",\"用食用白醋替代强酸，安全且有效。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-smartedu-0012-v1-2fdae34c53",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0012",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "《控制变量法在初中化学实验探究中的应用》",
+        "retainedFeature": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-premature-shade-plant-height-v1-09adc53484-v1",
+    "source": "distill_dsv4",
+    "scenario": "细节过早型-遮阴与株高-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "expression",
+      "stage_discipline",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-premature-shade-plant-height-v1-09adc53484"
+    ],
+    "qualityNotes": "通过反问引导反思测量误差的偏差方向、提出控制条件改进方案，并启发迁移应用，同时用hints支撑学生思考，不替学生写完整总结。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我报告写完了。但我发现实验有问题。我设了不同遮阴程度，但量株高时有些苗倒了，扶起来量可能偏高。我只测了一次，数据不准，怎么办？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你发现了测量误差，这很关键。扶起倒苗量高度会让数据偏高还是偏低？下次实验可以怎么固定幼苗避免倒伏？另外，遮阴影响株高这个原理，在农业生产或家庭种花时可能怎样应用？想想看。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"倒伏苗扶起后茎可能弯曲，测量值会比自然高度偏大；试着用竹签和细绳轻轻支撑。\",\"迁移应用：比如菜地间作高矮作物遮光，或者阳台遮阴选择耐阴植物。\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-premature-shade-plant-height-v1-09adc53484",
+      "sourceKind": "persona",
+      "personaId": "premature-shade-plant-height",
+      "subject": "biology_ecology",
+      "studentType": "premature_details",
+      "difficulty": "medium",
+      "failureModes": [
+        "premature_stage2"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "植物长不高",
+        "retainedFeature": "光照强弱影响株高",
+        "classroomProxy": "不同遮阴程度",
+        "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+        "independentVariable": "遮阴程度",
+        "dependentDirection": "幼苗株高"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:premature_details",
+        "failureMode:premature_stage2",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-fuzzy-yogurt-temperature-v1-6d5c3c01ad-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-酸奶与温度-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-fuzzy-yogurt-temperature-v1-6d5c3c01ad"
+    ],
+    "qualityNotes": "引导学生在完成报告后进行实验反思，聚焦误差来源，用开放式提问推动学生自主表达，控制认知负荷，提供轻量脚手架，不代替学生解答。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们实验做完了，报告也写了。接下来还要做什么吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"报告完成了，现在让我们回顾实验过程，想想哪些地方可能有误差。比如靠肉眼和闻气味判断变质，方法是否够准？存放温度是否一直稳定？你觉得本次实验最大的误差来源可能是什么？可以说一点。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"观察变质的方法是否可靠？\",\"温度控制是否一致？\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-fuzzy-yogurt-temperature-v1-6d5c3c01ad",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-yogurt-temperature",
+      "subject": "food_chemistry",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "食物保存",
+        "retainedFeature": "温度影响微生物活动",
+        "classroomProxy": "不同存放温度",
+        "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+        "independentVariable": "存放温度",
+        "dependentDirection": "变质快慢",
+        "safetyNotes": [
+          "变质食物只观察不食用",
+          "闻气味用手扇，不直接凑近"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  }
+]

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
 import { requireRole } from '@/app/lib/auth';
 import { getReviewItem } from '@/app/lib/queries';
@@ -76,10 +77,24 @@ export async function POST(req: Request, ctx: RouteContext<'/api/teacher/review/
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
+  // 教师批准 2→3：向会话追加提醒消息（学生下次加载即可见），引导其到数据表面板录入数据
+  let messagesUpdate: { messages: string } | undefined;
+  if (body.stage === 2 && body.action === 'approve' && result.currentStage === 3) {
+    const prevMessages = parseMessages(item.conversation?.messages ?? '[]');
+    prevMessages.push({
+      id: randomUUID(),
+      role: 'assistant',
+      content:
+        '🎉 老师已审核通过你的实验方案！现在进入「过程执行」阶段。\n请按照方案开展实验，并把观察到的数据记录在右侧的数据表面板中（手机上数据表在聊天下方）。录入完成后点击「完成录入」即可进入数据分析阶段。实验中注意安全，有任何问题随时问我。',
+      actionType: 'info',
+    });
+    messagesUpdate = { messages: JSON.stringify(prevMessages) };
+  }
+
   await db.$transaction([
     db.conversation.update({
       where: { id: item.conversationId },
-      data: { stageData: JSON.stringify(result.stageData) },
+      data: { stageData: JSON.stringify(result.stageData), ...(messagesUpdate ?? {}) },
     }),
     db.studentAssignment.update({
       where: { id: item.id },

@@ -1,0 +1,735 @@
+[
+  {
+    "id": "stem-distill-dsv4-p3-cooperative-light-color-v1-58131fe096-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-光色与绿豆发芽-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-cooperative-light-color-v1-58131fe096"
+    ],
+    "qualityNotes": "本样本训练教师在阶段3开始时提供清晰的安全提醒（用电、发霉处理）和记录要求（如实观察，不主观猜测），避免了一次性提出过多问题，符合认知负荷控制和教学引导。同时强调真实记录，不替学生编造数据。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我们小组已经准备好了，我们打算用红、蓝、绿、白四种颜色的LED小灯照射绿豆，每组20颗，放在湿纸巾上，每天记录发芽的颗数，观察7天。这样可以吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"方案设计得不错！在正式开始前，我想提醒几个关键点：\\n首先，使用LED灯时一定要确保电线远离水源，避免短路或触电。\\n其次，务必每天在固定时间观察，并如实记录每颗种子的情况——即使没有发芽也要记下，不要跳过。\\n第三，如果发现有发霉的绿豆，要尽快取出并记录，因为霉菌可能影响其他种子。\\n最后，实验中只记录你亲眼看到的现象，不猜测原因。\\n好了，现在可以开始实验了！有任何异常随时告诉我。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-cooperative-light-color-v1-58131fe096",
+      "sourceKind": "persona",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "光照对植物的影响",
+        "retainedFeature": "光的不同属性会影响植物",
+        "classroomProxy": "不同颜色的光（红蓝绿白）",
+        "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+        "independentVariable": "光的颜色",
+        "dependentDirection": "发芽速度/发芽数",
+        "safetyNotes": [
+          "避免使用220V强光灯具，用LED或手电筒"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-fuzzy-water-amount-v1-9f520384e3-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-浇水多少-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-fuzzy-water-amount-v1-9f520384e3"
+    ],
+    "qualityNotes": "该样本训练在阶段3引导学生如实记录异常数据，强调安全（避免积水引发霉变），通过一个开放问题降低认知负荷，体现从原始兴趣到实验操作的推理连贯性，并执行阶段纪律只推动单次操作。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我今天给每组浇完水后，发现有一组的水好像浇多了，土壤表面有积水，这样会不会影响种子？我该不该把这组的数据去掉？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察得很仔细！实验中出现异常情况很常见，不要去掉这组数据，必须如实记录。积水可能导致种子缺氧或霉变，你可以在记录表里备注“该日浇水过量，土壤出现积水”。接下来先停止给这组浇水，检查盆底排水孔是否堵塞，用吸水纸轻轻吸走表层多余水分，但不要翻动种子。科学精神要求真实记录所有结果，包括意外。现在请把今天每个组的实际浇水量和观察到的情况填入数据表中，异常情况也要记在notes栏。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"真实记录比完美数据更重要\",\"异常操作需要在notes栏备注\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-fuzzy-water-amount-v1-9f520384e3",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "种子发芽",
+        "retainedFeature": "水分多少影响发芽",
+        "classroomProxy": "不同浇水量",
+        "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+        "independentVariable": "每天浇水量",
+        "dependentDirection": "发芽率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p3-smartedu-0009-v1-dc4788e5a8-v1",
+    "source": "distill_dsv4",
+    "scenario": "化学实验探究-蒸馏样本1",
+    "phase": 3,
+    "rubricTargets": [
+      "safety",
+      "stage_discipline",
+      "structure_compliance",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p3-smartedu-0009-v1-dc4788e5a8"
+    ],
+    "qualityNotes": "在学生汇报第一批实验数据并透露想改变实验条件、出现轻度安全疏忽时，导师坚守实验执行阶段边界，明确要求先完成计划内所有数据收集，聚焦真实记录与结构化的数据录入，并立即强化安全操作提醒，防止学生跳跃阶段或忽略风险。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我刚才按照方案做了第一次蒸馏实验，把自来水设为室温条件（约25℃），酒精灯加热，沸腾后我观察冷凝管出口的液滴，发现前5分钟馏出液很少，颜色有点发黄，温度计示数在98℃附近波动。我觉得可能加热太猛了，想降温再试一次。而且烧杯好烫，我用手拿布垫了一下才取下烧杯。现在应该干什么？要不要我也试试用盐水对比？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"我已经收到你的实验观察，很好，你已经开始收集数据了！ 不过我们仍处于实验执行阶段，核心任务是按照你之前设计的自变量梯度，逐一完成全部实验并如实记录，现在不要跳转去测试盐水或其他条件。\\n\\n请先把当前实验的完整数据录入系统：在数据表中记录自变量（水温）、馏出液颜色、前5分钟体积、沸程等；如果出现异常现象（如发黄、示数波动），必须在备注栏里如实描述，不要省略或美化。\\n\\n关于安全：烧杯烫手时绝对不能用湿布直接垫取，湿布传热更快且可能滑脱，务必使用坩埚钳或防烫手套。下次请先熄灭酒精灯、稍冷却后再操作。我们可以继续完成剩余室温组的重复实验，然后再进行下一个温度梯度。\\n\\n请现在提交第一条数据记录。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"按数据表字段逐一填写：自变量值、馏出液颜色、馏出液体积、沸程范围、异常备注\",\"检查酒精灯是否完全熄灭、桌面有无洒落热水\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p3-smartedu-0009-v1-dc4788e5a8",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0009",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "化学实验探究",
+        "retainedFeature": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-cooperative-light-color-v1-48d5bcf376-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-光色与绿豆发芽-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-cooperative-light-color-v1-48d5bcf376"
+    ],
+    "qualityNotes": "引导学生描述趋势、比较组间差异、用相关性解释而非断言因果，并提出一个有意义的下一步分析问题；一次只推动一个核心问题，避免认知负荷过载。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看数据发现白光下绿豆发芽数最多，绿光下最少，是不是说明绿光完全不适合植物生长？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好的观察！从数据看，白光下发芽数确实最高，绿光下最低。先别急着下结论，我们一步步分析。请描述一下在每种光色下，发芽数随天数增长的变化趋势，然后比较不同组之间的差异。想一想，这可能和植物对光的吸收有关，但要注意这只是相关性，不一定是光色单独决定的。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-cooperative-light-color-v1-48d5bcf376",
+      "sourceKind": "persona",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "光照对植物的影响",
+        "retainedFeature": "光的不同属性会影响植物",
+        "classroomProxy": "不同颜色的光（红蓝绿白）",
+        "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+        "independentVariable": "光的颜色",
+        "dependentDirection": "发芽速度/发芽数",
+        "safetyNotes": [
+          "避免使用220V强光灯具，用LED或手电筒"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-fuzzy-water-amount-v1-09ff09dfc8-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-浇水多少-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-fuzzy-water-amount-v1-09ff09dfc8"
+    ],
+    "qualityNotes": "该样本训练模型在阶段4中遵循单一核心问题原则，引导学生描述趋势、比较组间差异并解释可能原因，同时强调相关性而非因果，推动学生提出下一步分析问题，避免一次提问过多内容，符合silver级认知负荷要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我看了一下数据，好像浇水量越多，发芽的数量就越多，但是第三天的C组有一个异常值，这是怎么回事呀？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察得很仔细！从数据来看，浇水量较高的组发芽数确实更多，而且随着天数增加，各组发芽数都呈上升趋势。不过要注意，这只能说明它们有关联，还不能证明是浇水多直接导致发芽数多，因为可能还有其他因素没控制。那个异常值可能是记录错误、随机波动，或者受到其他变量影响。你能试着分析一下，这个异常值可能是什么原因造成的？我们可以怎么进一步确认呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-fuzzy-water-amount-v1-09ff09dfc8",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "种子发芽",
+        "retainedFeature": "水分多少影响发芽",
+        "classroomProxy": "不同浇水量",
+        "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+        "independentVariable": "每天浇水量",
+        "dependentDirection": "发芽率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-smartedu-0009-v1-f63d7d852c-v1",
+    "source": "distill_dsv4",
+    "scenario": "化学实验探究-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "stem_fit",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-smartedu-0009-v1-f63d7d852c"
+    ],
+    "qualityNotes": "在阶段4数据分析中，导师通过聚焦单个学生观察（趋势与组间差异）来降低认知负荷，同时以提示性问题鼓励学生自主提出假设和下一步分析（如处理异常、计算平均值或绘图），并明确强调‘相关性不等于因果’，体现了科学探究严谨性与学生能动性的平衡。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我记录了三天实验数据，A组从0到1到2，B组从1到3到5，C组从2到4到6，第三天C组有个样本好像出问题了，写了‘一个样本异常’，但数据还是6。我发现三组的值每天都增加，B和C增长速度比A快，但B和C之间差别不大。这是不是说改变的条件对B和C有类似效果？可能是什么原因？我接下来该分析什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察得很细致！你发现了随时间增加的趋势，以及B组和C组增长速度相似、A组较慢。这提示改变的条件确实对结果产生了影响。但要注意，相关性不等于因果，我们还需排除其他因素。C组的异常样本很关键，可以想想它可能来自测量误差还是条件变化。接下来，你可以计算每组平均值或画折线图来更直观地比较，也可以讨论：哪个组可能是控制组？改变的条件最可能是什么？这能帮你推断原因。你打算先从哪里入手？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"尝试计算每组三天数据的平均值，或画出趋势线\",\"思考异常数据可能的原因，以及它对整体结论的影响\",\"推测改变的条件（如浓度、温度等），并设计一个简单推理\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-smartedu-0009-v1-f63d7d852c",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0009",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "化学实验探究",
+        "retainedFeature": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p4-high-concept-mars-light-v1-3f09d0958e-v1",
+    "source": "distill_dsv4",
+    "scenario": "高概念降级型-火星基地植物-蒸馏样本1",
+    "phase": 4,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "stem_fit",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p4-high-concept-mars-light-v1-3f09d0958e"
+    ],
+    "qualityNotes": "保留火星基地情景并以人工光照时长为代理，引导学生从数据表格中识别发芽数随时间和光照时长的变化趋势，通过比较组间差异（如0小时与8小时）来培养数据分析能力。避免将相关性直接断言为因果，而是用“可能”、“关联”等词。提问聚焦于描述趋势差异和思考发芽速度，控制单次认知负荷，保持学生主动解释。下一步引导比较早期生长速度，符合阶段4分析要求。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我看了数据表格，感觉光照时间越长，绿豆发芽就越多。但是12小时那组第5天和前一天一样都是9个，是不是因为种子全都发完了？那是不是光照越久越好？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察得很仔细！确实，随着光照时长的增加，绿豆发芽数总体上多于无光照的组。不过，像你说的，12小时光照组在第5天似乎增速放缓了。这提示我们，光照时长和发芽数可能并非简单的线性关系。我们可以先完整梳理一下各组从第1天到第5天的变化趋势，比较一下组间的差异。然后思考：为什么需要一定光照？光照太久会不会有负面作用？另外，我们还可以看看除了总发芽数，早期的发芽速度有没有差别。接下来，你能试着用一句话描述0小时和8小时这两组在5天里的发芽趋势有什么不同吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p4-high-concept-mars-light-v1-3f09d0958e",
+      "sourceKind": "persona",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "difficulty": "hard",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "火星基地植物生存",
+        "retainedFeature": "基地环境条件需要人工控制",
+        "classroomProxy": "不同人工光照时长",
+        "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+        "independentVariable": "人工光照时长",
+        "dependentDirection": "发芽和早期生长情况",
+        "safetyNotes": [
+          "人工光源用LED，不用高压灯具"
+        ],
+        "mustKeepTerms": [
+          [
+            "火星"
+          ],
+          [
+            "基地"
+          ],
+          [
+            "人工",
+            "控制"
+          ]
+        ],
+        "proxyTerms": [
+          [
+            "人工",
+            "光照"
+          ],
+          [
+            "光照",
+            "时长"
+          ]
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-cooperative-light-color-v1-02f490f567-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-光色与绿豆发芽-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-cooperative-light-color-v1-02f490f567"
+    ],
+    "qualityNotes": "一次性提供完整报告sections，贴合学生实验数据和问题，引导学生完成报告，无过度追问，认知负荷低，结构合规。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我的实验做完了，数据也记在表格里了。现在需要写实验报告，可是我不知道报告要分哪些部分，您能帮我整理一下吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，实验报告通常包含目的、假设、材料、步骤、数据总结和分析。根据你的实验，我已经帮你整理好了，你可以看看。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"report_sections\":{\"purpose\":\"探究不同颜色的光（红、蓝、绿、白）对绿豆发芽速度的影响。\",\"hypothesis\":\"白光下绿豆发芽最快，因为白光含有多种波长的光；而单一色光可能效果较弱。\",\"materials\":\"绿豆种子40粒、红色LED灯带、蓝色LED灯带、绿色LED灯带、白色LED灯带、4个培养皿、棉花、水、量杯、记录本。\",\"procedure\":\"1. 将40粒绿豆均分为4组，每组10粒，分别放入4个培养皿中，底部垫上湿棉花。\\n2. 将4个培养皿分别置于红、蓝、绿、白四种颜色的LED灯下。\\n3. 每天定时浇水保持棉花湿润，记录各皿中发芽的绿豆数量，连续观察5天。\",\"dataSummary\":\"实验数据记录如下：\\n第1天：红0、蓝0、绿0、白1\\n第2天：红1、蓝2、绿0、白3\\n第3天：红3、蓝4、绿1、白5\\n第4天：红5、蓝6、绿2、白7\\n第5天：红7、蓝8、绿4、白9\\n可见，各颜色光下发芽数均随时间增加，但增加速度有差异。\",\"analysis\":\"从数据可以看出，白色光下绿豆发芽速度最快，到第5天几乎所有种子都发芽了；蓝色和红色光下发芽速度次之，绿色光下最慢。这验证了假设：白光因包含多种波长，更利于植物生长。不同颜色光对发芽确实有影响，可为植物栽培提供参考。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-cooperative-light-color-v1-02f490f567",
+      "sourceKind": "persona",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "光照对植物的影响",
+        "retainedFeature": "光的不同属性会影响植物",
+        "classroomProxy": "不同颜色的光（红蓝绿白）",
+        "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+        "independentVariable": "光的颜色",
+        "dependentDirection": "发芽速度/发芽数",
+        "safetyNotes": [
+          "避免使用220V强光灯具，用LED或手电筒"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-fuzzy-water-amount-v1-664f2af1a8-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-浇水多少-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "stem_fit",
+      "structure_compliance",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-fuzzy-water-amount-v1-664f2af1a8"
+    ],
+    "qualityNotes": "导师通过给出有结构的报告六部分框架，直接将学生现有分析转化为规范报告，降低认知负荷；dialogue 仅反问一处推动整合，严格控制一次一个问题；report_sections 完全基于现有数据和前序流程，未编造额外材料或危险操作，契合 transformation 目标。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我比了一下三组的发芽数，浇水量多的那组发芽数好像一直在涨，不过第三天有个盆出了点异常。接下来该怎么把实验写成报告呢？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"咱们把比较结果直接整理成报告。研究问题、方法和你的数据趋势都在，试试用我刚才给的六个部分填空，尤其注意把异常点放在分析里解释。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"先填目的、假设和材料，再用表格总结数据\",\"分析时对比三组趋势，说明异常可能的原因\"],\"phase_complete\":true,\"report_sections\":{\"purpose\":\"探究每天浇水量不同对绿豆种子发芽率的影响，为理解水分在发芽中的作用提供证据。\",\"hypothesis\":\"如果每天浇水量增加，绿豆种子的发芽数可能随之增多，但过量浇水可能产生抑制作用。\",\"materials\":\"饱满绿豆种子30粒、相同花盆3个、等量营养土、量杯、清水、标签纸、记录本。\",\"procedure\":\"1. 将花盆分别标记为A、B、C组，每组播种10粒绿豆；2. A组每天浇10mL水，B组浇30mL，C组浇50mL；3. 每天观察并记录发芽种子数量，连续观察3天。\",\"dataSummary\":\"第1天A组0粒、B组1粒、C组2粒；第2天A组1粒、B组3粒、C组4粒；第3天A组2粒、B组5粒、C组6粒（C组一个样本出现霉烂，计入异常）。三天累计发芽数A组3粒、B组9粒、C组12粒，呈现浇水量越多发芽数越高的趋势。\",\"analysis\":\"数据显示浇水量增加与发芽数正相关，C组最高。但第三天C组的一个样本霉烂异常，提示过湿环境可能引发病害，并非水量越多越好。本实验中未出现严重抑制，可能与观察期较短有关。后续研究需延长天数并精确控制湿度，以确定最优浇水量区间。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-fuzzy-water-amount-v1-664f2af1a8",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "种子发芽",
+        "retainedFeature": "水分多少影响发芽",
+        "classroomProxy": "不同浇水量",
+        "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+        "independentVariable": "每天浇水量",
+        "dependentDirection": "发芽率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p5-smartedu-0009-v1-ed79fea655-v1",
+    "source": "distill_dsv4",
+    "scenario": "化学实验探究-蒸馏样本1",
+    "phase": 5,
+    "rubricTargets": [
+      "expression",
+      "stem_fit",
+      "structure_compliance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p5-smartedu-0009-v1-ed79fea655"
+    ],
+    "qualityNotes": "该样本训练助手在阶段5生成结构完整的报告草稿，所有六个部分均贴合已有数据和设定，避免编造材料。对话注重引导学生确认边界，提供可编辑的初始报告。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我已经把数据整理成图表了，现在想生成完整的实验报告，你能帮我组织一下吗？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"好的，我们一起来把实验报告整理出来。我根据你的实验数据和分析，生成了报告草稿，你可以在此基础上修改和补充。先确认一下各部分内容：\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false,\"report_sections\":{\"purpose\":\"围绕「化学实验探究」，改变一个条件会怎样影响观察结果？本研究旨在探究当改变一个条件时，观察到的结果会发生怎样的变化。\",\"hypothesis\":\"如果改变该条件，那么每组观察到的结果会呈现不同的变化趋势。\",\"materials\":\"根据实验方案，所需材料为：供试样本（如某种试剂或生物样品）、测量工具、计时设备、分组标签等。具体材料由学生已确定的方案决定，不额外增加。\",\"procedure\":\"1. 将实验对象平均分为三组（A、B、C），每组施加不同的条件水平。\\n2. 每天在相同时间点观察并记录每组的结果值。\\n3. 连续记录三天，当日数据记录异常观察。\",\"dataSummary\":\"三天记录的原始数据如下：\\n第1天：A组0，B组1，C组2\\n第2天：A组1，B组3，C组4\\n第3天：A组2，B组5，C组6（注：一个样本异常）\\n总体趋势显示，三组数据均随时间增加，其中B、C组增幅较A组更明显。\",\"analysis\":\"从数据趋势看，A组每日增加约1，B组每日增加约2，C组每日增加约2，表明改变条件可能促进了观察值的增长。第3天C组出现一个样本异常，可能影响该组当日数据的可靠性。总体而言，自变量对因变量产生了正向影响，但需进一步实验确认异常原因。\"}}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p5-smartedu-0009-v1-ed79fea655",
+      "sourceKind": "topic-library",
+      "topicId": "smartedu-0009",
+      "subject": "化学,初中",
+      "expectedTransformation": {
+        "originalInterest": "化学实验探究",
+        "retainedFeature": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "classroomProxy": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "researchQuestion": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+        "independentVariable": "一个可人为改变的条件",
+        "dependentDirection": "可观察或可测量的结果",
+        "safetyNotes": [
+          "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-cooperative-light-color-v1-02a9c2dd39-v1",
+    "source": "distill_dsv4",
+    "scenario": "配合型-光色与绿豆发芽-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "student_agency",
+      "teaching_guidance"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-cooperative-light-color-v1-02a9c2dd39"
+    ],
+    "qualityNotes": "引导反思误差来源与改进方向，问题单一聚焦，保留学生主体思考，避免替学生总结。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我把报告写好了。但我发现不同组的绿豆发芽快慢差别挺大，有的已经有点绿了，有的还没动静，这是不是很影响结论？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你能观察到数据波动真棒！回想我们操作时，你觉得可能是哪一步造成了这种不一致？如果下次再做，你会怎么调整来让结果更稳定呢？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":true}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-cooperative-light-color-v1-02a9c2dd39",
+      "sourceKind": "persona",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "difficulty": "easy",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "光照对植物的影响",
+        "retainedFeature": "光的不同属性会影响植物",
+        "classroomProxy": "不同颜色的光（红蓝绿白）",
+        "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+        "independentVariable": "光的颜色",
+        "dependentDirection": "发芽速度/发芽数",
+        "safetyNotes": [
+          "避免使用220V强光灯具，用LED或手电筒"
+        ]
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  },
+  {
+    "id": "stem-distill-dsv4-p6-fuzzy-water-amount-v1-537dfd5520-v1",
+    "source": "distill_dsv4",
+    "scenario": "模糊型-浇水多少-蒸馏样本1",
+    "phase": 6,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "expression",
+      "structure_compliance",
+      "student_agency",
+      "teaching_guidance",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p6-fuzzy-water-amount-v1-537dfd5520"
+    ],
+    "qualityNotes": "通过一个开放问题同时引导反思误差来源、提出可执行的改进方向并试探迁移应用，保持学生主体性，未代劳总结，避免了一次性追问过多问题。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "老师，我按计划每天浇10ml、20ml、30ml水，但三组绿豆发芽率差不多，都是80%左右，是不是我没量准？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你观察得很仔细！发芽率没有明显差别，确实需要回头想想原因。关键可能出在浇水量的控制上，你当时用什么工具量的？另外，除了水量，你觉得还有哪些干扰因素会影响发芽？下次如果让你改进，你会先抓哪一个环节？再想一想，这个实验方法能不能用来研究光照对发芽的影响？不用着急，慢慢说说你的想法。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p6-fuzzy-water-amount-v1-537dfd5520",
+      "sourceKind": "persona",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "种子发芽",
+        "retainedFeature": "水分多少影响发芽",
+        "classroomProxy": "不同浇水量",
+        "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+        "independentVariable": "每天浇水量",
+        "dependentDirection": "发芽率"
+      },
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc",
+        "tierHint:silver"
+      ],
+      "batchId": "distill-dsv4-calibration"
+    }
+  }
+]

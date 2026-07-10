@@ -50,3 +50,8 @@ next-env.d.ts
 # uploaded files (keep the dir, ignore contents)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# local source captures and incomplete external downloads
+/basic.smartedu.cn.har
+/aTrustInstaller_amd64.rpm
+/Magpie-Qwen2-Pro-200K-Chinese/

@@ -1,0 +1,76 @@
+[
+  {
+    "id": "stem-distill-dsv4-p1-all-at-once-parachute-area-v1-4cd6d2bbdd-v1",
+    "source": "distill_dsv4",
+    "scenario": "一次给全型-降落伞面积-蒸馏样本1",
+    "phase": 1,
+    "rubricTargets": [
+      "cognitive_load_control",
+      "proxy_quality",
+      "student_agency",
+      "theme_fidelity",
+      "transformation_reasoning"
+    ],
+    "evidence": [
+      "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json:p1-all-at-once-parachute-area-v1-4cd6d2bbdd"
+    ],
+    "qualityNotes": "学生在首次对话中直接给出完整变量和请求确认，导师没有过度追问，仅使用一个开放问题澄清‘下落时间测量标准’，降低认知负荷。确认时完整输出 theme_mapping、snapshot 和 variables.independent，保留学生原始兴趣表述，体现学生能动性和代理质量。确认后提示下一阶段，聚焦一个核心问题。",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "我要研究不同伞面面积对降落伞下落时间的影响。自变量是伞面面积（100cm²、400cm²、900cm²），因变量是下落时间，控制变量是材料、载荷、下落高度。请直接确认。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"你的变量设计很清晰。为了确保测量一致，你打算用什么工具和标准来记录下落时间？比如从何处释放、如何判断开始与结束？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}"
+      },
+      {
+        "from": "human",
+        "value": "我打算从固定高度2米释放，用手机秒表计时，从松手瞬间到落地停止。每次重复3次取平均。"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"很好，你明确了测量方法。现在确认你的研究主题：探究降落伞伞面面积对下落时间的影响。自变量为伞面面积（100 cm²、400 cm²、900 cm²），因变量为下落时间，通过2米释放、手机秒表计时，重复3次取平均。控制变量包括伞面材料、载荷和释放高度。阶段1完成，我们将进入实验设计。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"snapshot\":\"原始兴趣：降落伞下落快慢\\n保留特征：伞面面积影响空气阻力\\n课堂代理：不同伞面面积\\n研究问题：降落伞伞面面积是否影响下落时间？\",\"theme_mapping\":{\"originalInterest\":\"降落伞下落快慢\",\"retainedFeature\":\"伞面面积影响空气阻力\",\"classroomProxy\":\"不同伞面面积\",\"researchQuestion\":\"降落伞伞面面积是否影响下落时间？\"},\"variables\":{\"independent\":\"伞面面积\",\"dependent\":\"下落时间\"}}"
+      },
+      {
+        "from": "human",
+        "value": "好的，谢谢老师！接下来我们做什么？"
+      },
+      {
+        "from": "gpt",
+        "value": "{\"dialogue\":\"阶段1已完成，接下来你需要设计实验步骤和数据记录表。请先思考：你打算按什么顺序测试不同面积的降落伞，以减少环境变化带来的误差？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以随机顺序测试不同面积\",\"每次测试前检查伞面是否完好\"],\"phase_complete\":false}"
+      }
+    ],
+    "meta": {
+      "sourceTag": "distill-dsv4",
+      "distillTaskId": "p1-all-at-once-parachute-area-v1-4cd6d2bbdd",
+      "sourceKind": "persona",
+      "personaId": "all-at-once-parachute-area",
+      "subject": "physics_motion",
+      "studentType": "all_at_once",
+      "difficulty": "medium",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "expectedTransformation": {
+        "originalInterest": "降落伞下落快慢",
+        "retainedFeature": "伞面面积影响空气阻力",
+        "classroomProxy": "不同伞面面积",
+        "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+        "independentVariable": "伞面面积",
+        "dependentDirection": "下落时间"
+      },
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:all_at_once",
+        "failureMode:over_questioning"
+      ],
+      "batchId": "distill-dsv4-batch100"
+    }
+  }
+]

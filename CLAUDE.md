@@ -22,7 +22,16 @@ npx tsx scripts/test-stage-advance.ts      # canAdvance gating
 npx tsx scripts/test-stage-extraction.ts   # extractStageData + safeParseChatResponse
 npx tsx scripts/test-review.ts             # applyReview (teacher review logic)
 npx tsx scripts/test-guest-ratelimit.ts    # checkRateLimit sliding window (now injected)
+npx tsx scripts/test-parser.ts             # safeParseChatResponse strategies + repairJson
+npx tsx scripts/test-pacing.ts             # shouldNudgeConvergence / shouldShowEscapeHatch
+npx tsx scripts/test-normalize-schema.ts   # normalizeSchema (stage 2 column cleanup)
+npx tsx scripts/test-report-docx.ts        # buildReportDocx + zip roundtrip
+npx tsx scripts/test-report-summary.ts     # buildPriorSummary
 ```
+
+`scripts/probe-json-schema.ts` is a diagnostic (not a test): checks whether the configured LLM gateway supports `response_format: json_schema` strict mode.
+
+> **No npm registry access in this sandbox.** New dependencies cannot be installed. This is why `app/lib/zip.ts` (hand-written ZIP via zlib), `app/lib/docxExtract.ts` (replaces mammoth), and `app/lib/llm/jsonRepair.ts` (replaces jsonrepair) exist — prefer extending these zero-dependency utilities over adding packages.
 
 ### First-time setup
 
@@ -77,6 +86,7 @@ ConversationWorkspace.tsx (client, owns stage/stageData/status)
     → callLLM() → createLLMProvider().chat() → safeParseChatResponse() (retry w/o JSON mode on fail)
     → extractStageData() merges structured output
     → Stage 4: analysisCount++ tracked in stageData.stage4
+    → stageData.roundCounts[stage]++ per student message (feeds pacing nudge)
     → $transaction persists messages(+stageData+currentStage); on LLM error: nothing persisted
   ← ChatResponse + { currentStage, stageData }
 ```
@@ -101,6 +111,12 @@ The confirm button (rendered when `lastActionType === 'confirmation'`):
 - No cancel button exists
 - `lastActionType` finds the most recent assistant message WITH an `actionType` (skipping `confirmation_doc` cards)
 - Confirm only appears at genuine phase completion (enforced by prompt rules: LLM must not emit `"confirmation"` mid-discussion)
+
+### Pacing guard (anti-over-questioning)
+
+`app/lib/pacing.ts` (pure, tested) prevents the Socratic discussion in stages 1–2 from dragging on:
+- The chat route counts student messages per stage in `stageData.roundCounts` and, once `shouldNudgeConvergence(stage, roundCount)` fires (≥6 rounds, stages 1–2 only), injects `nudgeConverge: true` into `PromptContext` so the prompt tells the LLM to converge.
+- Stage 1 additionally gets a client-side **escape hatch button** (`shouldShowEscapeHatch`) in `ConversationChat` — clicking sends a fixed force-converge message asking for the 确认书. It does NOT bypass `canAdvance` gating.
 
 ### Persistence & auth
 
@@ -134,18 +150,21 @@ When the LLM emits `stage1_confirmed: true` + `snapshot`, `ConversationChat` ins
 - Stage 5 approve + score < 6 → **treated as soft-reject**: `approved=false, submitted=false`, feedback auto-appends rewrite prompt, student stays at stage 5
 - `ReviewActionForm.tsx` shows real-time score threshold hints to the teacher
 
+### Stage 2 schema normalization
+
+`normalizeSchema()` in `app/lib/schemaNormalize.ts` (pure, tested) cleans the LLM-produced `data_table_schema` inside `extractStageData` before it's stored: snake_case + deduped keys, empty-title columns dropped, types coerced to `text/number/image`, a `notes` text column guaranteed, `minRows ≥ 3`, `maxRows = 200`.
+
 ### Stage 5 auto-generation
 
-When entering stage 5 (via confirm button or `/advance`), `ConversationWorkspace.onPhaseConfirm` automatically sends a "开始报告成型" trigger message. The phase 5 prompt instructs the LLM to **always** include `report_sections` when `priorSummary` is injected — no student input required.
+When entering stage 5 (via confirm button or `/advance`), `ConversationWorkspace.onPhaseConfirm` automatically sends a "开始报告成型" trigger message. The chat route builds `priorSummary` with `buildPriorSummary(stageData)` (`app/lib/reportSummary.ts` — condenses stage 1 确认书/variables, stage 2 schema, stage 3 data rows into text); the phase 5 prompt instructs the LLM to **always** include `report_sections` when `priorSummary` is injected — no student input required. Guest mode builds the same summary client-side.
 
-### Report Viewer
+### Report Viewer & Word export/import
 
-`ReportViewer.tsx` receives `schemaColumns` and `dataRows` from stages 2–3 and renders:
-- AI-prefilled report sections (purpose/hypothesis/materials/procedure/dataSummary/analysis)
-- **Embedded data table** from stage 3
-- Student-editable conclusion and reflection fields
-- Teacher score display (green for ≥6, red for <6 with rewrite notice)
-- AI reference score display
+`ReportViewer.tsx` (stage 5 panel) wraps the shared `ReportDocument.tsx` renderer (also used read-only in stage 6) showing AI-prefilled sections (purpose/hypothesis/materials/procedure/dataSummary/analysis) + the embedded stage-3 data table, plus student-editable conclusion/reflection fields, teacher score (green ≥6 / red <6 with rewrite notice), and AI reference score.
+
+Word round-trip (both routes require ownership via `getConversationForUser`):
+- `POST /api/conversations/[id]/report/export` — builds a `.docx` from stage 5 sections + data table via `buildReportDocx()` (`app/lib/reportDocx.ts`, hand-written WordprocessingML zipped by `app/lib/zip.ts`).
+- `POST /api/conversations/[id]/report/import` (student-only, stage 5 only, ≤10MB `.docx`) — saves the file to `public/uploads/`, extracts text via `extractDocxText()` (`app/lib/docxExtract.ts`), and stores `uploadedDocUrl`/`uploadedText` on `stage5` **without overwriting the AI sections**.
 
 ### Safety system
 
@@ -207,20 +226,33 @@ ConversationWorkspace (client, owns stage/stageData/status)
 GuestWorkspace — same components, no DB, local state, no teacher review
 ```
 
+### Data Lab
+
+`/data-lab` is an isolated data-production workspace for `annotator`, `reviewer`, and `admin` roles. It supports immutable dataset imports, structured assistant-only annotation, anonymous arbitration, frozen ShareGPT releases, external training-run registration, and blind-eval artifact import. Public registration still only permits `student` and `teacher`; background roles are admin-managed.
+
+Initialization:
+
+```bash
+npm run data-lab:init   # requires ADMIN_USERNAME / ADMIN_PASSWORD / ADMIN_DISPLAY_NAME
+npm run data-lab:pilot  # optional 12-sample pilot and demo annotation accounts
+npm run data-lab:test
+```
+
 ### Type system
 
 - `Message` in `app/models/types.ts` — includes `hints`, `messageType` (for confirmation_doc), `actionType`, `phaseComplete`
 - `ChatResponse` in `app/models/types.ts` — includes `hints`, `stage1_confirmed`, `snapshot`, `variables` (with `controlled?: string[]`), `data_table_schema`, `risks`, `safety_quiz`, `report_sections`
-- `StageData` in `app/models/stageData.ts` — stage1–6 data shapes; stage4 has `analysisCount`
+- `StageData` in `app/models/stageData.ts` — stage1–6 data shapes; stage4 has `analysisCount`; stage5 has optional `uploadedDocUrl`/`uploadedText`; top-level `roundCounts` tracks per-stage message rounds
 - `PhaseEnum` in `app/models/types.ts` — 1–6 enum with Chinese comments
 
 ### LLM integration (`app/lib/llm/`)
 
 - **`provider.ts`** — `OpenAICompatibleProvider` hits `${baseURL}/chat/completions`. 30s timeout.
-- **`parser.ts`** — `safeParseChatResponse()` never throws. Multi-strategy parse: strict JSON → markdown fence → brace matching → heuristic natural-language extraction. Extracts `hints`, `controlled` variables, and all M4 structured fields.
+- **`parser.ts`** — `safeParseChatResponse()` never throws. Multi-strategy parse: strict JSON → markdown fence → brace matching → heuristic natural-language extraction; the fence and brace strategies each retry through `repairJson()` before giving up. Extracts `hints`, `controlled` variables, and all M4 structured fields.
+- **`jsonRepair.ts`** — `repairJson()`: deterministic, zero-dependency fixer for common LLM JSON slips (unescaped newlines/inner quotes in strings, trailing commas, Chinese smart quotes). Deliberately does NOT handle single-quoted strings or unquoted keys.
 - **`errors.ts`** — `classifyError()` maps errors to typed `ErrorCode` + Chinese user message + HTTP status.
 - **Two-attempt JSON strategy**: attempt 1 with `response_format: json_object`; if parse falls back to apology, attempt 2 without JSON mode + hard instruction for raw JSON. `APOLOGY_DIALOGUES` in `chat.ts` must stay in sync with `parser.ts`.
 
 ### Env vars
 
-`OPENAI_API_KEY` (+ optional `OPENAI_API_BASE`) or `DEEPSEEK_API_KEY` (+ optional `DEEPSEEK_API_BASE`). Optional overrides: `LLM_PROVIDER`, `LLM_MODEL` (defaults `gpt-4o` / `deepseek-chat`).
+`OPENAI_API_KEY` (+ optional `OPENAI_API_BASE`) or `DEEPSEEK_API_KEY` (+ optional `DEEPSEEK_API_BASE`). Optional overrides: `LLM_PROVIDER`, `LLM_MODEL` (defaults `gpt-4o` / `deepseek-v4-pro`).

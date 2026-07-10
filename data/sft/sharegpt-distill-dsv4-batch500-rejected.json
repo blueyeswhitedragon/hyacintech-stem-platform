@@ -1,0 +1,22 @@
+[
+  {
+    "taskId": "p1-high-concept-mars-water-recycle-v5-5122f73ba5",
+    "phase": 1,
+    "scenario": "高概念型-火星基地水循环-蒸馏样本5",
+    "tier": "reject",
+    "reasons": [
+      "Expected ',' or '}' after property value in JSON at position 1673"
+    ],
+    "raw": "{\"record\":{\"scenario\":\"高概念型-火星基地水循环-蒸馏样本5\",\"phase\":1,\"rubricTargets\":[\"cognitive_load_control\",\"proxy_quality\",\"student_agency\",\"theme_fidelity\",\"transformation_reasoning\"],\"qualityNotes\":\"从火星水循环兴趣切入，引导将‘净化方式影响回用水质’转化为具体变量（过滤层数、澄清度），全程不提供选项，每轮只问一个开放问题，尊重学生主体性，确认时输出完整的theme_mapping、snapshot和变量信息。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我想做一个和火星基地有关的项目，研究水怎么循环用。我最感兴趣的是基地里水怎么净化后再用，但不知道在课堂里能怎么研究。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"这个方向很有探究价值。要把“净化方式影响回用水质”带到课堂，我们可以用不同过滤层数来模拟净化过程。你觉得改变过滤层数，观察什么变化最能反映净化效果？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可以想一想水质变化中最直观、最容易观察的指标。\",\"试试把“回用水质”缩小到可以通过简单工具判断的特征。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"我觉得可以看水变清的程度，就是澄清度。我想研究过滤层数是不是影响澄清度。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"好的，这样你就有了清晰的自变量和因变量：自变量是过滤层数，因变量是回用水澄清度。我们来整理一下：研究问题为“过滤层数是否影响模拟回用水澄清度？”，请确认这是否符合你的想法，或者想调整什么？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"如果确认，下一步我们可以讨论具体的过滤材料和测量方案。\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"是的，这就是我的想法。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"我们确认选题：研究“过滤层数是否影响模拟回用水澄清度？”，自变量为过滤层数，因变量为回用水澄清度。保留了火星基地背景，用不同层数代理净化方式，用澄清度表征水质。请核对无误。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"stage1_confirmed\":true,\"theme_mapping\":{\"original_interest\":\"火星基地水循环\",\"retained_feature\":\"净化方式影响回用水质\",\"classroom_proxy\":\"不同过滤层数\",\"research_question\":\"过滤层数是否影响模拟回用水澄清度？\"},\"snapshot\":{\"original_interest\":\"火星基地水循环\",\"retained_feature\":\"净化方式影响回用水质\",\"classroom_proxy\":\"不同过滤层数\",\"research_question\":\"过滤层数是否影响模拟回用水澄清度？\",\"independent_variable\":\"过滤层数\",\"dependent_variable\":\"回用水澄清度\"},\"variables\":{\"independent\":\"过滤层数\",\"dependent\":{\"description\":\"回用水澄清度\",\"direction\":\"越高层数可能澄清度越高\"}}}]}}"
+  },
+  {
+    "taskId": "p1-engineering-oil-separation-v6-9a1fa6cd0f",
+    "phase": 1,
+    "scenario": "工程项目型-油污分离装置-蒸馏样本6",
+    "tier": "reject",
+    "reasons": [
+      "generation-error:empty-content"
+    ],
+    "raw": ""
+  }
+]

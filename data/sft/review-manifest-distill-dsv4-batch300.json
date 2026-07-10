@@ -1,0 +1,2391 @@
+{
+  "schemaVersion": 1,
+  "batchId": "distill-dsv4-batch300",
+  "createdAt": "2026-07-10T00:35:26.350Z",
+  "planFile": "/root/hyacintech-stem-platform/data/sft/distill-plan-dsv4.json",
+  "rawFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-raw.json",
+  "outputs": {
+    "clean": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-clean.json",
+    "goldCandidate": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json",
+    "silver": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json",
+    "rejected": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-rejected.json"
+  },
+  "summary": {
+    "totalRaw": 100,
+    "clean": 99,
+    "goldCandidate": 63,
+    "silver": 36,
+    "needsReview": 0,
+    "rejected": 1,
+    "byPhase": {
+      "P1": 32,
+      "P2": 32,
+      "P3": 9,
+      "P4": 12,
+      "P5": 9,
+      "P6": 6
+    },
+    "rejectReasons": {
+      "Expected ',' or '}' after property value in JSON at position 1915": 1
+    }
+  },
+  "records": [
+    {
+      "id": "stem-distill-dsv4-p1-engineering-sorting-color-sensor-v3-a376fc3a01-v1",
+      "taskId": "p1-engineering-sorting-color-sensor-v3-a376fc3a01",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "工程项目型-颜色分拣装置-蒸馏样本3",
+      "personaId": "engineering-sorting-color-sensor",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-door-reminder-distance-v3-08d6b87f36-v1",
+      "taskId": "p1-engineering-door-reminder-distance-v3-08d6b87f36",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "工程项目型-门禁提醒距离-蒸馏样本3",
+      "personaId": "engineering-door-reminder-distance",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0148-v3-c3fccb584d-v1",
+      "taskId": "p1-smartedu-0148-v3-c3fccb584d",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 1,
+      "scenario": "欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月-蒸馏样本3",
+      "topicId": "smartedu-0148",
+      "subject": "科学",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-fan-temperature-threshold-v3-562f03417c-v1",
+      "taskId": "p1-engineering-fan-temperature-threshold-v3-562f03417c",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "工程项目型-温控风扇阈值-蒸馏样本3",
+      "personaId": "engineering-fan-temperature-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v3-c2a8e634ff-v1",
+      "taskId": "p1-high-concept-smart-campus-energy-v3-c2a8e634ff",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "高概念型-智慧校园节能-蒸馏样本3",
+      "personaId": "high-concept-smart-campus-energy",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-city-cooling-roof-v3-86f27bec81-v1",
+      "taskId": "p1-high-concept-city-cooling-roof-v3-86f27bec81",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "高概念型-城市降温屋顶-蒸馏样本3",
+      "personaId": "high-concept-city-cooling-roof",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-low-carbon-commute-v3-b52233a5e6-v1",
+      "taskId": "p1-high-concept-low-carbon-commute-v3-b52233a5e6",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "高概念型-低碳出行-蒸馏样本3",
+      "personaId": "high-concept-low-carbon-commute",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0154-v3-d9b462ad56-v1",
+      "taskId": "p1-smartedu-0154-v3-d9b462ad56",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 1,
+      "scenario": "探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素-蒸馏样本3",
+      "topicId": "smartedu-0154",
+      "subject": "科学",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-water-recycle-v3-72d75f28ab-v1",
+      "taskId": "p1-high-concept-mars-water-recycle-v3-72d75f28ab",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "高概念型-火星基地水循环-蒸馏样本3",
+      "personaId": "high-concept-mars-water-recycle",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-light-color-v3-24b2d8d836-v1",
+      "taskId": "p1-cooperative-light-color-v3-24b2d8d836",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "配合型-光色与绿豆发芽-蒸馏样本3",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-water-amount-v3-84a250e2e8-v1",
+      "taskId": "p1-fuzzy-water-amount-v3-84a250e2e8",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "模糊型-浇水多少-蒸馏样本3",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-all-at-once-salt-germination-v3-830efa4676-v1",
+      "taskId": "p1-all-at-once-salt-germination-v3-830efa4676",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:all_at_once",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "一次给全型-盐水浓度与发芽-蒸馏样本3",
+      "personaId": "all-at-once-salt-germination",
+      "subject": "biology_ecology",
+      "studentType": "all_at_once",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0159-v3-da0edb51bf-v1",
+      "taskId": "p1-smartedu-0159-v3-da0edb51bf",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 1,
+      "scenario": "高中人工智能校本课程设计和教学实践-蒸馏样本3",
+      "topicId": "smartedu-0159",
+      "subject": "人工智能",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-acid-rain-plant-v3-2cfa74b9d2-v1",
+      "taskId": "p1-safety-acid-rain-plant-v3-2cfa74b9d2",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "安全风险型-酸雨与植物-蒸馏样本3",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v3-68e8a36e9b-v1",
+      "taskId": "p1-ecology-bottle-balance-v3-68e8a36e9b",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "过度宏大型-生态瓶平衡-蒸馏样本3",
+      "personaId": "ecology-bottle-balance",
+      "subject": "biology_ecology",
+      "studentType": "over_broad",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-premature-shade-plant-height-v3-d6c8b1043c-v1",
+      "taskId": "p1-premature-shade-plant-height-v3-d6c8b1043c",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:premature_details",
+        "failureMode:premature_stage2"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "细节过早型-遮阴与株高-蒸馏样本3",
+      "personaId": "premature-shade-plant-height",
+      "subject": "biology_ecology",
+      "studentType": "premature_details",
+      "failureModes": [
+        "premature_stage2"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-yogurt-temperature-v3-24301b3fde-v1",
+      "taskId": "p1-fuzzy-yogurt-temperature-v3-24301b3fde",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "模糊型-酸奶与温度-蒸馏样本3",
+      "personaId": "fuzzy-yogurt-temperature",
+      "subject": "food_chemistry",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0164-v3-b27f0d1960-v1",
+      "taskId": "p1-smartedu-0164-v3-b27f0d1960",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 1,
+      "scenario": "探究智能遮光系统——基于环境光的自动控制-蒸馏样本3",
+      "topicId": "smartedu-0164",
+      "subject": "STEM",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-bread-mold-preservative-v3-fa5a7ab760-v1",
+      "taskId": "p1-safety-bread-mold-preservative-v3-fa5a7ab760",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "安全风险型-面包防腐-蒸馏样本3",
+      "personaId": "safety-bread-mold-preservative",
+      "subject": "food_chemistry",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v3-0552ef09f1-v1",
+      "taskId": "p1-variable-confusion-apple-browning-v3-0552ef09f1",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "变量混乱型-苹果褐变-蒸馏样本3",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-paper-airplane-distance-v3-c6f4364e3d-v1",
+      "taskId": "p1-cooperative-paper-airplane-distance-v3-c6f4364e3d",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:format_discipline"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "配合型-纸飞机飞行距离-蒸馏样本3",
+      "personaId": "cooperative-paper-airplane-distance",
+      "subject": "physics_motion",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-vehicle-ramp-angle-v3-ff9bf4da1d-v1",
+      "taskId": "p1-fuzzy-vehicle-ramp-angle-v3-ff9bf4da1d",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "模糊型-小车与斜面-蒸馏样本3",
+      "personaId": "fuzzy-vehicle-ramp-angle",
+      "subject": "physics_motion",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0169-v3-144b6f964e-v1",
+      "taskId": "p1-smartedu-0169-v3-144b6f964e",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 1,
+      "scenario": "探究「如何在太阳系寻找生命 太阳是我们的朋友，它也会发脾气吗？」中的影响因素-蒸馏样本3",
+      "topicId": "smartedu-0169",
+      "subject": "科学",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-bridge-load-v3-192d992dec-v1",
+      "taskId": "p1-engineering-bridge-load-v3-192d992dec",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "工程项目型-纸桥承重-蒸馏样本3",
+      "personaId": "engineering-bridge-load",
+      "subject": "physics_motion",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v3-5497f03ae3-v1",
+      "taskId": "p1-over-broad-vehicle-fuel-v3-5497f03ae3",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "过度宏大型-新能源车续航-蒸馏样本3",
+      "personaId": "over-broad-vehicle-fuel",
+      "subject": "physics_motion",
+      "studentType": "over_broad",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-thermal-insulation-v3-a54aa624d2-v1",
+      "taskId": "p1-cooperative-thermal-insulation-v3-a54aa624d2",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:format_discipline"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "配合型-保温材料-蒸馏样本3",
+      "personaId": "cooperative-thermal-insulation",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v3-2e3bee8ed7-v1",
+      "taskId": "p1-real-world-classroom-shade-heat-v3-2e3bee8ed7",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:cooperative",
+        "failureMode:theme_loss"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "现实问题抽象型-教室遮光降温-蒸馏样本3",
+      "personaId": "real-world-classroom-shade-heat",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "failureModes": [
+        "theme_loss"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0174-v3-14c794bd54-v1",
+      "taskId": "p1-smartedu-0174-v3-14c794bd54",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 1,
+      "scenario": "探究「揭秘水族箱的秘密」中的影响因素-蒸馏样本3",
+      "topicId": "smartedu-0174",
+      "subject": "STEM",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-absorbent-paper-v3-c760080a98-v1",
+      "taskId": "p1-fuzzy-absorbent-paper-v3-c760080a98",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "模糊型-吸水材料-蒸馏样本3",
+      "personaId": "fuzzy-absorbent-paper",
+      "subject": "materials_structure",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-low-effort-egg-drop-v3-4fc22b0743-v1",
+      "taskId": "p1-low-effort-egg-drop-v3-4fc22b0743",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:low_effort",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "偷懒型-鸡蛋包装防摔-蒸馏样本3",
+      "personaId": "low-effort-egg-drop",
+      "subject": "materials_structure",
+      "studentType": "low_effort",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-water-filter-v3-8789842715-v1",
+      "taskId": "p1-cooperative-water-filter-v3-8789842715",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:format_discipline"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "配合型-净水过滤材料-蒸馏样本3",
+      "personaId": "cooperative-water-filter",
+      "subject": "water_environment",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-oil-separation-v3-6da83cde6c-v1",
+      "taskId": "p1-engineering-oil-separation-v3-6da83cde6c",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P1",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 1,
+      "scenario": "工程项目型-油污分离装置-蒸馏样本3",
+      "personaId": "engineering-oil-separation",
+      "subject": "water_environment",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0112-v2-6de74f04b9-v1",
+      "taskId": "p2-smartedu-0112-v2-6de74f04b9",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "探究「制造距离感（现实空间）」中的影响因素-蒸馏样本2",
+      "topicId": "smartedu-0112",
+      "subject": "STEM",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-water-recycle-v2-5dd9625dbc-v1",
+      "taskId": "p2-high-concept-mars-water-recycle-v2-5dd9625dbc",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "高概念型-火星基地水循环-蒸馏样本2",
+      "personaId": "high-concept-mars-water-recycle",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-light-v2-cd37f3f8bd-v1",
+      "taskId": "p2-high-concept-mars-light-v2-cd37f3f8bd",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "高概念降级型-火星基地植物-蒸馏样本2",
+      "personaId": "high-concept-mars-light",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v2-a855df0b24-v1",
+      "taskId": "p2-safety-acid-rain-plant-v2-a855df0b24",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "安全风险型-酸雨与植物-蒸馏样本2",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v2-5bcaa4ae91-v1",
+      "taskId": "p2-ecology-bottle-balance-v2-5bcaa4ae91",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "过度宏大型-生态瓶平衡-蒸馏样本2",
+      "personaId": "ecology-bottle-balance",
+      "subject": "biology_ecology",
+      "studentType": "over_broad",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0117-v2-561a8f0d9b-v1",
+      "taskId": "p2-smartedu-0117-v2-561a8f0d9b",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "跨学科实践活动1 自制简易净水器-蒸馏样本2",
+      "topicId": "smartedu-0117",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-apple-browning-v2-98ff07f63c-v1",
+      "taskId": "p2-variable-confusion-apple-browning-v2-98ff07f63c",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "failureMode:premature_stage2"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "变量混乱型-苹果褐变-蒸馏样本2",
+      "personaId": "variable-confusion-apple-browning",
+      "subject": "food_chemistry",
+      "studentType": "variable_confusion",
+      "failureModes": [
+        "variable_confusion",
+        "premature_stage2"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-bridge-load-v2-98e3c8ebab-v1",
+      "taskId": "p2-engineering-bridge-load-v2-98e3c8ebab",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "工程项目型-纸桥承重-蒸馏样本2",
+      "personaId": "engineering-bridge-load",
+      "subject": "physics_motion",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-vehicle-fuel-v2-49c00af10b-v1",
+      "taskId": "p2-over-broad-vehicle-fuel-v2-49c00af10b",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "过度宏大型-新能源车续航-蒸馏样本2",
+      "personaId": "over-broad-vehicle-fuel",
+      "subject": "physics_motion",
+      "studentType": "over_broad",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v2-41e621a397-v1",
+      "taskId": "p2-real-world-classroom-shade-heat-v2-41e621a397",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:cooperative",
+        "failureMode:theme_loss"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "现实问题抽象型-教室遮光降温-蒸馏样本2",
+      "personaId": "real-world-classroom-shade-heat",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "failureModes": [
+        "theme_loss"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0124-v2-cdb468a16f-v1",
+      "taskId": "p2-smartedu-0124-v2-cdb468a16f",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "跨学科实践活动3 水质检测及自制净水器-蒸馏样本2",
+      "topicId": "smartedu-0124",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-trash-sorting-v2-9144fa27b3-v1",
+      "taskId": "p2-over-broad-trash-sorting-v2-9144fa27b3",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:engineering_flattening"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "过度宏大型-垃圾分类装置-蒸馏样本2",
+      "personaId": "over-broad-trash-sorting",
+      "subject": "water_environment",
+      "studentType": "over_broad",
+      "failureModes": [
+        "theme_loss",
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-turbidity-settle-v2-3121078db2-v1",
+      "taskId": "p2-variable-confusion-turbidity-settle-v2-3121078db2",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "变量混乱型-泥沙沉降-蒸馏样本2",
+      "personaId": "variable-confusion-turbidity-settle",
+      "subject": "water_environment",
+      "studentType": "variable_confusion",
+      "failureModes": [
+        "variable_confusion"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-solar-car-angle-v2-0020611083-v1",
+      "taskId": "p2-engineering-solar-car-angle-v2-0020611083",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "工程项目型-太阳能小车光强-蒸馏样本2",
+      "personaId": "engineering-solar-car-angle",
+      "subject": "electricity_energy",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-circuit-brightness-v2-e8d8ac5b34-v1",
+      "taskId": "p2-safety-circuit-brightness-v2-e8d8ac5b34",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "安全风险型-电路与灯泡亮度-蒸馏样本2",
+      "personaId": "safety-circuit-brightness",
+      "subject": "electricity_energy",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0143-v2-e6d4c783f0-v1",
+      "taskId": "p2-smartedu-0143-v2-e6d4c783f0",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "机器人舞台-百年征程 未来可期-蒸馏样本2",
+      "topicId": "smartedu-0143",
+      "subject": "STEM",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-smart-shade-threshold-v2-d5c5d2e507-v1",
+      "taskId": "p2-engineering-smart-shade-threshold-v2-d5c5d2e507",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "工程保真型-智能遮光系统-蒸馏样本2",
+      "personaId": "engineering-smart-shade-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-alarm-sensitivity-v2-7afdd0018a-v1",
+      "taskId": "p2-engineering-alarm-sensitivity-v2-7afdd0018a",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "工程项目型-倾斜报警器灵敏度-蒸馏样本2",
+      "personaId": "engineering-alarm-sensitivity",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-door-reminder-distance-v3-12f0256841-v1",
+      "taskId": "p2-engineering-door-reminder-distance-v3-12f0256841",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "工程项目型-门禁提醒距离-蒸馏样本3",
+      "personaId": "engineering-door-reminder-distance",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0148-v3-fee4590134-v1",
+      "taskId": "p2-smartedu-0148-v3-fee4590134",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "欧阳自远院士 探月工程首任首席科学家 | “嫦娥之父”给孩子们说月-蒸馏样本3",
+      "topicId": "smartedu-0148",
+      "subject": "科学",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-fan-temperature-threshold-v3-5cfaf9483a-v1",
+      "taskId": "p2-engineering-fan-temperature-threshold-v3-5cfaf9483a",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "工程项目型-温控风扇阈值-蒸馏样本3",
+      "personaId": "engineering-fan-temperature-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-smart-campus-energy-v3-5abb1562f7-v1",
+      "taskId": "p2-high-concept-smart-campus-energy-v3-5abb1562f7",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "高概念型-智慧校园节能-蒸馏样本3",
+      "personaId": "high-concept-smart-campus-energy",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-city-cooling-roof-v3-4651494ac9-v1",
+      "taskId": "p2-high-concept-city-cooling-roof-v3-4651494ac9",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "高概念型-城市降温屋顶-蒸馏样本3",
+      "personaId": "high-concept-city-cooling-roof",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-low-carbon-commute-v3-e9e371c67e-v1",
+      "taskId": "p2-high-concept-low-carbon-commute-v3-e9e371c67e",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "高概念型-低碳出行-蒸馏样本3",
+      "personaId": "high-concept-low-carbon-commute",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0154-v3-858ebf604f-v1",
+      "taskId": "p2-smartedu-0154-v3-858ebf604f",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "探究「世所罕见的“全面发展之人物”——汉代科学家张衡」中的影响因素-蒸馏样本3",
+      "topicId": "smartedu-0154",
+      "subject": "科学",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-water-recycle-v3-d8b2e1ae80-v1",
+      "taskId": "p2-high-concept-mars-water-recycle-v3-d8b2e1ae80",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "高概念型-火星基地水循环-蒸馏样本3",
+      "personaId": "high-concept-mars-water-recycle",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-light-color-v3-d35a5e6e4a-v1",
+      "taskId": "p2-cooperative-light-color-v3-d35a5e6e4a",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:cooperative",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "配合型-光色与绿豆发芽-蒸馏样本3",
+      "personaId": "cooperative-light-color",
+      "subject": "biology_ecology",
+      "studentType": "cooperative",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-water-amount-v3-8463b2984f-v1",
+      "taskId": "p2-fuzzy-water-amount-v3-8463b2984f",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "failureMode:weak_confirmation_doc"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "模糊型-浇水多少-蒸馏样本3",
+      "personaId": "fuzzy-water-amount",
+      "subject": "biology_ecology",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning",
+        "weak_confirmation_doc"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-all-at-once-salt-germination-v3-ae6edb6811-v1",
+      "taskId": "p2-all-at-once-salt-germination-v3-ae6edb6811",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "studentType:all_at_once",
+        "failureMode:over_questioning"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "一次给全型-盐水浓度与发芽-蒸馏样本3",
+      "personaId": "all-at-once-salt-germination",
+      "subject": "biology_ecology",
+      "studentType": "all_at_once",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0159-v3-64ae11bea2-v1",
+      "taskId": "p2-smartedu-0159-v3-64ae11bea2",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:high",
+        "phase:P2",
+        "source:topic-library",
+        "phase:high-impact"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 2,
+      "scenario": "高中人工智能校本课程设计和教学实践-蒸馏样本3",
+      "topicId": "smartedu-0159",
+      "subject": "人工智能",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v3-eff5819b51-v1",
+      "taskId": "p2-safety-acid-rain-plant-v3-eff5819b51",
+      "tier": "gold_candidate",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:critical",
+        "phase:P2",
+        "source:persona",
+        "phase:high-impact",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness"
+      ],
+      "sourceKind": "persona",
+      "phase": 2,
+      "scenario": "安全风险型-酸雨与植物-蒸馏样本3",
+      "personaId": "safety-acid-rain-plant",
+      "subject": "biology_ecology",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-gold-candidate.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-water-filter-v1-6d7aaf32a8-v1",
+      "taskId": "p3-cooperative-water-filter-v1-6d7aaf32a8",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 3,
+      "scenario": "配合型-净水过滤材料-蒸馏样本1",
+      "personaId": "cooperative-water-filter",
+      "subject": "water_environment",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-oil-separation-v1-0f31eef5f3-v1",
+      "taskId": "p3-engineering-oil-separation-v1-0f31eef5f3",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 3,
+      "scenario": "工程项目型-油污分离装置-蒸馏样本1",
+      "personaId": "engineering-oil-separation",
+      "subject": "water_environment",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0047-v1-2d53996313-v1",
+      "taskId": "p3-smartedu-0047-v1-2d53996313",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 3,
+      "scenario": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0047",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-variable-confusion-turbidity-settle-v1-634da63148-v1",
+      "taskId": "p3-variable-confusion-turbidity-settle-v1-634da63148",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 3,
+      "scenario": "变量混乱型-泥沙沉降-蒸馏样本1",
+      "personaId": "variable-confusion-turbidity-settle",
+      "subject": "water_environment",
+      "studentType": "variable_confusion",
+      "failureModes": [
+        "variable_confusion"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-electromagnet-coils-v1-c76765c47d-v1",
+      "taskId": "p3-cooperative-electromagnet-coils-v1-c76765c47d",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 3,
+      "scenario": "配合型-电磁铁线圈数-蒸馏样本1",
+      "personaId": "cooperative-electromagnet-coils",
+      "subject": "electricity_energy",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0050-v1-ff376bd97a-v1",
+      "taskId": "p3-smartedu-0050-v1-ff376bd97a",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 3,
+      "scenario": "探究「化学实验基本操作」中的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0050",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-windmill-blades-v1-0a6f0929f5-v1",
+      "taskId": "p3-fuzzy-windmill-blades-v1-0a6f0929f5",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 3,
+      "scenario": "模糊型-风车叶片数-蒸馏样本1",
+      "personaId": "fuzzy-windmill-blades",
+      "subject": "electricity_energy",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-safety-circuit-brightness-v1-e7d755b12e-v1",
+      "taskId": "p3-safety-circuit-brightness-v1-e7d755b12e",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 3,
+      "scenario": "安全风险型-电路与灯泡亮度-蒸馏样本1",
+      "personaId": "safety-circuit-brightness",
+      "subject": "electricity_energy",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0054-v1-11659a4a90-v1",
+      "taskId": "p3-smartedu-0054-v1-11659a4a90",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P3",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 3,
+      "scenario": "课题２ 学习开展化学实验探究-蒸馏样本1",
+      "topicId": "smartedu-0054",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-smart-shade-threshold-v1-a04e16ef24-v1",
+      "taskId": "p4-engineering-smart-shade-threshold-v1-a04e16ef24",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "工程保真型-智能遮光系统-蒸馏样本1",
+      "personaId": "engineering-smart-shade-threshold",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-alarm-sensitivity-v1-372f3eb1d5-v1",
+      "taskId": "p4-engineering-alarm-sensitivity-v1-372f3eb1d5",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "工程项目型-倾斜报警器灵敏度-蒸馏样本1",
+      "personaId": "engineering-alarm-sensitivity",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0057-v1-99252cc3a0-v1",
+      "taskId": "p4-smartedu-0057-v1-99252cc3a0",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 4,
+      "scenario": "探究「学生实验」中的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0057",
+      "subject": "生物,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-door-reminder-distance-v1-47554c95ad-v1",
+      "taskId": "p4-engineering-door-reminder-distance-v1-47554c95ad",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "工程项目型-门禁提醒距离-蒸馏样本1",
+      "personaId": "engineering-door-reminder-distance",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-plant-light-auto-duration-v1-3c12fde7f3-v1",
+      "taskId": "p4-engineering-plant-light-auto-duration-v1-3c12fde7f3",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:theme_loss",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "工程项目型-补光灯时长-蒸馏样本1",
+      "personaId": "engineering-plant-light-auto-duration",
+      "subject": "engineering_automation",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "theme_loss"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0060-v1-fb1c8ae908-v1",
+      "taskId": "p4-smartedu-0060-v1-fb1c8ae908",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 4,
+      "scenario": "探究「植物生长素的探索史」中的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0060",
+      "subject": "生物",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-smart-campus-energy-v1-5333fee220-v1",
+      "taskId": "p4-high-concept-smart-campus-energy-v1-5333fee220",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "高概念型-智慧校园节能-蒸馏样本1",
+      "personaId": "high-concept-smart-campus-energy",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-city-cooling-roof-v1-5172f99b94-v1",
+      "taskId": "p4-high-concept-city-cooling-roof-v1-5172f99b94",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "高概念型-城市降温屋顶-蒸馏样本1",
+      "personaId": "high-concept-city-cooling-roof",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0063-v1-5ce265f1b5-v1",
+      "taskId": "p4-smartedu-0063-v1-5ce265f1b5",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 4,
+      "scenario": ".植物的变化 实验-蒸馏样本1",
+      "topicId": "smartedu-0063",
+      "subject": "科学",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-ai-recognition-threshold-v1-240b481c3a-v1",
+      "taskId": "p4-high-concept-ai-recognition-threshold-v1-240b481c3a",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:engineering_flattening",
+        "failureMode:theme_loss",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "高概念型-AI识别阈值-蒸馏样本1",
+      "personaId": "high-concept-ai-recognition-threshold",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "engineering_flattening",
+        "theme_loss"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-mars-water-recycle-v1-6343d668ac-v1",
+      "taskId": "p4-high-concept-mars-water-recycle-v1-6343d668ac",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:high_concept",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 4,
+      "scenario": "高概念型-火星基地水循环-蒸馏样本1",
+      "personaId": "high-concept-mars-water-recycle",
+      "subject": "high_concept_interdisciplinary",
+      "studentType": "high_concept",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0067-v2-c2384f1b9a-v1",
+      "taskId": "p4-smartedu-0067-v2-c2384f1b9a",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P4",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 4,
+      "scenario": "探究「第一节 植物生长素」中的影响因素-蒸馏样本2",
+      "topicId": "smartedu-0067",
+      "subject": "生物",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-water-filter-v1-38ed787c23-v1",
+      "taskId": "p5-cooperative-water-filter-v1-38ed787c23",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 5,
+      "scenario": "配合型-净水过滤材料-蒸馏样本1",
+      "personaId": "cooperative-water-filter",
+      "subject": "water_environment",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-oil-separation-v1-1cd3e41274-v1",
+      "taskId": "p5-engineering-oil-separation-v1-1cd3e41274",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 5,
+      "scenario": "工程项目型-油污分离装置-蒸馏样本1",
+      "personaId": "engineering-oil-separation",
+      "subject": "water_environment",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0047-v1-7d6deea38b-v1",
+      "taskId": "p5-smartedu-0047-v1-7d6deea38b",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 5,
+      "scenario": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0047",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-variable-confusion-turbidity-settle-v1-7501cae38d-v1",
+      "taskId": "p5-variable-confusion-turbidity-settle-v1-7501cae38d",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:variable_confusion",
+        "failureMode:variable_confusion",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 5,
+      "scenario": "变量混乱型-泥沙沉降-蒸馏样本1",
+      "personaId": "variable-confusion-turbidity-settle",
+      "subject": "water_environment",
+      "studentType": "variable_confusion",
+      "failureModes": [
+        "variable_confusion"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-electromagnet-coils-v1-00b3f4df2a-v1",
+      "taskId": "p5-cooperative-electromagnet-coils-v1-00b3f4df2a",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 5,
+      "scenario": "配合型-电磁铁线圈数-蒸馏样本1",
+      "personaId": "cooperative-electromagnet-coils",
+      "subject": "electricity_energy",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0050-v1-7e46bd291f-v1",
+      "taskId": "p5-smartedu-0050-v1-7e46bd291f",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 5,
+      "scenario": "探究「化学实验基本操作」中的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0050",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-fuzzy-windmill-blades-v1-269d41d46b-v1",
+      "taskId": "p5-fuzzy-windmill-blades-v1-269d41d46b",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 5,
+      "scenario": "模糊型-风车叶片数-蒸馏样本1",
+      "personaId": "fuzzy-windmill-blades",
+      "subject": "electricity_energy",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-safety-circuit-brightness-v1-9e504758aa-v1",
+      "taskId": "p5-safety-circuit-brightness-v1-9e504758aa",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:safety_risk",
+        "failureMode:safety_softness",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 5,
+      "scenario": "安全风险型-电路与灯泡亮度-蒸馏样本1",
+      "personaId": "safety-circuit-brightness",
+      "subject": "electricity_energy",
+      "studentType": "safety_risk",
+      "failureModes": [
+        "safety_softness"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0054-v1-efe097c650-v1",
+      "taskId": "p5-smartedu-0054-v1-efe097c650",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:medium",
+        "phase:P5",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 5,
+      "scenario": "课题２ 学习开展化学实验探究-蒸馏样本1",
+      "topicId": "smartedu-0054",
+      "subject": "化学,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0023-v1-1797ee48c0-v1",
+      "taskId": "p6-smartedu-0023-v1-1797ee48c0",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 6,
+      "scenario": "探究弹性势能的影响因素-蒸馏样本1",
+      "topicId": "smartedu-0023",
+      "subject": "物理",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p6-over-broad-vehicle-fuel-v1-f488deadf6-v1",
+      "taskId": "p6-over-broad-vehicle-fuel-v1-f488deadf6",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:over_broad",
+        "failureMode:theme_loss",
+        "failureMode:proxy_drift",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 6,
+      "scenario": "过度宏大型-新能源车续航-蒸馏样本1",
+      "personaId": "over-broad-vehicle-fuel",
+      "subject": "physics_motion",
+      "studentType": "over_broad",
+      "failureModes": [
+        "theme_loss",
+        "proxy_drift"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p6-cooperative-thermal-insulation-v1-c298caf4c9-v1",
+      "taskId": "p6-cooperative-thermal-insulation-v1-c298caf4c9",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:cooperative",
+        "failureMode:format_discipline",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 6,
+      "scenario": "配合型-保温材料-蒸馏样本1",
+      "personaId": "cooperative-thermal-insulation",
+      "subject": "materials_structure",
+      "studentType": "cooperative",
+      "failureModes": [
+        "format_discipline"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0026-v1-c69d79eca2-v1",
+      "taskId": "p6-smartedu-0026-v1-c69d79eca2",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:topic-library",
+        "tierHint:silver"
+      ],
+      "sourceKind": "topic-library",
+      "phase": 6,
+      "scenario": "探究影响电磁铁磁性强弱的因素-蒸馏样本1",
+      "topicId": "smartedu-0026",
+      "subject": "物理,初中",
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p6-engineering-waterproof-material-v1-73b061c6a8-v1",
+      "taskId": "p6-engineering-waterproof-material-v1-73b061c6a8",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "difficulty:hard",
+        "studentType:engineering_project",
+        "failureMode:engineering_flattening",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 6,
+      "scenario": "工程项目型-防水材料-蒸馏样本1",
+      "personaId": "engineering-waterproof-material",
+      "subject": "materials_structure",
+      "studentType": "engineering_project",
+      "failureModes": [
+        "engineering_flattening"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    },
+    {
+      "id": "stem-distill-dsv4-p6-fuzzy-absorbent-paper-v1-fbdc9240ca-v1",
+      "taskId": "p6-fuzzy-absorbent-paper-v1-fbdc9240ca",
+      "tier": "silver",
+      "reviewStatus": "unreviewed",
+      "gradeReasons": [
+        "priority:routine",
+        "phase:P6",
+        "source:persona",
+        "studentType:fuzzy_interest",
+        "failureMode:over_questioning",
+        "tierHint:silver"
+      ],
+      "sourceKind": "persona",
+      "phase": 6,
+      "scenario": "模糊型-吸水材料-蒸馏样本1",
+      "personaId": "fuzzy-absorbent-paper",
+      "subject": "materials_structure",
+      "studentType": "fuzzy_interest",
+      "failureModes": [
+        "over_questioning"
+      ],
+      "outputFile": "/root/hyacintech-stem-platform/data/sft/sharegpt-distill-dsv4-batch300-silver.json"
+    }
+  ],
+  "rejected": [
+    {
+      "taskId": "p2-engineering-sorting-color-sensor-v3-723422d558",
+      "phase": 2,
+      "scenario": "工程项目型-颜色分拣装置-蒸馏样本3",
+      "tier": "reject",
+      "reasons": [
+        "Expected ',' or '}' after property value in JSON at position 1915"
+      ],
+      "raw": "{\"record\":{\"scenario\":\"工程项目型-颜色分拣装置-蒸馏样本3\",\"phase\":2,\"rubricTargets\":[\"cognitive_load_control\",\"interdisciplinary_integration\",\"proxy_quality\",\"safety\",\"stage_discipline\",\"stem_fit\",\"structure_compliance\",\"theme_fidelity\"],\"qualityNotes\":\"样本展示了在多细节输入下确认阶段边界、逐步构建数据表、控制认知负荷、融入安全提醒、严格遵循数据表schema输出，推进自变量-因变量-控制变量-表格的流程，没有提前分析，符合阶段2纪律。\",\"conversations\":[{\"from\":\"human\",\"value\":\"我设三个灵敏度：低、中、高，每个测10次。看该分到A色时有没有分对，传感器位置和小球大小保持一样。每次记录小球颜色、灵敏度、分拣结果是否正确，可以生成数据表了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"你考虑得很系统。现在我们需要先确认阶段边界：自变量是颜色识别灵敏度（低、中、高），因变量是分拣准确率，控制变量是传感器位置和小球大小。请你明确一下如何判定分拣准确——是看小球最终是否进入正确颜色出口吗？确认后我们才能设计记录表。先别急着填数哦。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"建议每次测试前固定好装置，避免移位\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"对，就是看小球是否进入目标颜色出口。每次测试前我会用标准色小球校准灵敏度，这样更可靠。请帮我设计表格吧。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"很好，校准步骤确保可靠性。现在设计记录表。每行一次测试，需要记录：测试序号、小球真实颜色、灵敏度设置（低/中/高）、分拣结果（正确/错误）。再加一列备注，用于记录异常或观察。整个表格最多200行，够你用。你觉得这样够吗？需要添加其他列吗？\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[\"可记录每次测试时间，但非必需\"],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"备注列是选填吗？如果实验顺利可以不写吧。其他没问题。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"对，备注列为选填。即使在无异常时也可留空，我们保留它以备不时之需。那么表格结构基本确定。为了最终确认，我们来过一遍：测试序号、小球颜色、灵敏度、分拣结果、备注，最大200行。请再次确认是否接受这个设计，确认后我们就进入数据收集阶段了。\",\"next_action_type\":\"text_input\",\"options\":[],\"hints\":[],\"phase_complete\":false}},{\"from\":\"human\",\"value\":\"确认，就这样，我可以开始测试了。\"},{\"from\":\"gpt\",\"value\":{\"dialogue\":\"数据表确认完成。实验前请注意：保持分拣装置稳固，手远离运动部件。现在可以按计划收集数据了。\",\"next_action_type\":\"confirmation\",\"options\":[],\"hints\":[],\"phase_complete\":true,\"data_table_schema\":{\"maxRows\":200,\"columns\":[{\"key\":\"test_id\",\"title\":\"测试序号\",\"type\":\"text\",\"required\":true},{\"key\":\"ball_color\",\"title\":\"小球真实颜色\",\"type\":\"text\",\"required\":true},{\"key\":\"sensitivity\",\"title\":\"灵敏度设置\",\"type\":\"text\",\"required\":true},{\"key\":\"result\",\"title\":\"分拣结果\",\"type\":\"text\",\"required\":true},{\"key\":\"notes\",\"title\":\"备注\",\"type\":\"text\",\"required\":false}]}}]}}"
+    }
+  ]
+}

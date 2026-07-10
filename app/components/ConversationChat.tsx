@@ -31,6 +31,8 @@ interface Props {
   onPhaseConfirm?: () => Promise<string | null>;
   /** 本阶段累计对话轮次，用于判断是否显示「我已准备好，进入下一步」逃生按钮。 */
   roundCount?: number;
+  /** 向父组件注册"程序化发送"函数（用于阶段推进后的自动触发消息，消息正常进入聊天流）。 */
+  registerAutoSend?: (fn: (text: string) => Promise<void>) => void;
 }
 
 const noop = () => {};
@@ -47,7 +49,7 @@ function structuredNotice(data: ChatApiResponse): string | null {
   return null;
 }
 
-export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, roundCount = 0 }: Props) {
+export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, roundCount = 0, registerAutoSend }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,13 +59,16 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   const [quizError, setQuizError] = useState<string | null>(null);
   const [hintsEnabled, setHintsEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // 并发发送守卫：用 ref 而非 isLoading，确保确认按钮流程中（isLoading=true）仍可执行自动触发消息
+  const sendingRef = useRef(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
   const doSend = async (text: string) => {
-    if (text.trim() === '' || isLoading) return;
+    if (text.trim() === '' || sendingRef.current) return;
+    sendingRef.current = true;
 
     const userMessage: Message = { id: uuidv4(), role: 'user', content: text, status: 'sent' };
     setMessages((prev) => [...prev, userMessage]);
@@ -122,11 +127,18 @@ export default function ConversationChat({ initialMessages, stage, completed, se
       setError('发送消息失败，请重试');
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
     } finally {
+      sendingRef.current = false;
       setIsLoading(false);
     }
   };
 
   const sendMessage = () => doSend(inputValue);
+
+  // 向父组件暴露程序化发送（自动触发消息也会正常进入聊天流与历史）。
+  // 每次渲染都重注册，保证闭包里的 send/stage/messages 始终最新（guest 模式 send 捕获 stage）。
+  useEffect(() => {
+    registerAutoSend?.(doSend);
+  });
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -173,9 +185,25 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   const lastWithAction = [...assistantMessages].reverse().find(m => m.actionType);
   const lastActionType = lastWithAction?.actionType ?? null;
   const options =
-    hintsEnabled && lastActionType === 'ask_choice' && lastWithAction?.options?.length ? lastWithAction.options : null;
+    stage !== 1 && hintsEnabled && lastActionType === 'ask_choice' && lastWithAction?.options?.length ? lastWithAction.options : null;
   const hints =
     hintsEnabled && lastWithAction?.hints?.length ? lastWithAction.hints : null;
+
+  // 确认按钮与确认书卡片绑定：若最近一条 confirmation_doc 在 confirmation 动作之后出现，
+  // 则按钮直接渲染在该卡片下方（同一视觉块）；否则退回底部固定条（阶段3/4等无卡片场景）。
+  const lastDocIndex = messages.reduce(
+    (acc, m, i) => (m.messageType === 'confirmation_doc' ? i : acc), -1);
+  const confirmAttachedToDoc = lastActionType === 'confirmation' && lastDocIndex === messages.length - 1;
+
+  const confirmButton = (
+    <button
+      onClick={handleConfirm}
+      disabled={isLoading}
+      className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 text-lg font-medium"
+    >
+      {isLoading ? '处理中…' : '确认，进入下一阶段'}
+    </button>
+  );
 
   return (
     <div className="flex flex-col h-full">
@@ -193,6 +221,10 @@ export default function ConversationChat({ initialMessages, stage, completed, se
             onEdit={noop}
           />
         ))}
+        {/* 确认书卡片存在时，确认按钮紧跟卡片渲染在消息流内（同一视觉块） */}
+        {confirmAttachedToDoc && (
+          <div className="mb-4 -mt-2 text-left">{confirmButton}</div>
+        )}
         {isLoading && (
           <div className="text-left mb-4">
             <div className="inline-block rounded-lg px-4 py-2 bg-gray-100 text-gray-800">
@@ -210,20 +242,25 @@ export default function ConversationChat({ initialMessages, stage, completed, se
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 思维提示区域（可开关，仅展示不互动） */}
+      {/* 思考线索区域（可开关，仅展示不互动） */}
       {hints && hints.length > 0 && (
-        <div className="px-4 py-2 bg-yellow-50 border-t border-yellow-100">
+        <div className="px-4 py-3 bg-amber-50 border-t border-amber-100">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-yellow-700 font-medium">💡 思维提示</span>
+            <span className="text-xs text-amber-800 font-medium">
+              {stage === 1 ? '思考线索' : '思维提示'}
+            </span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="space-y-1.5">
             {hints.map((hint, index) => (
-              <span
+              <div
                 key={index}
-                className="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full border border-yellow-200"
+                className="rounded-md border border-amber-200 border-l-4 border-l-amber-400 bg-white px-3 py-2 text-sm text-amber-950"
               >
-                {hint}
-              </span>
+                <span className="mr-2 text-xs font-medium text-amber-700">
+                  {stage === 1 ? `线索${index + 1}` : `提示${index + 1}`}
+                </span>
+                <span>{hint}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -244,15 +281,9 @@ export default function ConversationChat({ initialMessages, stage, completed, se
         </div>
       )}
 
-      {lastActionType === 'confirmation' && (
+      {lastActionType === 'confirmation' && !confirmAttachedToDoc && (
         <div className="p-4 bg-gray-50 flex justify-center">
-          <button
-            onClick={handleConfirm}
-            disabled={isLoading}
-            className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 text-lg font-medium"
-          >
-            {isLoading ? '处理中…' : '确认，进入下一阶段'}
-          </button>
+          {confirmButton}
         </div>
       )}
 
@@ -298,7 +329,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
       )}
 
       <div className="border-t p-4 bg-white">
-        {/* 提示开关：控制思维提示(hints)和选择按钮(options)的显示 */}
+        {/* 提示开关：控制思维提示(hints)和非阶段1选择项(options)的显示 */}
         <div className="flex items-center justify-end mb-2">
           <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer select-none">
             <span>提示</span>

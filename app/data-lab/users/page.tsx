@@ -1,0 +1,6 @@
+import UserManager from '@/app/components/dataLab/UserManager';
+import RoleEditor from '@/app/components/dataLab/RoleEditor';
+import { listDataLabUsers } from '@/app/lib/dataLab/service';
+import { roleLabel, type UserRole } from '@/app/lib/roles';
+
+export default async function UsersPage(){const users=await listDataLabUsers();return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">后台账号</h1><p className="mt-1 text-sm text-gray-500">后台角色禁止自助注册，由管理员创建和分配。</p></div><UserManager/><div className="overflow-x-auto border bg-white"><table className="w-full text-left text-sm"><thead className="border-b bg-gray-50"><tr><th className="p-3">显示名称</th><th className="p-3">用户名</th><th className="p-3">角色</th><th className="p-3">调整角色</th><th className="p-3">创建时间</th></tr></thead><tbody>{users.map((user)=><tr key={user.id} className="border-b last:border-0"><td className="p-3 font-medium">{user.displayName}</td><td className="p-3">{user.username}</td><td className="p-3">{roleLabel(user.role as UserRole)}</td><td className="p-3"><RoleEditor userId={user.id} currentRole={user.role as UserRole}/></td><td className="p-3 text-gray-500">{user.createdAt.toLocaleString('zh-CN')}</td></tr>)}</tbody></table></div></div>}

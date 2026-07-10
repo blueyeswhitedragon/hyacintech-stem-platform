@@ -1,8 +1,9 @@
 import 'server-only';
 import { getIronSession, type SessionOptions } from 'iron-session';
 import { cookies } from 'next/headers';
+import type { UserRole } from './roles';
 
-export type UserRole = 'student' | 'teacher';
+export type { UserRole } from './roles';
 
 export interface SessionUser {
   id: string;

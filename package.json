@@ -9,6 +9,9 @@
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "data-lab:init": "tsx scripts/init-data-lab.ts",
+    "data-lab:pilot": "tsx scripts/setup-data-lab-pilot.ts",
+    "data-lab:test": "tsx scripts/test-data-lab.ts && tsx scripts/test-data-lab-integration.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },
