@@ -18,7 +18,7 @@ function sessionUser(user: { id: string; username: string; displayName: string; 
 async function main() {
   const [adminRow, annotator, sample] = await Promise.all([
     db.user.findFirstOrThrow({ where: { role: 'admin' } }),
-    db.user.findFirstOrThrow({ where: { role: 'annotator' } }),
+    db.user.findFirstOrThrow({ where: { role: 'annotator', isActive: true } }),
     db.datasetSample.findFirstOrThrow(),
   ]);
   const admin = sessionUser(adminRow);

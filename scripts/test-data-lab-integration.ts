@@ -39,13 +39,14 @@ function noChangeInput(task: NonNullable<Awaited<ReturnType<typeof claimAnnotati
 }
 
 async function main() {
-  const [adminRow, annotator1Row, annotator2Row, reviewerRow, campaign] = await Promise.all([
-    db.user.findUniqueOrThrow({ where: { username: 'data-admin' } }),
-    db.user.findUniqueOrThrow({ where: { username: 'annotator1' } }),
-    db.user.findUniqueOrThrow({ where: { username: 'annotator2' } }),
-    db.user.findUniqueOrThrow({ where: { username: 'reviewer1' } }),
+  const [adminRow, annotatorRows, reviewerRow, campaign] = await Promise.all([
+    db.user.findFirstOrThrow({ where: { role: 'admin', isActive: true } }),
+    db.user.findMany({ where: { role: 'annotator', isActive: true }, orderBy: { username: 'asc' }, take: 2 }),
+    db.user.findFirstOrThrow({ where: { role: 'reviewer', isActive: true }, orderBy: { username: 'asc' } }),
     db.annotationCampaign.findUniqueOrThrow({ where: { name: 'dataset-base-v1-pilot-12' } }),
   ]);
+  if (annotatorRows.length < 2) throw new Error('集成测试至少需要 2 个启用中的标注员账号');
+  const [annotator1Row, annotator2Row] = annotatorRows;
   const admin = sessionUser(adminRow);
   const annotator1 = sessionUser(annotator1Row);
   const annotator2 = sessionUser(annotator2Row);

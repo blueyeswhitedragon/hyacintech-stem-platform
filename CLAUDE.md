@@ -240,6 +240,8 @@ M9C adds transformation evidence and training eligibility. Revisions persist a d
 
 M9D completes deployment governance. Evaluation imports resolve transcript tags to `ModelVersion`; `deploymentGate.ts` requires ready training lineage, non-regressing aggregate results, and independent coverage/non-regression for all five styles. Only `ELIGIBLE` models can advance 10% → 30% → 100%. `resolveConversationModel()` uses a stable conversation hash and persists `Conversation.deployedModelVersionId`; chat uses that registered provider/external model. Normal promotion preserves conversation stickiness. Rollback creates a 100% baseline deployment and repins conversations still using the failed candidate. Deployment APIs are admin-only and every mutation is audited.
 
+M9E adds terminal annotation-campaign lifecycle governance. Admins may archive an `ACTIVE` campaign, atomically changing unfinished tasks to `CANCELLED`, disabling participants, and preserving assignees, drafts, submissions, work reviews, arbitration, releases, and audit history. Archived work can still be approved, invalidated, selected, merged, or rejected, but it cannot be returned to annotators or reopened. Only an empty `DRAFT` campaign can be permanently deleted. Claim, draft-save, and submit writes all re-check that the campaign is still `ACTIVE` to close archive races.
+
 Initialization:
 
 ```bash
