@@ -155,17 +155,69 @@ function AssistantEditor({ phase, response, originalResponse, contractIssues, on
 
 function Phase1Editor({ response, onChange }: { response: ChatResponse; onChange: (value: Partial<ChatResponse>) => void }) {
   const mapping = response.theme_mapping ?? { originalInterest: '', retainedFeature: '', classroomProxy: '', researchQuestion: '' };
-  const variables = response.variables ?? { independent: '', dependent: '', controlled: [] };
-  return <div className="mt-4 border-t pt-4"><h3 className="text-sm font-medium">阶段1确认结构</h3><div className="mt-2 grid gap-2 md:grid-cols-2">{(['originalInterest','retainedFeature','classroomProxy','researchQuestion'] as const).map((key) => <label key={key} className="text-xs">{key}<input value={mapping[key]} onChange={(event) => onChange({ theme_mapping: { ...mapping, [key]: event.target.value } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>)}<label className="text-xs">自变量<input value={variables.independent} onChange={(event) => onChange({ variables: { ...variables, independent: event.target.value } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label><label className="text-xs">因变量<input value={variables.dependent ?? ''} onChange={(event) => onChange({ variables: { ...variables, dependent: event.target.value } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label></div><label className="mt-2 block text-xs">确认书<textarea value={response.snapshot ?? ''} onChange={(event) => onChange({ snapshot: event.target.value, stage1_confirmed: true })} className="mt-1 min-h-20 w-full border p-2 text-sm" /></label></div>;
+  const legacy = response.variables;
+  const direction = response.topic_direction ?? {
+    factor: legacy?.independent ?? '',
+    phenomenon: legacy?.dependent ?? '',
+  };
+  return (
+    <div className="mt-4 border-t pt-4">
+      <h3 className="text-sm font-medium">阶段1确认结构</h3>
+      <p className="mt-1 text-xs text-amber-700">这里只确定因素方向和现象方向；水平、测量方式与控制变量留到阶段2。</p>
+      <div className="mt-2 grid gap-2 md:grid-cols-2">
+        {(['originalInterest', 'retainedFeature', 'classroomProxy', 'researchQuestion'] as const).map((key) => (
+          <label key={key} className="text-xs">{key}
+            <input value={mapping[key]} onChange={(event) => onChange({ theme_mapping: { ...mapping, [key]: event.target.value } })} className="mt-1 w-full border px-2 py-1.5 text-sm" />
+          </label>
+        ))}
+        <label className="text-xs">拟改变因素方向
+          <input value={direction.factor} onChange={(event) => onChange({ topic_direction: { ...direction, factor: event.target.value } })} className="mt-1 w-full border px-2 py-1.5 text-sm" />
+        </label>
+        <label className="text-xs">关注现象方向
+          <input value={direction.phenomenon} onChange={(event) => onChange({ topic_direction: { ...direction, phenomenon: event.target.value } })} className="mt-1 w-full border px-2 py-1.5 text-sm" />
+        </label>
+      </div>
+      <label className="mt-2 block text-xs">确认书
+        <textarea value={response.snapshot ?? ''} onChange={(event) => onChange({ snapshot: event.target.value, stage1_confirmed: true, variables: undefined })} className="mt-1 min-h-20 w-full border p-2 text-sm" />
+      </label>
+    </div>
+  );
 }
 
 function Phase2Editor({ response, onChange }: { response: ChatResponse; onChange: (value: Partial<ChatResponse>) => void }) {
+  const plan = response.experiment_plan ?? {
+    independentVariable: { name: '', levels: [] },
+    dependentVariable: { name: '', measurement: '' },
+    controlledVariables: [],
+    materials: [],
+    procedure: [],
+    safetyNotes: [],
+  };
+  const splitLines = (value: string) => value.split('\n').map((item) => item.trim()).filter(Boolean);
+  const planEditor = (
+    <div className="mt-4 border-t pt-4">
+      <h3 className="text-sm font-medium">结构化实验方案</h3>
+      <div className="mt-2 grid gap-2 md:grid-cols-2">
+        <label className="text-xs">自变量名称<input value={plan.independentVariable.name} onChange={(event) => onChange({ experiment_plan: { ...plan, independentVariable: { ...plan.independentVariable, name: event.target.value } } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>
+        <label className="text-xs">自变量水平（每行一个）<textarea value={plan.independentVariable.levels.join('\n')} onChange={(event) => onChange({ experiment_plan: { ...plan, independentVariable: { ...plan.independentVariable, levels: splitLines(event.target.value) } } })} className="mt-1 min-h-20 w-full border p-2 text-sm" /></label>
+        <label className="text-xs">因变量名称<input value={plan.dependentVariable.name} onChange={(event) => onChange({ experiment_plan: { ...plan, dependentVariable: { ...plan.dependentVariable, name: event.target.value } } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>
+        <label className="text-xs">测量方式<input value={plan.dependentVariable.measurement} onChange={(event) => onChange({ experiment_plan: { ...plan, dependentVariable: { ...plan.dependentVariable, measurement: event.target.value } } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>
+        {([
+          ['controlledVariables', '控制变量'],
+          ['materials', '材料'],
+          ['procedure', '步骤'],
+          ['safetyNotes', '安全措施'],
+        ] as const).map(([key, label]) => <label key={key} className="text-xs">{label}（每行一条）<textarea value={plan[key].join('\n')} onChange={(event) => onChange({ experiment_plan: { ...plan, [key]: splitLines(event.target.value) } })} className="mt-1 min-h-20 w-full border p-2 text-sm" /></label>)}
+      </div>
+    </div>
+  );
+
   if (!response.data_table_schema) {
-    return <div className="mt-4 border-t pt-4"><div className="flex items-center justify-between gap-3"><div><h3 className="text-sm font-medium">实验数据表</h3><p className="mt-1 text-xs text-gray-500">当前轮次尚未生成数据表；中间讨论轮次可以保持此状态。</p></div><button type="button" onClick={() => onChange({ next_action_type: 'confirmation', data_table_schema: { columns: [{ key: 'notes', title: '备注', type: 'text', required: false }], minRows: 3, maxRows: 200 } })} className="border px-2 py-1 text-xs">在本轮创建数据表</button></div></div>;
+    return <>{planEditor}<div className="mt-4 border-t pt-4"><div className="flex items-center justify-between gap-3"><div><h3 className="text-sm font-medium">实验数据表</h3><p className="mt-1 text-xs text-gray-500">中间讨论轮次可不生成数据表；最终轮次必须同时提交方案与表格。</p></div><button type="button" onClick={() => onChange({ experiment_plan: plan, next_action_type: 'confirmation', data_table_schema: { columns: [{ key: 'notes', title: '备注', type: 'text', required: false }], minRows: 3, maxRows: 200 } })} className="border px-2 py-1 text-xs">在本轮创建数据表</button></div></div></>;
   }
   const schema = response.data_table_schema;
   const columns = schema.columns;
-  return <div className="mt-4 border-t pt-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-medium">实验数据表</h3><div className="flex gap-2"><button type="button" onClick={() => onChange({ data_table_schema: undefined, next_action_type: response.next_action_type === 'confirmation' ? 'text_input' : response.next_action_type, phase_complete: false })} className="rounded border border-red-200 px-2 py-1 text-xs text-red-700">移除本轮数据表</button><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: [...columns, { key: `field_${columns.length + 1}`, title: '新字段', type: 'text', required: false }] } })} className="rounded border px-2 py-1 text-xs">添加列</button></div></div><div className="mt-3 flex flex-wrap gap-3"><label className="text-xs">最少行数<input type="number" min={1} value={schema.minRows} onChange={(event) => onChange({ data_table_schema: { ...schema, minRows: Number(event.target.value) } })} className="ml-2 w-20 rounded border px-2 py-1" /></label><label className="text-xs">最大行数<input type="number" min={1} value={schema.maxRows} onChange={(event) => onChange({ data_table_schema: { ...schema, maxRows: Number(event.target.value) } })} className="ml-2 w-20 rounded border px-2 py-1" /></label></div><div className="mt-3 space-y-2">{columns.map((column, index) => <div key={`${column.key}-${index}`} className="grid gap-2 rounded-lg border bg-gray-50 p-3 md:grid-cols-[1fr_1.5fr_100px_80px_32px]"><label className="text-xs text-gray-500 md:contents"><span className="md:hidden">字段键</span><input aria-label={`第 ${index + 1} 列字段键`} value={column.key} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, key: event.target.value } : item) } })} className="w-full rounded border bg-white px-2 py-2 text-sm text-gray-900" /></label><label className="text-xs text-gray-500 md:contents"><span className="md:hidden">中文名称</span><input aria-label={`第 ${index + 1} 列中文名称`} value={column.title} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item) } })} className="w-full rounded border bg-white px-2 py-2 text-sm text-gray-900" /></label><select aria-label={`第 ${index + 1} 列类型`} value={column.type} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as 'text'|'number'|'image' } : item) } })} className="rounded border bg-white px-2 py-2 text-sm"><option value="text">文本</option><option value="number">数字</option><option value="image">图片</option></select><label className="pt-2 text-xs"><input type="checkbox" checked={column.required} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, required: event.target.checked } : item) } })} className="mr-1" />必填</label><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: columns.filter((_, itemIndex) => itemIndex !== index) } })} title="删除列" className="rounded p-2 text-red-600">删除</button></div>)}</div></div>;
+  return <>{planEditor}<div className="mt-4 border-t pt-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-medium">实验数据表</h3><div className="flex gap-2"><button type="button" onClick={() => onChange({ data_table_schema: undefined, next_action_type: response.next_action_type === 'confirmation' ? 'text_input' : response.next_action_type, phase_complete: false })} className="rounded border border-red-200 px-2 py-1 text-xs text-red-700">移除本轮数据表</button><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: [...columns, { key: `field_${columns.length + 1}`, title: '新字段', type: 'text', required: false }] } })} className="rounded border px-2 py-1 text-xs">添加列</button></div></div><div className="mt-3 flex flex-wrap gap-3"><label className="text-xs">最少行数<input type="number" min={3} value={schema.minRows} onChange={(event) => onChange({ data_table_schema: { ...schema, minRows: Number(event.target.value) } })} className="ml-2 w-20 rounded border px-2 py-1" /></label><label className="text-xs">最大行数<input type="number" min={1} value={schema.maxRows} onChange={(event) => onChange({ data_table_schema: { ...schema, maxRows: Number(event.target.value) } })} className="ml-2 w-20 rounded border px-2 py-1" /></label></div><div className="mt-3 space-y-2">{columns.map((column, index) => <div key={`${column.key}-${index}`} className="grid gap-2 rounded-lg border bg-gray-50 p-3 md:grid-cols-[1fr_1.5fr_100px_80px_32px]"><label className="text-xs text-gray-500 md:contents"><span className="md:hidden">字段键</span><input aria-label={`第 ${index + 1} 列字段键`} value={column.key} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, key: event.target.value } : item) } })} className="w-full rounded border bg-white px-2 py-2 text-sm text-gray-900" /></label><label className="text-xs text-gray-500 md:contents"><span className="md:hidden">中文名称</span><input aria-label={`第 ${index + 1} 列中文名称`} value={column.title} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item) } })} className="w-full rounded border bg-white px-2 py-2 text-sm text-gray-900" /></label><select aria-label={`第 ${index + 1} 列类型`} value={column.type} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as 'text'|'number'|'image' } : item) } })} className="rounded border bg-white px-2 py-2 text-sm"><option value="text">文本</option><option value="number">数字</option><option value="image">图片</option></select><label className="pt-2 text-xs"><input type="checkbox" checked={column.required} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, required: event.target.checked } : item) } })} className="mr-1" />必填</label><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: columns.filter((_, itemIndex) => itemIndex !== index) } })} title="删除列" className="rounded p-2 text-red-600">删除</button></div>)}</div></div></>;
 }
 
 function Phase5Editor({ response, onChange }: { response: ChatResponse; onChange: (value: Partial<ChatResponse>) => void }) {

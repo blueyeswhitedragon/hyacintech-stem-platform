@@ -82,6 +82,16 @@ function isStr(v: unknown): v is string {
   return typeof v === 'string';
 }
 
+function isStrArray(v: unknown): v is string[] {
+  return Array.isArray(v) && v.every(isStr);
+}
+
+function asRecord(v: unknown): Record<string, unknown> | undefined {
+  return v && typeof v === 'object' && !Array.isArray(v)
+    ? v as Record<string, unknown>
+    : undefined;
+}
+
 /**
  * 透传 M4 结构化字段：形状合法才保留，畸形则丢弃（绝不抛错）。
  */
@@ -107,6 +117,20 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
       researchQuestion: tm.researchQuestion,
     };
   }
+  const topicDirection = asRecord(raw.topic_direction);
+  if (
+    topicDirection &&
+    isStr(topicDirection.factor) &&
+    topicDirection.factor.trim() &&
+    isStr(topicDirection.phenomenon) &&
+    topicDirection.phenomenon.trim()
+  ) {
+    out.topic_direction = {
+      factor: topicDirection.factor.trim(),
+      phenomenon: topicDirection.phenomenon.trim(),
+    };
+  }
+
   if (
     raw.variables &&
     typeof raw.variables === 'object' &&
@@ -124,8 +148,42 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
     };
   }
 
+  // 阶段2 结构化实验方案
+  const experimentPlan = asRecord(raw.experiment_plan);
+  const independentVariable = asRecord(experimentPlan?.independentVariable);
+  const dependentVariable = asRecord(experimentPlan?.dependentVariable);
+  if (
+    experimentPlan &&
+    independentVariable &&
+    dependentVariable &&
+    isStr(independentVariable.name) && independentVariable.name.trim() &&
+    isStrArray(independentVariable.levels) && independentVariable.levels.length >= 2 &&
+    independentVariable.levels.every((item) => item.trim()) &&
+    isStr(dependentVariable.name) && dependentVariable.name.trim() &&
+    isStr(dependentVariable.measurement) && dependentVariable.measurement.trim() &&
+    isStrArray(experimentPlan.controlledVariables) &&
+    isStrArray(experimentPlan.materials) &&
+    isStrArray(experimentPlan.procedure) && experimentPlan.procedure.length > 0 &&
+    isStrArray(experimentPlan.safetyNotes)
+  ) {
+    out.experiment_plan = {
+      independentVariable: {
+        name: independentVariable.name.trim(),
+        levels: independentVariable.levels.map((item) => item.trim()),
+      },
+      dependentVariable: {
+        name: dependentVariable.name.trim(),
+        measurement: dependentVariable.measurement.trim(),
+      },
+      controlledVariables: experimentPlan.controlledVariables.map((item) => item.trim()).filter(Boolean),
+      materials: experimentPlan.materials.map((item) => item.trim()).filter(Boolean),
+      procedure: experimentPlan.procedure.map((item) => item.trim()).filter(Boolean),
+      safetyNotes: experimentPlan.safetyNotes.map((item) => item.trim()).filter(Boolean),
+    };
+  }
+
   // 阶段2 数据表结构
-  const dts = raw.data_table_schema as Record<string, unknown> | undefined;
+  const dts = asRecord(raw.data_table_schema);
   if (dts && Array.isArray(dts.columns)) {
     const columns = dts.columns.filter(
       (c): c is { key: string; title: string; type: 'text' | 'number' | 'image'; required: boolean } =>
@@ -185,8 +243,38 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
     };
   }
 
+  // 阶段4 学生证据分析进度
+  const analysisProgress = asRecord(raw.analysis_progress);
+  if (analysisProgress) {
+    const evidenceCitations = isStrArray(analysisProgress.evidenceCitations)
+      ? analysisProgress.evidenceCitations.map((item) => item.trim()).filter(Boolean)
+      : undefined;
+    const progress = {
+      observation: isStr(analysisProgress.observation) && analysisProgress.observation.trim()
+        ? analysisProgress.observation.trim()
+        : undefined,
+      evidenceCitations: evidenceCitations?.length ? evidenceCitations : undefined,
+      anomalyNoted: isStr(analysisProgress.anomalyNoted) && analysisProgress.anomalyNoted.trim()
+        ? analysisProgress.anomalyNoted.trim()
+        : undefined,
+      interpretation: isStr(analysisProgress.interpretation) && analysisProgress.interpretation.trim()
+        ? analysisProgress.interpretation.trim()
+        : undefined,
+      studentEvidenceAccepted: analysisProgress.studentEvidenceAccepted === true,
+    };
+    if (
+      progress.observation ||
+      progress.evidenceCitations ||
+      progress.anomalyNoted ||
+      progress.interpretation ||
+      progress.studentEvidenceAccepted
+    ) {
+      out.analysis_progress = progress;
+    }
+  }
+
   // 阶段5 报告框架
-  const rs = raw.report_sections as Record<string, unknown> | undefined;
+  const rs = asRecord(raw.report_sections);
   if (rs && typeof rs === 'object') {
     const keys = ['purpose', 'hypothesis', 'materials', 'procedure', 'dataSummary', 'analysis'] as const;
     if (keys.some((k) => isStr(rs[k]))) {

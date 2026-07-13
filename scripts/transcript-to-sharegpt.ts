@@ -398,8 +398,11 @@ function phaseHardProblem(phase: Phase, turns: TurnRecord[]): string | null {
     const confirmations = turns.filter((turn) => turn.parsed.next_action_type === 'confirmation');
     for (const turn of confirmations) {
       const r = turn.parsed;
-      if (!r.stage1_confirmed || !r.theme_mapping || !r.snapshot?.trim() || !r.variables?.independent?.trim()) {
-        return 'phase1-confirmation-missing-fields';
+      if (!r.stage1_confirmed || !r.theme_mapping || !r.snapshot?.trim() || !r.topic_direction?.factor?.trim() || !r.topic_direction?.phenomenon?.trim()) {
+        return 'phase1-confirmation-missing-v2-fields';
+      }
+      if (r.variables?.dependent?.trim() || (r.variables?.controlled?.length ?? 0) > 0) {
+        return 'phase1-confirmation-operationalizes-later-variables';
       }
     }
   }
@@ -408,8 +411,10 @@ function phaseHardProblem(phase: Phase, turns: TurnRecord[]): string | null {
     const confirmations = turns.filter((turn) => turn.parsed.next_action_type === 'confirmation');
     for (const turn of confirmations) {
       const r = turn.parsed;
+      if (!r.experiment_plan) return 'phase2-confirmation-missing-experiment-plan';
       if (!r.data_table_schema) return 'phase2-confirmation-missing-schema';
       if (!hasNotesColumn(r)) return 'phase2-schema-missing-notes';
+      if (r.data_table_schema.minRows < 3) return 'phase2-schema-minRows-below-3';
       if (r.data_table_schema.maxRows !== 200) return 'phase2-schema-maxRows-not-200';
     }
   }
@@ -579,7 +584,6 @@ function makeRecord(
       studentType: scenario.meta?.studentType,
       difficulty: scenario.meta?.difficulty,
       failureModes: scenario.meta?.failureModes,
-      expectedTransformation: scenario.meta?.expectedTransformation,
       clean,
       violationRules: rules,
       tier: grade.tier,

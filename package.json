@@ -20,7 +20,8 @@
     "data-lab:repair-drafts": "tsx scripts/repair-empty-stage2-drafts.ts",
     "platform:launcher": "powershell -ExecutionPolicy Bypass -File ./scripts/launcher.ps1",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "data-lab:distill-rollout": "tsx scripts/distill-stage-contract-rollout.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

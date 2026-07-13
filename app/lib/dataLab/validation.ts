@@ -3,6 +3,7 @@ import type { ChatResponse } from '@/app/models/types';
 import { safeParseChatResponse } from '@/app/lib/llm/parser';
 import { claimsStage2ArtifactReady, hasResponseStage2Schema, validateChatContract } from '@/app/lib/llm/chatContract';
 import { evaluateShareGPTRecordSemantic } from '@/scripts/semantic-guardrails';
+import { STAGE_CONTRACT_VERSION, validateStageResponseBehavior, type StageTriggerType } from '@/app/lib/stageContract';
 import type {
   AutoCheckIssue,
   AutoCheckResult,
@@ -68,7 +69,45 @@ function hasNotesColumn(response: ChatResponse): boolean {
 export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationMode = 'import'): AutoCheckResult {
   const issues: AutoCheckIssue[] = [];
   const strict = mode !== 'import';
+  const releaseStrict = mode === 'release';
   let hasPriorStage2Schema = false;
+  if (record.meta?.stageContractVersion !== STAGE_CONTRACT_VERSION) {
+    issues.push(issue(
+      'STAGE_CONTRACT_VERSION_MISSING',
+      `记录未声明当前阶段合同 ${STAGE_CONTRACT_VERSION}`,
+      String(record.meta?.stageContractVersion ?? '缺失'),
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
+  if (typeof record.meta?.systemPrompt !== 'string' || !record.meta.systemPrompt.trim()) {
+    issues.push(issue(
+      'SYSTEM_PROMPT_SNAPSHOT_MISSING',
+      '记录缺少生成时完整 system prompt，不能确认训练可见上下文与生产一致',
+      undefined,
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
+  if (typeof record.meta?.stageTriggerType !== 'string' || !record.meta.stageTriggerType.trim()) {
+    issues.push(issue(
+      'STAGE_TRIGGER_TYPE_MISSING',
+      '记录缺少 USER_MESSAGE/STAGE_ENTER/STAGE_TRANSITION 等触发类型',
+      undefined,
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
+  const humanTurnCount = record.conversations?.filter((message) => message.from === 'human').length ?? 0;
+  const turnSystemPrompts = record.meta?.generationContext?.turnSystemPrompts;
+  if (
+    turnSystemPrompts !== undefined &&
+    (!Array.isArray(turnSystemPrompts) || turnSystemPrompts.length !== humanTurnCount || turnSystemPrompts.some((value) => typeof value !== 'string' || !value.trim()))
+  ) {
+    issues.push(issue(
+      'TURN_SYSTEM_PROMPTS_INVALID',
+      '逐轮 system prompt 数量必须与 human/gpt 轮次数一致且均非空',
+      undefined,
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
   if (!record.id?.trim()) issues.push(issue('ID_MISSING', '缺少记录 ID'));
   if (!record.scenario?.trim()) issues.push(issue('SCENARIO_MISSING', '缺少场景名称'));
   if (!Number.isInteger(record.phase) || record.phase < 1 || record.phase > 6) issues.push(issue('PHASE_INVALID', '阶段必须为 1-6'));
@@ -105,9 +144,14 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
       if ((response.options?.length ?? 0) > 0 && response.next_action_type !== 'ask_choice') {
         issues.push(issue('OPTIONS_ACTION_MISMATCH', `导师消息 ${index} 的 options 与动作类型不一致`));
       }
-      if (record.phase === 1 && response.phase_complete) {
-        if (!response.stage1_confirmed || !response.theme_mapping || !response.snapshot?.trim() || !response.variables?.independent?.trim()) {
-          issues.push(issue('PHASE1_CONFIRMATION_INCOMPLETE', `导师消息 ${index} 缺少阶段1确认结构`));
+      if (record.phase === 1 && response.stage1_confirmed) {
+        if (!response.theme_mapping || !response.snapshot?.trim() || !response.topic_direction?.factor?.trim() || !response.topic_direction?.phenomenon?.trim()) {
+          issues.push(issue(
+            'PHASE1_CONFIRMATION_INCOMPLETE',
+            `导师消息 ${index} 缺少新版阶段1确认结构（theme_mapping/snapshot/topic_direction）`,
+            response.dialogue,
+            strict ? 'error' : 'warning'
+          ));
         }
       }
       if (record.phase === 2) {
@@ -138,6 +182,40 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
           issues.push(issue('PHASE5_SECTIONS_INCOMPLETE', `导师消息 ${index} 的报告框架不完整`));
         }
       }
+
+      const assistantTurnIndex = record.conversations
+        .slice(0, index)
+        .filter((item) => item.from === 'gpt').length;
+      const turnTriggerTypes = record.meta?.generationContext?.turnTriggerTypes;
+      const perTurnTrigger = Array.isArray(turnTriggerTypes) && typeof turnTriggerTypes[assistantTurnIndex] === 'string'
+        ? turnTriggerTypes[assistantTurnIndex] as StageTriggerType
+        : undefined;
+      const declaredTrigger = perTurnTrigger ?? (typeof record.meta?.stageTriggerType === 'string'
+        ? record.meta.stageTriggerType as StageTriggerType
+        : undefined);
+      const inferredTrigger: StageTriggerType = declaredTrigger
+        ?? (record.phase === 3 && index === 1
+          ? 'STAGE_ENTER'
+          : record.phase === 5 && index === 1
+            ? 'REPORT_BOOTSTRAP'
+            : record.phase === 6
+              ? 'OPTIONAL_COACHING'
+              : 'USER_MESSAGE');
+      const visibleContext = typeof record.meta?.visibleContext === 'string'
+        ? record.meta.visibleContext
+        : undefined;
+      for (const contractIssue of validateStageResponseBehavior(record.phase, response, {
+        triggerType: inferredTrigger,
+        visibleContext,
+      })) {
+        issues.push(issue(
+          contractIssue.code,
+          `导师消息 ${index}：${contractIssue.message}`,
+          contractIssue.evidence ?? response.dialogue,
+          contractIssue.severity === 'warning' || !strict ? 'warning' : 'error'
+        ));
+      }
+
       const questionMarks = (response.dialogue.match(/[？?]/g) ?? []).length;
       if (questionMarks > 2) {
         issues.push(issue('COGNITIVE_LOAD_RISK', `导师消息 ${index} 一次提出了 ${questionMarks} 个问题`, response.dialogue, 'warning'));

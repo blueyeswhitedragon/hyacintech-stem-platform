@@ -441,8 +441,8 @@ model ModelVersion {
   externalModelId     String
   parentModelVersionId String?
   trainingRunId       String?  @unique
-  promptPolicyVersion String   @default("stem-six-phase-v1")
-  contractVersion     String   @default("chat-contract-v1")
+  promptPolicyVersion String   @default("stem-six-phase-v2")
+  contractVersion     String   @default("stage-contract-v2")
   status              String   @default("DRAFT")
   createdById         String?
   createdAt           DateTime @default(now())
@@ -494,6 +494,7 @@ model GenerationTrace {
   conversationId        String
   assistantMessageId    String   @unique
   userMessageId         String
+  triggerType           String   @default("USER_MESSAGE")
   stage                 Int
   modelVersionId        String
   modelTagSnapshot      String
@@ -501,6 +502,7 @@ model GenerationTrace {
   externalModelSnapshot String
   promptVersion         String
   promptSha256          String
+  systemPromptSnapshot  String   @default("")
   styleFamily           String
   stylePolicyVersion    String
   requestMessageSha256  String
@@ -518,6 +520,7 @@ model GenerationTrace {
   @@index([conversationId, createdAt])
   @@index([modelVersionId, createdAt])
   @@index([stage])
+  @@index([triggerType, createdAt])
 }
 
 model ProductionCandidate {

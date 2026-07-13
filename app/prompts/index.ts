@@ -10,6 +10,8 @@ import phaseFourPrompt from './phase4-data-analysis';
 import phaseFivePrompt from './phase5-results-formation';
 import phaseSixPrompt from './phase6-reflection';
 import { PhaseEnum } from '../models/types';
+import type { Stage2Data } from '../models/stageData';
+import { buildStageContractInstruction, type StageTriggerType } from '../lib/stageContract';
 import { pickTopicExamples, renderTopicExamples } from '../lib/topicLibrary';
 import {
   buildStyleInstruction,
@@ -84,9 +86,11 @@ export interface PromptContext {
   topicDirection?: string; // 阶段1：作业限定的研究方向
   topicExamples?: string; // 阶段1：动态选题案例库（由 topicLibrary 渲染）
   dataRows?: Record<string, unknown>[]; // 阶段4：stage3 收集的数据
-  priorSummary?: string; // 阶段5：stage1-4 摘要，供预填报告
+  dataSchema?: Stage2Data['schema']; // 阶段4：列标题和类型
+  priorSummary?: string; // 阶段5/6：前序结构化摘要
   needSafetyQuiz?: boolean; // 阶段3：是否首次进入需出安全问答
   nudgeConverge?: boolean; // 任意阶段：轮次过多，提示模型尽快收敛放行
+  triggerType?: StageTriggerType;
 }
 
 /**
@@ -115,9 +119,9 @@ export function injectPacingGuidance(basePrompt: string): string {
 function renderRowsAsTable(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return '（学生尚未录入数据）';
   const keys = Array.from(new Set(rows.flatMap((r) => Object.keys(r))));
-  const header = keys.join(' | ');
+  const header = ['行号', ...keys].join(' | ');
   const body = rows
-    .map((r) => keys.map((k) => String(r[k] ?? '')).join(' | '))
+    .map((r, index) => [String(index + 1), ...keys.map((k) => String(r[k] ?? ''))].join(' | '))
     .join('\n');
   return `${header}\n${body}`;
 }
@@ -129,6 +133,7 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
   const basePrompt = promptTemplates[phase];
   let prompt = injectSafetyConstraints(basePrompt);
   prompt = injectPacingGuidance(prompt);
+  prompt += `\n\n${buildStageContractInstruction(phase)}`;
 
   const ctx = context ?? {};
   prompt += `\n\n${buildStyleInstruction(
@@ -151,16 +156,33 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
     prompt += `\n\n【动态转化模式库（来自国家智慧教育平台公开资源，供内部启发，勿照搬）】\n${topicExamples}\n\n【工程/跨学科主题转化规则】\n当学生想做“装置/模型/机器人/系统/作品”时，不要否定它不够像实验，也不要直接给作品方案；请把它转化为可探究问题：\n1. 保留原作品里的关键约束或机制，例如自动判断、材料保护、能量转换、资源限制。\n2. 找一个课堂可改变的代理参数（材料、尺寸、角度、结构、程序阈值、传感器位置等），作为自变量方向。\n3. 再找一个可观察的表现方向（距离、承重、净化效果、成功率、响应时间、稳定性等）。具体测量方式、步骤、数据表与控制变量留到阶段2。`;
   }
 
+  if (phase === PhaseEnum.PlanDesign && ctx.priorSummary) {
+    prompt += `\n\n【阶段1已确认方向】\n以下内容是学生已确认的研究问题与方向。本阶段只能在此基础上操作化变量和设计方案，不得重新换题：\n${ctx.priorSummary}`;
+  }
+
+  if (phase === PhaseEnum.Execution && ctx.priorSummary) {
+    prompt += `\n\n【当前已审核方案】\n只能依据以下真实方案提供安全问答、操作提醒和记录指导；不得新增未出现的参数、条件或材料：\n${ctx.priorSummary}`;
+  }
+
   if (phase === PhaseEnum.Execution && ctx.needSafetyQuiz) {
     prompt += `\n\n【首次进入本阶段】\n这是学生首次进入过程执行阶段。请在本次回复的 JSON 中额外输出 safety_quiz 字段（一道与本实验相关的安全单选题），格式见下方结构化字段说明。`;
   }
 
   if (phase === PhaseEnum.DataAnalysis && ctx.dataRows) {
-    prompt += `\n\n【学生收集的实验数据】\n以下是学生在过程执行阶段录入的数据表，请据此引导学生观察规律、发现关系（但不要替学生下结论）：\n${renderRowsAsTable(ctx.dataRows)}`;
+    const schemaSummary = ctx.dataSchema?.columns.map((column) => `${column.key}=${column.title}(${column.type})`).join('、') ?? '未提供列定义';
+    prompt += `\n\n【学生收集的实验数据】\n列定义：${schemaSummary}\n以下是学生实际录入的数据。只能引用这里出现的值；不得补写、猜测或套用通用 A/B/C 数据：\n${renderRowsAsTable(ctx.dataRows)}`;
+  }
+
+  if (phase === PhaseEnum.DataAnalysis && ctx.triggerType === 'STAGE_TRANSITION') {
+    prompt += `\n\n【阶段3→4系统主动过渡】\n这是系统在学生完成数据收集后触发的助手开场，不是真实学生消息。请简短说明已经读取数据表，但不要替学生分析结论。只选择一个首个分析动作，要求学生引用至少两个具体数值或两条明确观察作答。next_action_type 必须为 text_input，不输出 analysis_progress，不使用 confirmation。`;
   }
 
   if (phase === PhaseEnum.ResultsFormation && ctx.priorSummary) {
-    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。你必须在本次回复中自动生成 report_sections 字段，预填以下各节（purpose/hypothesis/materials/procedure/dataSummary/analysis），无需等待学生开口要求。conclusion 和 reflection 留空给学生自己填写。\n\n${ctx.priorSummary}`;
+    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。你必须在本次回复中自动生成 report_sections 字段。只能使用摘要中明确存在的内容；缺失信息写明“待学生补充”，不得使用通用 A/B/C 数据。conclusion 和 reflection 留给学生自己填写。\n\n${ctx.priorSummary}`;
+  }
+
+  if (phase === PhaseEnum.Reflection && ctx.priorSummary) {
+    prompt += `\n\n【本次探究摘要】\n只能围绕以下真实探究内容提出一个反思问题，不得引入无关的新实验：\n${ctx.priorSummary}`;
   }
 
   return prompt;

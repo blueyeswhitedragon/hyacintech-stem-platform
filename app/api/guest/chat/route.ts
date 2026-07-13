@@ -4,6 +4,8 @@ import { classifyError } from '@/app/lib/llm/errors';
 import { callLLM } from '@/app/lib/llm/chat';
 import { checkRateLimit } from '@/app/lib/guestRateLimit';
 import { PhaseEnum, type Message } from '@/app/models/types';
+import type { Stage2Data } from '@/app/models/stageData';
+import type { StageTriggerType } from '@/app/lib/stageContract';
 
 const MAX_MESSAGE_LEN = 2000;
 const MAX_HISTORY = 20;
@@ -26,9 +28,11 @@ export async function POST(req: Request) {
     stage?: number;
     history?: Message[];
     dataRows?: Record<string, unknown>[];
+    dataSchema?: Stage2Data['schema'];
     needSafetyQuiz?: boolean;
     priorSummary?: string;
     hasStage2Schema?: boolean;
+    triggerType?: StageTriggerType;
   };
   try {
     body = await req.json();
@@ -57,16 +61,44 @@ export async function POST(req: Request) {
   const stage = typeof body.stage === 'number' && body.stage >= 1 && body.stage <= 6 ? body.stage : 1;
   const history = Array.isArray(body.history) ? body.history.slice(-MAX_HISTORY) : [];
 
-  const context: PromptContext = {};
-  if (stage === PhaseEnum.Execution && body.needSafetyQuiz) context.needSafetyQuiz = true;
-  if (stage === PhaseEnum.DataAnalysis) context.dataRows = body.dataRows ?? [];
-  if (stage === PhaseEnum.ResultsFormation && body.priorSummary) context.priorSummary = body.priorSummary;
+  const allowedTriggers: StageTriggerType[] = [
+    'USER_MESSAGE', 'STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP', 'OPTIONAL_COACHING',
+  ];
+  const triggerType = body.triggerType && allowedTriggers.includes(body.triggerType)
+    ? body.triggerType
+    : stage === PhaseEnum.Execution && body.needSafetyQuiz
+      ? 'STAGE_ENTER'
+      : stage === PhaseEnum.ResultsFormation
+        ? 'REPORT_BOOTSTRAP'
+        : stage === PhaseEnum.Reflection
+          ? 'OPTIONAL_COACHING'
+          : 'USER_MESSAGE';
+  const context: PromptContext = { triggerType };
+  if (stage === PhaseEnum.PlanDesign && body.priorSummary) {
+    context.priorSummary = body.priorSummary;
+  }
+  if (stage === PhaseEnum.Execution) {
+    if (body.needSafetyQuiz) context.needSafetyQuiz = true;
+    if (body.priorSummary) context.priorSummary = body.priorSummary;
+  }
+  if (stage === PhaseEnum.DataAnalysis) {
+    context.dataRows = body.dataRows ?? [];
+    context.dataSchema = body.dataSchema;
+  }
+  if ((stage === PhaseEnum.ResultsFormation || stage === PhaseEnum.Reflection) && body.priorSummary) {
+    context.priorSummary = body.priorSummary;
+  }
 
   try {
     const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
+    const visibleContext = stage === PhaseEnum.DataAnalysis
+      ? JSON.stringify({ schema: body.dataSchema, rows: body.dataRows ?? [], rowNumbers: (body.dataRows ?? []).map((_, index) => index + 1) })
+      : body.priorSummary;
     const response = await callLLM(systemPrompt, message, history, {
       stage,
       hasStage2Schema: body.hasStage2Schema === true,
+      triggerType,
+      visibleContext,
     });
     return NextResponse.json(response);
   } catch (err) {

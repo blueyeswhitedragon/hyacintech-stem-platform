@@ -1,8 +1,8 @@
 import { db } from '@/app/lib/db';
 import { validateConfig } from '@/app/lib/llm/provider';
 
-export const PROMPT_POLICY_VERSION = 'stem-six-phase-v1';
-export const CHAT_CONTRACT_VERSION = 'chat-contract-v1';
+export const PROMPT_POLICY_VERSION = 'stem-six-phase-v2';
+export const CHAT_CONTRACT_VERSION = 'stage-contract-v2';
 
 export const MODEL_VERSION_STATUSES = [
   'DRAFT',

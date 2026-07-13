@@ -259,6 +259,7 @@ export async function getReviewItem(studentAssignmentId: string) {
           stageData: true,
           traceCoverage: true,
           generationTraces: {
+            where: { triggerType: 'USER_MESSAGE' },
             orderBy: { createdAt: 'desc' },
             select: {
               id: true,

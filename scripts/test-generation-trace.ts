@@ -93,7 +93,9 @@ async function main() {
     !JSON.stringify(traceData).includes(secretLikeStudentText),
     '轨迹数据不保存原始学生请求内容'
   );
-  check(traceData.promptSha256.length === 64, '系统提示词保存版本和指纹而非全文');
+  check(traceData.promptSha256.length === 64, '系统提示词保存 SHA-256 指纹');
+  check(traceData.systemPromptSnapshot === '阶段2系统提示词', '轨迹保存完整生产 system prompt 供训练上下文追溯');
+  check(traceData.triggerType === 'USER_MESSAGE', '普通教学轮次默认标记 USER_MESSAGE');
 
   await persistGenerationTurn(input);
   const [storedConversation, storedTrace] = await Promise.all([
@@ -103,6 +105,7 @@ async function main() {
   check(storedConversation.messages === JSON.stringify(messages), '消息与轨迹在同一事务落库');
   check(storedTrace.modelVersionId === model.id, '轨迹关联稳定模型版本');
   check(storedTrace.styleFamily === 'evidence_analyst', '轨迹固化目标风格');
+  check(storedTrace.systemPromptSnapshot === '阶段2系统提示词', '数据库轨迹持久化完整 system prompt');
 
   let duplicateRejected = false;
   try {

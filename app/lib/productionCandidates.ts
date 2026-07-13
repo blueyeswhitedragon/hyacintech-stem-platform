@@ -8,6 +8,7 @@ import {
   redactProductionRecord,
 } from '@/app/lib/redaction';
 import type { ShareGPTRecord } from '@/app/lib/dataLab/types';
+import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
 import { parseJson, sha256, validateShareGPTRecord } from '@/app/lib/dataLab/validation';
 
 export const DATA_POLICY_VERSION = 'student-data-policy-v1';
@@ -113,6 +114,7 @@ export async function nominateProductionCandidate(input: {
   });
   const studentAssignment = trace?.conversation.studentAssignment;
   if (!trace || !studentAssignment || studentAssignment.id !== input.studentAssignmentId) throw new Error('生成轨迹不存在');
+  if (trace.triggerType !== 'USER_MESSAGE') throw new Error('系统主动生成的阶段消息不能进入生产候选池');
   if (studentAssignment.assignment.class.teacherId !== input.teacherId) throw new Error('无权提名该会话');
   if (studentAssignment.assignment.dataContributionMode !== 'CONSENT_REQUIRED') throw new Error('该作业未开启数据回流');
   if (studentAssignment.dataConsentStatus !== 'GRANTED') throw new Error('学生尚未授权或已撤回授权');
@@ -137,6 +139,9 @@ export async function nominateProductionCandidate(input: {
       sourceKind: 'production_trace',
       styleFamily: trace.styleFamily as ShareGPTRecord['meta'] extends { styleFamily?: infer T } ? T : never,
       stylePolicyVersion: trace.stylePolicyVersion,
+      stageContractVersion: STAGE_CONTRACT_VERSION,
+      systemPrompt: trace.systemPromptSnapshot,
+      stageTriggerType: trace.triggerType,
     },
   };
   const { record: redacted, report } = redactProductionRecord(record, [

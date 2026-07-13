@@ -56,6 +56,7 @@ const sourceRecord: ShareGPTRecord = {
   id: 'style-export-test',
   scenario: '风格训练导出测试',
   phase: 1,
+  meta: { expectedTransformation: { hidden: 'evaluator-only' } },
   conversations: [
     { from: 'human', value: '我想研究纸桥。' },
     { from: 'gpt', value: JSON.stringify({ dialogue: '你最想比较纸桥的哪个特征？', next_action_type: 'text_input', phase_complete: false }) },
@@ -66,7 +67,9 @@ const enriched = withStyleMetadata(sourceRecord, recordStyle);
 check('人工修订记录写入风格元数据', enriched.meta?.styleFamily === 'engineering_mentor' && enriched.meta?.stylePolicyVersion === DEFAULT_STYLE_POLICY_VERSION);
 const trainingRecord = toTrainingShareGPTRecord(enriched, recordStyle);
 check('训练导出首条为模型可见 system 风格指令', trainingRecord.conversations[0].from === 'system' && trainingRecord.conversations[0].value.includes('工程导师型'));
+check('训练导出包含完整生产阶段合同而非仅风格指令', trainingRecord.conversations[0].value.includes('阶段行为合同 stage-contract-v2') && trainingRecord.conversations[0].value.includes('选题定向'));
 check('训练导出保留原始 human/gpt 对话', trainingRecord.conversations[1].from === 'human' && trainingRecord.conversations[2].from === 'gpt');
+check('训练导出剥离 evaluator-only expectedTransformation', !Object.prototype.hasOwnProperty.call(trainingRecord.meta ?? {}, 'expectedTransformation'));
 const styleCounts = summarizeStyles([recordStyle, recordStyle, resolveRecordStyle(sourceRecord, 'warm_companion')]);
 check('manifest 风格汇总按最终入选记录计数', styleCounts.engineering_mentor === 2 && styleCounts.warm_companion === 1);
 

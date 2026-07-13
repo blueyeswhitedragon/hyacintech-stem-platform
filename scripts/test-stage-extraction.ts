@@ -46,16 +46,16 @@ console.log('extractStageData:');
         classroomProxy: '不同人工光照时长',
         researchQuestion: '不同人工光照时长是否影响绿豆发芽',
       },
-      variables: { independent: '光照时长', dependent: '株高' },
+      topic_direction: { factor: '光照时长', phenomenon: '发芽表现' },
     }),
     {}
   );
-  check('stage1 确认写入 stage1', r.stageData.stage1?.confirmed === true && r.stageData.stage1?.variables.independent === '光照时长');
+  check('stage1 确认写入 stage1', r.stageData.stage1?.confirmed === true && r.stageData.stage1?.factorDirection === '光照时长');
   check('stage1 写入 themeMapping', r.stageData.stage1?.themeMapping?.classroomProxy === '不同人工光照时长');
   check('stage1 确认不再自动推进', r.advanceTo === undefined);
 }
 
-// 1b. stage1 仅自变量（无因变量，新口径）→ dependent 落为空串、不报错
+// 1b. 旧记录只有 variables.independent 时仍兼容，但不会伪造 phenomenon/dependent
 {
   const r = extractStageData(
     1,
@@ -67,14 +67,14 @@ console.log('extractStageData:');
     {}
   );
   check('stage1 仅自变量写入', r.stageData.stage1?.variables.independent === '光照时长');
-  check('stage1 因变量缺省落为空串', r.stageData.stage1?.variables.dependent === '');
+  check('stage1 不伪造因变量', r.stageData.stage1?.variables.dependent === undefined && r.stageData.stage1?.phenomenonDirection === '');
 }
 
-// 2. stage1 缺 variables → 不写、不推进
+// 2. 解析器之外的畸形确认不会伪造方向；推进仍由 canAdvance 拦截
 {
   const r = extractStageData(1, base({ stage1_confirmed: true }), {});
-  check('stage1 缺变量不写入', r.stageData.stage1 === undefined);
-  check('stage1 缺变量不推进', r.advanceTo === undefined);
+  check('stage1 畸形确认不伪造方向', r.stageData.stage1?.factorDirection === '' && r.stageData.stage1?.phenomenonDirection === '');
+  check('stage1 缺方向不推进', r.advanceTo === undefined);
 }
 
 // 3. stage2 数据表 + 风险
@@ -82,6 +82,14 @@ console.log('extractStageData:');
   const r = extractStageData(
     2,
     base({
+      experiment_plan: {
+        independentVariable: { name: '光照时长', levels: ['短', '中', '长'] },
+        dependentVariable: { name: '发芽数', measurement: '每天同一时间计数' },
+        controlledVariables: ['种子数量'],
+        materials: ['绿豆'],
+        procedure: ['按方案培养并记录'],
+        safetyNotes: [],
+      },
       data_table_schema: {
         columns: [{ key: 'trial', title: '次数', type: 'number', required: true }],
         minRows: 5,
@@ -92,12 +100,30 @@ console.log('extractStageData:');
     {}
   );
   check('stage2 写入 schema', r.stageData.stage2?.schema.columns[0].key === 'trial');
+  check('stage2 写入 experimentPlan', r.stageData.stage2?.experimentPlan?.dependentVariable.measurement === '每天同一时间计数');
   check('stage2 写入风险', r.stageData.stage2?.aiRiskAnnotations?.[0].severity === 'high');
   check('stage2 默认未提交未审核', r.stageData.stage2?.submitted === false && r.stageData.stage2?.approved === null);
   check('stage2 不推进', r.advanceTo === undefined);
 }
 
-// 4. stage5 报告框架 → conclusion/reflection 空
+// 4. stage4 只有被接受的学生证据才累计，并保存结构化分析进度
+{
+  const r = extractStageData(4, base({
+    analysis_progress: {
+      observation: '第二组数值更高',
+      evidenceCitations: ['第1天：2 对 5', '第2天：3 对 7'],
+      studentEvidenceAccepted: true,
+    },
+  }), { stage4: { analysisCount: 1 } });
+  check('stage4 有效证据轮次加一', r.stageData.stage4?.analysisCount === 2);
+  check('stage4 保存证据引用', r.stageData.stage4?.evidenceCitations?.length === 2);
+}
+{
+  const r = extractStageData(4, base({ analysis_progress: { observation: '我猜更高', studentEvidenceAccepted: false } }), { stage4: { analysisCount: 1 } });
+  check('stage4 未接受证据不计数', r.stageData.stage4?.analysisCount === 1);
+}
+
+// 5. stage5 报告框架 → conclusion/reflection 空
 {
   const r = extractStageData(
     5,
@@ -147,11 +173,13 @@ console.log('safeParseChatResponse 透传:');
       classroomProxy: '不同人工光照时长',
       researchQuestion: '不同人工光照时长是否影响绿豆发芽',
     },
+    topic_direction: { factor: '光照时长', phenomenon: '发芽表现' },
     variables: { independent: '温度', dependent: '溶解速度' },
   });
   const p = safeParseChatResponse(raw);
   check('透传 stage1_confirmed', p.stage1_confirmed === true);
   check('透传 theme_mapping', p.theme_mapping?.retainedFeature === '人工控制光照');
+  check('透传 topic_direction', p.topic_direction?.phenomenon === '发芽表现');
   check('透传 variables', p.variables?.dependent === '溶解速度');
 }
 
@@ -210,6 +238,23 @@ console.log('safeParseChatResponse 透传:');
   });
   const p = safeParseChatResponse(raw);
   check('非法列被过滤', p.data_table_schema?.columns.length === 1 && p.data_table_schema?.columns[0].key === 'k1');
+}
+
+// 11. 新版 experiment_plan 与 analysis_progress 透传
+{
+  const p = safeParseChatResponse(JSON.stringify({
+    dialogue: '继续', next_action_type: 'text_input', phase_complete: false,
+    experiment_plan: {
+      independentVariable: { name: '温度', levels: ['低', '高'] },
+      dependentVariable: { name: '溶解时间', measurement: '秒表记录秒数' },
+      controlledVariables: ['水量'], materials: ['烧杯'], procedure: ['记录时间'], safetyNotes: [],
+    },
+    analysis_progress: {
+      observation: '高温组更快', evidenceCitations: ['20秒与35秒'], studentEvidenceAccepted: true,
+    },
+  }));
+  check('透传 experiment_plan', p.experiment_plan?.independentVariable.levels.length === 2);
+  check('透传 analysis_progress', p.analysis_progress?.studentEvidenceAccepted === true && p.analysis_progress.evidenceCitations?.length === 1);
 }
 
 console.log(`\n结果: ${passed} 通过, ${failed} 失败`);

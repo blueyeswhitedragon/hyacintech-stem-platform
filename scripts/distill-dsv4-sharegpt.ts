@@ -750,6 +750,12 @@ function selectGenerateTasks(plan: DistillPlan, raw: RawGenerationFile, options:
 }
 
 async function runGenerate(options: GenerateOptions) {
+  if (process.env.ALLOW_LEGACY_ONE_SHOT_DISTILL !== 'true') {
+    throw new Error(
+      '旧版 one-shot 蒸馏已停用：它会把 expectedTransformation 和前序答案暴露给同一个生成器。' +
+      '请改用 scripts/distill-stage-contract-rollout.ts；仅回放历史实验时才可显式设置 ALLOW_LEGACY_ONE_SHOT_DISTILL=true。'
+    );
+  }
   const plan = await readJsonFile<DistillPlan>(options.plan);
   const rawFile = await readRawFile(options.rawOut, options.plan);
   const tasks = selectGenerateTasks(plan, rawFile, options);

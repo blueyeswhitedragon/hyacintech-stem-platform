@@ -4,6 +4,7 @@ import { safeParseChatResponse } from './parser';
 import { LLMMessage } from './types';
 import { validateChatContract } from './chatContract';
 import { LLMError } from './errors';
+import { validateStageResponseBehavior, type StageTriggerType } from '@/app/lib/stageContract';
 
 // 与 parser.ts 的 canned fallback 文案保持同步：用于判断首次解析是否失败。
 const APOLOGY_DIALOGUES = [
@@ -11,6 +12,42 @@ const APOLOGY_DIALOGUES = [
   '抱歉，AI回复格式出现异常，请重试。',
   '抱歉，我暂时无法处理您的请求，请重新描述您的问题。',
 ];
+
+export interface LLMRuntimeContract {
+  stage: number;
+  hasStage2Schema?: boolean;
+  triggerType?: StageTriggerType;
+  /** 只包含本轮模型可见的真实业务数据，用于检查凭空引用。 */
+  visibleContext?: string;
+}
+
+interface CombinedContractIssue {
+  code: string;
+  message: string;
+  severity?: 'warning' | 'error';
+  evidence?: string;
+}
+
+function validateRuntimeContract(response: ChatResponse, contract?: LLMRuntimeContract) {
+  if (!contract) return { response, issues: [] as CombinedContractIssue[], warnings: [] as CombinedContractIssue[], repairs: [], ok: true };
+  const structural = validateChatContract(response, {
+    stage: contract.stage,
+    hasStage2Schema: contract.hasStage2Schema,
+    canonicalize: true,
+  });
+  const behavior = validateStageResponseBehavior(contract.stage, structural.response, {
+    triggerType: contract.triggerType,
+    visibleContext: contract.visibleContext,
+  });
+  const behaviorErrors = behavior.filter((item) => item.severity === 'error');
+  return {
+    response: structural.response,
+    issues: [...structural.issues, ...behaviorErrors] as CombinedContractIssue[],
+    warnings: behavior.filter((item) => item.severity === 'warning'),
+    repairs: structural.repairs,
+    ok: structural.ok && behaviorErrors.length === 0,
+  };
+}
 
 /**
  * 调用 LLM 并解析为 ChatResponse 的两段式策略（被 /api/chat 与
@@ -21,7 +58,7 @@ export async function callLLM(
   systemPrompt: string,
   userMessage: string,
   history: Message[],
-  contract?: { stage: number; hasStage2Schema?: boolean },
+  contract?: LLMRuntimeContract,
   runtimeModel?: { provider: string; model: string }
 ): Promise<ChatResponse> {
   return (await callLLMWithTrace(systemPrompt, userMessage, history, contract, runtimeModel)).response;
@@ -40,7 +77,7 @@ export async function callLLMWithTrace(
   systemPrompt: string,
   userMessage: string,
   history: Message[],
-  contract?: { stage: number; hasStage2Schema?: boolean },
+  contract?: LLMRuntimeContract,
   runtimeModel?: { provider: string; model: string }
 ): Promise<LLMCallTrace> {
   const messages: LLMMessage[] = [
@@ -57,9 +94,7 @@ export async function callLLMWithTrace(
   // Attempt 1: with response_format (JSON mode)
   const raw1 = await provider.chat(messages, { useJsonFormat: true });
   const parsed1 = safeParseChatResponse(raw1);
-  const checked1 = contract
-    ? validateChatContract(parsed1, { ...contract, canonicalize: true })
-    : { response: parsed1, issues: [], repairs: [], ok: true };
+  const checked1 = validateRuntimeContract(parsed1, contract);
 
   // JSON/语义契约都通过才返回。schema 已存在但 action 错误属于可确定修复，不额外调用模型。
   if (!APOLOGY_DIALOGUES.includes(parsed1.dialogue) && checked1.ok) {
@@ -80,7 +115,9 @@ export async function callLLMWithTrace(
         contractCheck: {
           ok: true,
           stage: contract?.stage ?? null,
+          triggerType: contract?.triggerType ?? 'USER_MESSAGE',
           issues: checked1.issues,
+          warnings: checked1.warnings ?? [],
           repairs: checked1.repairs,
         },
       },
@@ -104,9 +141,7 @@ export async function callLLMWithTrace(
 
   const raw2 = await provider.chat(retryMessages, { useJsonFormat: false });
   const parsed2 = safeParseChatResponse(raw2);
-  const checked2 = contract
-    ? validateChatContract(parsed2, { ...contract, canonicalize: true })
-    : { response: parsed2, issues: [], repairs: [], ok: true };
+  const checked2 = validateRuntimeContract(parsed2, contract);
   if (APOLOGY_DIALOGUES.includes(parsed2.dialogue) || !checked2.ok) {
     const codes = checked2.issues.map((item) => item.code).join(',') || 'JSON_PARSE_FAILED';
     console.error('Second LLM attempt failed response contract:', codes);
@@ -135,8 +170,10 @@ export async function callLLMWithTrace(
       contractCheck: {
         ok: true,
         stage: contract?.stage ?? null,
+        triggerType: contract?.triggerType ?? 'USER_MESSAGE',
         firstAttemptIssues: checked1.issues,
         issues: checked2.issues,
+        warnings: checked2.warnings ?? [],
         repairs: checked2.repairs,
       },
     },

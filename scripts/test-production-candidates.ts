@@ -51,6 +51,37 @@ async function main() {
   const studentAssignment = await db.studentAssignment.create({ data: { assignmentId: assignment.id, studentId: student.id, conversationId: conversation.id, status: 'IN_PROGRESS', currentStage: 1, dataConsentStatus: 'GRANTED', dataConsentPolicyVersion: 'student-data-policy-v1' } });
   const model = await db.modelVersion.create({ data: { tag: `candidate-test-${suffix}`, provider: 'test', externalModelId: 'test-model' } });
   const trace = await db.generationTrace.create({ data: { conversationId: conversation.id, assistantMessageId, userMessageId, stage: 1, modelVersionId: model.id, modelTagSnapshot: model.tag, providerSnapshot: 'test', externalModelSnapshot: 'test-model', promptVersion: 'p1', promptSha256: 'a'.repeat(64), styleFamily: 'classroom_coach', stylePolicyVersion: 'style-v1', requestMessageSha256: 'b'.repeat(64), responseJson: JSON.stringify(response), responseSha256: 'c'.repeat(64), contractVersion: 'c1' } });
+  const systemAssistantMessageId = randomUUID();
+  const systemTrace = await db.generationTrace.create({
+    data: {
+      conversationId: conversation.id,
+      assistantMessageId: systemAssistantMessageId,
+      userMessageId: randomUUID(),
+      triggerType: 'STAGE_TRANSITION',
+      stage: 4,
+      modelVersionId: model.id,
+      modelTagSnapshot: model.tag,
+      providerSnapshot: 'test',
+      externalModelSnapshot: 'test-model',
+      promptVersion: 'p4',
+      promptSha256: 'd'.repeat(64),
+      systemPromptSnapshot: '阶段4主动过渡提示词',
+      styleFamily: 'classroom_coach',
+      stylePolicyVersion: 'style-v1',
+      requestMessageSha256: 'e'.repeat(64),
+      responseJson: JSON.stringify(response),
+      responseSha256: 'f'.repeat(64),
+      contractVersion: 'stage-contract-v2',
+    },
+  });
+  let systemTraceRejected = false;
+  try {
+    await nominateProductionCandidate({ studentAssignmentId: studentAssignment.id, assistantMessageId: systemAssistantMessageId, teacherId: teacher.id, triggerType: 'TEACHER_NOMINATION' });
+  } catch (error) {
+    systemTraceRejected = error instanceof Error && error.message.includes('系统主动生成');
+  }
+  check(systemTraceRejected, '系统触发的阶段消息不能进入生产候选池');
+
   const teacherSession: SessionUser = { id: teacher.id, username: teacher.username, displayName: teacher.displayName, role: 'teacher' };
   const adminSession: SessionUser = { id: admin.id, username: admin.username, displayName: admin.displayName, role: 'admin' };
 
@@ -76,7 +107,7 @@ async function main() {
   await db.annotationCampaign.delete({ where: { id: campaign.id } });
   await db.productionCandidate.delete({ where: { id: candidate.id } });
   await db.datasetBatch.delete({ where: { id: converted.batch.id } });
-  await db.generationTrace.delete({ where: { id: trace.id } });
+  await db.generationTrace.deleteMany({ where: { id: { in: [trace.id, systemTrace.id] } } });
   await db.studentAssignment.delete({ where: { id: studentAssignment.id } });
   await db.conversation.delete({ where: { id: conversation.id } });
   await db.assignment.delete({ where: { id: assignment.id } });

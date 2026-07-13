@@ -12,16 +12,24 @@ export function buildPriorSummary(stageData: StageData): string {
         `【课题转化链】原始兴趣：${m.originalInterest}；保留特征：${m.retainedFeature}；课堂代理：${m.classroomProxy}；研究问题：${m.researchQuestion}`
       );
     }
-    if (stageData.stage1.variables) {
-      const v = stageData.stage1.variables;
-      const controlled = v.controlled?.length
-        ? `，控制变量：${v.controlled.join('、')}`
-        : '';
-      const dependent = v.dependent?.trim() ? v.dependent : '待第二阶段确定';
-      parts.push(
-        `自变量：${v.independent}，因变量：${dependent}${controlled}`
-      );
+    const factor = stageData.stage1.factorDirection?.trim() || stageData.stage1.variables?.independent?.trim();
+    const phenomenon = stageData.stage1.phenomenonDirection?.trim();
+    if (factor || phenomenon) {
+      parts.push(`拟改变因素方向：${factor || '待第二阶段确认'}；关注现象方向：${phenomenon || '待第二阶段确认'}`);
     }
+  }
+
+  if (stageData.stage2?.experimentPlan) {
+    const plan = stageData.stage2.experimentPlan;
+    parts.push([
+      '【结构化实验方案】',
+      `自变量：${plan.independentVariable.name}；水平：${plan.independentVariable.levels.join('、')}`,
+      `因变量：${plan.dependentVariable.name}；测量方式：${plan.dependentVariable.measurement}`,
+      `控制变量：${plan.controlledVariables.join('、') || '无'}`,
+      `材料：${plan.materials.join('、') || '待补充'}`,
+      `步骤：${plan.procedure.join('；') || '待补充'}`,
+      `安全：${plan.safetyNotes.join('；') || '无特殊风险'}`,
+    ].join('\n'));
   }
 
   if (stageData.stage2?.schema) {
@@ -37,6 +45,35 @@ export function buildPriorSummary(stageData: StageData): string {
       .map((row, i) => `${i + 1}. ` + keys.map((k) => String(row[k] ?? '')).join(' | '))
       .join('\n');
     parts.push(`【实验数据-共${stageData.stage3.rows.length}行】\n${header}\n${body}`);
+  }
+
+  if (stageData.stage4) {
+    const analysis = stageData.stage4;
+    parts.push([
+      '【数据分析进度】',
+      `有效分析轮次：${analysis.analysisCount}`,
+      analysis.observations?.length ? `学生观察：${analysis.observations.join('；')}` : '',
+      analysis.evidenceCitations?.length ? `数据证据：${analysis.evidenceCitations.join('；')}` : '',
+      analysis.anomalies?.length ? `异常与不确定性：${analysis.anomalies.join('；')}` : '',
+      analysis.interpretations?.length ? `当前解释：${analysis.interpretations.join('；')}` : '',
+    ].filter(Boolean).join('\n'));
+  }
+
+  if (stageData.stage5?.sections) {
+    const report = stageData.stage5.sections;
+    parts.push([
+      '【学生报告】',
+      `目的：${report.purpose}`,
+      `假设：${report.hypothesis}`,
+      `材料：${report.materials}`,
+      `步骤：${report.procedure}`,
+      `数据概述：${report.dataSummary}`,
+      `分析：${report.analysis}`,
+      `学生结论：${report.conclusion || '待填写'}`,
+      `学生反思：${report.reflection || '待填写'}`,
+      stageData.stage5.teacherScore !== undefined ? `教师评分：${stageData.stage5.teacherScore}` : '',
+      stageData.stage5.teacherFeedback?.trim() ? `教师反馈：${stageData.stage5.teacherFeedback.trim()}` : '',
+    ].filter(Boolean).join('\n'));
   }
 
   return parts.join('\n\n') || '（前序阶段暂无结构化摘要，请参考对话历史）';

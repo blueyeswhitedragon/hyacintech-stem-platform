@@ -19,6 +19,9 @@ export interface Stage1Data {
   confirmed: boolean;
   snapshot: string; // 纯文本《探究问题确认书》
   themeMapping?: ThemeMapping;
+  factorDirection?: string;
+  phenomenonDirection?: string;
+  /** @deprecated 兼容旧会话；新流程在阶段2才正式定义变量。 */
   variables: {
     independent: string;
     /** 第一阶段只确定自变量方向；因变量的具体测量方式下沉到第二阶段，故此处可空。 */
@@ -40,10 +43,20 @@ export interface Stage2RiskAnnotation {
   severity: 'low' | 'medium' | 'high';
 }
 
+export interface Stage2ExperimentPlan {
+  independentVariable: { name: string; levels: string[] };
+  dependentVariable: { name: string; measurement: string };
+  controlledVariables: string[];
+  materials: string[];
+  procedure: string[];
+  safetyNotes: string[];
+}
+
 export interface Stage2Data {
   submitted: boolean;
   approved: boolean | null; // null=未审核
   teacherFeedback?: string;
+  experimentPlan?: Stage2ExperimentPlan;
   schema: {
     columns: Stage2Column[];
     minRows: number;
@@ -71,6 +84,10 @@ export interface Stage3Data {
 // 阶段4：分析轮次计数（至少2轮有效分析才能进入阶段5）
 export interface Stage4Data {
   analysisCount: number;
+  observations?: string[];
+  evidenceCitations?: string[];
+  anomalies?: string[];
+  interpretations?: string[];
 }
 
 export interface Stage5Sections {

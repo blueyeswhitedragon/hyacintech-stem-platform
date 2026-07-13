@@ -17,6 +17,7 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { getPromptForPhase, type PromptContext } from '../app/prompts/index';
+import { validateStageResponseBehavior, type StageTriggerType } from '../app/lib/stageContract';
 import { repairJson } from '../app/lib/llm/jsonRepair';
 import { safeParseChatResponse } from '../app/lib/llm/parser';
 import { shouldNudgeConvergence } from '../app/lib/pacing';
@@ -548,6 +549,7 @@ function checkPersonaExpectation(persona: StemPersona, r: ChatResponse): Violati
     r.dialogue,
     r.snapshot ?? '',
     r.theme_mapping ? JSON.stringify(r.theme_mapping) : '',
+    r.topic_direction ? JSON.stringify(r.topic_direction) : '',
     r.variables ? JSON.stringify(r.variables) : '',
   ].join('\n');
   const v: Violation[] = [];
@@ -593,11 +595,11 @@ function checkStage1Boundary(r: ChatResponse): Violation[] {
 
 function checkConfirmationPairing(phase: number, r: ChatResponse): Violation[] {
   if (r.next_action_type !== 'confirmation') return [];
-  if (phase === 1 && !r.stage1_confirmed) {
-    return [{ rule: 'p1-confirm-no-doc', detail: 'confirmation 未伴随 stage1_confirmed+snapshot' }];
+  if (phase === 1 && (!r.stage1_confirmed || !r.snapshot || !r.topic_direction?.factor || !r.topic_direction?.phenomenon)) {
+    return [{ rule: 'p1-confirm-no-v2-doc', detail: 'confirmation 未伴随 stage1_confirmed+snapshot+topic_direction' }];
   }
-  if (phase === 2 && !r.data_table_schema) {
-    return [{ rule: 'p2-confirm-no-schema', detail: 'confirmation 未伴随 data_table_schema' }];
+  if (phase === 2 && (!r.data_table_schema || !r.experiment_plan)) {
+    return [{ rule: 'p2-confirm-no-plan-schema', detail: 'confirmation 未同时包含 experiment_plan 与 data_table_schema' }];
   }
   return [];
 }
@@ -615,12 +617,27 @@ function structuredFields(r: ChatResponse): string[] {
   if (r.stage1_confirmed) out.push('stage1_confirmed');
   if (r.snapshot) out.push('snapshot');
   if (r.theme_mapping) out.push('theme_mapping');
+  if (r.topic_direction) out.push('topic_direction');
   if (r.variables) out.push('variables');
+  if (r.experiment_plan) out.push('experiment_plan');
   if (r.data_table_schema) out.push('data_table_schema');
   if (r.risks) out.push('risks');
   if (r.safety_quiz) out.push('safety_quiz');
+  if (r.analysis_progress) out.push('analysis_progress');
   if (r.report_sections) out.push('report_sections');
   return out;
+}
+
+function sharedStageContractViolations(phase: number, parsed: ChatResponse): Violation[] {
+  const triggerType: StageTriggerType = phase === 3 && parsed.safety_quiz
+    ? 'STAGE_ENTER'
+    : phase === 5
+      ? 'REPORT_BOOTSTRAP'
+      : phase === 6
+        ? 'OPTIONAL_COACHING'
+        : 'USER_MESSAGE';
+  return validateStageResponseBehavior(phase, parsed, { triggerType })
+    .map((item) => ({ rule: item.code.toLowerCase(), detail: item.message }));
 }
 
 function currentViolationsForTurn(
@@ -643,6 +660,7 @@ function currentViolationsForTurn(
       ...checkMissingRelevanceExplanation(parsed),
       ...(persona ? checkCreativeScaffolding(persona, parsed) : []),
       ...(persona ? checkPersonaExpectation(persona, parsed) : []),
+      ...sharedStageContractViolations(phase, parsed),
     ];
   }
   if (phase === 2) {
@@ -650,6 +668,7 @@ function currentViolationsForTurn(
       ...checkMarkdown(parsed.dialogue),
       ...checkOptions(parsed),
       ...checkConfirmationPairing(2, parsed),
+      ...sharedStageContractViolations(phase, parsed),
     ];
   }
   if (phase === 5) {
@@ -657,11 +676,13 @@ function currentViolationsForTurn(
       ...checkMarkdown(parsed.dialogue),
       ...checkOptions(parsed),
       ...checkReportSections(parsed),
+      ...sharedStageContractViolations(phase, parsed),
     ];
   }
   return [
     ...checkMarkdown(parsed.dialogue),
     ...checkOptions(parsed),
+    ...sharedStageContractViolations(phase, parsed),
   ];
 }
 

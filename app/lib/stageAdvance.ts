@@ -19,17 +19,19 @@ export function canAdvance(from: number, to: number, stageData: StageData): Adva
     if (!stageData.stage1?.confirmed) {
       return { ok: false, error: '请先确认探究问题' };
     }
-    // 第一阶段只需确认「研究问题 + 自变量方向」；因变量测量方式与控制变量下沉到第二阶段。
-    if (!stageData.stage1.variables?.independent?.trim()) {
-      return { ok: false, error: '请先确定要改变的自变量' };
+    const factor = stageData.stage1.factorDirection?.trim() || stageData.stage1.variables?.independent?.trim();
+    const phenomenon = stageData.stage1.phenomenonDirection?.trim() || stageData.stage1.themeMapping?.researchQuestion?.trim();
+    if (!factor || !phenomenon) {
+      return { ok: false, error: '请先明确拟改变因素和关注现象方向' };
     }
     return { ok: true };
   }
 
   if (from === 3 && to === 4) {
     const rows = stageData.stage3?.rows ?? [];
-    if (rows.length === 0) {
-      return { ok: false, error: '请先录入至少一行实验数据' };
+    const minRows = stageData.stage2?.schema?.minRows ?? 1;
+    if (rows.length < minRows) {
+      return { ok: false, error: `请先录入至少 ${minRows} 行实验数据` };
     }
     const requiredKeys = (stageData.stage2?.schema?.columns ?? [])
       .filter((c) => c.required)

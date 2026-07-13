@@ -3,12 +3,16 @@ import type { StageData } from '@/app/models/stageData';
 import { db } from '@/app/lib/db';
 import { sha256 } from '@/app/lib/dataLab/validation';
 import type { RuntimeModelIdentity } from '@/app/lib/modelRegistry';
+import type { StageTriggerType } from '@/app/lib/stageContract';
 
 export interface GenerationTraceInput {
   conversationId: string;
   studentAssignmentId: string;
   currentStage: number;
   nextStage: number;
+  /** 轨迹归属阶段；系统过渡 3→4 的回复归入阶段4。 */
+  traceStage?: number;
+  triggerType?: StageTriggerType;
   updatedMessages: Message[];
   stageData: StageData;
   stageDataChanged: boolean;
@@ -31,13 +35,15 @@ export function buildGenerationTraceData(input: GenerationTraceInput) {
     conversationId: input.conversationId,
     assistantMessageId: input.assistantMessageId,
     userMessageId: input.userMessageId,
-    stage: input.currentStage,
+    triggerType: input.triggerType ?? 'USER_MESSAGE',
+    stage: input.traceStage ?? input.currentStage,
     modelVersionId: input.modelVersionId,
     modelTagSnapshot: input.modelIdentity.tag,
     providerSnapshot: input.modelIdentity.provider,
     externalModelSnapshot: input.modelIdentity.externalModelId,
     promptVersion: input.modelIdentity.promptPolicyVersion,
     promptSha256: sha256(input.systemPrompt),
+    systemPromptSnapshot: input.systemPrompt,
     styleFamily: input.styleFamily,
     stylePolicyVersion: input.stylePolicyVersion,
     requestMessageSha256: sha256(input.userMessage),
@@ -65,10 +71,13 @@ export async function persistGenerationTurn(input: GenerationTraceInput) {
       },
     });
     if (stageChanged) {
-      await tx.studentAssignment.update({
-        where: { id: input.studentAssignmentId },
+      const advanced = await tx.studentAssignment.updateMany({
+        where: { id: input.studentAssignmentId, currentStage: input.currentStage },
         data: { currentStage: input.nextStage },
       });
+      if (advanced.count !== 1) {
+        throw new Error('阶段已变化，请刷新后重试');
+      }
     }
     return tx.generationTrace.create({ data: traceData });
   });
