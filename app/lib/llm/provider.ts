@@ -93,7 +93,7 @@ export function validateConfig(): ConfigValidation {
   const providerType = process.env.LLM_PROVIDER ?? detectProvider();
 
   if (!providerType) {
-    issues.push('未检测到有效的 API Key。请在 .env.local 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。');
+    issues.push('未检测到有效的 API Key。请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。');
     return { valid: false, provider: null, model: null, issues };
   }
 

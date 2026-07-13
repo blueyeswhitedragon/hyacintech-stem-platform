@@ -28,6 +28,7 @@ export async function POST(req: Request) {
     dataRows?: Record<string, unknown>[];
     needSafetyQuiz?: boolean;
     priorSummary?: string;
+    hasStage2Schema?: boolean;
   };
   try {
     body = await req.json();
@@ -63,7 +64,10 @@ export async function POST(req: Request) {
 
   try {
     const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
-    const response = await callLLM(systemPrompt, message, history);
+    const response = await callLLM(systemPrompt, message, history, {
+      stage,
+      hasStage2Schema: body.hasStage2Schema === true,
+    });
     return NextResponse.json(response);
   } catch (err) {
     console.error('体验模式聊天出错:', err);

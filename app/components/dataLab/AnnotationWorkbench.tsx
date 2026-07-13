@@ -1,10 +1,29 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
-import { ISSUE_TAGS, STYLE_LABELS, type AnnotationPayload, type RevisionInput } from '@/app/lib/dataLab/types';
+import {
+  ISSUE_TAGS,
+  ISSUE_TAG_META,
+  PHASE_META,
+  STYLE_LABELS,
+  type AnnotationClaimAvailability,
+  type AnnotationPayload,
+  type RevisionInput,
+} from '@/app/lib/dataLab/types';
 import type { ChatResponse } from '@/app/models/types';
+import { hasResponseStage2Schema, validateChatContract, type ChatContractIssue } from '@/app/lib/llm/chatContract';
 
 type EditableTurn = { messageIndex: number; response: ChatResponse };
+
+function availabilityMessage(availability?: AnnotationClaimAvailability | null): string {
+  if (!availability) return '当前没有可领取任务。';
+  if (availability.reason === 'NO_ACTIVE_CAMPAIGN') return '当前没有进行中的标注活动，请联系管理员启动活动。';
+  if (availability.reason === 'NO_CAMPAIGN_ASSIGNMENT') return '管理员尚未把你加入当前标注活动，请联系管理员分配任务。';
+  if (availability.reason === 'DOUBLE_BLIND_EXHAUSTED') {
+    return `你已处理完当前可分配样本。剩余 ${availability.blockedByDoubleBlind} 条为双标任务，需要其他标注员完成。`;
+  }
+  return '当前活动暂时没有待领取任务。';
+}
 
 function cloneResponse(response: ChatResponse): ChatResponse {
   return JSON.parse(JSON.stringify(response)) as ChatResponse;
@@ -30,7 +49,7 @@ export default function AnnotationWorkbench() {
 
   async function claim() {
     setPending(true); setMessage(null);
-    try { const response = await fetch('/api/data-lab/tasks/claim', { method: 'POST' }); const data = await response.json(); if (!response.ok) throw new Error(data.error ?? '领取失败'); load(data.task); if (!data.task) setMessage('当前没有可领取任务。'); }
+    try { const response = await fetch('/api/data-lab/tasks/claim', { method: 'POST' }); const data = await response.json(); if (!response.ok) throw new Error(data.error ?? '领取失败'); load(data.task); if (!data.task) setMessage(availabilityMessage(data.availability)); }
     catch (error) { setMessage(error instanceof Error ? error.message : String(error)); } finally { setPending(false); }
   }
 
@@ -41,17 +60,39 @@ export default function AnnotationWorkbench() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? '领取失败');
         if (!cancelled) load(data.task);
-        if (!cancelled && !data.task) setMessage('当前没有可领取任务。');
+        if (!cancelled && !data.task) setMessage(availabilityMessage(data.availability));
       })
       .catch((error) => { if (!cancelled) setMessage(error instanceof Error ? error.message : String(error)); });
     return () => { cancelled = true; };
   }, []);
 
   function updateTurn(index: number, updater: (response: ChatResponse) => ChatResponse) {
+    setNoChange(false);
     setTurns((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, response: updater(cloneResponse(item.response)) } : item));
   }
 
   const payload: RevisionInput = useMemo(() => ({ assistantMessages: turns, issueTags: tags, changeReason: reason, noChange }), [turns, tags, reason, noChange]);
+  const turnChecks = useMemo(() => {
+    let hasStage2Schema = false;
+    return turns.map((turn) => {
+      const result = validateChatContract(turn.response, { stage: task?.phase ?? 0, hasStage2Schema });
+      const issues = [...result.issues];
+      if (task?.phase === 2 && turn.response.data_table_schema) {
+        const hasNotes = turn.response.data_table_schema.columns.some((column) => column.key === 'notes' && column.type === 'text');
+        if (!hasNotes || turn.response.data_table_schema.maxRows !== 200) {
+          issues.push({ code: 'P2_SCHEMA_INVALID', message: '数据表必须含 notes 文本列且 maxRows 为 200' });
+        }
+      }
+      if (hasResponseStage2Schema(turn.response)) hasStage2Schema = true;
+      return { messageIndex: turn.messageIndex, issues };
+    });
+  }, [task?.phase, turns]);
+  const hardIssueCount = turnChecks.reduce((sum, item) => sum + item.issues.length, 0);
+  const hasEdits = useMemo(() => {
+    if (!task) return false;
+    const originals = new Map(task.conversations.filter((item) => item.from === 'gpt' && item.response).map((item) => [item.index, item.response!]));
+    return turns.some((turn) => JSON.stringify(turn.response) !== JSON.stringify(originals.get(turn.messageIndex)));
+  }, [task, turns]);
 
   async function save() {
     if (!task) return; setPending(true); setMessage(null);
@@ -60,34 +101,48 @@ export default function AnnotationWorkbench() {
   }
 
   async function submit() {
-    if (!task) return; setPending(true); setMessage(null);
+    if (!task) return;
+    if (hardIssueCount > 0) { setMessage(`还有 ${hardIssueCount} 个结构契约错误，请先修正标红轮次。`); return; }
+    if (noChange && hasEdits) { setMessage('已修改导师回复，不能同时勾选“无需修改”。'); return; }
+    setPending(true); setMessage(null);
     try { const response = await fetch(`/api/data-lab/tasks/${task.taskId}/submit`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error ?? '提交失败'); setMessage('提交成功，正在领取下一条'); await claim(); }
     catch (error) { setMessage(error instanceof Error ? error.message : String(error)); } finally { setPending(false); }
   }
 
-  if (!task) return <div className="border bg-white p-8 text-center"><p className="text-gray-500">{message ?? '正在领取任务…'}</p><button onClick={claim} disabled={pending} className="mt-4 bg-gray-950 px-4 py-2 text-sm text-white">重新领取</button></div>;
+  if (!task) return <div className="rounded-xl border bg-white p-8 text-center shadow-sm"><p className="text-gray-600">{message ?? '正在领取任务…'}</p><button onClick={claim} disabled={pending} className="mt-4 rounded-lg bg-gray-950 px-4 py-2 text-sm text-white disabled:opacity-50">重新检查任务</button></div>;
+
+  const phaseMeta = PHASE_META[task.phase] ?? { label: `阶段 ${task.phase}`, goal: '', guardrail: '' };
+  const startingPoint = task.conversations.find((item) => item.from === 'human')?.value;
 
   return <div className="space-y-5">
-    <div className="flex flex-wrap items-start justify-between gap-4 border bg-white p-4"><div><div className="text-xs font-medium text-blue-700">P{task.phase} · {task.styleFamily ? STYLE_LABELS[task.styleFamily] : '自由风格'}</div><h2 className="mt-1 text-lg font-semibold">{task.scenario}</h2><p className="mt-1 text-xs text-gray-500">任务租约至 {task.leaseExpiresAt ? new Date(task.leaseExpiresAt).toLocaleTimeString('zh-CN') : '-'}</p></div><div className="flex gap-2"><button onClick={save} disabled={pending} className="border px-3 py-2 text-sm">保存草稿</button><button onClick={submit} disabled={pending} className="bg-gray-950 px-3 py-2 text-sm text-white">提交标注</button></div></div>
+    <div className="rounded-xl border bg-white p-4 shadow-sm"><div className="flex flex-wrap items-start justify-between gap-4"><div><div className="text-sm font-semibold text-blue-700">阶段 {task.phase}/6 · {phaseMeta.label} · {task.styleFamily ? STYLE_LABELS[task.styleFamily] : '自由风格'}</div><h2 className="mt-1 text-lg font-semibold">{task.scenario}</h2><p className="mt-2 text-sm text-gray-700">本阶段目标：{phaseMeta.goal}</p><p className="mt-1 text-xs text-amber-700">边界提醒：{phaseMeta.guardrail}</p><p className="mt-2 text-xs text-gray-500">任务租约至 {task.leaseExpiresAt ? new Date(task.leaseExpiresAt).toLocaleTimeString('zh-CN') : '-'}</p></div><div className="hidden gap-2 sm:flex"><button onClick={save} disabled={pending} className="rounded-lg border px-3 py-2 text-sm">保存草稿</button><button onClick={submit} disabled={pending} className="rounded-lg bg-gray-950 px-3 py-2 text-sm text-white">提交标注</button></div></div>
+      <ol className="mt-4 grid grid-cols-3 gap-1 text-center text-[11px] sm:grid-cols-6">{Object.entries(PHASE_META).map(([phase, meta]) => <li key={phase} className={`rounded px-1 py-2 ${Number(phase) === task.phase ? 'bg-blue-600 font-medium text-white' : 'bg-gray-100 text-gray-500'}`}>{phase}. {meta.label}</li>)}</ol>
+      <details className="mt-3 rounded-lg bg-gray-50 p-3 text-sm"><summary className="cursor-pointer font-medium text-gray-700">查看本条标注背景</summary><div className="mt-2 space-y-2 text-gray-600"><p><span className="font-medium text-gray-800">学生起点：</span>{startingPoint ?? '未提供'}</p><p><span className="font-medium text-gray-800">标注重点：</span>判断导师是否围绕当前阶段推进，并只修订导师回复。</p></div></details>
+    </div>
+    {task.autoCheck.issues.length > 0 && <div className="border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"><div className="font-medium">原始样本自动检查</div><ul className="mt-1 space-y-1 text-xs">{task.autoCheck.issues.map((item) => <li key={`${item.ruleCode}-${item.message}`}>• [{item.severity}] {item.message}</li>)}</ul></div>}
+    {hardIssueCount > 0 && <div className="border border-red-300 bg-red-50 p-3 text-sm text-red-800">检测到 {hardIssueCount} 个结构契约错误。提交前必须修正；每个错误已标在对应导师回复下方。</div>}
     <div className="space-y-3">{task.conversations.map((item) => {
       if (item.from === 'human') return <div key={item.index} className="max-w-3xl border-l-4 border-gray-300 bg-white p-4"><div className="mb-2 text-xs font-medium text-gray-500">学生 · 只读</div><p className="whitespace-pre-wrap text-sm leading-6">{item.value}</p></div>;
       const turnIndex = turns.findIndex((turn) => turn.messageIndex === item.index); const turn = turns[turnIndex]; if (!turn) return null;
-      return <AssistantEditor key={item.index} phase={task.phase} response={turn.response} onChange={(response) => updateTurn(turnIndex, () => response)} />;
+      const contractIssues = turnChecks.find((check) => check.messageIndex === item.index)?.issues ?? [];
+      return <AssistantEditor key={item.index} phase={task.phase} response={turn.response} originalResponse={item.response!} contractIssues={contractIssues} onChange={(response) => updateTurn(turnIndex, () => response)} />;
     })}</div>
-    <div className="grid gap-4 border bg-white p-4 lg:grid-cols-2"><fieldset><legend className="text-sm font-medium">问题标签</legend><div className="mt-2 grid gap-2 sm:grid-cols-2">{ISSUE_TAGS.map((tag) => <label key={tag} className="text-xs"><input type="checkbox" checked={tags.includes(tag)} onChange={(event) => setTags((current) => event.target.checked ? [...current, tag] : current.filter((item) => item !== tag))} className="mr-1" />{tag}</label>)}</div></fieldset><div><label className="text-sm font-medium">修改理由<textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-28 w-full border p-2 text-sm" placeholder="说明保留了什么、修复了什么。" /></label><label className="mt-2 block text-sm"><input type="checkbox" checked={noChange} onChange={(event) => setNoChange(event.target.checked)} className="mr-1" />无需修改，原回复已符合要求</label></div></div>
+    <div className="grid gap-4 rounded-xl border bg-white p-4 shadow-sm lg:grid-cols-2"><fieldset><legend className="text-sm font-medium">问题标签</legend><p className="mt-1 text-xs text-gray-500">按实际问题选择；点击“说明”可查看判定标准。</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{ISSUE_TAGS.map((tag) => <div key={tag} className="rounded-lg border p-2"><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={tags.includes(tag)} onChange={(event) => setTags((current) => event.target.checked ? [...current, tag] : current.filter((item) => item !== tag))} />{ISSUE_TAG_META[tag].label}</label><details className="mt-1 text-xs text-gray-500"><summary className="cursor-pointer">说明</summary><p className="mt-1 leading-5">{ISSUE_TAG_META[tag].description}</p></details></div>)}</div></fieldset><div><label className="text-sm font-medium">修改理由<textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-28 w-full rounded-lg border p-2 text-sm" placeholder="说明保留了什么、修复了什么。" /></label><label className={`mt-2 block text-sm ${hasEdits ? 'text-gray-400' : ''}`}><input type="checkbox" checked={noChange} disabled={hasEdits} onChange={(event) => setNoChange(event.target.checked)} className="mr-1" />无需修改，原回复已符合要求</label>{hasEdits && <p className="mt-1 text-xs text-gray-500">已检测到回复修订，因此不能选择“无需修改”。</p>}</div></div>
     {message && <div className="text-sm text-gray-600">{message}</div>}
+    <div className="sticky bottom-3 z-20 flex gap-2 rounded-xl border bg-white/95 p-3 shadow-lg backdrop-blur sm:hidden"><button onClick={save} disabled={pending} className="flex-1 rounded-lg border px-3 py-3 text-sm">保存草稿</button><button onClick={submit} disabled={pending} className="flex-1 rounded-lg bg-gray-950 px-3 py-3 text-sm text-white">提交标注</button></div>
   </div>;
 }
 
-function AssistantEditor({ phase, response, onChange }: { phase: number; response: ChatResponse; onChange: (value: ChatResponse) => void }) {
+function AssistantEditor({ phase, response, originalResponse, contractIssues, onChange }: { phase: number; response: ChatResponse; originalResponse: ChatResponse; contractIssues: ChatContractIssue[]; onChange: (value: ChatResponse) => void }) {
   const patch = (value: Partial<ChatResponse>) => onChange({ ...response, ...value });
-  return <div className="border bg-white p-4"><div className="mb-3 text-xs font-medium text-blue-700">导师回复 · 可修订</div>
+  return <div className={`rounded-xl border bg-white p-4 shadow-sm ${contractIssues.length > 0 ? 'border-red-400' : ''}`}><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><span className="text-xs font-medium text-blue-700">导师回复 · 可修订</span><div className="flex items-center gap-2"><button type="button" onClick={() => onChange(cloneResponse(originalResponse))} className="rounded border px-2 py-1 text-xs text-gray-600">恢复本轮原文</button><span className={`rounded-full px-2 py-1 text-xs ${contractIssues.length > 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{contractIssues.length > 0 ? `${contractIssues.length} 个结构错误` : '结构契约通过'}</span></div></div>
     <label className="text-sm">对话内容<textarea value={response.dialogue} onChange={(event) => patch({ dialogue: event.target.value })} className="mt-1 min-h-28 w-full border p-2 leading-6" /></label>
     <div className="mt-3 grid gap-3 md:grid-cols-3"><label className="text-sm">下一步动作<select value={response.next_action_type} onChange={(event) => patch({ next_action_type: event.target.value as ChatResponse['next_action_type'] })} className="mt-1 w-full border px-2 py-2"><option value="text_input">继续输入</option><option value="confirmation">请求确认</option><option value="info">信息提示</option><option value="ask_choice">选择题</option></select></label><label className="text-sm">提示（每行一条）<textarea value={(response.hints ?? []).join('\n')} onChange={(event) => patch({ hints: event.target.value.split('\n').map((item) => item.trim()).filter(Boolean) })} className="mt-1 min-h-20 w-full border p-2" /></label><label className="text-sm">选项（每行一条）<textarea value={(response.options ?? []).join('\n')} onChange={(event) => patch({ options: event.target.value.split('\n').map((item) => item.trim()).filter(Boolean) })} className="mt-1 min-h-20 w-full border p-2" /></label></div>
     <label className="mt-3 block text-sm"><input type="checkbox" checked={response.phase_complete} onChange={(event) => patch({ phase_complete: event.target.checked })} className="mr-1" />当前阶段完成</label>
     {phase === 1 && <Phase1Editor response={response} onChange={patch} />}
     {phase === 2 && <Phase2Editor response={response} onChange={patch} />}
     {phase === 5 && <Phase5Editor response={response} onChange={patch} />}
+    {contractIssues.length > 0 && <ul className="mt-3 space-y-1 border-t border-red-100 pt-3 text-xs text-red-700">{contractIssues.map((item) => <li key={item.code}>• {item.message}</li>)}</ul>}
   </div>;
 }
 
@@ -98,9 +153,12 @@ function Phase1Editor({ response, onChange }: { response: ChatResponse; onChange
 }
 
 function Phase2Editor({ response, onChange }: { response: ChatResponse; onChange: (value: Partial<ChatResponse>) => void }) {
-  const schema = response.data_table_schema ?? { columns: [], minRows: 1, maxRows: 200 };
+  if (!response.data_table_schema) {
+    return <div className="mt-4 border-t pt-4"><div className="flex items-center justify-between gap-3"><div><h3 className="text-sm font-medium">实验数据表</h3><p className="mt-1 text-xs text-gray-500">当前轮次尚未生成数据表；中间讨论轮次可以保持此状态。</p></div><button type="button" onClick={() => onChange({ next_action_type: 'confirmation', data_table_schema: { columns: [{ key: 'notes', title: '备注', type: 'text', required: false }], minRows: 3, maxRows: 200 } })} className="border px-2 py-1 text-xs">在本轮创建数据表</button></div></div>;
+  }
+  const schema = response.data_table_schema;
   const columns = schema.columns;
-  return <div className="mt-4 border-t pt-4"><div className="flex items-center justify-between"><h3 className="text-sm font-medium">实验数据表</h3><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: [...columns, { key: `field_${columns.length + 1}`, title: '新字段', type: 'text', required: false }] } })} className="border px-2 py-1 text-xs">添加列</button></div><div className="mt-2 space-y-2">{columns.map((column, index) => <div key={`${column.key}-${index}`} className="grid gap-2 md:grid-cols-[1fr_1.5fr_100px_80px_32px]"><input value={column.key} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, key: event.target.value } : item) } })} className="border px-2 py-1 text-sm" /><input value={column.title} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item) } })} className="border px-2 py-1 text-sm" /><select value={column.type} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as 'text'|'number'|'image' } : item) } })} className="border px-2 py-1 text-sm"><option value="text">文本</option><option value="number">数字</option><option value="image">图片</option></select><label className="pt-1 text-xs"><input type="checkbox" checked={column.required} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, required: event.target.checked } : item) } })} className="mr-1" />必填</label><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: columns.filter((_, itemIndex) => itemIndex !== index) } })} title="删除列" className="text-red-600">×</button></div>)}</div></div>;
+  return <div className="mt-4 border-t pt-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-medium">实验数据表</h3><div className="flex gap-2"><button type="button" onClick={() => onChange({ data_table_schema: undefined, next_action_type: response.next_action_type === 'confirmation' ? 'text_input' : response.next_action_type, phase_complete: false })} className="rounded border border-red-200 px-2 py-1 text-xs text-red-700">移除本轮数据表</button><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: [...columns, { key: `field_${columns.length + 1}`, title: '新字段', type: 'text', required: false }] } })} className="rounded border px-2 py-1 text-xs">添加列</button></div></div><div className="mt-3 flex flex-wrap gap-3"><label className="text-xs">最少行数<input type="number" min={1} value={schema.minRows} onChange={(event) => onChange({ data_table_schema: { ...schema, minRows: Number(event.target.value) } })} className="ml-2 w-20 rounded border px-2 py-1" /></label><label className="text-xs">最大行数<input type="number" min={1} value={schema.maxRows} onChange={(event) => onChange({ data_table_schema: { ...schema, maxRows: Number(event.target.value) } })} className="ml-2 w-20 rounded border px-2 py-1" /></label></div><div className="mt-3 space-y-2">{columns.map((column, index) => <div key={`${column.key}-${index}`} className="grid gap-2 rounded-lg border bg-gray-50 p-3 md:grid-cols-[1fr_1.5fr_100px_80px_32px]"><label className="text-xs text-gray-500 md:contents"><span className="md:hidden">字段键</span><input aria-label={`第 ${index + 1} 列字段键`} value={column.key} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, key: event.target.value } : item) } })} className="w-full rounded border bg-white px-2 py-2 text-sm text-gray-900" /></label><label className="text-xs text-gray-500 md:contents"><span className="md:hidden">中文名称</span><input aria-label={`第 ${index + 1} 列中文名称`} value={column.title} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item) } })} className="w-full rounded border bg-white px-2 py-2 text-sm text-gray-900" /></label><select aria-label={`第 ${index + 1} 列类型`} value={column.type} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as 'text'|'number'|'image' } : item) } })} className="rounded border bg-white px-2 py-2 text-sm"><option value="text">文本</option><option value="number">数字</option><option value="image">图片</option></select><label className="pt-2 text-xs"><input type="checkbox" checked={column.required} onChange={(event) => onChange({ data_table_schema: { ...schema, columns: columns.map((item, itemIndex) => itemIndex === index ? { ...item, required: event.target.checked } : item) } })} className="mr-1" />必填</label><button type="button" onClick={() => onChange({ data_table_schema: { ...schema, columns: columns.filter((_, itemIndex) => itemIndex !== index) } })} title="删除列" className="rounded p-2 text-red-600">删除</button></div>)}</div></div>;
 }
 
 function Phase5Editor({ response, onChange }: { response: ChatResponse; onChange: (value: Partial<ChatResponse>) => void }) {

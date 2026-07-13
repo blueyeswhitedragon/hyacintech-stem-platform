@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "version": "pilot-v1",
-  "frozenAt": "2026-07-10T04:47:32.251Z",
+  "frozenAt": "2026-07-10T07:59:06.901Z",
   "recipe": {
     "goldWeight": 1.5,
     "silverWeight": 1,
@@ -18,10 +18,10 @@
   },
   "items": [
     {
-      "sampleId": "9e2f7ead-87b5-47f4-a376-d3b819e5bb82",
-      "revisionId": "e978d191-9f87-41a4-b567-304dd9c05d7f",
+      "sampleId": "d3604afd-935a-4c23-b20c-0ed8b38f5edf",
+      "revisionId": "952c0b3a-56ac-406f-9d84-46ab518664ca",
       "tier": "human_gold",
-      "reason": "review:3edabb9e-a6b5-4d0f-94e0-2845ccaba4fa"
+      "reason": "review:192440a8-4419-489b-a788-db0422c3c6ae"
     }
   ]
 }

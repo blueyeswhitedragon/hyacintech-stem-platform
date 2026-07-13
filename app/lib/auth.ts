@@ -1,5 +1,5 @@
 import 'server-only';
-import { getSession, type SessionUser, type UserRole } from './session';
+import { getCurrentUser, type SessionUser, type UserRole } from './session';
 
 /**
  * 鉴权守卫工具。返回判别联合：
@@ -16,11 +16,11 @@ export type AuthResult =
   | { ok: false; error: string; status: 401 | 403 };
 
 export async function requireUser(): Promise<AuthResult> {
-  const session = await getSession();
-  if (!session.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     return { ok: false, error: '未登录', status: 401 };
   }
-  return { ok: true, user: session.user };
+  return { ok: true, user };
 }
 
 export async function requireRole(role: UserRole): Promise<AuthResult> {

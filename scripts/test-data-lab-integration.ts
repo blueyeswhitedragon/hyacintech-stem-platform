@@ -12,6 +12,7 @@ import {
   decideReview,
   freezeDatasetRelease,
   importEvaluation,
+  reviewAnnotationWork,
   submitAnnotationTask,
 } from '../app/lib/dataLab/service';
 
@@ -58,8 +59,15 @@ async function main() {
     check('double annotation uses same sample', taskA?.sampleId === taskB?.sampleId);
     check('double annotation uses different slots/tasks', taskA?.taskId !== taskB?.taskId);
     if (!taskA || !taskB) throw new Error('无法领取双标任务');
-    await submitAnnotationTask(taskA.taskId, noChangeInput(taskA), annotator1);
-    await submitAnnotationTask(taskB.taskId, noChangeInput(taskB), annotator2);
+    const submissionA = await submitAnnotationTask(taskA.taskId, noChangeInput(taskA), annotator1);
+    const submissionB = await submitAnnotationTask(taskB.taskId, noChangeInput(taskB), annotator2);
+    const [workA, workB] = await Promise.all([
+      db.annotationWorkReview.findUniqueOrThrow({ where: { revisionId: submissionA.revision.id } }),
+      db.annotationWorkReview.findUniqueOrThrow({ where: { revisionId: submissionB.revision.id } }),
+    ]);
+    await reviewAnnotationWork({ reviewId: workA.id, status: 'APPROVED', user: admin });
+    await reviewAnnotationWork({ reviewId: workB.id, status: 'APPROVED', user: admin });
+    check('approved submissions count independently', await db.annotationWorkReview.count({ where: { id: { in: [workA.id, workB.id] }, status: 'APPROVED' } }) === 2);
     const reviewCase = await claimReviewCase(reviewer);
     check('reviewer receives arbitration case', !!reviewCase);
     check('review candidates anonymized', reviewCase?.candidates.every((candidate) => /^[A-Z]$/.test(candidate.label)) ?? false);

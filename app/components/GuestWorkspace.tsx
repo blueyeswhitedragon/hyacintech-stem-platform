@@ -45,6 +45,7 @@ export default function GuestWorkspace() {
         dataRows: stageData.stage3?.rows,
         needSafetyQuiz: stage === 3 && needQuizRef.current,
         priorSummary: stage === 5 ? buildPriorSummary(stageData) : undefined,
+        hasStage2Schema: (stageData.stage2?.schema.columns.length ?? 0) > 0,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -92,6 +93,7 @@ export default function GuestWorkspace() {
           history: [],
           needSafetyQuiz: false,
           priorSummary: buildPriorSummary(stageData),
+          hasStage2Schema: (stageData.stage2?.schema.columns.length ?? 0) > 0,
         }),
       });
       const data = await res.json().catch(() => ({}));

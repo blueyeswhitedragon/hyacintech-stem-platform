@@ -10,7 +10,8 @@ export default async function DataLabPage() {
     ['数据批次', stats.batches],
     ['基线样本', stats.samples],
     ['标注活动', stats.campaigns],
-    ['待办标注', stats.pendingTasks],
+    [user.role === 'annotator' ? '我的未完成标注' : '待办标注', stats.pendingTasks],
+    ...(user.role === 'admin' ? [['待工作量审核', stats.pendingWorkReviews], ['有效标注条数', stats.approvedWork]] : []),
     ['待仲裁', stats.pendingReviews],
     ['冻结版本', stats.releases],
     ['训练任务', stats.trainingRuns],
@@ -31,11 +32,12 @@ export default async function DataLabPage() {
         ))}
       </div>
       <div className="grid gap-4 xl:grid-cols-3">
-        <Link href="/data-lab/annotate" className="border bg-white p-5 hover:border-blue-400">
+        {user.role === 'admin' && <Link href="/data-lab/campaigns" className="rounded-xl border bg-white p-5 hover:border-blue-400"><h2 className="font-medium">分配标注任务</h2><p className="mt-2 text-sm text-gray-500">选择数据、参与人员和审核强度，创建新的标注活动。</p></Link>}
+        {user.role === 'admin' && <Link href="/data-lab/workload" className="rounded-xl border bg-white p-5 hover:border-blue-400"><h2 className="font-medium">审核有效工作量</h2><p className="mt-2 text-sm text-gray-500">逐条确认提交是否有效，并查看每位参与者的准确条数。</p></Link>}
+        {user.role !== 'admin' && <Link href="/data-lab/annotate" className="rounded-xl border bg-white p-5 hover:border-blue-400">
           <h2 className="font-medium">领取下一条标注</h2><p className="mt-2 text-sm text-gray-500">结构化编辑导师回复，不接触 ShareGPT JSON。</p>
-        </Link>
-        {user.role !== 'annotator' && <Link href="/data-lab/review" className="border bg-white p-5 hover:border-blue-400"><h2 className="font-medium">进入匿名仲裁</h2><p className="mt-2 text-sm text-gray-500">比较匿名版本，决定 Gold、Silver 或退回。</p></Link>}
-        {user.role === 'admin' && <Link href="/data-lab/batches" className="border bg-white p-5 hover:border-blue-400"><h2 className="font-medium">导入数据批次</h2><p className="mt-2 text-sm text-gray-500">上传 clean ShareGPT 与可选 manifest，自动生成检查报告。</p></Link>}
+        </Link>}
+        {user.role !== 'annotator' && <Link href="/data-lab/review" className="rounded-xl border bg-white p-5 hover:border-blue-400"><h2 className="font-medium">进入匿名仲裁</h2><p className="mt-2 text-sm text-gray-500">工作量审核通过后，再匿名比较版本并决定数据集采用结果。</p></Link>}
       </div>
     </div>
   );

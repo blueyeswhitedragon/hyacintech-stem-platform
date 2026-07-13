@@ -11,12 +11,18 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  username     String   @unique
-  passwordHash String
-  role         String // "student" | "teacher" | "annotator" | "reviewer" | "admin"
-  displayName  String
-  createdAt    DateTime @default(now())
+  id             String    @id @default(uuid())
+  username       String    @unique
+  passwordHash   String
+  role           String // "student" | "teacher" | "annotator" | "reviewer" | "admin"
+  displayName    String
+  isActive       Boolean   @default(true)
+  sessionVersion Int       @default(0)
+  disabledAt     DateTime?
+  disabledReason String    @default("")
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   ownedClasses       Class[]             @relation("TeacherClasses")
   classMemberships   ClassMember[]
@@ -25,14 +31,18 @@ model User {
 
   importedDatasetBatches DatasetBatch[]       @relation("DatasetBatchImporter")
   createdCampaigns       AnnotationCampaign[] @relation("CampaignCreator")
+  campaignParticipations CampaignParticipant[]
   annotationTasks        AnnotationTask[]     @relation("TaskAssignee")
   annotationRevisions    AnnotationRevision[] @relation("RevisionAuthor")
+  completedWorkReviews   AnnotationWorkReview[] @relation("WorkReviewReviewer")
   assignedReviewCases    ReviewCase[]         @relation("ReviewCaseAssignee")
   reviewDecisions        ReviewDecision[]     @relation("DecisionReviewer")
   createdDatasetReleases DatasetRelease[]     @relation("ReleaseCreator")
   createdTrainingRuns    TrainingRun[]        @relation("TrainingRunCreator")
   createdEvaluationRuns  EvaluationRun[]      @relation("EvaluationRunCreator")
   dataLabAuditLogs       DataLabAuditLog[]    @relation("AuditActor")
+
+  @@index([role, isActive])
 }
 
 model Class {
@@ -166,8 +176,24 @@ model AnnotationCampaign {
 
   createdBy   User             @relation("CampaignCreator", fields: [createdById], references: [id])
   tasks       AnnotationTask[]
+  participants CampaignParticipant[]
   reviewCases ReviewCase[]
   releases    DatasetRelease[]
+}
+
+model CampaignParticipant {
+  id         String   @id @default(uuid())
+  campaignId String
+  userId     String
+  taskLimit  Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  campaign AnnotationCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, userId])
+  @@index([userId, active])
 }
 
 model AnnotationTask {
@@ -188,6 +214,7 @@ model AnnotationTask {
   sample     DatasetSample        @relation(fields: [sampleId], references: [id], onDelete: Cascade)
   assignedTo User?                @relation("TaskAssignee", fields: [assignedToId], references: [id])
   revisions  AnnotationRevision[]
+  workReviews AnnotationWorkReview[]
 
   @@unique([campaignId, sampleId, slot])
   @@index([campaignId, status])
@@ -216,9 +243,30 @@ model AnnotationRevision {
   selectedBy     ReviewDecision[]     @relation("SelectedRevision")
   mergedBy       ReviewDecision[]     @relation("MergedRevision")
   releaseItems   DatasetReleaseItem[]
+  workReview     AnnotationWorkReview?
 
   @@unique([taskId, version])
   @@index([sampleId])
+}
+
+model AnnotationWorkReview {
+  id         String    @id @default(uuid())
+  taskId     String
+  revisionId String    @unique
+  status     String    @default("PENDING")
+  note       String    @default("")
+  reviewerId String?
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  task     AnnotationTask     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  revision AnnotationRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  reviewer User?              @relation("WorkReviewReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([taskId, status])
+  @@index([reviewerId])
 }
 
 model ReviewCase {

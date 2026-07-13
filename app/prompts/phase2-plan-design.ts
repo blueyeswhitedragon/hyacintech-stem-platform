@@ -76,6 +76,7 @@ dialogue 内可以使用 \\n 换行，但引号必须用 \\" 转义。
 "risks": [ { "description": "风险描述", "severity": "low|medium|high" } ]
 
 输出数据表后，将 next_action_type 设为 "confirmation"，dialogue 中提示学生「右侧面板可以预览和修改列定义，检查无误后点击提交」。
+只有在同一 JSON 响应中实际包含非空 data_table_schema 时，才可以说「已生成数据表」「右侧面板可以查看」或使用含义相同的完成措辞。绝不能只在 dialogue 中声称已经生成。
 
 完整示例：
 {

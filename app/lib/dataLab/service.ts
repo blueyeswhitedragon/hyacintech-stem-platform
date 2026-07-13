@@ -6,21 +6,28 @@ import type { SessionUser } from '@/app/lib/session';
 import type { UserRole } from '@/app/lib/roles';
 import {
   STYLE_FAMILIES,
+  type AutoCheckResult,
+  type AnnotationClaimAvailability,
   type AnnotationPayload,
+  type CampaignParticipantInput,
   type CampaignSelection,
   type ReleaseRecipe,
   type RevisionInput,
   type ShareGPTRecord,
   type StyleQuota,
   type StyleFamily,
+  type WorkReviewStatus,
 } from './types';
+import { chooseAnnotationCandidate, claimUnavailableReason, hasMeaningfulDraft } from './assignment';
 import {
   applyRevision,
+  assertRevisionIntent,
   canonicalizeRecord,
   familyKey,
   parseAssistantResponse,
   parseJson,
   parseShareGPTDataset,
+  normalizeLegacyEmptyStage2Schemas,
   sha256,
   validateShareGPTRecord,
 } from './validation';
@@ -133,17 +140,19 @@ export async function importDatasetBatch(input: {
 }
 
 export async function dataLabOverview(user: SessionUser) {
-  const [batches, samples, campaigns, pendingTasks, pendingReviews, releases, trainingRuns, evaluations] = await Promise.all([
+  const [batches, samples, campaigns, pendingTasks, pendingWorkReviews, approvedWork, pendingReviews, releases, trainingRuns, evaluations] = await Promise.all([
     db.datasetBatch.count(),
     db.datasetSample.count(),
     db.annotationCampaign.count(),
     isAdmin(user.role) ? db.annotationTask.count({ where: { status: { in: ['PENDING', 'IN_PROGRESS'] } } }) : db.annotationTask.count({ where: { assignedToId: user.id, status: { in: ['PENDING', 'IN_PROGRESS'] } } }),
+    isAdmin(user.role) ? db.annotationWorkReview.count({ where: { status: 'PENDING' } }) : Promise.resolve(0),
+    isAdmin(user.role) ? db.annotationWorkReview.count({ where: { status: 'APPROVED' } }) : Promise.resolve(0),
     canReview(user.role) ? db.reviewCase.count({ where: { status: { in: ['PENDING', 'IN_REVIEW'] } } }) : Promise.resolve(0),
     db.datasetRelease.count(),
     db.trainingRun.count(),
     db.evaluationRun.count(),
   ]);
-  return { batches, samples, campaigns, pendingTasks, pendingReviews, releases, trainingRuns, evaluations };
+  return { batches, samples, campaigns, pendingTasks, pendingWorkReviews, approvedWork, pendingReviews, releases, trainingRuns, evaluations };
 }
 
 export async function listBatches() {
@@ -219,18 +228,33 @@ export async function createCampaign(input: {
   goldSlots?: number;
   silverDoubleReviewPercent?: number;
   maxActivePerAnnotator?: number;
+  participants?: CampaignParticipantInput[];
   user: SessionUser;
 }) {
-  const campaign = await db.annotationCampaign.create({
-    data: {
-      name: input.name,
-      selectionJson: JSON.stringify(input.selection),
-      styleQuotaJson: JSON.stringify(input.styleQuota ?? Object.fromEntries(STYLE_FAMILIES.map((style) => [style, 1]))),
-      goldSlots: Math.min(3, Math.max(1, input.goldSlots ?? 2)),
-      silverDoubleReviewPercent: Math.min(100, Math.max(0, input.silverDoubleReviewPercent ?? 30)),
-      maxActivePerAnnotator: Math.max(1, input.maxActivePerAnnotator ?? 1),
-      createdById: input.user.id,
-    },
+  const participantMap = new Map((input.participants ?? []).map((item) => [item.userId, Math.max(0, Math.floor(item.taskLimit ?? 0))]));
+  const participantIds = [...participantMap.keys()];
+  if (participantIds.length > 0) {
+    const eligible = await db.user.count({ where: { id: { in: participantIds }, role: 'annotator', isActive: true } });
+    if (eligible !== participantIds.length) throw new Error('参与人员中包含不存在或非标注员账号');
+  }
+  const campaign = await db.$transaction(async (tx) => {
+    const created = await tx.annotationCampaign.create({
+      data: {
+        name: input.name,
+        selectionJson: JSON.stringify(input.selection),
+        styleQuotaJson: JSON.stringify(input.styleQuota ?? Object.fromEntries(STYLE_FAMILIES.map((style) => [style, 1]))),
+        goldSlots: Math.min(3, Math.max(1, input.goldSlots ?? 2)),
+        silverDoubleReviewPercent: Math.min(100, Math.max(0, input.silverDoubleReviewPercent ?? 30)),
+        maxActivePerAnnotator: Math.max(1, input.maxActivePerAnnotator ?? 1),
+        createdById: input.user.id,
+      },
+    });
+    if (participantIds.length > 0) {
+      await tx.campaignParticipant.createMany({
+        data: participantIds.map((userId) => ({ campaignId: created.id, userId, taskLimit: participantMap.get(userId) ?? 0 })),
+      });
+    }
+    return created;
   });
   await audit(input.user.id, 'CAMPAIGN_CREATED', 'AnnotationCampaign', campaign.id, input);
   return campaign;
@@ -280,6 +304,52 @@ export async function listCampaigns() {
   });
 }
 
+export async function listAssignableAnnotators() {
+  return db.user.findMany({
+    where: { role: 'annotator', isActive: true },
+    orderBy: [{ displayName: 'asc' }, { username: 'asc' }],
+    select: { id: true, username: true, displayName: true },
+  });
+}
+
+export async function listCampaignProgress() {
+  const campaigns = await db.annotationCampaign.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      createdBy: { select: { displayName: true } },
+      participants: { where: { active: true }, select: { taskLimit: true, user: { select: { displayName: true } } } },
+      tasks: {
+        select: {
+          status: true,
+          sampleId: true,
+          workReviews: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true } },
+        },
+      },
+      reviewCases: { select: { status: true } },
+    },
+  });
+  return campaigns.map((campaign) => {
+    const bySample = new Map<string, typeof campaign.tasks>();
+    for (const task of campaign.tasks) bySample.set(task.sampleId, [...(bySample.get(task.sampleId) ?? []), task]);
+    const approvedTasks = campaign.tasks.filter((task) => task.workReviews[0]?.status === 'APPROVED').length;
+    return {
+      id: campaign.id,
+      name: campaign.name,
+      status: campaign.status,
+      createdBy: campaign.createdBy,
+      participantCount: campaign.participants.length,
+      taskCount: campaign.tasks.length,
+      submittedTaskCount: campaign.tasks.filter((task) => task.status === 'SUBMITTED').length,
+      approvedTaskCount: approvedTasks,
+      pendingWorkReviewCount: campaign.tasks.filter((task) => task.workReviews[0]?.status === 'PENDING').length,
+      sampleCount: bySample.size,
+      completedSampleCount: [...bySample.values()].filter((tasks) => tasks.length > 0 && tasks.every((task) => task.workReviews[0]?.status === 'APPROVED')).length,
+      pendingReviewCount: campaign.reviewCases.filter((item) => ['PENDING', 'IN_REVIEW'].includes(item.status)).length,
+      decidedReviewCount: campaign.reviewCases.filter((item) => item.status === 'DECIDED').length,
+    };
+  });
+}
+
 async function taskPayload(taskId: string, userId: string): Promise<AnnotationPayload> {
   const task = await db.annotationTask.findUnique({
     where: { id: taskId },
@@ -287,6 +357,10 @@ async function taskPayload(taskId: string, userId: string): Promise<AnnotationPa
   });
   if (!task || task.assignedToId !== userId) throw new Error('任务不存在或未分配给当前用户');
   const record = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
+  const rawDraft = parseJson<Partial<RevisionInput>>(task.draftJson, {});
+  const draft = Array.isArray(rawDraft.assistantMessages)
+    ? normalizeLegacyEmptyStage2Schemas(rawDraft as RevisionInput).input
+    : undefined;
   return {
     taskId: task.id,
     sampleId: task.sampleId,
@@ -300,40 +374,71 @@ async function taskPayload(taskId: string, userId: string): Promise<AnnotationPa
       value: message.from === 'human' ? message.value : '',
       response: message.from === 'gpt' ? parseAssistantResponse(message.value) : undefined,
     })),
-    draft: parseJson<RevisionInput | undefined>(task.draftJson, undefined),
+    autoCheck: parseJson<AutoCheckResult>(task.sample.autoCheckJson, { status: 'error', issues: [] }),
+    rubricTargets: parseJson<string[]>(task.sample.rubricTargetsJson, []),
+    draft,
     leaseExpiresAt: task.leaseExpiresAt?.toISOString() ?? null,
   };
 }
 
-export async function claimAnnotationTask(user: SessionUser) {
-  const active = await db.annotationTask.findFirst({
-    where: {
-      assignedToId: user.id,
-      OR: [
-        { status: 'IN_PROGRESS', leaseExpiresAt: { gt: new Date() } },
-        { status: 'RETURNED' },
-      ],
-    },
-    orderBy: { updatedAt: 'desc' },
-  });
-  if (active) {
-    if (active.status === 'RETURNED') {
-      await db.annotationTask.update({ where: { id: active.id }, data: { status: 'IN_PROGRESS', leaseExpiresAt: new Date(Date.now() + LEASE_MS) } });
-    }
-    return taskPayload(active.id, user.id);
-  }
+async function annotationExposure(userId: string) {
+  const [assigned, claimAudits] = await Promise.all([
+    db.annotationTask.findMany({
+      where: { assignedToId: userId },
+      select: { id: true, campaignId: true, sampleId: true, updatedAt: true, sample: { select: { familyKey: true } } },
+    }),
+    db.dataLabAuditLog.findMany({
+      where: { actorId: userId, action: 'ANNOTATION_TASK_CLAIMED', entityType: 'AnnotationTask' },
+      orderBy: { createdAt: 'desc' },
+      select: { entityId: true },
+      take: 1000,
+    }),
+  ]);
+  const auditedIds = [...new Set(claimAudits.map((item) => item.entityId))];
+  const audited = auditedIds.length > 0
+    ? await db.annotationTask.findMany({
+      where: { id: { in: auditedIds } },
+      select: { id: true, campaignId: true, sampleId: true, updatedAt: true, sample: { select: { familyKey: true } } },
+    })
+    : [];
+  return [...new Map([...assigned, ...audited].map((item) => [item.id, item])).values()]
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+}
 
-  const handled = await db.annotationTask.findMany({
-    where: { assignedToId: user.id },
-    orderBy: { updatedAt: 'desc' },
-    select: { campaignId: true, sampleId: true, sample: { select: { familyKey: true } } },
+async function annotationCampaignAccess(userId: string) {
+  const campaigns = await db.annotationCampaign.findMany({
+    where: { status: 'ACTIVE' },
+    select: { id: true, participants: { where: { active: true }, select: { userId: true, taskLimit: true } } },
   });
-  const handledPairs = new Set(handled.map((item) => `${item.campaignId}:${item.sampleId}`));
-  const excludedFamilies = new Set(handled.slice(0, 5).map((item) => item.sample.familyKey));
-  const now = new Date();
-  const candidates = await db.annotationTask.findMany({
+  const assigned = await db.annotationTask.groupBy({
+    by: ['campaignId'],
+    where: { assignedToId: userId, campaignId: { in: campaigns.map((item) => item.id) } },
+    _count: { _all: true },
+  });
+  const assignedCounts = new Map(assigned.map((item) => [item.campaignId, item._count._all]));
+  let assignedCampaigns = 0;
+  const allowedCampaignIds: string[] = [];
+  for (const campaign of campaigns) {
+    if (campaign.participants.length === 0) {
+      assignedCampaigns++;
+      allowedCampaignIds.push(campaign.id);
+      continue;
+    }
+    const participant = campaign.participants.find((item) => item.userId === userId);
+    if (!participant) continue;
+    assignedCampaigns++;
+    if (participant.taskLimit === 0 || (assignedCounts.get(campaign.id) ?? 0) < participant.taskLimit) {
+      allowedCampaignIds.push(campaign.id);
+    }
+  }
+  return { activeCampaigns: campaigns.length, assignedCampaigns, allowedCampaignIds };
+}
+
+async function availableAnnotationCandidates(now: Date, campaignIds?: string[]) {
+  if (campaignIds && campaignIds.length === 0) return [];
+  const rows = await db.annotationTask.findMany({
     where: {
-      campaign: { status: 'ACTIVE' },
+      campaign: { status: 'ACTIVE', ...(campaignIds ? { id: { in: campaignIds } } : {}) },
       OR: [
         { status: 'PENDING', assignedToId: null },
         { status: 'IN_PROGRESS', leaseExpiresAt: { lt: now } },
@@ -343,40 +448,101 @@ export async function claimAnnotationTask(user: SessionUser) {
     include: { sample: { select: { familyKey: true } } },
     take: 200,
   });
-  const fallback = candidates.find((item) => !handledPairs.has(`${item.campaignId}:${item.sampleId}`) && !excludedFamilies.has(item.sample.familyKey))
-    ?? candidates.find((item) => !handledPairs.has(`${item.campaignId}:${item.sampleId}`));
+  return rows.filter((item) => item.status === 'PENDING' || !hasMeaningfulDraft(item.draftJson));
+}
+
+export async function claimAnnotationTask(user: SessionUser) {
+  const now = new Date();
+  const active = await db.annotationTask.findFirst({
+    where: {
+      assignedToId: user.id,
+      status: { in: ['IN_PROGRESS', 'RETURNED'] },
+    },
+    orderBy: { updatedAt: 'desc' },
+  });
+  if (active) {
+    const expired = !active.leaseExpiresAt || active.leaseExpiresAt <= now;
+    if (active.status === 'RETURNED' || expired) {
+      const leaseExpiresAt = new Date(Date.now() + LEASE_MS);
+      await db.annotationTask.update({ where: { id: active.id }, data: { status: 'IN_PROGRESS', leaseExpiresAt } });
+      await audit(user.id, 'ANNOTATION_TASK_RENEWED', 'AnnotationTask', active.id, { previousStatus: active.status, expired });
+    }
+    return taskPayload(active.id, user.id);
+  }
+
+  const handled = await annotationExposure(user.id);
+  const handledPairs = new Set(handled.map((item) => `${item.campaignId}:${item.sampleId}`));
+  const excludedFamilies = new Set(handled.slice(0, 5).map((item) => item.sample.familyKey));
+  const access = await annotationCampaignAccess(user.id);
+  const candidates = await availableAnnotationCandidates(now, access.allowedCampaignIds);
+  const fallback = chooseAnnotationCandidate(
+    candidates.map((item) => ({ ...item, familyKey: item.sample.familyKey })),
+    handledPairs,
+    excludedFamilies,
+  );
   if (!fallback) return null;
   const leaseExpiresAt = new Date(Date.now() + LEASE_MS);
   const updated = await db.annotationTask.updateMany({
     where: {
       id: fallback.id,
+      draftJson: fallback.draftJson,
       OR: [
         { status: 'PENDING', assignedToId: null },
         { status: 'IN_PROGRESS', leaseExpiresAt: { lt: now } },
       ],
     },
-    data: { assignedToId: user.id, status: 'IN_PROGRESS', leaseExpiresAt },
+    data: { assignedToId: user.id, status: 'IN_PROGRESS', leaseExpiresAt, draftJson: '{}' },
   });
   if (updated.count !== 1) return claimAnnotationTask(user);
   await audit(user.id, 'ANNOTATION_TASK_CLAIMED', 'AnnotationTask', fallback.id);
   return taskPayload(fallback.id, user.id);
 }
 
+export async function annotationClaimAvailability(user: SessionUser): Promise<AnnotationClaimAvailability> {
+  const now = new Date();
+  const access = await annotationCampaignAccess(user.id);
+  const [candidates, handled] = await Promise.all([
+    availableAnnotationCandidates(now, access.allowedCampaignIds),
+    annotationExposure(user.id),
+  ]);
+  const handledPairs = new Set(handled.map((item) => `${item.campaignId}:${item.sampleId}`));
+  const blockedByDoubleBlind = candidates.filter((item) => handledPairs.has(`${item.campaignId}:${item.sampleId}`)).length;
+  const eligibleForUser = candidates.length - blockedByDoubleBlind;
+  return {
+    reason: claimUnavailableReason({ activeCampaigns: access.activeCampaigns, assignedCampaigns: access.assignedCampaigns, remainingGlobal: candidates.length, blockedByDoubleBlind }),
+    remainingGlobal: candidates.length,
+    eligibleForUser,
+    blockedByDoubleBlind,
+  };
+}
+
+export async function claimAnnotationTaskWithStatus(user: SessionUser) {
+  const task = await claimAnnotationTask(user);
+  if (task) return { task, availability: null };
+  return { task: null, availability: await annotationClaimAvailability(user) };
+}
+
 export async function saveTaskDraft(taskId: string, input: RevisionInput, user: SessionUser) {
   const task = await db.annotationTask.findUnique({ where: { id: taskId } });
   if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS') throw new Error('任务不可编辑');
+  const normalized = normalizeLegacyEmptyStage2Schemas(input);
   await db.annotationTask.update({
     where: { id: taskId },
-    data: { draftJson: JSON.stringify(input), leaseExpiresAt: new Date(Date.now() + LEASE_MS) },
+    data: { draftJson: JSON.stringify(normalized.input), leaseExpiresAt: new Date(Date.now() + LEASE_MS) },
   });
+  if (normalized.removedMessageIndexes.length > 0) {
+    await audit(user.id, 'EMPTY_STAGE2_SCHEMA_NORMALIZED', 'AnnotationTask', taskId, { messageIndexes: normalized.removedMessageIndexes });
+  }
 }
 
 export async function submitAnnotationTask(taskId: string, input: RevisionInput, user: SessionUser) {
   const task = await db.annotationTask.findUnique({ where: { id: taskId }, include: { sample: true } });
   if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS') throw new Error('任务不可提交');
+  const normalizedInput = normalizeLegacyEmptyStage2Schemas(input).input;
   const original = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
-  const revised = applyRevision(original, input);
-  const check = validateShareGPTRecord(revised);
+  assertRevisionIntent(original, normalizedInput);
+  const revised = applyRevision(original, normalizedInput);
+  const check = validateShareGPTRecord(revised, 'submit');
   if (check.status === 'error') throw new Error(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；'));
 
   const revision = await db.$transaction(async (tx) => {
@@ -387,36 +553,261 @@ export async function submitAnnotationTask(taskId: string, input: RevisionInput,
         sampleId: task.sampleId,
         authorId: user.id,
         version: (latest?.version ?? 0) + 1,
-        contentJson: JSON.stringify(input.assistantMessages),
+        contentJson: JSON.stringify(normalizedInput.assistantMessages),
         fullRecordJson: JSON.stringify(revised),
-        issueTagsJson: JSON.stringify(input.issueTags),
-        changeReason: input.changeReason,
-        noChange: input.noChange,
+        issueTagsJson: JSON.stringify(normalizedInput.issueTags),
+        changeReason: normalizedInput.changeReason,
+        noChange: normalizedInput.noChange,
         parentRevisionId: latest?.id,
       },
     });
+    await tx.annotationWorkReview.create({ data: { taskId, revisionId: created.id, status: 'PENDING' } });
     await tx.annotationTask.update({ where: { id: taskId }, data: { status: 'SUBMITTED', submittedAt: new Date(), draftJson: '{}', leaseExpiresAt: null } });
-    const siblingTasks = await tx.annotationTask.findMany({ where: { campaignId: task.campaignId, sampleId: task.sampleId } });
-    if (siblingTasks.length > 1 && siblingTasks.every((item) => item.id === task.id || item.status === 'SUBMITTED')) {
-      const revisions = await tx.annotationRevision.findMany({
-        where: { task: { campaignId: task.campaignId, sampleId: task.sampleId } },
-        orderBy: { createdAt: 'asc' },
-      });
-      await tx.reviewCase.upsert({
-        where: { campaignId_sampleId: { campaignId: task.campaignId, sampleId: task.sampleId } },
-        update: { candidateRevisionIdsJson: JSON.stringify(revisions.map((item) => item.id)), status: 'PENDING' },
-        create: {
-          campaignId: task.campaignId,
-          sampleId: task.sampleId,
-          triggerReason: 'MULTI_ANNOTATION',
-          candidateRevisionIdsJson: JSON.stringify(revisions.map((item) => item.id)),
-        },
-      });
-    }
     return created;
   });
   await audit(user.id, 'ANNOTATION_SUBMITTED', 'AnnotationRevision', revision.id, { check });
   return { revision, check };
+}
+
+function revisionDraft(revision: { contentJson: string; issueTagsJson: string; changeReason: string }): RevisionInput {
+  return {
+    assistantMessages: parseJson(revision.contentJson, []),
+    issueTags: parseJson(revision.issueTagsJson, []),
+    changeReason: revision.changeReason,
+    noChange: false,
+  };
+}
+
+async function ensureReviewCaseReady(campaignId: string, sampleId: string) {
+  const tasks = await db.annotationTask.findMany({
+    where: { campaignId, sampleId },
+    orderBy: { slot: 'asc' },
+    include: {
+      revisions: { orderBy: { version: 'desc' }, take: 1, include: { workReview: true } },
+    },
+  });
+  if (tasks.length < 2) return;
+  if (!tasks.every((task) => task.status === 'SUBMITTED' && task.revisions[0]?.workReview?.status === 'APPROVED')) return;
+  const candidateRevisionIds = tasks.map((task) => task.revisions[0].id);
+  const existing = await db.reviewCase.findUnique({ where: { campaignId_sampleId: { campaignId, sampleId } } });
+  if (existing?.status === 'DECIDED' || existing?.status === 'IN_REVIEW') return;
+  await db.reviewCase.upsert({
+    where: { campaignId_sampleId: { campaignId, sampleId } },
+    update: { candidateRevisionIdsJson: JSON.stringify(candidateRevisionIds), status: 'PENDING', assignedReviewerId: null, assignedAt: null, decidedAt: null },
+    create: { campaignId, sampleId, triggerReason: 'MULTI_ANNOTATION', candidateRevisionIdsJson: JSON.stringify(candidateRevisionIds) },
+  });
+}
+
+export async function reviewAnnotationWork(input: {
+  reviewId: string;
+  status: Exclude<WorkReviewStatus, 'PENDING'>;
+  note?: string;
+  user: SessionUser;
+}) {
+  if (!isAdmin(input.user.role)) throw new Error('仅管理员可以审核工作量');
+  const note = input.note?.trim() ?? '';
+  if (input.status !== 'APPROVED' && !note) throw new Error('退回或判定无效时必须填写说明');
+  const review = await db.annotationWorkReview.findUnique({
+    where: { id: input.reviewId },
+    include: {
+      revision: true,
+      task: { include: { revisions: { orderBy: { version: 'desc' }, take: 1 } } },
+    },
+  });
+  if (!review || review.status !== 'PENDING') throw new Error('该提交已审核或不存在');
+  if (review.task.revisions[0]?.id !== review.revisionId) throw new Error('该提交已被更新，请审核最新版本');
+  const reviewCase = await db.reviewCase.findUnique({
+    where: { campaignId_sampleId: { campaignId: review.task.campaignId, sampleId: review.task.sampleId } },
+  });
+  if (input.status !== 'APPROVED' && reviewCase && ['IN_REVIEW', 'DECIDED'].includes(reviewCase.status)) {
+    throw new Error('该样本已进入或完成数据仲裁，不能再退回工作量');
+  }
+
+  if (input.status === 'APPROVED') {
+    const duplicate = await db.annotationWorkReview.count({
+      where: {
+        id: { not: review.id },
+        taskId: review.taskId,
+        status: 'APPROVED',
+        revision: { authorId: review.revision.authorId },
+      },
+    });
+    if (duplicate > 0) throw new Error('该参与者在此任务已有一条通过记录，不能重复计数');
+    await db.annotationWorkReview.update({
+      where: { id: review.id },
+      data: { status: 'APPROVED', note, reviewerId: input.user.id, reviewedAt: new Date() },
+    });
+    await ensureReviewCaseReady(review.task.campaignId, review.task.sampleId);
+  } else {
+    const nextTaskData = input.status === 'RETURNED'
+      ? {
+          status: 'RETURNED',
+          draftJson: JSON.stringify({ ...revisionDraft(review.revision), changeReason: `${review.revision.changeReason}\n工作量审核退回：${note}`.trim() }),
+          leaseExpiresAt: null,
+          submittedAt: null,
+        }
+      : { status: 'PENDING', assignedToId: null, draftJson: '{}', leaseExpiresAt: null, submittedAt: null };
+    await db.$transaction(async (tx) => {
+      await tx.annotationWorkReview.update({
+        where: { id: review.id },
+        data: { status: input.status, note, reviewerId: input.user.id, reviewedAt: new Date() },
+      });
+      await tx.annotationTask.update({ where: { id: review.taskId }, data: nextTaskData });
+      if (reviewCase?.status === 'PENDING') await tx.reviewCase.delete({ where: { id: reviewCase.id } });
+    });
+  }
+  await audit(input.user.id, 'ANNOTATION_WORK_REVIEWED', 'AnnotationWorkReview', review.id, { status: input.status, note });
+  return { ok: true };
+}
+
+async function currentWorkReviewRows() {
+  const rows = await db.annotationWorkReview.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      reviewer: { select: { displayName: true } },
+      revision: { include: { author: { select: { id: true, username: true, displayName: true, role: true } } } },
+      task: { include: { campaign: { select: { id: true, name: true } }, sample: { select: { sourceRecordId: true, phase: true, scenario: true } } } },
+    },
+  });
+  const latest = new Map<string, (typeof rows)[number]>();
+  for (const row of rows) {
+    const key = `${row.taskId}:${row.revision.authorId}`;
+    if (!latest.has(key)) latest.set(key, row);
+  }
+  return [...latest.values()];
+}
+
+export async function workloadDashboard() {
+  const [rows, annotators, assignedTasks] = await Promise.all([
+    currentWorkReviewRows(),
+    db.user.findMany({ where: { role: 'annotator', isActive: true }, orderBy: { displayName: 'asc' }, select: { id: true, username: true, displayName: true, role: true } }),
+    db.annotationTask.findMany({ where: { assignedToId: { not: null } }, select: { assignedToId: true, status: true } }),
+  ]);
+  const people = new Map<string, { id: string; username: string; displayName: string; role: string; assigned: number; inProgress: number; pending: number; approved: number; returned: number; invalid: number }>();
+  const ensurePerson = (person: { id: string; username: string; displayName: string; role: string }) => {
+    if (!people.has(person.id)) people.set(person.id, { ...person, assigned: 0, inProgress: 0, pending: 0, approved: 0, returned: 0, invalid: 0 });
+    return people.get(person.id)!;
+  };
+  for (const annotator of annotators) ensurePerson(annotator);
+  for (const task of assignedTasks) {
+    if (!task.assignedToId || !people.has(task.assignedToId)) continue;
+    const person = people.get(task.assignedToId)!;
+    person.assigned++;
+    if (['IN_PROGRESS', 'RETURNED'].includes(task.status)) person.inProgress++;
+  }
+  for (const row of rows) {
+    const person = ensurePerson(row.revision.author);
+    if (row.status === 'PENDING') person.pending++;
+    if (row.status === 'APPROVED') person.approved++;
+    if (row.status === 'RETURNED') person.returned++;
+    if (row.status === 'INVALID') person.invalid++;
+  }
+  const items = rows.slice(0, 300).map((row) => {
+    const record = parseJson<ShareGPTRecord>(row.revision.fullRecordJson, {} as ShareGPTRecord);
+    const preview = record.conversations.filter((message) => message.from === 'gpt').slice(0, 4).map((message) => parseAssistantResponse(message.value)?.dialogue ?? message.value);
+    return {
+      id: row.id,
+      taskId: row.taskId,
+      revisionId: row.revisionId,
+      participant: row.revision.author,
+      campaign: row.task.campaign,
+      phase: row.task.sample.phase,
+      scenario: row.task.sample.scenario,
+      sourceRecordId: row.task.sample.sourceRecordId,
+      submittedAt: row.revision.createdAt.toISOString(),
+      status: row.status as WorkReviewStatus,
+      note: row.note,
+      reviewer: row.reviewer,
+      preview,
+    };
+  });
+  return {
+    totals: {
+      pending: rows.filter((row) => row.status === 'PENDING').length,
+      approved: rows.filter((row) => row.status === 'APPROVED').length,
+      returned: rows.filter((row) => row.status === 'RETURNED').length,
+      invalid: rows.filter((row) => row.status === 'INVALID').length,
+    },
+    people: [...people.values()].sort((a, b) => b.approved - a.approved || a.displayName.localeCompare(b.displayName, 'zh-CN')),
+    items,
+  };
+}
+
+function csvCell(value: unknown) {
+  const text = String(value ?? '');
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+export async function workloadCsv() {
+  const rows = await currentWorkReviewRows();
+  const lines = [
+    ['参与者账号', '参与者姓名', '活动', '任务ID', '样本ID', '阶段', '场景', '提交版本', '提交时间', '工作量状态', '审核人', '审核时间', '审核说明'],
+    ...rows.map((row) => [
+      row.revision.author.username,
+      row.revision.author.displayName,
+      row.task.campaign.name,
+      row.taskId,
+      row.task.sample.sourceRecordId,
+      row.task.sample.phase,
+      row.task.sample.scenario,
+      row.revision.version,
+      row.revision.createdAt.toISOString(),
+      row.status,
+      row.reviewer?.displayName ?? '',
+      row.reviewedAt?.toISOString() ?? '',
+      row.note,
+    ]),
+  ];
+  return `\uFEFF${lines.map((line) => line.map(csvCell).join(',')).join('\r\n')}`;
+}
+
+export async function listExpiredAnnotationTasks() {
+  const now = new Date();
+  const tasks = await db.annotationTask.findMany({
+    where: { status: 'IN_PROGRESS', leaseExpiresAt: { lt: now } },
+    orderBy: { leaseExpiresAt: 'asc' },
+    include: {
+      assignedTo: { select: { displayName: true, username: true } },
+      sample: { select: { phase: true, scenario: true, sourceRecordId: true } },
+      campaign: { select: { name: true } },
+    },
+    take: 100,
+  });
+  return tasks.map((task) => ({
+    id: task.id,
+    campaignName: task.campaign.name,
+    phase: task.sample.phase,
+    scenario: task.sample.scenario,
+    sourceRecordId: task.sample.sourceRecordId,
+    assignedTo: task.assignedTo,
+    leaseExpiresAt: task.leaseExpiresAt?.toISOString() ?? null,
+    hasDraft: hasMeaningfulDraft(task.draftJson),
+  }));
+}
+
+export async function releaseExpiredAnnotationTask(taskId: string, user: SessionUser) {
+  if (!isAdmin(user.role)) throw new Error('仅管理员可以释放过期任务');
+  const now = new Date();
+  const task = await db.annotationTask.findUnique({ where: { id: taskId } });
+  if (!task || task.status !== 'IN_PROGRESS' || !task.leaseExpiresAt || task.leaseExpiresAt >= now) {
+    throw new Error('任务不存在或租约尚未过期');
+  }
+  await db.$transaction([
+    db.annotationTask.update({
+      where: { id: taskId },
+      data: { status: 'PENDING', assignedToId: null, draftJson: '{}', leaseExpiresAt: null, submittedAt: null },
+    }),
+    db.dataLabAuditLog.create({
+      data: {
+        actorId: user.id,
+        action: 'ANNOTATION_TASK_RELEASED',
+        entityType: 'AnnotationTask',
+        entityId: taskId,
+        payloadJson: JSON.stringify({ previousAssigneeId: task.assignedToId, discardedDraft: hasMeaningfulDraft(task.draftJson) }),
+      },
+    }),
+  ]);
+  return { ok: true };
 }
 
 export async function myTasks(userId: string) {
@@ -434,6 +825,11 @@ export async function claimReviewCase(user: SessionUser) {
   const pendingCases = await db.reviewCase.findMany({ where: { status: 'PENDING' }, orderBy: { createdAt: 'asc' }, take: 100 });
   let candidate: (typeof pendingCases)[number] | undefined;
   for (const item of pendingCases) {
+    const candidateIds = parseJson<string[]>(item.candidateRevisionIdsJson, []);
+    const approvedCount = candidateIds.length > 0
+      ? await db.annotationWorkReview.count({ where: { revisionId: { in: candidateIds }, status: 'APPROVED' } })
+      : 0;
+    if (approvedCount !== candidateIds.length) continue;
     const authored = await db.annotationRevision.count({ where: { sampleId: item.sampleId, authorId: user.id, task: { campaignId: item.campaignId } } });
     if (authored === 0) { candidate = item; break; }
   }
@@ -505,6 +901,12 @@ export async function decideReview(input: {
           where: { id: task.id },
           data: { status: 'RETURNED', draftJson: JSON.stringify(draft ?? {}), leaseExpiresAt: null, submittedAt: null },
         });
+        if (latest) {
+          await tx.annotationWorkReview.updateMany({
+            where: { revisionId: latest.id, status: { in: ['PENDING', 'APPROVED'] } },
+            data: { status: 'RETURNED', note: `数据仲裁退回：${input.reason}`.trim(), reviewerId: input.user.id, reviewedAt: new Date() },
+          });
+        }
       }
       await tx.reviewCase.update({
         where: { id: reviewCase.id },
@@ -520,7 +922,7 @@ export async function decideReview(input: {
     if (!input.mergedInput) throw new Error('合并决策必须提交 mergedInput');
     const original = parseJson<ShareGPTRecord>(reviewCase.sample.originalRecordJson, {} as ShareGPTRecord);
     const mergedRecord = applyRevision(original, input.mergedInput);
-    const check = validateShareGPTRecord(mergedRecord);
+    const check = validateShareGPTRecord(mergedRecord, 'submit');
     if (check.status === 'error') throw new Error('合并版本未通过自动检查');
     const syntheticTask = await db.annotationTask.findFirst({ where: { campaignId: reviewCase.campaignId, sampleId: reviewCase.sampleId }, orderBy: { slot: 'asc' } });
     if (!syntheticTask) throw new Error('缺少关联标注任务');
@@ -538,6 +940,15 @@ export async function decideReview(input: {
       },
     });
     mergedRevisionId = revision.id;
+  }
+
+  if (input.action === 'SELECT' && input.selectedRevisionId) {
+    const selected = await db.annotationRevision.findUnique({ where: { id: input.selectedRevisionId } });
+    if (!selected) throw new Error('所选 revision 不存在');
+    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(selected.fullRecordJson, {} as ShareGPTRecord), 'release');
+    if (check.status === 'error') {
+      throw new Error(`所选版本未通过结构契约：${check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；')}`);
+    }
   }
 
   const decision = await db.$transaction(async (tx) => {
@@ -586,10 +997,11 @@ export async function createDatasetRelease(input: {
 async function releaseCandidates(campaignId: string) {
   const decisions = await db.reviewDecision.findMany({
     where: { reviewCase: { campaignId }, finalTier: { in: ['human_gold', 'reviewed_silver'] } },
-    include: { reviewCase: true, selectedRevision: true, mergedRevision: true },
+    include: { reviewCase: true, selectedRevision: { include: { workReview: true } }, mergedRevision: true },
   });
   const result = new Map<string, { sampleId: string; revisionId: string; tier: string; recordJson: string; reason: string }>();
   for (const decision of decisions) {
+    if (decision.selectedRevision && decision.selectedRevision.workReview?.status !== 'APPROVED') continue;
     const revision = decision.mergedRevision ?? decision.selectedRevision;
     if (!revision) continue;
     result.set(decision.reviewCase.sampleId, {
@@ -603,7 +1015,7 @@ async function releaseCandidates(campaignId: string) {
 
   const singleTasks = await db.annotationTask.findMany({
     where: { campaignId, status: 'SUBMITTED' },
-    include: { sample: true, revisions: { orderBy: { version: 'desc' }, take: 1 }, campaign: true },
+    include: { sample: true, revisions: { orderBy: { version: 'desc' }, take: 1, include: { workReview: true } }, campaign: true },
   });
   const grouped = new Map<string, typeof singleTasks>();
   for (const task of singleTasks) {
@@ -613,7 +1025,7 @@ async function releaseCandidates(campaignId: string) {
   for (const [sampleId, tasks] of grouped) {
     if (result.has(sampleId) || tasks.length !== 1 || tasks[0].sample.candidateTier === 'gold_candidate') continue;
     const revision = tasks[0].revisions[0];
-    if (!revision) continue;
+    if (!revision || revision.workReview?.status !== 'APPROVED') continue;
     result.set(sampleId, {
       sampleId,
       revisionId: revision.id,
@@ -638,6 +1050,15 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
   const candidates = await releaseCandidates(release.campaignId);
   const selected = candidates.filter((item) => item.tier === 'human_gold' ? recipe.includeHumanGold : recipe.includeReviewedSilver);
   if (selected.length === 0) throw new Error('没有符合发布条件的人工审定样本');
+  const invalid = selected.flatMap((item) => {
+    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord), 'release');
+    return check.issues
+      .filter((checkIssue) => checkIssue.severity === 'error')
+      .map((checkIssue) => `${item.sampleId}: ${checkIssue.message}`);
+  });
+  if (invalid.length > 0) {
+    throw new Error(`发布集中有 ${invalid.length} 个结构契约错误：${invalid.slice(0, 5).join('；')}`);
+  }
   const gold = selected.filter((item) => item.tier === 'human_gold').map((item) => parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord));
   const silver = selected.filter((item) => item.tier === 'reviewed_silver').map((item) => parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord));
   const clean = [...gold, ...silver];
@@ -803,20 +1224,159 @@ export async function evaluationDetail(id: string) {
 }
 
 export async function listDataLabUsers() {
-  return db.user.findMany({ where: { role: { in: DATA_LAB_ROLES } }, orderBy: { createdAt: 'asc' }, select: { id: true, username: true, displayName: true, role: true, createdAt: true } });
+  const [users, activeTasks, activeReviews, approvedWork] = await Promise.all([
+    db.user.findMany({
+      where: { role: { in: DATA_LAB_ROLES } },
+      orderBy: [{ isActive: 'desc' }, { createdAt: 'asc' }],
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        role: true,
+        isActive: true,
+        disabledAt: true,
+        disabledReason: true,
+        lastLoginAt: true,
+        createdAt: true,
+        _count: {
+          select: {
+            ownedClasses: true,
+            classMemberships: true,
+            studentAssignments: true,
+            conversations: true,
+            importedDatasetBatches: true,
+            createdCampaigns: true,
+            campaignParticipations: true,
+            annotationTasks: true,
+            annotationRevisions: true,
+            completedWorkReviews: true,
+            assignedReviewCases: true,
+            reviewDecisions: true,
+            createdDatasetReleases: true,
+            createdTrainingRuns: true,
+            createdEvaluationRuns: true,
+            dataLabAuditLogs: true,
+          },
+        },
+      },
+    }),
+    db.annotationTask.groupBy({ by: ['assignedToId'], where: { assignedToId: { not: null }, status: { in: ['IN_PROGRESS', 'RETURNED'] } }, _count: { _all: true } }),
+    db.reviewCase.groupBy({ by: ['assignedReviewerId'], where: { assignedReviewerId: { not: null }, status: 'IN_REVIEW' }, _count: { _all: true } }),
+    db.annotationWorkReview.findMany({ where: { status: 'APPROVED' }, select: { revision: { select: { authorId: true } } } }),
+  ]);
+  const taskCounts = new Map(activeTasks.map((item) => [item.assignedToId, item._count._all]));
+  const reviewCounts = new Map(activeReviews.map((item) => [item.assignedReviewerId, item._count._all]));
+  const workCounts = new Map<string, number>();
+  for (const item of approvedWork) workCounts.set(item.revision.authorId, (workCounts.get(item.revision.authorId) ?? 0) + 1);
+  return users.map(({ _count, ...user }) => ({
+    ...user,
+    activeTaskCount: taskCounts.get(user.id) ?? 0,
+    activeReviewCount: reviewCounts.get(user.id) ?? 0,
+    effectiveWorkCount: workCounts.get(user.id) ?? 0,
+    canDelete: Object.values(_count).every((count) => count === 0),
+  }));
+}
+
+async function assertLastActiveAdmin(target: { id: string; role: string; isActive: boolean }, actor: SessionUser, next: { role?: UserRole; isActive?: boolean }) {
+  if (target.id === actor.id && (next.isActive === false || (next.role && next.role !== 'admin'))) {
+    throw new Error('管理员不能停用自己或移除自己的管理员权限');
+  }
+  const removesAdmin = target.role === 'admin' && target.isActive && (next.isActive === false || (next.role && next.role !== 'admin'));
+  if (removesAdmin && await db.user.count({ where: { role: 'admin', isActive: true } }) <= 1) {
+    throw new Error('必须至少保留一个启用中的管理员');
+  }
+}
+
+async function activeAccountWork(targetUserId: string) {
+  const [tasks, reviews] = await Promise.all([
+    db.annotationTask.count({ where: { assignedToId: targetUserId, status: { in: ['IN_PROGRESS', 'RETURNED'] } } }),
+    db.reviewCase.count({ where: { assignedReviewerId: targetUserId, status: 'IN_REVIEW' } }),
+  ]);
+  return { tasks, reviews };
+}
+
+export async function updateDataLabUser(input: { targetUserId: string; username: string; displayName: string; role: UserRole; actor: SessionUser }) {
+  if (!isAdmin(input.actor.role)) throw new Error('仅管理员可以编辑后台账号');
+  if (!DATA_LAB_ROLES.includes(input.role)) throw new Error('后台账号角色无效');
+  const username = input.username.trim();
+  const displayName = input.displayName.trim();
+  if (!/^[A-Za-z0-9._-]{3,32}$/.test(username)) throw new Error('用户名需为 3-32 位字母、数字、点、下划线或短横线');
+  if (!displayName || displayName.length > 50) throw new Error('显示名称需为 1-50 个字符');
+  const target = await db.user.findUnique({ where: { id: input.targetUserId } });
+  if (!target || !DATA_LAB_ROLES.includes(target.role as UserRole)) throw new Error('后台账号不存在');
+  const duplicate = await db.user.findFirst({ where: { username, id: { not: target.id } }, select: { id: true } });
+  if (duplicate) throw new Error('该用户名已被使用');
+  if (target.role !== input.role) {
+    await assertLastActiveAdmin(target, input.actor, { role: input.role });
+    const active = await activeAccountWork(target.id);
+    if (active.tasks > 0 || active.reviews > 0) throw new Error(`该账户仍有 ${active.tasks} 条进行中标注和 ${active.reviews} 条进行中仲裁，请先处理后再修改角色`);
+  }
+  const user = await db.user.update({ where: { id: target.id }, data: { username, displayName, role: input.role } });
+  await audit(input.actor.id, 'DATA_LAB_USER_UPDATED', 'User', target.id, {
+    before: { username: target.username, displayName: target.displayName, role: target.role },
+    after: { username, displayName, role: input.role },
+  });
+  return user;
 }
 
 export async function updateUserRole(targetUserId: string, role: UserRole, actor: SessionUser) {
-  if (!DATA_LAB_ROLES.includes(role) && role !== 'student' && role !== 'teacher') throw new Error('角色无效');
-  if (targetUserId === actor.id && role !== 'admin') throw new Error('管理员不能移除自己的 admin 权限');
-  const user = await db.user.update({ where: { id: targetUserId }, data: { role } });
-  await audit(actor.id, 'USER_ROLE_UPDATED', 'User', targetUserId, { role });
-  return user;
+  const target = await db.user.findUnique({ where: { id: targetUserId } });
+  if (!target) throw new Error('后台账号不存在');
+  return updateDataLabUser({ targetUserId, username: target.username, displayName: target.displayName, role, actor });
+}
+
+export async function resetDataLabUserPassword(input: { targetUserId: string; passwordHash: string; actor: SessionUser }) {
+  if (!isAdmin(input.actor.role)) throw new Error('仅管理员可以重置密码');
+  const target = await db.user.findUnique({ where: { id: input.targetUserId }, select: { id: true } });
+  if (!target) throw new Error('后台账号不存在');
+  await db.user.update({ where: { id: target.id }, data: { passwordHash: input.passwordHash, sessionVersion: { increment: 1 } } });
+  await audit(input.actor.id, 'DATA_LAB_USER_PASSWORD_RESET', 'User', target.id);
+  return { ok: true };
+}
+
+export async function setDataLabUserActive(input: { targetUserId: string; isActive: boolean; reason?: string; actor: SessionUser }) {
+  if (!isAdmin(input.actor.role)) throw new Error('仅管理员可以调整账户状态');
+  const target = await db.user.findUnique({ where: { id: input.targetUserId } });
+  if (!target || !DATA_LAB_ROLES.includes(target.role as UserRole)) throw new Error('后台账号不存在');
+  if (target.isActive === input.isActive) return { ok: true };
+  if (!input.isActive) {
+    await assertLastActiveAdmin(target, input.actor, { isActive: false });
+    const active = await activeAccountWork(target.id);
+    if (active.tasks > 0 || active.reviews > 0) throw new Error(`该账户仍有 ${active.tasks} 条进行中标注和 ${active.reviews} 条进行中仲裁，请先处理后再停用`);
+  }
+  const reason = input.reason?.trim() ?? '';
+  await db.$transaction([
+    db.user.update({
+      where: { id: target.id },
+      data: input.isActive
+        ? { isActive: true, disabledAt: null, disabledReason: '', sessionVersion: { increment: 1 } }
+        : { isActive: false, disabledAt: new Date(), disabledReason: reason, sessionVersion: { increment: 1 } },
+    }),
+    ...(!input.isActive ? [db.campaignParticipant.updateMany({ where: { userId: target.id, active: true }, data: { active: false } })] : []),
+  ]);
+  await audit(input.actor.id, input.isActive ? 'DATA_LAB_USER_ENABLED' : 'DATA_LAB_USER_DISABLED', 'User', target.id, { reason });
+  return { ok: true };
+}
+
+export async function deleteUnusedDataLabUser(targetUserId: string, actor: SessionUser) {
+  if (!isAdmin(actor.role)) throw new Error('仅管理员可以删除后台账号');
+  if (targetUserId === actor.id) throw new Error('管理员不能删除自己');
+  const listed = (await listDataLabUsers()).find((item) => item.id === targetUserId);
+  if (!listed) throw new Error('后台账号不存在');
+  await assertLastActiveAdmin(listed, actor, { isActive: false });
+  if (!listed.canDelete) throw new Error('该账户已有业务或审计记录，只能停用，不能永久删除');
+  await db.user.delete({ where: { id: targetUserId } });
+  await audit(actor.id, 'UNUSED_DATA_LAB_USER_DELETED', 'User', targetUserId, { username: listed.username, displayName: listed.displayName });
+  return { ok: true };
 }
 
 export async function createDataLabUser(input: { username: string; passwordHash: string; displayName: string; role: UserRole; actor: SessionUser }) {
   if (!DATA_LAB_ROLES.includes(input.role)) throw new Error('只能创建 Data Lab 后台角色');
-  const user = await db.user.create({ data: { username: input.username, passwordHash: input.passwordHash, displayName: input.displayName, role: input.role } });
+  const username = input.username.trim();
+  const displayName = input.displayName.trim();
+  if (!/^[A-Za-z0-9._-]{3,32}$/.test(username)) throw new Error('用户名需为 3-32 位字母、数字、点、下划线或短横线');
+  if (!displayName || displayName.length > 50) throw new Error('显示名称需为 1-50 个字符');
+  const user = await db.user.create({ data: { username, passwordHash: input.passwordHash, displayName, role: input.role } });
   await audit(input.actor.id, 'DATA_LAB_USER_CREATED', 'User', user.id, { role: input.role });
   return user;
 }

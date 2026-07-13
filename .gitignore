@@ -51,6 +51,10 @@ next-env.d.ts
 /public/uploads/*
 !/public/uploads/.gitkeep
 
+# local operational backups
+/backups/
+/logs/
+
 # local source captures and incomplete external downloads
 /basic.smartedu.cn.har
 /aTrustInstaller_amd64.rpm

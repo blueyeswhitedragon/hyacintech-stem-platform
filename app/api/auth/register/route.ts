@@ -43,8 +43,8 @@ export async function POST(request: Request) {
 
   // 注册成功即登录
   const session = await getSession();
-  session.user = { id: user.id, username: user.username, role, displayName: user.displayName };
+  session.user = { id: user.id, username: user.username, role, displayName: user.displayName, sessionVersion: user.sessionVersion };
   await session.save();
 
-  return NextResponse.json({ user: session.user }, { status: 201 });
+  return NextResponse.json({ user: { id: user.id, username: user.username, role, displayName: user.displayName } }, { status: 201 });
 }

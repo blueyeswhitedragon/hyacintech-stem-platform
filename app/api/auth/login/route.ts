@@ -21,22 +21,24 @@ export async function POST(request: Request) {
 
   const user = await db.user.findUnique({ where: { username } });
   // 用户不存在 / 密码错误 返回同样的 401，避免泄露用户名是否存在
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+  if (!user || !user.isActive || !(await bcrypt.compare(password, user.passwordHash))) {
     return NextResponse.json({ error: '用户名或密码错误' }, { status: 401 });
   }
 
-  const session = await getSession();
   if (!isUserRole(user.role)) {
     return NextResponse.json({ error: '账号角色无效，请联系管理员' }, { status: 403 });
   }
+  await db.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+  const session = await getSession();
 
   session.user = {
     id: user.id,
     username: user.username,
     role: user.role,
     displayName: user.displayName,
+    sessionVersion: user.sessionVersion,
   };
   await session.save();
 
-  return NextResponse.json({ user: session.user });
+  return NextResponse.json({ user: { id: user.id, username: user.username, role: user.role, displayName: user.displayName } });
 }

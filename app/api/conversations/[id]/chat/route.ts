@@ -77,7 +77,10 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       context = { ...(context ?? {}), nudgeConverge: true };
     }
     const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
-    const response = await callLLM(systemPrompt, message, conv.messages);
+    const response = await callLLM(systemPrompt, message, conv.messages, {
+      stage,
+      hasStage2Schema: (conv.stageData.stage2?.schema.columns.length ?? 0) > 0,
+    });
 
     // 结构化提取（纯函数）
     const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData);

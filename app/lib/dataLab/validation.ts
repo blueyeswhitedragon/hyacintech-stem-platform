@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import type { ChatResponse } from '@/app/models/types';
 import { safeParseChatResponse } from '@/app/lib/llm/parser';
+import { claimsStage2ArtifactReady, hasResponseStage2Schema, validateChatContract } from '@/app/lib/llm/chatContract';
 import { evaluateShareGPTRecordSemantic } from '@/scripts/semantic-guardrails';
 import type {
   AutoCheckIssue,
@@ -10,6 +11,7 @@ import type {
 } from './types';
 
 export const MAX_IMPORT_BYTES = 10 * 1024 * 1024;
+export type ValidationMode = 'import' | 'submit' | 'release';
 
 export function sha256(value: string | Buffer): string {
   return createHash('sha256').update(value).digest('hex');
@@ -63,8 +65,10 @@ function hasNotesColumn(response: ChatResponse): boolean {
   return !!response.data_table_schema?.columns.some((column) => column.key === 'notes' && column.type === 'text');
 }
 
-export function validateShareGPTRecord(record: ShareGPTRecord): AutoCheckResult {
+export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationMode = 'import'): AutoCheckResult {
   const issues: AutoCheckIssue[] = [];
+  const strict = mode !== 'import';
+  let hasPriorStage2Schema = false;
   if (!record.id?.trim()) issues.push(issue('ID_MISSING', '缺少记录 ID'));
   if (!record.scenario?.trim()) issues.push(issue('SCENARIO_MISSING', '缺少场景名称'));
   if (!Number.isInteger(record.phase) || record.phase < 1 || record.phase > 6) issues.push(issue('PHASE_INVALID', '阶段必须为 1-6'));
@@ -81,7 +85,23 @@ export function validateShareGPTRecord(record: ShareGPTRecord): AutoCheckResult 
     if (!message.value?.trim()) issues.push(issue('MESSAGE_EMPTY', `消息 ${index} 为空`));
     if (message.from !== 'gpt') continue;
     try {
+      let rawResponse: Record<string, unknown> = {};
+      try {
+        const parsed = JSON.parse(message.value) as unknown;
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) rawResponse = parsed as Record<string, unknown>;
+      } catch {
+        // parseAssistantResponse 会生成统一的可读错误。
+      }
       const response = parseAssistantResponse(message.value);
+      const rawAction = rawResponse.next_action_type;
+      if (typeof rawAction !== 'string' || !['ask_choice', 'text_input', 'confirmation', 'info'].includes(rawAction)) {
+        issues.push(issue(
+          'ACTION_TYPE_INVALID',
+          `导师消息 ${index} 的原始 next_action_type 无效：${String(rawAction ?? '缺失')}`,
+          undefined,
+          strict ? 'error' : 'warning'
+        ));
+      }
       if ((response.options?.length ?? 0) > 0 && response.next_action_type !== 'ask_choice') {
         issues.push(issue('OPTIONS_ACTION_MISMATCH', `导师消息 ${index} 的 options 与动作类型不一致`));
       }
@@ -90,10 +110,27 @@ export function validateShareGPTRecord(record: ShareGPTRecord): AutoCheckResult 
           issues.push(issue('PHASE1_CONFIRMATION_INCOMPLETE', `导师消息 ${index} 缺少阶段1确认结构`));
         }
       }
-      if (record.phase === 2 && response.phase_complete) {
-        if (!response.data_table_schema || !hasNotesColumn(response) || response.data_table_schema.maxRows !== 200) {
-          issues.push(issue('PHASE2_SCHEMA_INVALID', `导师消息 ${index} 缺少合法数据表 schema`));
+      if (record.phase === 2) {
+        const rawHasSchema = Object.prototype.hasOwnProperty.call(rawResponse, 'data_table_schema');
+        if (rawHasSchema && !response.data_table_schema) {
+          issues.push(issue('PHASE2_SCHEMA_MALFORMED', `导师消息 ${index} 的 data_table_schema 为空或格式错误`));
         }
+        const contract = validateChatContract(response, {
+          stage: 2,
+          hasStage2Schema: hasPriorStage2Schema,
+        });
+        for (const contractIssue of contract.issues) {
+          issues.push(issue(
+            contractIssue.code,
+            `导师消息 ${index}：${contractIssue.message}`,
+            response.dialogue,
+            contractIssue.code === 'P2_SCHEMA_ACTION_MISMATCH' && !strict ? 'warning' : 'error'
+          ));
+        }
+        if (response.data_table_schema && (!hasNotesColumn(response) || response.data_table_schema.maxRows !== 200)) {
+          issues.push(issue('PHASE2_SCHEMA_INVALID', `导师消息 ${index} 的数据表必须含 notes 文本列且 maxRows 为 200`));
+        }
+        if (hasResponseStage2Schema(response)) hasPriorStage2Schema = true;
       }
       if (record.phase === 5) {
         const sections = response.report_sections;
@@ -143,6 +180,49 @@ export function applyRevision(record: ShareGPTRecord, input: RevisionInput): Sha
       return { from: 'gpt', value: JSON.stringify(supplied.get(index)) };
     }),
   };
+}
+
+/**
+ * 兼容旧版标注器产生的“中间轮次空表”。只有回复仍在继续讨论、未声称表格完成时才安全移除；
+ * confirmation、phase_complete 或声称已生成表格的空 schema 必须继续作为结构错误暴露。
+ */
+export function normalizeLegacyEmptyStage2Schemas(input: RevisionInput): {
+  input: RevisionInput;
+  removedMessageIndexes: number[];
+} {
+  const removedMessageIndexes: number[] = [];
+  const assistantMessages = input.assistantMessages.map((item) => {
+    const response = JSON.parse(JSON.stringify(item.response)) as ChatResponse;
+    const schema = response.data_table_schema;
+    const removable = schema
+      && schema.columns.length === 0
+      && response.next_action_type === 'text_input'
+      && response.phase_complete === false
+      && !claimsStage2ArtifactReady(response.dialogue);
+    if (removable) {
+      delete response.data_table_schema;
+      removedMessageIndexes.push(item.messageIndex);
+    }
+    return { ...item, response };
+  });
+  return { input: { ...input, assistantMessages }, removedMessageIndexes };
+}
+
+/** “无需修改”只能用于导师结构化回复逐轮完全不变的提交。 */
+export function assertRevisionIntent(record: ShareGPTRecord, input: RevisionInput): void {
+  if (!input.noChange) return;
+  const original = new Map(
+    record.conversations
+      .map((message, index) => message.from === 'gpt'
+        ? [index, parseAssistantResponse(message.value)] as const
+        : null)
+      .filter((item): item is readonly [number, ChatResponse] => item !== null)
+  );
+  const changed = input.assistantMessages.some((item) => {
+    const source = original.get(item.messageIndex);
+    return !source || JSON.stringify(source) !== JSON.stringify(item.response);
+  });
+  if (changed) throw new Error('已修改导师回复，不能同时勾选“无需修改”');
 }
 
 export function canonicalizeRecord(record: ShareGPTRecord): ShareGPTRecord {

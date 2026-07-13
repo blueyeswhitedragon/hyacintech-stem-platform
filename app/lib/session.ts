@@ -1,7 +1,8 @@
 import 'server-only';
 import { getIronSession, type SessionOptions } from 'iron-session';
 import { cookies } from 'next/headers';
-import type { UserRole } from './roles';
+import { db } from './db';
+import { isUserRole, type UserRole } from './roles';
 
 export type { UserRole } from './roles';
 
@@ -12,8 +13,12 @@ export interface SessionUser {
   displayName: string;
 }
 
+interface SessionIdentity extends SessionUser {
+  sessionVersion: number;
+}
+
 export interface AppSession {
-  user?: SessionUser;
+  user?: SessionIdentity;
 }
 
 export const sessionOptions: SessionOptions = {
@@ -47,5 +52,13 @@ export async function getSession() {
  */
 export async function getCurrentUser(): Promise<SessionUser | null> {
   const session = await getSession();
-  return session.user ?? null;
+  if (!session.user?.id) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, username: true, displayName: true, role: true, isActive: true, sessionVersion: true },
+  });
+  if (!user || !user.isActive || !isUserRole(user.role)) return null;
+  const cookieVersion = typeof session.user.sessionVersion === 'number' ? session.user.sessionVersion : 0;
+  if (cookieVersion !== user.sessionVersion) return null;
+  return { id: user.id, username: user.username, displayName: user.displayName, role: user.role };
 }
