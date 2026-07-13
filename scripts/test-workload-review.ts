@@ -55,6 +55,13 @@ async function main() {
     await reviewAnnotationWork({ reviewId: invalidReview.id, status: 'INVALID', note: '无效测试记录', user: admin });
     const reopened = await db.annotationTask.findUniqueOrThrow({ where: { id: invalidTask.id } });
     check('无效任务重新进入公共队列', reopened.status === 'PENDING' && reopened.assignedToId === null);
+    const selfTask = await db.annotationTask.create({ data: { campaignId: campaign.id, sampleId: sample.id, slot: 3, status: 'SUBMITTED', assignedToId: admin.id, submittedAt: new Date() } });
+    const selfRevision = await db.annotationRevision.create({ data: { taskId: selfTask.id, sampleId: sample.id, authorId: admin.id, version: 1, contentJson: '[]', fullRecordJson: sample.originalRecordJson } });
+    const selfReview = await db.annotationWorkReview.create({ data: { taskId: selfTask.id, revisionId: selfRevision.id } });
+    reviewIds.push(selfReview.id);
+    let selfReviewBlocked = false;
+    try { await reviewAnnotationWork({ reviewId: selfReview.id, status: 'APPROVED', user: admin }); } catch { selfReviewBlocked = true; }
+    check('即使后来拥有管理员身份也不能审核自己的修订', selfReviewBlocked);
     check('活动参与者和条数上限被保存', await db.campaignParticipant.count({ where: { campaignId: campaign.id, userId: annotator.id, taskLimit: 3 } }) === 1);
   } finally {
     await db.dataLabAuditLog.deleteMany({ where: { OR: [{ entityType: 'AnnotationWorkReview', entityId: { in: reviewIds } }, { entityType: 'AnnotationCampaign', entityId: campaign.id }] } });

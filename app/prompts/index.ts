@@ -11,6 +11,12 @@ import phaseFivePrompt from './phase5-results-formation';
 import phaseSixPrompt from './phase6-reflection';
 import { PhaseEnum } from '../models/types';
 import { pickTopicExamples, renderTopicExamples } from '../lib/topicLibrary';
+import {
+  buildStyleInstruction,
+  DEFAULT_STYLE_FAMILY,
+  DEFAULT_STYLE_POLICY_VERSION,
+  type StyleFamily,
+} from '../lib/stylePolicy';
 
 // 创建提示词映射表
 export const promptTemplates = {
@@ -73,6 +79,8 @@ export function checkBlacklistedKeywords(message: string): string | null {
  * 动态上下文：在静态提示词后注入作业/阶段相关数据。
  */
 export interface PromptContext {
+  styleFamily?: StyleFamily;
+  stylePolicyVersion?: string;
   topicDirection?: string; // 阶段1：作业限定的研究方向
   topicExamples?: string; // 阶段1：动态选题案例库（由 topicLibrary 渲染）
   dataRows?: Record<string, unknown>[]; // 阶段4：stage3 收集的数据
@@ -123,6 +131,10 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
   prompt = injectPacingGuidance(prompt);
 
   const ctx = context ?? {};
+  prompt += `\n\n${buildStyleInstruction(
+    ctx.styleFamily ?? DEFAULT_STYLE_FAMILY,
+    ctx.stylePolicyVersion ?? DEFAULT_STYLE_POLICY_VERSION,
+  )}`;
 
   if (ctx.nudgeConverge) {
     prompt += `\n\n【对话节奏提醒——该收敛了】\n本阶段对话轮次已较多。请在本轮尽快收敛：若学生已满足本阶段最低要求，就立即输出阶段完成信号（第一阶段输出 stage1_confirmed 与确认书；第二阶段输出 data_table_schema），不要再提出新的追问。`;

@@ -15,10 +15,19 @@ import {
   type RevisionInput,
   type ShareGPTRecord,
   type StyleQuota,
-  type StyleFamily,
+  TRANSFORMATION_TYPES,
+  type TransformationType,
   type WorkReviewStatus,
 } from './types';
-import { chooseAnnotationCandidate, claimUnavailableReason, hasMeaningfulDraft } from './assignment';
+import { chooseAnnotationCandidate, claimUnavailableReason, hasMeaningfulDraft, styleForSample } from './assignment';
+import { DEFAULT_STYLE_POLICY_VERSION, isStyleFamily, type StyleFamily } from '@/app/lib/stylePolicy';
+import {
+  resolveRecordStyle,
+  summarizeStyles,
+  toTrainingShareGPTRecord,
+  withStyleMetadata,
+  type RecordStyle,
+} from './styleMetadata';
 import {
   applyRevision,
   assertRevisionIntent,
@@ -31,6 +40,14 @@ import {
   sha256,
   validateShareGPTRecord,
 } from './validation';
+import {
+  assertTransformationType,
+  buildPreferenceRecord,
+  computeTransformationMetrics,
+  evaluateTrainingEligibility,
+  TRAINING_POLICY_VERSION,
+} from '@/app/lib/trainingEligibility';
+import { refreshModelDeploymentGate } from '@/app/lib/deployment';
 
 const DATA_LAB_ROLES: UserRole[] = ['annotator', 'reviewer', 'admin'];
 const REVIEW_ROLES: UserRole[] = ['reviewer', 'admin'];
@@ -184,16 +201,6 @@ function doubleReviewSilver(sampleId: string, percent: number): boolean {
   return bucket < percent;
 }
 
-function weightedStyleSequence(quota: StyleQuota): StyleFamily[] {
-  const sequence = STYLE_FAMILIES.flatMap((style) => Array.from({ length: Math.max(0, Math.round(quota[style] ?? 0)) }, () => style));
-  return sequence.length > 0 ? sequence : [...STYLE_FAMILIES];
-}
-
-function styleFor(index: number, slot: number, quota: StyleQuota): StyleFamily {
-  const sequence = weightedStyleSequence(quota);
-  return sequence[(index + slot - 1) % sequence.length];
-}
-
 function stratifiedCampaignSamples<T extends { phase: number; sourceKind: string; familyKey: string }>(samples: T[], limit?: number): T[] {
   if (!limit || limit <= 0 || samples.length <= limit) return samples;
   const queues = new Map<string, T[]>();
@@ -243,6 +250,7 @@ export async function createCampaign(input: {
         name: input.name,
         selectionJson: JSON.stringify(input.selection),
         styleQuotaJson: JSON.stringify(input.styleQuota ?? Object.fromEntries(STYLE_FAMILIES.map((style) => [style, 1]))),
+        stylePolicyVersion: DEFAULT_STYLE_POLICY_VERSION,
         goldSlots: Math.min(3, Math.max(1, input.goldSlots ?? 2)),
         silverDoubleReviewPercent: Math.min(100, Math.max(0, input.silverDoubleReviewPercent ?? 30)),
         maxActivePerAnnotator: Math.max(1, input.maxActivePerAnnotator ?? 1),
@@ -266,7 +274,8 @@ export async function startCampaign(id: string, user: SessionUser) {
   if (campaign.status !== 'DRAFT') throw new Error('只有草稿活动可以启动');
   const selection = parseJson<CampaignSelection>(campaign.selectionJson, {});
   const styles = parseJson<StyleQuota>(campaign.styleQuotaJson, Object.fromEntries(STYLE_FAMILIES.map((style) => [style, 1])) as StyleQuota);
-  const matchedSamples = (await db.datasetSample.findMany({ orderBy: [{ phase: 'asc' }, { sourceRecordId: 'asc' }] }))
+  const matchedSamples = (await db.datasetSample.findMany({ include: { productionCandidate: { select: { status: true } } }, orderBy: [{ phase: 'asc' }, { sourceRecordId: 'asc' }] }))
+    .filter((sample) => !sample.productionCandidate || sample.productionCandidate.status === 'CONVERTED')
     .filter((sample) => selectedByCampaign(sample, selection));
   const samples = stratifiedCampaignSamples(matchedSamples, selection.limit);
   if (samples.length === 0) throw new Error('筛选条件没有匹配样本');
@@ -276,13 +285,15 @@ export async function startCampaign(id: string, user: SessionUser) {
     for (const sample of samples) {
       const gold = sample.candidateTier === 'gold_candidate';
       const slots = gold ? campaign.goldSlots : (doubleReviewSilver(sample.id, campaign.silverDoubleReviewPercent) ? 2 : 1);
+      const styleFamily = styleForSample(styleIndex, styles);
       for (let slot = 1; slot <= slots; slot++) {
         await tx.annotationTask.create({
           data: {
             campaignId: campaign.id,
             sampleId: sample.id,
             slot,
-            styleFamily: styleFor(styleIndex, slot, styles),
+            styleFamily,
+            stylePolicyVersion: campaign.stylePolicyVersion,
           },
         });
       }
@@ -365,9 +376,11 @@ async function taskPayload(taskId: string, userId: string): Promise<AnnotationPa
     taskId: task.id,
     sampleId: task.sampleId,
     sourceRecordId: task.sample.sourceRecordId,
+    sourceKind: task.sample.sourceKind,
     phase: task.sample.phase,
     scenario: task.sample.scenario,
     styleFamily: task.styleFamily as StyleFamily | null,
+    stylePolicyVersion: task.stylePolicyVersion,
     conversations: record.conversations.map((message, index) => ({
       index,
       from: message.from,
@@ -541,7 +554,14 @@ export async function submitAnnotationTask(taskId: string, input: RevisionInput,
   const normalizedInput = normalizeLegacyEmptyStage2Schemas(input).input;
   const original = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
   assertRevisionIntent(original, normalizedInput);
-  const revised = applyRevision(original, normalizedInput);
+  const style = resolveRecordStyle(original, task.styleFamily, task.stylePolicyVersion);
+  const revised = withStyleMetadata(applyRevision(original, normalizedInput), style);
+  const transformationType: TransformationType = normalizedInput.transformationType
+    && TRANSFORMATION_TYPES.includes(normalizedInput.transformationType)
+      ? normalizedInput.transformationType
+      : normalizedInput.noChange ? 'NO_CHANGE' : 'LIGHT_EDIT';
+  const transformationMetrics = computeTransformationMetrics(original, revised);
+  assertTransformationType(transformationType, transformationMetrics);
   const check = validateShareGPTRecord(revised, 'submit');
   if (check.status === 'error') throw new Error(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；'));
 
@@ -558,6 +578,10 @@ export async function submitAnnotationTask(taskId: string, input: RevisionInput,
         issueTagsJson: JSON.stringify(normalizedInput.issueTags),
         changeReason: normalizedInput.changeReason,
         noChange: normalizedInput.noChange,
+        styleFamily: style.styleFamily,
+        stylePolicyVersion: style.stylePolicyVersion,
+        transformationType,
+        transformationMetricsJson: JSON.stringify(transformationMetrics),
         parentRevisionId: latest?.id,
       },
     });
@@ -569,12 +593,15 @@ export async function submitAnnotationTask(taskId: string, input: RevisionInput,
   return { revision, check };
 }
 
-function revisionDraft(revision: { contentJson: string; issueTagsJson: string; changeReason: string }): RevisionInput {
+function revisionDraft(revision: { contentJson: string; issueTagsJson: string; changeReason: string; transformationType?: string }): RevisionInput {
   return {
     assistantMessages: parseJson(revision.contentJson, []),
     issueTags: parseJson(revision.issueTagsJson, []),
     changeReason: revision.changeReason,
     noChange: false,
+    transformationType: TRANSFORMATION_TYPES.includes(revision.transformationType as TransformationType)
+      ? revision.transformationType as TransformationType
+      : undefined,
   };
 }
 
@@ -615,6 +642,7 @@ export async function reviewAnnotationWork(input: {
     },
   });
   if (!review || review.status !== 'PENDING') throw new Error('该提交已审核或不存在');
+  if (review.revision.authorId === input.user.id) throw new Error('不能审核自己的标注提交');
   if (review.task.revisions[0]?.id !== review.revisionId) throw new Error('该提交已被更新，请审核最新版本');
   const reviewCase = await db.reviewCase.findUnique({
     where: { campaignId_sampleId: { campaignId: review.task.campaignId, sampleId: review.task.sampleId } },
@@ -847,7 +875,11 @@ async function reviewPayload(reviewCaseId: string, reviewerId: string) {
   const item = await db.reviewCase.findUnique({ where: { id: reviewCaseId }, include: { sample: true } });
   if (!item || item.assignedReviewerId !== reviewerId) throw new Error('复审任务不存在');
   const ids = parseJson<string[]>(item.candidateRevisionIdsJson, []);
-  const revisions = await db.annotationRevision.findMany({ where: { id: { in: ids } }, orderBy: { id: 'asc' } });
+  const revisions = await db.annotationRevision.findMany({
+    where: { id: { in: ids } },
+    orderBy: { id: 'asc' },
+    include: { task: { select: { styleFamily: true, stylePolicyVersion: true } } },
+  });
   const anonymize = (record: ShareGPTRecord): ShareGPTRecord => ({
     id: 'anonymous',
     scenario: record.scenario,
@@ -858,12 +890,17 @@ async function reviewPayload(reviewCaseId: string, reviewerId: string) {
     .map((revision) => ({ id: revision.id, record: anonymize(parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord)) }))
     .sort((a, b) => sha256(`${item.id}:${a.id}`).localeCompare(sha256(`${item.id}:${b.id}`)))
     .map((candidate, index) => ({ label: String.fromCharCode(65 + index), ...candidate }));
+  const styleFamilies = [...new Set(revisions.map((revision) => revision.task.styleFamily).filter(isStyleFamily))];
+  const styleVersions = [...new Set(revisions.map((revision) => revision.task.stylePolicyVersion))];
   return {
     id: item.id,
     phase: item.sample.phase,
     scenario: item.sample.scenario,
     original: anonymize(parseJson<ShareGPTRecord>(item.sample.originalRecordJson, {} as ShareGPTRecord)),
     candidates,
+    styleFamily: styleFamilies.length === 1 ? styleFamilies[0] : null,
+    stylePolicyVersion: styleVersions.length === 1 ? styleVersions[0] : DEFAULT_STYLE_POLICY_VERSION,
+    styleTargetMismatch: styleFamilies.length > 1,
     autoCheck: parseJson(item.sample.autoCheckJson, {}),
   };
 }
@@ -881,6 +918,8 @@ export async function decideReview(input: {
   const reviewCase = await db.reviewCase.findUnique({ where: { id: input.reviewCaseId }, include: { sample: true } });
   if (!reviewCase || reviewCase.assignedReviewerId !== input.user.id || reviewCase.status !== 'IN_REVIEW') throw new Error('复审任务不可提交');
   const candidateIds = parseJson<string[]>(reviewCase.candidateRevisionIdsJson, []);
+  const selfAuthored = await db.annotationRevision.count({ where: { id: { in: candidateIds }, authorId: input.user.id } });
+  if (selfAuthored > 0) throw new Error('不能仲裁自己参与修订的样本');
   if (input.selectedRevisionId && !candidateIds.includes(input.selectedRevisionId)) throw new Error('所选 revision 不属于该复审任务');
 
   if (input.action === 'RETURN') {
@@ -921,11 +960,18 @@ export async function decideReview(input: {
   if (input.action === 'MERGE') {
     if (!input.mergedInput) throw new Error('合并决策必须提交 mergedInput');
     const original = parseJson<ShareGPTRecord>(reviewCase.sample.originalRecordJson, {} as ShareGPTRecord);
-    const mergedRecord = applyRevision(original, input.mergedInput);
-    const check = validateShareGPTRecord(mergedRecord, 'submit');
-    if (check.status === 'error') throw new Error('合并版本未通过自动检查');
     const syntheticTask = await db.annotationTask.findFirst({ where: { campaignId: reviewCase.campaignId, sampleId: reviewCase.sampleId }, orderBy: { slot: 'asc' } });
     if (!syntheticTask) throw new Error('缺少关联标注任务');
+    const style = resolveRecordStyle(original, syntheticTask.styleFamily, syntheticTask.stylePolicyVersion);
+    const mergedRecord = withStyleMetadata(applyRevision(original, input.mergedInput), style);
+    const mergedMetrics = computeTransformationMetrics(original, mergedRecord);
+    const mergedType: TransformationType = input.mergedInput.transformationType
+      && TRANSFORMATION_TYPES.includes(input.mergedInput.transformationType)
+      ? input.mergedInput.transformationType
+      : mergedMetrics.recommendedType;
+    assertTransformationType(mergedType, mergedMetrics);
+    const check = validateShareGPTRecord(mergedRecord, 'submit');
+    if (check.status === 'error') throw new Error('合并版本未通过自动检查');
     const revision = await db.annotationRevision.create({
       data: {
         taskId: syntheticTask.id,
@@ -937,6 +983,10 @@ export async function decideReview(input: {
         issueTagsJson: JSON.stringify(input.mergedInput.issueTags),
         changeReason: input.reason,
         noChange: false,
+        styleFamily: style.styleFamily,
+        stylePolicyVersion: style.stylePolicyVersion,
+        transformationType: mergedType,
+        transformationMetricsJson: JSON.stringify(mergedMetrics),
       },
     });
     mergedRevisionId = revision.id;
@@ -995,21 +1045,33 @@ export async function createDatasetRelease(input: {
 }
 
 async function releaseCandidates(campaignId: string) {
+  const withdrawnProductionSamples = new Set((await db.productionCandidate.findMany({
+    where: { status: 'WITHDRAWN', convertedSampleId: { not: null } },
+    select: { convertedSampleId: true },
+  })).map((item) => item.convertedSampleId).filter((id): id is string => Boolean(id)));
   const decisions = await db.reviewDecision.findMany({
     where: { reviewCase: { campaignId }, finalTier: { in: ['human_gold', 'reviewed_silver'] } },
-    include: { reviewCase: true, selectedRevision: { include: { workReview: true } }, mergedRevision: true },
+    include: {
+      reviewCase: true,
+      selectedRevision: { include: { workReview: true, task: { select: { styleFamily: true, stylePolicyVersion: true } } } },
+      mergedRevision: { include: { task: { select: { styleFamily: true, stylePolicyVersion: true } } } },
+    },
   });
-  const result = new Map<string, { sampleId: string; revisionId: string; tier: string; recordJson: string; reason: string }>();
+  const result = new Map<string, { sampleId: string; revisionId: string; tier: string; recordJson: string; reason: string } & RecordStyle>();
   for (const decision of decisions) {
+    if (withdrawnProductionSamples.has(decision.reviewCase.sampleId)) continue;
     if (decision.selectedRevision && decision.selectedRevision.workReview?.status !== 'APPROVED') continue;
     const revision = decision.mergedRevision ?? decision.selectedRevision;
     if (!revision) continue;
+    const record = parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord);
+    const style = resolveRecordStyle(record, revision.styleFamily ?? revision.task.styleFamily, revision.stylePolicyVersion ?? revision.task.stylePolicyVersion);
     result.set(decision.reviewCase.sampleId, {
       sampleId: decision.reviewCase.sampleId,
       revisionId: revision.id,
       tier: decision.finalTier,
-      recordJson: revision.fullRecordJson,
+      recordJson: JSON.stringify(withStyleMetadata(record, style)),
       reason: `review:${decision.id}`,
+      ...style,
     });
   }
 
@@ -1023,15 +1085,19 @@ async function releaseCandidates(campaignId: string) {
     grouped.get(task.sampleId)?.push(task);
   }
   for (const [sampleId, tasks] of grouped) {
+    if (withdrawnProductionSamples.has(sampleId)) continue;
     if (result.has(sampleId) || tasks.length !== 1 || tasks[0].sample.candidateTier === 'gold_candidate') continue;
     const revision = tasks[0].revisions[0];
     if (!revision || revision.workReview?.status !== 'APPROVED') continue;
+    const record = parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord);
+    const style = resolveRecordStyle(record, revision.styleFamily ?? tasks[0].styleFamily, revision.stylePolicyVersion ?? tasks[0].stylePolicyVersion);
     result.set(sampleId, {
       sampleId,
       revisionId: revision.id,
       tier: 'reviewed_silver',
-      recordJson: revision.fullRecordJson,
+      recordJson: JSON.stringify(withStyleMetadata(record, style)),
       reason: `single-review:${tasks[0].id}`,
+      ...style,
     });
   }
   return [...result.values()];
@@ -1062,31 +1128,107 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
   const gold = selected.filter((item) => item.tier === 'human_gold').map((item) => parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord));
   const silver = selected.filter((item) => item.tier === 'reviewed_silver').map((item) => parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord));
   const clean = [...gold, ...silver];
+  const eligibilityItems = await Promise.all(selected.map(async (item) => {
+    const [sample, revision] = await Promise.all([
+      db.datasetSample.findUnique({
+        where: { id: item.sampleId },
+        include: {
+          productionCandidate: {
+            include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } },
+          },
+        },
+      }),
+      db.annotationRevision.findUnique({ where: { id: item.revisionId }, include: { workReview: true } }),
+    ]);
+    if (!sample || !revision) throw new Error('发布候选缺少样本或修订血缘');
+    const candidate = sample.productionCandidate;
+    const leakage = candidate ? parseJson<{ blocked?: boolean }>(candidate.leakageCheckJson, {}) : {};
+    const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(revision.transformationMetricsJson, {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
+    const result = evaluateTrainingEligibility({
+      sourceKind: sample.sourceKind,
+      candidateStatus: candidate?.status,
+      consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus,
+      leakageBlocked: leakage.blocked,
+      transformationType: revision.transformationType,
+      metrics,
+      workReviewApproved: revision.workReview?.status === 'APPROVED' || Boolean(candidate),
+      finallySelected: true,
+    });
+    return { item, sample, revision, candidate, metrics, ...result };
+  }));
+  const eligibleSelected = eligibilityItems.filter((entry) => entry.eligibility === 'SFT_ALLOWED');
+  const training = eligibleSelected.map(({ item }) => toTrainingShareGPTRecord(
+    parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord),
+    { styleFamily: item.styleFamily, stylePolicyVersion: item.stylePolicyVersion },
+  ));
+  const preference = eligibilityItems.filter((entry) => entry.preferenceAllowed).map(({ item, sample, candidate }) => {
+    const chosen = parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord);
+    const rejected = parseJson<ShareGPTRecord>(sample.originalRecordJson, {} as ShareGPTRecord);
+    return buildPreferenceRecord({
+      id: `preference-${item.sampleId}`,
+      original: rejected,
+      chosen,
+      meta: {
+        sourceKind: sample.sourceKind,
+        sourceModelVersionId: candidate?.generationTrace.modelVersionId ?? null,
+        styleFamily: item.styleFamily,
+        stylePolicyVersion: item.stylePolicyVersion,
+      },
+    });
+  });
   await mkdir(RELEASE_DIR, { recursive: true });
   const safeVersion = release.version.replace(/[^a-zA-Z0-9._-]+/g, '-');
   const cleanPath = path.join(RELEASE_DIR, `sharegpt-${safeVersion}-all.json`);
   const goldPath = path.join(RELEASE_DIR, `sharegpt-${safeVersion}-gold.json`);
   const silverPath = path.join(RELEASE_DIR, `sharegpt-${safeVersion}-silver.json`);
+  const trainingPath = path.join(RELEASE_DIR, `sharegpt-${safeVersion}-training.json`);
+  const preferencePath = path.join(RELEASE_DIR, `preference-${safeVersion}.json`);
   const manifestPath = path.join(RELEASE_DIR, `manifest-${safeVersion}.json`);
   const serialize = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
   const cleanText = serialize(clean);
   const goldText = serialize(gold);
   const silverText = serialize(silver);
+  const trainingText = serialize(training);
+  const preferenceText = serialize(preference);
   const byPhase: Record<string, number> = {};
   for (const record of clean) byPhase[`P${record.phase}`] = (byPhase[`P${record.phase}`] ?? 0) + 1;
+  const byStyle = summarizeStyles(selected.map((item) => ({ styleFamily: item.styleFamily, stylePolicyVersion: item.stylePolicyVersion })));
+  const stylePolicyVersions = [...new Set(selected.map((item) => item.stylePolicyVersion))].sort();
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 3,
     version: release.version,
     frozenAt: new Date().toISOString(),
     recipe,
-    summary: { clean: clean.length, humanGold: gold.length, reviewedSilver: silver.length, byPhase },
-    items: selected.map((item) => ({ sampleId: item.sampleId, revisionId: item.revisionId, tier: item.tier, reason: item.reason })),
+    trainingExport: {
+      format: 'sharegpt-with-system-v1',
+      description: '每条记录首条 system 消息包含与在线推理一致的版本化导师风格指令。',
+    },
+    preferenceExport: { format: 'chosen-rejected-v1', records: preference.length },
+    eligibility: {
+      policyVersion: TRAINING_POLICY_VERSION,
+      sftAllowed: eligibilityItems.filter((item) => item.eligibility === 'SFT_ALLOWED').length,
+      monitoringOnly: eligibilityItems.filter((item) => item.eligibility === 'MONITORING_ONLY').length,
+      blocked: eligibilityItems.filter((item) => item.eligibility === 'BLOCKED').length,
+    },
+    summary: { clean: clean.length, training: training.length, preference: preference.length, humanGold: gold.length, reviewedSilver: silver.length, byPhase, byStyle, stylePolicyVersions },
+    items: selected.map((item) => ({
+      sampleId: item.sampleId,
+      revisionId: item.revisionId,
+      tier: item.tier,
+      reason: item.reason,
+      styleFamily: item.styleFamily,
+      stylePolicyVersion: item.stylePolicyVersion,
+      trainingEligibility: eligibilityItems.find((entry) => entry.item.sampleId === item.sampleId)?.eligibility,
+      eligibilityReasons: eligibilityItems.find((entry) => entry.item.sampleId === item.sampleId)?.reasons,
+    })),
   };
   const manifestText = serialize(manifest);
   await Promise.all([
     writeFile(cleanPath, cleanText, 'utf8'),
     writeFile(goldPath, goldText, 'utf8'),
     writeFile(silverPath, silverText, 'utf8'),
+    writeFile(trainingPath, trainingText, 'utf8'),
+    writeFile(preferencePath, preferenceText, 'utf8'),
     writeFile(manifestPath, manifestText, 'utf8'),
   ]);
   await db.$transaction(async (tx) => {
@@ -1100,6 +1242,10 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
           weight: item.tier === 'human_gold' ? recipe.goldWeight : recipe.silverWeight,
           inclusionReason: item.reason,
           recordJson: item.recordJson,
+          styleFamily: item.styleFamily,
+          stylePolicyVersion: item.stylePolicyVersion,
+          trainingEligibility: eligibilityItems.find((entry) => entry.item.sampleId === item.sampleId)?.eligibility ?? 'BLOCKED',
+          eligibilityReasonJson: JSON.stringify(eligibilityItems.find((entry) => entry.item.sampleId === item.sampleId)?.reasons ?? []),
         },
       });
     }
@@ -1115,6 +1261,11 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
         goldSha256: sha256(goldText),
         silverPath,
         silverSha256: sha256(silverText),
+        trainingPath,
+        trainingSha256: sha256(trainingText),
+        preferencePath,
+        preferenceSha256: sha256(preferenceText),
+        eligibilityReportJson: JSON.stringify(manifest.eligibility),
         manifestPath,
         manifestSha256: sha256(manifestText),
       },
@@ -1128,10 +1279,20 @@ export async function listReleases() {
   return db.datasetRelease.findMany({ orderBy: { createdAt: 'desc' }, include: { _count: { select: { items: true, trainingRuns: true } } } });
 }
 
-export async function releaseForDownload(id: string, kind: 'clean' | 'gold' | 'silver' | 'manifest') {
+export async function releaseForDownload(id: string, kind: 'clean' | 'gold' | 'silver' | 'training' | 'preference' | 'manifest') {
   const release = await db.datasetRelease.findUnique({ where: { id } });
   if (!release || release.status !== 'FROZEN') throw new Error('数据集版本不存在或尚未冻结');
-  const filePath = kind === 'clean' ? release.cleanPath : kind === 'gold' ? release.goldPath : kind === 'silver' ? release.silverPath : release.manifestPath;
+  const filePath = kind === 'clean'
+    ? release.cleanPath
+    : kind === 'gold'
+      ? release.goldPath
+      : kind === 'silver'
+        ? release.silverPath
+        : kind === 'training'
+          ? release.trainingPath
+          : kind === 'preference'
+            ? release.preferencePath
+          : release.manifestPath;
   if (!filePath) throw new Error('导出文件不存在');
   return { filePath, fileName: path.basename(filePath) };
 }
@@ -1145,8 +1306,25 @@ export async function createTrainingRun(input: {
   status?: string;
   modelTag?: string;
   notes?: string;
+  parentModelVersionId?: string;
   user: SessionUser;
 }) {
+  const requestedStatus = input.status ?? 'DRAFT';
+  const release = await db.datasetRelease.findUnique({
+    where: { id: input.releaseId },
+    include: { items: { include: { sample: { include: { productionCandidate: { include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } } } } }, revision: { include: { workReview: true } } } } },
+  });
+  if (!release || release.status !== 'FROZEN') throw new Error('训练只能使用已冻结数据版本');
+  if (requestedStatus !== 'DRAFT' && !input.parentModelVersionId) throw new Error('提交或运行训练前必须选择父模型版本');
+  if (input.parentModelVersionId && !(await db.modelVersion.findUnique({ where: { id: input.parentModelVersionId } }))) throw new Error('父模型版本不存在');
+  const results = release.items.map((item) => {
+    const candidate = item.sample.productionCandidate;
+    const leakage = candidate ? parseJson<{ blocked?: boolean }>(candidate.leakageCheckJson, {}) : {};
+    const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(item.revision?.transformationMetricsJson ?? '{}', {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
+    return evaluateTrainingEligibility({ sourceKind: item.sample.sourceKind, candidateStatus: candidate?.status, consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus, leakageBlocked: leakage.blocked, transformationType: item.revision?.transformationType, metrics, workReviewApproved: item.revision?.workReview?.status === 'APPROVED' || Boolean(candidate), finallySelected: true });
+  });
+  const report = { policyVersion: TRAINING_POLICY_VERSION, checkedAt: new Date().toISOString(), parentModelVersionId: input.parentModelVersionId ?? null, sftAllowed: results.filter((result) => result.eligibility === 'SFT_ALLOWED').length, monitoringOnly: results.filter((result) => result.eligibility === 'MONITORING_ONLY').length, blocked: results.filter((result) => result.eligibility === 'BLOCKED').length, reasons: [...new Set(results.flatMap((result) => result.reasons))] };
+  if (requestedStatus !== 'DRAFT' && (report.blocked > 0 || report.sftAllowed === 0)) throw new Error(`训练资格检查未通过：可训练 ${report.sftAllowed}，阻断 ${report.blocked}；${report.reasons.join('、')}`);
   const run = await db.trainingRun.create({
     data: {
       name: input.name,
@@ -1154,9 +1332,12 @@ export async function createTrainingRun(input: {
       baseModel: input.baseModel,
       externalTaskId: input.externalTaskId,
       parametersJson: JSON.stringify(input.parameters ?? {}),
-      status: input.status ?? 'DRAFT',
+      status: requestedStatus,
       modelTag: input.modelTag,
       notes: input.notes ?? '',
+      parentModelVersionId: input.parentModelVersionId || null,
+      eligibilityReportJson: JSON.stringify(report),
+      policyVersion: TRAINING_POLICY_VERSION,
       createdById: input.user.id,
     },
   });
@@ -1165,7 +1346,7 @@ export async function createTrainingRun(input: {
 }
 
 export async function listTrainingRuns() {
-  return db.trainingRun.findMany({ orderBy: { createdAt: 'desc' }, include: { release: { select: { version: true } }, createdBy: { select: { displayName: true } } } });
+  return db.trainingRun.findMany({ orderBy: { createdAt: 'desc' }, include: { release: { select: { version: true } }, parentModelVersion: { select: { tag: true } }, createdBy: { select: { displayName: true } } } });
 }
 
 interface ImportedArtifact {
@@ -1174,6 +1355,8 @@ interface ImportedArtifact {
   scope?: string;
   tags?: { A?: string; B?: string };
   summary?: unknown;
+  styleFamily?: string;
+  stylePolicyVersion?: string;
 }
 
 export async function importEvaluation(input: {
@@ -1185,11 +1368,20 @@ export async function importEvaluation(input: {
   const parsed = input.files.map((file) => ({ ...file, json: JSON.parse(file.raw) as ImportedArtifact }));
   for (const file of parsed) {
     if (typeof file.json.schemaVersion !== 'number') throw new Error(`${file.fileName} 缺少 schemaVersion`);
+    if (file.json.styleFamily && !isStyleFamily(file.json.styleFamily)) throw new Error(`${file.fileName} 包含未知目标风格`);
   }
+  const styleFamilies = [...new Set(parsed.map((file) => file.json.styleFamily).filter(isStyleFamily))];
+  const stylePolicyVersions = [...new Set(parsed.map((file) => file.json.stylePolicyVersion).filter((value): value is string => typeof value === 'string' && !!value.trim()))];
+  if (styleFamilies.length > 1) throw new Error('同一次导入不能混合不同目标风格的评测产物');
+  if (stylePolicyVersions.length > 1) throw new Error('同一次导入不能混合不同风格规范版本的评测产物');
   const verdict = parsed.find((file) => file.json.tags?.A && file.json.tags?.B);
   const transcripts = parsed.filter((file) => typeof file.json.tag === 'string');
   const modelATag = verdict?.json.tags?.A ?? transcripts[0]?.json.tag ?? 'A';
   const modelBTag = verdict?.json.tags?.B ?? transcripts[1]?.json.tag ?? 'B';
+  const [modelAVersion, modelBVersion] = await Promise.all([
+    db.modelVersion.findUnique({ where: { tag: modelATag }, select: { id: true } }),
+    db.modelVersion.findUnique({ where: { tag: modelBTag }, select: { id: true } }),
+  ]);
   const scope = verdict?.json.scope ?? transcripts[0]?.json.scope ?? 'unknown';
   const run = await db.$transaction(async (tx) => {
     const created = await tx.evaluationRun.create({
@@ -1199,6 +1391,10 @@ export async function importEvaluation(input: {
         modelBTag,
         scope,
         summaryJson: JSON.stringify(verdict?.json.summary ?? {}),
+        styleFamily: styleFamilies[0],
+        stylePolicyVersion: stylePolicyVersions[0],
+        modelAVersionId: modelAVersion?.id,
+        modelBVersionId: modelBVersion?.id,
         createdById: input.user.id,
       },
     });
@@ -1212,11 +1408,12 @@ export async function importEvaluation(input: {
     return created;
   });
   await audit(input.user.id, 'EVALUATION_IMPORTED', 'EvaluationRun', run.id, { files: input.files.map((file) => file.fileName) });
+  if (modelBVersion) await refreshModelDeploymentGate(modelBVersion.id);
   return run;
 }
 
 export async function listEvaluations() {
-  return db.evaluationRun.findMany({ orderBy: { createdAt: 'desc' }, include: { _count: { select: { artifacts: true } }, createdBy: { select: { displayName: true } } } });
+  return db.evaluationRun.findMany({ orderBy: { createdAt: 'desc' }, include: { modelAVersion: { select: { tag: true } }, modelBVersion: { select: { tag: true } }, _count: { select: { artifacts: true } }, createdBy: { select: { displayName: true } } } });
 }
 
 export async function evaluationDetail(id: string) {

@@ -24,6 +24,13 @@ import { createLLMProvider, validateConfig } from '../app/lib/llm/provider';
 import { PhaseEnum, type ChatResponse } from '../app/models/types';
 import type { LLMMessage } from '../app/lib/llm/types';
 import {
+  DEFAULT_STYLE_FAMILY,
+  DEFAULT_STYLE_POLICY_VERSION,
+  STYLE_LABELS,
+  isStyleFamily,
+  type StyleFamily,
+} from '../app/lib/stylePolicy';
+import {
   FILLER,
   PERSONAS,
   personaToScenarioId,
@@ -38,6 +45,8 @@ import {
 const OUT_DIR = path.join(process.cwd(), 'data/blind-eval');
 const TRANSCRIPT_SCHEMA_VERSION = 2;
 const VERDICT_SCHEMA_VERSION = 3;
+let evaluationStyleFamily: StyleFamily = DEFAULT_STYLE_FAMILY;
+let evaluationStylePolicyVersion = DEFAULT_STYLE_POLICY_VERSION;
 const FALLBACKS = [
   '抱歉，AI服务返回了空内容，请重试。',
   '抱歉，AI回复格式出现异常，请重试。',
@@ -105,6 +114,8 @@ interface Transcript {
   tag: string;
   createdAt: string;
   scope: Scope;
+  styleFamily?: StyleFamily;
+  stylePolicyVersion?: string;
   modelConfig: {
     provider: string | null;
     model: string | null;
@@ -154,6 +165,8 @@ interface VerdictFile {
   scope: Scope;
   judgeLevel: JudgeLevel;
   tags: { A: string; B: string };
+  styleFamily?: StyleFamily;
+  stylePolicyVersion?: string;
   judgeConfig: {
     baseURL: string;
     model: string;
@@ -217,7 +230,7 @@ const PRIOR_SUMMARY = `【选题确认书】
 
 function printHelp() {
   console.log(`Usage:
-  npx tsx scripts/blind-eval.ts collect [--scope smoke|full] [--stages persona,3,4,5,6] [--limit N] [--subject <area>] [--student-type <type>] [--difficulty easy|medium|hard] [--persona <id-or-name>] [--tag <tag>] [--include-regression true|false]
+  npx tsx scripts/blind-eval.ts collect [--scope smoke|full] [--style <style-family>] [--stages persona,3,4,5,6] [--limit N] [--subject <area>] [--student-type <type>] [--difficulty easy|medium|hard] [--persona <id-or-name>] [--tag <tag>] [--include-regression true|false]
   npx tsx scripts/blind-eval.ts judge <tagA> <tagB> [--scope smoke|full] [--judge-level scenario|full] [--scenario <id-or-name>]
 
 Collect env:
@@ -286,6 +299,7 @@ interface CollectOptions {
   difficulty?: 'easy' | 'medium' | 'hard';
   tag?: string;
   limit?: number;
+  styleFamily: StyleFamily;
 }
 
 function parseFlagValue(args: string[], flag: string): string | undefined {
@@ -329,6 +343,10 @@ function parseCollectOptions(args: string[], scope: Scope): CollectOptions {
   if (difficulty && !['easy', 'medium', 'hard'].includes(difficulty)) {
     throw new Error('--difficulty 必须是 easy、medium 或 hard');
   }
+  const requestedStyle = parseFlagValue(args, '--style') ?? DEFAULT_STYLE_FAMILY;
+  if (!isStyleFamily(requestedStyle)) {
+    throw new Error(`--style 不支持：${requestedStyle}`);
+  }
   return {
     scope,
     stages: parseStages(args),
@@ -339,6 +357,7 @@ function parseCollectOptions(args: string[], scope: Scope): CollectOptions {
     difficulty,
     tag: parseFlagValue(args, '--tag'),
     limit: parseLimit(args),
+    styleFamily: requestedStyle,
   };
 }
 
@@ -657,6 +676,14 @@ async function callOnce(provider: ReturnType<typeof createLLMProvider>, systemPr
   return { raw, parsed, parseOk: !FALLBACKS.includes(parsed.dialogue) };
 }
 
+function evaluationPrompt(phase: PhaseEnum, context?: PromptContext): string {
+  return getPromptForPhase(phase, {
+    ...(context ?? {}),
+    styleFamily: evaluationStyleFamily,
+    stylePolicyVersion: evaluationStylePolicyVersion,
+  });
+}
+
 function makeTurn(
   scenario: Pick<ScenarioRecord, 'id' | 'name'>,
   phase: number,
@@ -709,7 +736,7 @@ async function runPersona(provider: ReturnType<typeof createLLMProvider>, person
     roundCounts[phase] = round;
     let ctx = extra;
     if (shouldNudgeConvergence(phase, round)) ctx = { ...(ctx ?? {}), nudgeConverge: true };
-    return getPromptForPhase(phase, ctx);
+    return evaluationPrompt(phase, ctx);
   };
 
   let confirmed = false;
@@ -822,7 +849,7 @@ async function runPhase3FromPersona(provider: ReturnType<typeof createLLMProvide
   ];
   for (let t = 1; t <= messages.length; t++) {
     const msg = messages[t - 1];
-    const prompt = getPromptForPhase(PhaseEnum.Execution, { needSafetyQuiz: t === 1 });
+    const prompt = evaluationPrompt(PhaseEnum.Execution, { needSafetyQuiz: t === 1 });
     const { raw, parsed, parseOk } = await callOnce(provider, prompt, history, msg);
     const violations = currentViolationsForTurn(scenario, 3, parsed);
     scenario.turns.push(makeTurn(scenario, 3, t, msg, raw, parsed, parseOk, violations));
@@ -840,7 +867,7 @@ async function runPhase4FromPersona(provider: ReturnType<typeof createLLMProvide
     turns: [],
   };
   const history: LLMMessage[] = [];
-  const prompt = getPromptForPhase(PhaseEnum.DataAnalysis, { dataRows: defaultRowsForPersona(persona) });
+  const prompt = evaluationPrompt(PhaseEnum.DataAnalysis, { dataRows: defaultRowsForPersona(persona) });
   const messages = persona.phase4?.length
     ? persona.phase4
     : [
@@ -865,7 +892,7 @@ async function runPhase5FromPersona(provider: ReturnType<typeof createLLMProvide
     meta: personaMeta(persona),
     turns: [],
   };
-  const prompt = getPromptForPhase(PhaseEnum.ResultsFormation, { priorSummary: buildPriorSummaryFromPersona(persona) });
+  const prompt = evaluationPrompt(PhaseEnum.ResultsFormation, { priorSummary: buildPriorSummaryFromPersona(persona) });
   const msg = '开始报告成型，请根据前序阶段摘要自动生成 report_sections 六节预填内容。';
   const { raw, parsed, parseOk } = await callOnce(provider, prompt, [], msg);
   const violations = currentViolationsForTurn(scenario, 5, parsed);
@@ -882,7 +909,7 @@ async function runPhase6FromPersona(provider: ReturnType<typeof createLLMProvide
     turns: [],
   };
   const history: LLMMessage[] = [];
-  const prompt = getPromptForPhase(PhaseEnum.Reflection);
+  const prompt = evaluationPrompt(PhaseEnum.Reflection);
   const messages = persona.phase6?.length
     ? persona.phase6
     : [
@@ -907,7 +934,7 @@ async function runPhase4(provider: ReturnType<typeof createLLMProvider>): Promis
     turns: [] as TurnRecord[],
   };
   const history: LLMMessage[] = [];
-  const prompt = getPromptForPhase(PhaseEnum.DataAnalysis, { dataRows: DATA_ROWS });
+  const prompt = evaluationPrompt(PhaseEnum.DataAnalysis, { dataRows: DATA_ROWS });
   const messages = ['这是我收集的数据，帮我看看有什么规律', '我发现白光组发芽最快，绿光组最慢，这说明什么？'];
   for (let t = 1; t <= messages.length; t++) {
     const msg = messages[t - 1];
@@ -926,7 +953,7 @@ async function runPhase5(provider: ReturnType<typeof createLLMProvider>): Promis
     kind: 'phase5' as const,
     turns: [] as TurnRecord[],
   };
-  const prompt = getPromptForPhase(PhaseEnum.ResultsFormation, { priorSummary: PRIOR_SUMMARY });
+  const prompt = evaluationPrompt(PhaseEnum.ResultsFormation, { priorSummary: PRIOR_SUMMARY });
   const msg = '开始报告成型';
   const { raw, parsed, parseOk } = await callOnce(provider, prompt, [], msg);
   const violations = currentViolationsForTurn(scenario, 5, parsed);
@@ -970,12 +997,14 @@ function collectModelConfig(): Transcript['modelConfig'] {
 
 async function collect(options: CollectOptions) {
   const tag = safeTag(process.env.MODEL_TAG);
+  evaluationStyleFamily = options.styleFamily;
+  evaluationStylePolicyVersion = DEFAULT_STYLE_POLICY_VERSION;
   const provider = createLLMProvider();
   const scenarios: ScenarioRecord[] = [];
   await mkdir(OUT_DIR, { recursive: true });
 
   const personas = selectedPersonas(options);
-  console.log(`Collecting ${tag} (${options.scope})`);
+  console.log(`Collecting ${tag} (${options.scope}; ${STYLE_LABELS[options.styleFamily]})`);
   console.log(`Personas: ${personas.length}; stages: ${options.stages.join(',')}; regression: ${options.includeRegression}`);
 
   for (const persona of personas) {
@@ -1013,6 +1042,8 @@ async function collect(options: CollectOptions) {
     tag,
     createdAt: new Date().toISOString(),
     scope: options.scope,
+    styleFamily: options.styleFamily,
+    stylePolicyVersion: evaluationStylePolicyVersion,
     modelConfig: collectModelConfig(),
     summary: collectSummary(scenarios),
     scenarios,
@@ -1408,6 +1439,12 @@ function dimensionSummary(scenarioVerdicts: FinalVerdict[]): Record<DimensionKey
 async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: JudgeLevel, scenarioFilter?: string) {
   const transcriptA = await readTranscript(tagA);
   const transcriptB = await readTranscript(tagB);
+  if (transcriptA.styleFamily && transcriptB.styleFamily && transcriptA.styleFamily !== transcriptB.styleFamily) {
+    throw new Error(`不能比较不同目标风格：${transcriptA.styleFamily} vs ${transcriptB.styleFamily}`);
+  }
+  if (transcriptA.stylePolicyVersion && transcriptB.stylePolicyVersion && transcriptA.stylePolicyVersion !== transcriptB.stylePolicyVersion) {
+    throw new Error(`不能比较不同风格规范版本：${transcriptA.stylePolicyVersion} vs ${transcriptB.stylePolicyVersion}`);
+  }
   const scenariosA = filterScenarios(transcriptA, scope, scenarioFilter);
   const scenariosB = filterScenarios(transcriptB, scope, scenarioFilter);
   const scenarioPairs = pairScenarios(scenariosA, scenariosB);
@@ -1447,6 +1484,8 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
     scope,
     judgeLevel,
     tags: { A: transcriptA.tag, B: transcriptB.tag },
+    styleFamily: transcriptA.styleFamily ?? transcriptB.styleFamily,
+    stylePolicyVersion: transcriptA.stylePolicyVersion ?? transcriptB.stylePolicyVersion,
     judgeConfig: {
       baseURL: cfg.baseURL,
       model: cfg.model,
@@ -1503,7 +1542,7 @@ async function loadDotEnv() {
 function positionalArgs(args: string[]): string[] {
   const valueFlags = new Set([
     '--scope', '--judge-level', '--scenario', '--stages', '--limit', '--subject',
-    '--student-type', '--difficulty', '--persona', '--tag', '--include-regression',
+    '--student-type', '--difficulty', '--persona', '--tag', '--style', '--include-regression',
   ]);
   const out: string[] = [];
   for (let i = 0; i < args.length; i++) {

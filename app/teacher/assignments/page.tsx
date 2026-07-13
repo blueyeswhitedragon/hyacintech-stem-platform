@@ -5,6 +5,7 @@ import { db } from '@/app/lib/db';
 import { getTeacherClasses } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import PublishAssignmentForm from '@/app/components/PublishAssignmentForm';
+import { styleSelectionLabel } from '@/app/lib/stylePolicy';
 
 export default async function TeacherAssignmentsPage() {
   const user = await getCurrentUser();
@@ -21,6 +22,8 @@ export default async function TeacherAssignmentsPage() {
       id: true,
       title: true,
       topicDirection: true,
+      assistantStyleFamily: true,
+      dataContributionMode: true,
       dueDate: true,
       class: { select: { name: true } },
       _count: { select: { studentAssignments: true } },
@@ -59,6 +62,8 @@ export default async function TeacherAssignmentsPage() {
                   <div className="text-sm text-gray-500 mt-1">
                     班级：{a.class.name}
                     {a.topicDirection && <> · 方向：{a.topicDirection}</>}
+                    <> · 导师风格：{styleSelectionLabel(a.assistantStyleFamily)}</>
+                    <> · 数据回流：{a.dataContributionMode === 'CONSENT_REQUIRED' ? '学生自愿授权' : '关闭'}</>
                     {a.dueDate && <> · 截止：{new Date(a.dueDate).toLocaleDateString('zh-CN')}</>}
                   </div>
                   <div className="text-sm text-gray-400 mt-1">{a._count.studentAssignments} 名学生已开始</div>

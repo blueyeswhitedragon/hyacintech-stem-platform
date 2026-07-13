@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ASSISTANT_STYLE_OPTIONS, type AssistantStyleSelection } from '@/app/lib/stylePolicy';
 
 interface ClassOption {
   id: string;
@@ -14,6 +15,8 @@ export default function PublishAssignmentForm({ classes }: { classes: ClassOptio
   const [title, setTitle] = useState('');
   const [topicDirection, setTopicDirection] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [assistantStyleFamily, setAssistantStyleFamily] = useState<AssistantStyleSelection>('auto');
+  const [allowDataContribution, setAllowDataContribution] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -29,6 +32,8 @@ export default function PublishAssignmentForm({ classes }: { classes: ClassOptio
           classId,
           title,
           topicDirection: topicDirection || undefined,
+          assistantStyleFamily,
+          allowDataContribution,
           dueDate: dueDate || undefined,
         }),
       });
@@ -40,6 +45,8 @@ export default function PublishAssignmentForm({ classes }: { classes: ClassOptio
       setTitle('');
       setTopicDirection('');
       setDueDate('');
+      setAssistantStyleFamily('auto');
+      setAllowDataContribution(false);
       router.refresh();
     } catch {
       setError('网络错误，请重试');
@@ -86,6 +93,33 @@ export default function PublishAssignmentForm({ classes }: { classes: ClassOptio
           className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
+      <div>
+        <label className="block text-sm text-gray-700 mb-1">AI 导师回复风格</label>
+        <select
+          value={assistantStyleFamily}
+          onChange={(event) => setAssistantStyleFamily(event.target.value as AssistantStyleSelection)}
+          className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {ASSISTANT_STYLE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </select>
+        <p className="mt-1 text-xs leading-5 text-gray-500">
+          {ASSISTANT_STYLE_OPTIONS.find((option) => option.value === assistantStyleFamily)?.summary}
+        </p>
+      </div>
+      <label className="flex items-start gap-2 rounded-lg border bg-gray-50 p-3 text-sm">
+        <input
+          type="checkbox"
+          checked={allowDataContribution}
+          onChange={(event) => setAllowDataContribution(event.target.checked)}
+          className="mt-1"
+        />
+        <span>
+          <span className="font-medium text-gray-800">允许学生自愿授权脱敏对话用于模型改进</span>
+          <span className="mt-1 block text-xs leading-5 text-gray-500">
+            默认关闭。开启后学生可以同意、拒绝或撤回；拒绝不会影响作业完成。只有教师提名且管理员审核通过的脱敏片段才会进入候选池。
+          </span>
+        </span>
+      </label>
       <div>
         <label className="block text-sm text-gray-700 mb-1">截止日期（可选）</label>
         <input

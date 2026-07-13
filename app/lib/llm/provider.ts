@@ -102,7 +102,7 @@ export function validateConfig(): ConfigValidation {
   return { valid: true, provider: providerType, model, issues: issues.length > 0 ? issues : [] };
 }
 
-export function createLLMProvider(): LLMProvider {
+export function createLLMProvider(override?: { provider: string; model: string }): LLMProvider {
   const config = validateConfig();
   const maxTokens = process.env.LLM_MAX_TOKENS ? Number(process.env.LLM_MAX_TOKENS) : undefined;
   const timeoutMs = process.env.LLM_TIMEOUT_MS ? Number(process.env.LLM_TIMEOUT_MS) : undefined;
@@ -111,25 +111,28 @@ export function createLLMProvider(): LLMProvider {
     throw new LLMError('bad_config', config.issues.join(' '), 500);
   }
 
-  const providerType = process.env.LLM_PROVIDER ?? config.provider!;
+  const providerType = override?.provider ?? process.env.LLM_PROVIDER ?? config.provider!;
+  const model = override?.model ?? config.model!;
 
   if (providerType === 'openai') {
-    const apiKey = process.env.OPENAI_API_KEY!;
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || isPlaceholderKey(apiKey)) throw new LLMError('bad_config', '所选部署缺少有效 OPENAI_API_KEY', 500);
     return new OpenAICompatibleProvider({
       apiKey,
       baseURL: process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1',
-      model: config.model!,
+      model,
       maxTokens,
       timeoutMs,
     });
   }
 
   if (providerType === 'deepseek') {
-    const apiKey = process.env.DEEPSEEK_API_KEY!;
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey || isPlaceholderKey(apiKey)) throw new LLMError('bad_config', '所选部署缺少有效 DEEPSEEK_API_KEY', 500);
     return new OpenAICompatibleProvider({
       apiKey,
       baseURL: process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com',
-      model: config.model!,
+      model,
       maxTokens,
       timeoutMs,
     });

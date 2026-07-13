@@ -16,6 +16,8 @@ const advancedAdminLinks = [
   ['/data-lab/releases', '数据版本'],
   ['/data-lab/training-runs', '训练登记'],
   ['/data-lab/evaluations', '双盲评测'],
+  ['/data-lab/models', '模型与血缘'],
+  ['/data-lab/candidates', '线上候选池'],
   ['/data-lab/users', '后台账号'],
 ] as const;
 

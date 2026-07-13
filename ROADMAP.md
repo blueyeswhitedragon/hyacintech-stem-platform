@@ -2,7 +2,7 @@
 
 > 目标：从当前「单用户匿名六阶段 AI 聊天原型」演进到框架2(v3.0)要求的
 > 「账号 / 班级 / 作业 / 教师审核 / 数据表 / 图表 / 报告 / 双模式」完整全栈平台。
-> 当前实现度约 10~15%。本 roadmap 按依赖顺序排列，**上层里程碑依赖下层完成**。
+> M0–M8 已完成，当前正在实施 M9 模型迭代真实闭环。本 roadmap 按依赖顺序保留历史实施记录，并持续反映当前状态。
 
 图例：✅ 已有 · ⚠️ 部分 · ❌ 未做
 
@@ -27,14 +27,14 @@ M0 基建地基 ──┬─> M1 认证 ──┬─> M2 班级/作业 ──┐
 
 > 没有数据库 / 会话 / 加密，所有上层功能都无法开始。
 
-- [ ] 安装依赖：`prisma @prisma/client iron-session bcryptjs openai recharts`（文件上传可用 Next 内置 `Request.formData()`，不强依赖 formidable）
-- [ ] 创建 `prisma/schema.prisma`（6 张表：User / Class / ClassMember / Assignment / StudentAssignment / Conversation，按框架2第三章）
-- [ ] `npx prisma migrate dev --name init` 生成 `dev.db`
-- [ ] 在 `app/lib/db.ts` 封装单例 PrismaClient（避免 dev 热重载多实例）
-- [ ] 在 `app/lib/session.ts` 封装 iron-session 配置（读 `SESSION_SECRET`）
-- [ ] `app/models/stageData.ts`：把框架2的 `StageData`(stage1~6) TS 接口落地，供前后端共用
-- [ ] 更新 `.env.example`：补 `DATABASE_URL`、`SESSION_SECRET`
-- [ ] `prisma/seed.ts`：创建演示教师 + 1 个班级，方便测试
+- [x] 安装 Prisma、iron-session、bcryptjs、Recharts 等运行依赖；LLM 使用 OpenAI-compatible HTTP provider
+- [x] 创建并持续扩展 `prisma/schema.prisma`
+- [x] 建立 Prisma migrations 和 SQLite `dev.db`
+- [x] 在 `app/lib/db.ts` 封装单例 PrismaClient（避免 dev 热重载多实例）
+- [x] 在 `app/lib/session.ts` 封装 iron-session 配置（读 `SESSION_SECRET`）
+- [x] `app/models/stageData.ts`：落地六阶段 `StageData` 类型
+- [x] 更新 `.env.example`：包含 `DATABASE_URL`、`SESSION_SECRET` 和 LLM 配置
+- [x] `prisma/seed.ts`：创建演示教师、学生、班级与作业
 
 **验收**：`npm run dev` 能起，`dev.db` 自动生成，seed 能写入数据。
 
@@ -42,12 +42,12 @@ M0 基建地基 ──┬─> M1 认证 ──┬─> M2 班级/作业 ──┐
 
 ## M1 · 认证体系（依赖 M0）
 
-- [ ] `POST /api/auth/register`（含 role 字段，bcrypt 加密）
-- [ ] `POST /api/auth/login`（校验密码，写 iron-session `{id,username,role,displayName}`）
-- [ ] `POST /api/auth/logout`、`GET /api/auth/me`
-- [ ] `app/lib/auth.ts`：`requireUser()` / `requireRole('teacher')` 守卫工具
-- [ ] 页面：`/auth/login`、`/auth/register`
-- [ ] 首页 `/` 改造：[直接体验] + [登录] 双入口
+- [x] `POST /api/auth/register`（bcrypt 加密；公开注册仅允许 student/teacher）
+- [x] `POST /api/auth/login`（校验密码并写入 iron-session）
+- [x] `POST /api/auth/logout`、`GET /api/auth/me`
+- [x] `app/lib/auth.ts`：`requireUser()` / `requireRole()` 守卫工具
+- [x] 页面：`/auth/login`、`/auth/register`
+- [x] 首页 `/`：[直接体验] + [登录/工作台] 双入口
 
 **验收**：能注册登录登出，受保护 API 未登录返回 401，role 越权返回 403。
 
@@ -174,3 +174,22 @@ M0 基建地基 ──┬─> M1 认证 ──┬─> M2 班级/作业 ──┐
 | M8 | 收尾联调（landing + 删旧原型 + seed 扩充 + 文档） | ✅ |
 
 **当前项目状态**：完整可运行的 Next.js 全栈应用，覆盖账号/班级/作业/六阶段/结构化数据/富 UI/教师审核/体验模式。
+
+---
+
+## M9 · 模型迭代真实闭环（已完成）
+
+> 设计基线见 [`docs/model-improvement-loop.md`](./docs/model-improvement-loop.md)，字段、API、页面、迁移和测试详案见 [`docs/model-improvement-loop-implementation-design.md`](./docs/model-improvement-loop-implementation-design.md)。线上模型原始回答只作为隔离候选和失败证据，未经独立人工纠正与复核不得成为其后继模型的 SFT 正样本。
+
+- [x] M9A：打通回复风格的作业选择、会话固化、在线提示词、训练元数据和分风格评测。
+  - [x] M9A1：五种版本化风格规范、教师作业选择、auto 稳定解析、会话固化、正式提示词消费、标注/仲裁规范展示，以及双标槽位共享目标风格。
+  - [x] M9A2：修订和冻结版本保留风格，独立 `training` 导出写入模型可见 system 风格指令，manifest 记录实际分布，双盲结果按风格汇总。迁移和回归于 2026-07-13 完成。
+- [x] M9B：建立正式会话的授权、脱敏、去重、来源模型血缘和隔离候选池；Guest 数据永不回流。
+  - [x] M9B1：模型注册表、生产部署基线、正式聊天不可变 GenerationTrace、消息/阶段/轨迹原子写入和历史会话隔离。迁移与真实 LLM 验收于 2026-07-13 完成。
+  - [x] M9B2：作业回流选项、学生授权/拒绝/撤回、教师按轨迹提名、本地脱敏、泄漏检查、管理员候选池和隔离批次转换。迁移与回归于 2026-07-13 完成。
+- [x] M9C：把合格候选接入标注、工作量审核和匿名仲裁；验证人工实质修正，阻止同人自审，分别导出 SFT 与 chosen/rejected 偏好数据，并在训练登记时按父模型重查资格。迁移与回归于 2026-07-13 完成。
+- [x] M9D：双盲评测关联稳定模型版本；总体及五风格门禁；10% → 30% → 100% 稳定分桶灰度；会话模型黏性；门禁限制和一键回滚。迁移与回归于 2026-07-13 完成。
+
+**验收**：可从线上失败轮次追溯到人工纠正、冻结数据、训练任务、双盲结果和部署版本；平台技术上阻止模型未经人工变换的自产出直接回灌自身后继版本。
+
+**M9 完成状态**：✅ 风格消费、生成轨迹、授权脱敏、人工纠正、SFT/偏好导出、训练血缘、分风格评测门禁、灰度和回滚均已形成可运行闭环。

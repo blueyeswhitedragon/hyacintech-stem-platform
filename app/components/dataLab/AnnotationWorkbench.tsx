@@ -9,9 +9,13 @@ import {
   type AnnotationClaimAvailability,
   type AnnotationPayload,
   type RevisionInput,
+  TRANSFORMATION_LABELS,
+  TRANSFORMATION_TYPES,
+  type TransformationType,
 } from '@/app/lib/dataLab/types';
 import type { ChatResponse } from '@/app/models/types';
 import { hasResponseStage2Schema, validateChatContract, type ChatContractIssue } from '@/app/lib/llm/chatContract';
+import { getStylePolicy } from '@/app/lib/stylePolicy';
 
 type EditableTurn = { messageIndex: number; response: ChatResponse };
 
@@ -35,6 +39,7 @@ export default function AnnotationWorkbench() {
   const [tags, setTags] = useState<string[]>([]);
   const [reason, setReason] = useState('');
   const [noChange, setNoChange] = useState(false);
+  const [transformationType, setTransformationType] = useState<TransformationType>('LIGHT_EDIT');
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -44,7 +49,7 @@ export default function AnnotationWorkbench() {
     const base = payload.draft?.assistantMessages?.length
       ? payload.draft.assistantMessages.map((item) => ({ messageIndex: item.messageIndex, response: cloneResponse(item.response) }))
       : payload.conversations.filter((item) => item.from === 'gpt' && item.response).map((item) => ({ messageIndex: item.index, response: cloneResponse(item.response!) }));
-    setTurns(base); setTags(payload.draft?.issueTags ?? []); setReason(payload.draft?.changeReason ?? ''); setNoChange(payload.draft?.noChange ?? false);
+    setTurns(base); setTags(payload.draft?.issueTags ?? []); setReason(payload.draft?.changeReason ?? ''); setNoChange(payload.draft?.noChange ?? false); setTransformationType(payload.draft?.transformationType ?? (payload.draft?.noChange ? 'NO_CHANGE' : 'LIGHT_EDIT'));
   }
 
   async function claim() {
@@ -67,11 +72,11 @@ export default function AnnotationWorkbench() {
   }, []);
 
   function updateTurn(index: number, updater: (response: ChatResponse) => ChatResponse) {
-    setNoChange(false);
+    setNoChange(false); if (transformationType === 'NO_CHANGE') setTransformationType('LIGHT_EDIT');
     setTurns((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, response: updater(cloneResponse(item.response)) } : item));
   }
 
-  const payload: RevisionInput = useMemo(() => ({ assistantMessages: turns, issueTags: tags, changeReason: reason, noChange }), [turns, tags, reason, noChange]);
+  const payload: RevisionInput = useMemo(() => ({ assistantMessages: turns, issueTags: tags, changeReason: reason, noChange, transformationType }), [turns, tags, reason, noChange, transformationType]);
   const turnChecks = useMemo(() => {
     let hasStage2Schema = false;
     return turns.map((turn) => {
@@ -112,11 +117,13 @@ export default function AnnotationWorkbench() {
   if (!task) return <div className="rounded-xl border bg-white p-8 text-center shadow-sm"><p className="text-gray-600">{message ?? '正在领取任务…'}</p><button onClick={claim} disabled={pending} className="mt-4 rounded-lg bg-gray-950 px-4 py-2 text-sm text-white disabled:opacity-50">重新检查任务</button></div>;
 
   const phaseMeta = PHASE_META[task.phase] ?? { label: `阶段 ${task.phase}`, goal: '', guardrail: '' };
+  const stylePolicy = task.styleFamily ? getStylePolicy(task.styleFamily, task.stylePolicyVersion) : null;
   const startingPoint = task.conversations.find((item) => item.from === 'human')?.value;
 
   return <div className="space-y-5">
     <div className="rounded-xl border bg-white p-4 shadow-sm"><div className="flex flex-wrap items-start justify-between gap-4"><div><div className="text-sm font-semibold text-blue-700">阶段 {task.phase}/6 · {phaseMeta.label} · {task.styleFamily ? STYLE_LABELS[task.styleFamily] : '自由风格'}</div><h2 className="mt-1 text-lg font-semibold">{task.scenario}</h2><p className="mt-2 text-sm text-gray-700">本阶段目标：{phaseMeta.goal}</p><p className="mt-1 text-xs text-amber-700">边界提醒：{phaseMeta.guardrail}</p><p className="mt-2 text-xs text-gray-500">任务租约至 {task.leaseExpiresAt ? new Date(task.leaseExpiresAt).toLocaleTimeString('zh-CN') : '-'}</p></div><div className="hidden gap-2 sm:flex"><button onClick={save} disabled={pending} className="rounded-lg border px-3 py-2 text-sm">保存草稿</button><button onClick={submit} disabled={pending} className="rounded-lg bg-gray-950 px-3 py-2 text-sm text-white">提交标注</button></div></div>
       <ol className="mt-4 grid grid-cols-3 gap-1 text-center text-[11px] sm:grid-cols-6">{Object.entries(PHASE_META).map(([phase, meta]) => <li key={phase} className={`rounded px-1 py-2 ${Number(phase) === task.phase ? 'bg-blue-600 font-medium text-white' : 'bg-gray-100 text-gray-500'}`}>{phase}. {meta.label}</li>)}</ol>
+      {stylePolicy && <details className="mt-3 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm"><summary className="cursor-pointer font-medium text-blue-900">本条目标风格：{stylePolicy.label} · 查看判定标准</summary><p className="mt-2 text-blue-800">{stylePolicy.summary}</p><ul className="mt-2 space-y-1 text-xs text-blue-800">{stylePolicy.annotationRubric.map((item) => <li key={item}>• {item}</li>)}</ul><p className="mt-2 text-[11px] text-blue-600">规范版本：{stylePolicy.version}</p></details>}
       <details className="mt-3 rounded-lg bg-gray-50 p-3 text-sm"><summary className="cursor-pointer font-medium text-gray-700">查看本条标注背景</summary><div className="mt-2 space-y-2 text-gray-600"><p><span className="font-medium text-gray-800">学生起点：</span>{startingPoint ?? '未提供'}</p><p><span className="font-medium text-gray-800">标注重点：</span>判断导师是否围绕当前阶段推进，并只修订导师回复。</p></div></details>
     </div>
     {task.autoCheck.issues.length > 0 && <div className="border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"><div className="font-medium">原始样本自动检查</div><ul className="mt-1 space-y-1 text-xs">{task.autoCheck.issues.map((item) => <li key={`${item.ruleCode}-${item.message}`}>• [{item.severity}] {item.message}</li>)}</ul></div>}
@@ -127,7 +134,7 @@ export default function AnnotationWorkbench() {
       const contractIssues = turnChecks.find((check) => check.messageIndex === item.index)?.issues ?? [];
       return <AssistantEditor key={item.index} phase={task.phase} response={turn.response} originalResponse={item.response!} contractIssues={contractIssues} onChange={(response) => updateTurn(turnIndex, () => response)} />;
     })}</div>
-    <div className="grid gap-4 rounded-xl border bg-white p-4 shadow-sm lg:grid-cols-2"><fieldset><legend className="text-sm font-medium">问题标签</legend><p className="mt-1 text-xs text-gray-500">按实际问题选择；点击“说明”可查看判定标准。</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{ISSUE_TAGS.map((tag) => <div key={tag} className="rounded-lg border p-2"><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={tags.includes(tag)} onChange={(event) => setTags((current) => event.target.checked ? [...current, tag] : current.filter((item) => item !== tag))} />{ISSUE_TAG_META[tag].label}</label><details className="mt-1 text-xs text-gray-500"><summary className="cursor-pointer">说明</summary><p className="mt-1 leading-5">{ISSUE_TAG_META[tag].description}</p></details></div>)}</div></fieldset><div><label className="text-sm font-medium">修改理由<textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-28 w-full rounded-lg border p-2 text-sm" placeholder="说明保留了什么、修复了什么。" /></label><label className={`mt-2 block text-sm ${hasEdits ? 'text-gray-400' : ''}`}><input type="checkbox" checked={noChange} disabled={hasEdits} onChange={(event) => setNoChange(event.target.checked)} className="mr-1" />无需修改，原回复已符合要求</label>{hasEdits && <p className="mt-1 text-xs text-gray-500">已检测到回复修订，因此不能选择“无需修改”。</p>}</div></div>
+    <div className="grid gap-4 rounded-xl border bg-white p-4 shadow-sm lg:grid-cols-2"><fieldset><legend className="text-sm font-medium">问题标签</legend><p className="mt-1 text-xs text-gray-500">按实际问题选择；点击“说明”可查看判定标准。</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{ISSUE_TAGS.map((tag) => <div key={tag} className="rounded-lg border p-2"><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={tags.includes(tag)} onChange={(event) => setTags((current) => event.target.checked ? [...current, tag] : current.filter((item) => item !== tag))} />{ISSUE_TAG_META[tag].label}</label><details className="mt-1 text-xs text-gray-500"><summary className="cursor-pointer">说明</summary><p className="mt-1 leading-5">{ISSUE_TAG_META[tag].description}</p></details></div>)}</div></fieldset><div><label className="text-sm font-medium">人工变换类型<select value={transformationType} onChange={(event) => { const value = event.target.value as TransformationType; setTransformationType(value); setNoChange(value === 'NO_CHANGE'); }} className="mt-2 w-full rounded-lg border p-2 text-sm">{TRANSFORMATION_TYPES.map((type) => <option key={type} value={type}>{TRANSFORMATION_LABELS[type]}</option>)}</select></label>{task.sourceKind === 'production_trace' && <p className="mt-1 text-xs text-amber-700">线上模型原回答只有“实质纠正”或“人工重写”并通过服务端差异校验后，才可能进入训练。</p>}<label className="mt-3 block text-sm font-medium">修改理由<textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-28 w-full rounded-lg border p-2 text-sm" placeholder="说明保留了什么、修复了什么。" /></label><label className={`mt-2 block text-sm ${hasEdits ? 'text-gray-400' : ''}`}><input type="checkbox" checked={noChange} disabled={hasEdits} onChange={(event) => { setNoChange(event.target.checked); setTransformationType(event.target.checked ? 'NO_CHANGE' : 'LIGHT_EDIT'); }} className="mr-1" />无需修改，原回复已符合要求</label>{hasEdits && <p className="mt-1 text-xs text-gray-500">已检测到回复修订，因此不能选择“无需修改”。</p>}</div></div>
     {message && <div className="text-sm text-gray-600">{message}</div>}
     <div className="sticky bottom-3 z-20 flex gap-2 rounded-xl border bg-white/95 p-3 shadow-lg backdrop-blur sm:hidden"><button onClick={save} disabled={pending} className="flex-1 rounded-lg border px-3 py-3 text-sm">保存草稿</button><button onClick={submit} disabled={pending} className="flex-1 rounded-lg bg-gray-950 px-3 py-3 text-sm text-white">提交标注</button></div>
   </div>;

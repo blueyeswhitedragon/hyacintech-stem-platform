@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/app/lib/session';
 import { getStudentAssignments } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import StartAssignmentButton from '@/app/components/StartAssignmentButton';
+import { styleSelectionLabel } from '@/app/lib/stylePolicy';
 
 const STATUS_LABEL: Record<string, string> = {
   NOT_STARTED: '未开始',
@@ -45,6 +46,7 @@ export default async function StudentAssignmentsPage() {
                 <div className="text-sm text-gray-500 mt-1">
                   班级：{a.className}
                   {a.topicDirection && <> · 方向：{a.topicDirection}</>}
+                  <> · 导师风格：{styleSelectionLabel(a.assistantStyleFamily)}</>
                   {a.dueDate && <> · 截止：{new Date(a.dueDate).toLocaleDateString('zh-CN')}</>}
                 </div>
                 <div className="text-sm mt-2">

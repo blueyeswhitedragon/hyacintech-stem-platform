@@ -2,6 +2,7 @@ import 'server-only';
 import { db } from './db';
 import { parseStageData } from './conversation';
 import type { AssignmentStatus } from '@/app/models/stageData';
+import type { AssistantStyleSelection } from '@/app/lib/stylePolicy';
 
 /**
  * 共享数据查询层。Server Component 页面与 GET API 都调用这里，避免重复。
@@ -69,6 +70,7 @@ export async function getClassAssignments(classId: string) {
       id: true,
       title: true,
       topicDirection: true,
+      assistantStyleFamily: true,
       dueDate: true,
       createdAt: true,
       _count: { select: { studentAssignments: true } },
@@ -80,6 +82,7 @@ export interface StudentAssignmentView {
   assignmentId: string;
   title: string;
   topicDirection: string | null;
+  assistantStyleFamily: AssistantStyleSelection;
   dueDate: Date | null;
   className: string;
   status: AssignmentStatus;
@@ -108,6 +111,7 @@ export async function getStudentAssignments(
       id: true,
       title: true,
       topicDirection: true,
+      assistantStyleFamily: true,
       dueDate: true,
       class: { select: { name: true } },
       studentAssignments: {
@@ -123,6 +127,7 @@ export async function getStudentAssignments(
       assignmentId: a.id,
       title: a.title,
       topicDirection: a.topicDirection,
+      assistantStyleFamily: (a.assistantStyleFamily === 'auto' ? 'auto' : a.assistantStyleFamily) as AssistantStyleSelection,
       dueDate: a.dueDate,
       className: a.class.name,
       status: (sa?.status as AssignmentStatus) ?? 'NOT_STARTED',
@@ -189,6 +194,7 @@ export async function getPendingReviews(teacherId: string) {
       id: true,
       status: true,
       currentStage: true,
+      dataConsentStatus: true,
       updatedAt: true,
       student: { select: { displayName: true, username: true } },
       assignment: { select: { title: true, class: { select: { name: true } } } },
@@ -242,11 +248,29 @@ export async function getReviewItem(studentAssignmentId: string) {
       status: true,
       currentStage: true,
       conversationId: true,
+      dataConsentStatus: true,
       student: { select: { displayName: true, username: true } },
       assignment: {
-        select: { title: true, topicDirection: true, class: { select: { name: true, teacherId: true } } },
+        select: { title: true, topicDirection: true, dataContributionMode: true, dataPolicyVersion: true, class: { select: { name: true, teacherId: true } } },
       },
-      conversation: { select: { messages: true, stageData: true } },
+      conversation: {
+        select: {
+          messages: true,
+          stageData: true,
+          traceCoverage: true,
+          generationTraces: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              assistantMessageId: true,
+              stage: true,
+              responseJson: true,
+              createdAt: true,
+              productionCandidate: { select: { id: true, status: true } },
+            },
+          },
+        },
+      },
     },
   });
 }

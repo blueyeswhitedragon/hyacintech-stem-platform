@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { AutoCheckResult, ShareGPTRecord } from '@/app/lib/dataLab/types';
 import type { ChatResponse } from '@/app/models/types';
 import { hasResponseStage2Schema, validateChatContract } from '@/app/lib/llm/chatContract';
+import { getStylePolicy, type StyleFamily } from '@/app/lib/stylePolicy';
 
 interface ReviewPayload {
   id: string;
@@ -12,6 +13,9 @@ interface ReviewPayload {
   original: ShareGPTRecord;
   candidates: Array<{ label: string; id: string; record: ShareGPTRecord }>;
   autoCheck: AutoCheckResult;
+  styleFamily: StyleFamily | null;
+  stylePolicyVersion: string;
+  styleTargetMismatch: boolean;
 }
 
 interface TurnDetail {
@@ -79,6 +83,7 @@ export default function ReviewWorkbench() {
     (item?.candidates ?? []).map((candidate) => [candidate.id, assistantDetails(candidate.record)])
   ), [item]);
   const selectedHasErrors = (candidateChecks.get(selected) ?? []).some((turn) => turn.issues.length > 0);
+  const stylePolicy = item?.styleFamily ? getStylePolicy(item.styleFamily, item.stylePolicyVersion) : null;
 
   async function decide(action: 'SELECT'|'RETURN'|'REJECT') {
     if (!item) return;
@@ -101,7 +106,7 @@ export default function ReviewWorkbench() {
   if (!item) return <div className="border bg-white p-8 text-center"><p className="text-gray-500">{message ?? '正在领取仲裁任务…'}</p><button onClick={claim} disabled={pending} className="mt-4 bg-gray-950 px-4 py-2 text-sm text-white">重新领取</button></div>;
 
   return <div className="space-y-5">
-    <div className="border bg-white p-4"><div className="text-xs font-medium text-blue-700">P{item.phase} · 匿名仲裁</div><h2 className="mt-1 text-lg font-semibold">{item.scenario}</h2><div className="mt-3 max-w-4xl space-y-2">{item.original.conversations.filter((entry) => entry.from === 'human').map((entry, index) => <p key={index} className="border-l-4 border-gray-300 pl-3 text-sm leading-6">{entry.value}</p>)}</div>{item.autoCheck?.issues?.length > 0 && <div className="mt-3 border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">原始样本自动检查：{item.autoCheck.issues.map((check) => check.message).join('；')}</div>}</div>
+    <div className="border bg-white p-4"><div className="text-xs font-medium text-blue-700">P{item.phase} · 匿名仲裁</div><h2 className="mt-1 text-lg font-semibold">{item.scenario}</h2>{stylePolicy && <div className="mt-3 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900"><div className="font-medium">共同目标风格：{stylePolicy.label}</div><p className="mt-1 text-xs leading-5">{stylePolicy.summary} 判定时同时检查：{stylePolicy.annotationRubric.join('；')}。</p></div>}{item.styleTargetMismatch && <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">这是旧活动遗留任务，候选版本的目标风格不一致。本次只能按内容、阶段和结构质量仲裁，不能用于判断风格遵循度。</div>}<div className="mt-3 max-w-4xl space-y-2">{item.original.conversations.filter((entry) => entry.from === 'human').map((entry, index) => <p key={index} className="border-l-4 border-gray-300 pl-3 text-sm leading-6">{entry.value}</p>)}</div>{item.autoCheck?.issues?.length > 0 && <div className="mt-3 border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">原始样本自动检查：{item.autoCheck.issues.map((check) => check.message).join('；')}</div>}</div>
     <div className="grid gap-4 xl:grid-cols-2">{item.candidates.map((candidate) => {
       const details = candidateChecks.get(candidate.id) ?? [];
       const issueCount = details.reduce((sum, turn) => sum + turn.issues.length, 0);

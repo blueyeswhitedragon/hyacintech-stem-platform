@@ -11,6 +11,7 @@ import Stage6Panel from './Stage6Panel';
 import SchemaEditor from './SchemaEditor';
 import Fireworks from './Fireworks';
 import type { Stage2Column } from '../models/stageData';
+import { STYLE_LABELS, STYLE_POLICIES, type StyleFamily } from '../lib/stylePolicy';
 
 interface Props {
   conversationId: string;
@@ -18,6 +19,7 @@ interface Props {
   initialStage: number;
   initialStageData: StageData;
   initialStatus: AssignmentStatus;
+  initialStyleFamily: StyleFamily;
 }
 
 export default function ConversationWorkspace({
@@ -26,6 +28,7 @@ export default function ConversationWorkspace({
   initialStage,
   initialStageData,
   initialStatus,
+  initialStyleFamily,
 }: Props) {
   const [stage, setStage] = useState(initialStage);
   const [stageData, setStageData] = useState<StageData>(initialStageData);
@@ -345,17 +348,23 @@ export default function ConversationWorkspace({
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <ConversationChat
-          initialMessages={initialMessages}
-          stage={stage}
-          completed={completed}
-          send={sendChat}
-          onResult={onChatResult}
-          onSafetyPassed={markSafetyPassed}
-          onPhaseConfirm={onPhaseConfirm}
-          roundCount={stageData.roundCounts?.[stage] ?? 0}
-          registerAutoSend={registerAutoSend}
-        />
+        <div className="border-b bg-blue-50 px-4 py-2 text-xs text-blue-900" title={STYLE_POLICIES[initialStyleFamily].summary}>
+          当前导师风格：<span className="font-medium">{STYLE_LABELS[initialStyleFamily]}</span>
+          <span className="ml-2 text-blue-700">{STYLE_POLICIES[initialStyleFamily].summary}</span>
+        </div>
+        <div className="min-h-0 flex-1">
+          <ConversationChat
+            initialMessages={initialMessages}
+            stage={stage}
+            completed={completed}
+            send={sendChat}
+            onResult={onChatResult}
+            onSafetyPassed={markSafetyPassed}
+            onPhaseConfirm={onPhaseConfirm}
+            roundCount={stageData.roundCounts?.[stage] ?? 0}
+            registerAutoSend={registerAutoSend}
+          />
+        </div>
       </div>
       {panel && (
         <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">

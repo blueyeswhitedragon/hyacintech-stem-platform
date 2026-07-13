@@ -129,6 +129,7 @@ function Start-LocalPlatform {
   Require-Command 'node' | Out-Null
   Push-Location $repoRoot
   try {
+    Invoke-Npm @('run', 'model:bootstrap')
     if (Test-BuildRequired) { Invoke-Npm @('run', 'build') }
     else { Write-Host '生产构建仍然有效，跳过 build。' }
     New-Item -ItemType Directory -Force -Path $runtimeDir | Out-Null
