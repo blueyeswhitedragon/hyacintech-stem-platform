@@ -10,7 +10,7 @@ import {
 import { stylesForSampleSlots, weightedStyleSequence } from '../app/lib/dataLab/assignment';
 import { getPromptForPhase } from '../app/prompts';
 import { PhaseEnum } from '../app/models/types';
-import { resolveRecordStyle, summarizeStyles, toTrainingShareGPTRecord, withStyleMetadata } from '../app/lib/dataLab/styleMetadata';
+import { resolveRecordStyle, summarizeStyles, toTrainingShareGPTRecord, toTrainingShareGPTRecords, withStyleMetadata } from '../app/lib/dataLab/styleMetadata';
 import { aggregateEvaluationsByStyle } from '../app/lib/dataLab/evaluation';
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
 
@@ -70,6 +70,46 @@ check('训练导出首条为模型可见 system 风格指令', trainingRecord.co
 check('训练导出包含完整生产阶段合同而非仅风格指令', trainingRecord.conversations[0].value.includes('阶段行为合同 stage-contract-v2') && trainingRecord.conversations[0].value.includes('选题定向'));
 check('训练导出保留原始 human/gpt 对话', trainingRecord.conversations[1].from === 'human' && trainingRecord.conversations[2].from === 'gpt');
 check('训练导出剥离 evaluator-only expectedTransformation', !Object.prototype.hasOwnProperty.call(trainingRecord.meta ?? {}, 'expectedTransformation'));
+const multiTurn = toTrainingShareGPTRecords({
+  ...enriched,
+  id: 'multi-turn-style-export',
+  conversations: [
+    { from: 'human', value: '第一问' },
+    { from: 'gpt', value: JSON.stringify({ dialogue: '先回答第一问。', next_action_type: 'text_input', phase_complete: false }) },
+    { from: 'human', value: '第二问' },
+    { from: 'gpt', value: JSON.stringify({ dialogue: '再回答第二问。', next_action_type: 'text_input', phase_complete: false }) },
+  ],
+  meta: {
+    ...enriched.meta,
+    generationContext: { turnSystemPrompts: ['第一轮生产提示词', '第二轮生产提示词'] },
+  },
+}, recordStyle);
+check('多轮记录按导师轮次拆成两个训练样本', multiTurn.length === 2);
+check('每个训练样本只有开头一条 system 消息', multiTurn.every((item) => item.conversations.filter((message) => message.from === 'system').length === 1 && item.conversations[0].from === 'system'));
+check('第二轮训练样本保留此前对话但不混入旧 system', multiTurn[1].conversations.length === 5 && multiTurn[1].conversations[0].value === '第二轮生产提示词');
+const productionHistory = toTrainingShareGPTRecord({
+  ...enriched,
+  id: 'production-history-export',
+  meta: {
+    ...enriched.meta,
+    systemPrompt: '生产完整提示词',
+    generationContext: {
+      modelVisibleHistory: [
+        { role: 'assistant', content: '欢迎开始探究。' },
+        { role: 'user', content: '我想先比较纸桥宽度。' },
+        { role: 'assistant', content: '你准备比较哪些宽度？' },
+      ],
+    },
+  },
+}, recordStyle);
+check(
+  '生产训练导出恢复模型当轮实际看到的对话历史',
+  productionHistory.conversations.length === 6
+    && productionHistory.conversations[0].from === 'system'
+    && productionHistory.conversations[1].from === 'gpt'
+    && productionHistory.conversations[3].value === '你准备比较哪些宽度？'
+    && productionHistory.conversations[4].from === 'human'
+);
 const styleCounts = summarizeStyles([recordStyle, recordStyle, resolveRecordStyle(sourceRecord, 'warm_companion')]);
 check('manifest 风格汇总按最终入选记录计数', styleCounts.engineering_mentor === 2 && styleCounts.warm_companion === 1);
 

@@ -45,6 +45,7 @@ export type EnsureConversationResult =
       status: AssignmentStatus;
       styleFamily: StyleFamily;
       stylePolicyVersion: string;
+      safetyQuizCompleted: boolean;
     }
   | { ok: false; error: 'not_found' | 'forbidden' };
 
@@ -84,7 +85,7 @@ export async function ensureStudentConversation(
   if (existing?.conversationId) {
     const conv = await db.conversation.findUnique({
       where: { id: existing.conversationId },
-      select: { messages: true, stageData: true, resolvedStyleFamily: true, stylePolicyVersion: true },
+      select: { messages: true, stageData: true, safetyQuizCompleted: true, resolvedStyleFamily: true, stylePolicyVersion: true },
     });
     return {
       ok: true,
@@ -96,6 +97,7 @@ export async function ensureStudentConversation(
       status: existing.status as AssignmentStatus,
       styleFamily: isStyleFamily(conv?.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
       stylePolicyVersion: conv?.stylePolicyVersion ?? DEFAULT_STYLE_POLICY_VERSION,
+      safetyQuizCompleted: conv?.safetyQuizCompleted ?? false,
     };
   }
 
@@ -156,6 +158,7 @@ export async function ensureStudentConversation(
     status: 'IN_PROGRESS',
     styleFamily: resolvedStyleFamily,
     stylePolicyVersion: assignment.stylePolicyVersion,
+    safetyQuizCompleted: false,
   };
 }
 
@@ -168,6 +171,7 @@ export interface ConversationForUser {
   studentAssignmentId: string;
   assignmentId: string;
   topicDirection: string | null;
+  dataConsentStatus: string;
   safetyQuizCompleted: boolean;
   styleFamily: StyleFamily;
   stylePolicyVersion: string;
@@ -197,6 +201,7 @@ export async function getConversationForUser(
           currentStage: true,
           status: true,
           assignmentId: true,
+          dataConsentStatus: true,
           assignment: { select: { topicDirection: true } },
         },
       },
@@ -213,6 +218,7 @@ export async function getConversationForUser(
     studentAssignmentId: conv.studentAssignment.id,
     assignmentId: conv.studentAssignment.assignmentId,
     topicDirection: conv.studentAssignment.assignment.topicDirection,
+    dataConsentStatus: conv.studentAssignment.dataConsentStatus,
     safetyQuizCompleted: conv.safetyQuizCompleted,
     styleFamily: isStyleFamily(conv.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
     stylePolicyVersion: conv.stylePolicyVersion || DEFAULT_STYLE_POLICY_VERSION,

@@ -28,6 +28,7 @@ export function buildPriorSummary(stageData: StageData): string {
       `控制变量：${plan.controlledVariables.join('、') || '无'}`,
       `材料：${plan.materials.join('、') || '待补充'}`,
       `步骤：${plan.procedure.join('；') || '待补充'}`,
+      `每个水平重复：${plan.repeatCount}次`,
       `安全：${plan.safetyNotes.join('；') || '无特殊风险'}`,
     ].join('\n'));
   }

@@ -164,6 +164,8 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
     isStrArray(experimentPlan.controlledVariables) &&
     isStrArray(experimentPlan.materials) &&
     isStrArray(experimentPlan.procedure) && experimentPlan.procedure.length > 0 &&
+    typeof experimentPlan.repeatCount === 'number' &&
+    Number.isInteger(experimentPlan.repeatCount) && experimentPlan.repeatCount >= 1 &&
     isStrArray(experimentPlan.safetyNotes)
   ) {
     out.experiment_plan = {
@@ -178,6 +180,7 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
       controlledVariables: experimentPlan.controlledVariables.map((item) => item.trim()).filter(Boolean),
       materials: experimentPlan.materials.map((item) => item.trim()).filter(Boolean),
       procedure: experimentPlan.procedure.map((item) => item.trim()).filter(Boolean),
+      repeatCount: experimentPlan.repeatCount,
       safetyNotes: experimentPlan.safetyNotes.map((item) => item.trim()).filter(Boolean),
     };
   }

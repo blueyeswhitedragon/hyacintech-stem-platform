@@ -1,11 +1,17 @@
 import type { ChatResponse } from '@/app/models/types';
 import type { StageData } from '@/app/models/stageData';
 import { normalizeSchema } from './schemaNormalize';
+import { groundAnalysisEvidence } from './analysisGrounding';
 
 export interface ExtractionResult {
   stageData: StageData;
   /** 若需服务端权威推进阶段，给出目标阶段号（如阶段1确认后 → 2）。 */
   advanceTo?: number;
+}
+
+export interface ExtractionContext {
+  studentMessage?: string;
+  dataRows?: Record<string, unknown>[];
 }
 
 /**
@@ -15,7 +21,8 @@ export interface ExtractionResult {
 export function extractStageData(
   currentStage: number,
   response: ChatResponse,
-  prev: StageData
+  prev: StageData,
+  context: ExtractionContext = {},
 ): ExtractionResult {
   const stageData: StageData = { ...prev };
 
@@ -51,24 +58,55 @@ export function extractStageData(
     return { stageData };
   }
 
+  // 阶段3：保存本次真实安全题。只有服务端核验答案后才会置 passed=true。
+  if (currentStage === 3 && response.safety_quiz) {
+    stageData.stage3 = {
+      ...(prev.stage3 ?? { rows: [] }),
+      safetyQuiz: {
+        question: response.safety_quiz.question,
+        options: response.safety_quiz.options,
+        correct: response.safety_quiz.correct,
+        passed: prev.stage3?.safetyQuiz?.passed ?? false,
+      },
+    };
+    return { stageData };
+  }
+
   // 阶段4：只在学生实际引用证据并完成比较时累计有效分析轮次。
   if (currentStage === 4 && response.analysis_progress) {
     const progress = response.analysis_progress;
     const previous = prev.stage4 ?? { analysisCount: 0 };
+    const grounded = groundAnalysisEvidence(
+      progress,
+      context.studentMessage ?? '',
+      context.dataRows ?? prev.stage3?.rows ?? [],
+    );
+    const nextRound = grounded.accepted
+      ? {
+          observation: progress.observation!.trim(),
+          citations: grounded.citations,
+          matchedValues: grounded.matchedValues,
+          anomaly: progress.anomalyNoted?.trim() || undefined,
+          interpretation: progress.interpretation?.trim() || undefined,
+        }
+      : null;
     stageData.stage4 = {
-      analysisCount: previous.analysisCount + (progress.studentEvidenceAccepted ? 1 : 0),
-      observations: progress.observation?.trim()
+      analysisCount: previous.analysisCount + (grounded.accepted ? 1 : 0),
+      observations: grounded.accepted && progress.observation?.trim()
         ? [...(previous.observations ?? []), progress.observation.trim()]
         : previous.observations,
-      evidenceCitations: progress.evidenceCitations?.length
-        ? [...(previous.evidenceCitations ?? []), ...progress.evidenceCitations.map((item) => item.trim()).filter(Boolean)]
+      evidenceCitations: grounded.accepted
+        ? [...(previous.evidenceCitations ?? []), ...grounded.citations]
         : previous.evidenceCitations,
-      anomalies: progress.anomalyNoted?.trim()
+      anomalies: grounded.accepted && progress.anomalyNoted?.trim()
         ? [...(previous.anomalies ?? []), progress.anomalyNoted.trim()]
         : previous.anomalies,
-      interpretations: progress.interpretation?.trim()
+      interpretations: grounded.accepted && progress.interpretation?.trim()
         ? [...(previous.interpretations ?? []), progress.interpretation.trim()]
         : previous.interpretations,
+      evidenceRounds: nextRound
+        ? [...(previous.evidenceRounds ?? []), nextRound]
+        : previous.evidenceRounds,
     };
     return { stageData };
   }

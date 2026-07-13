@@ -29,7 +29,7 @@ export default function GuestWorkspace() {
   const stageDataRef = useRef<StageData>({});
   const [completed, setCompleted] = useState(false);
   const [injectedMessage, setInjectedMessage] = useState<Message | null>(null);
-  // 进入阶段3后是否还需出安全问答（每次"进入"强制一次）
+  // 进入阶段3后是否还需出安全问答；只有答对后才关闭。
   const needQuizRef = useRef(true);
   // ConversationChat 注入的发送：打 guest 端点，本地跑结构化提取
   const send = async (message: string, history: Message[]): Promise<ChatApiResponse> => {
@@ -57,10 +57,11 @@ export default function GuestWorkspace() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.message || data.error || '请求失败，请重试。');
 
-    if (stage === 3 && data.safety_quiz) needQuizRef.current = false;
-
     // 本地结构化提取（与服务端同源纯函数）
-    const { stageData: nextSD, advanceTo } = extractStageData(stage, data, stageData);
+    const { stageData: nextSD, advanceTo } = extractStageData(stage, data, stageData, {
+      studentMessage: message,
+      dataRows: stageData.stage3?.rows ?? [],
+    });
     const nextStage = advanceTo ?? stage;
     return { ...data, currentStage: nextStage, stageData: nextSD };
   };
@@ -75,7 +76,9 @@ export default function GuestWorkspace() {
 
   const advanceLocal = async (to: number): Promise<string | null> => {
     const currentData = stageDataRef.current;
-    const chk = canAdvance(stage, to, currentData);
+    const chk = canAdvance(stage, to, currentData, {
+      safetyQuizCompleted: currentData.stage3?.safetyQuiz?.passed === true,
+    });
     if (!chk.ok) return chk.error ?? '暂不能进入下一阶段';
 
     if (stage === 1 && to === 2) {
@@ -174,10 +177,29 @@ export default function GuestWorkspace() {
   };
 
   const saveStage3 = async (rows: Record<string, unknown>[], fileAssociations: Stage3FileAssociation[]) => {
-    const nextData = { ...stageDataRef.current, stage3: { rows, fileAssociations } };
+    if (stageDataRef.current.stage3?.safetyQuiz?.passed !== true) {
+      return '请先完成并通过本实验的安全问答，再录入数据';
+    }
+    const nextData = { ...stageDataRef.current, stage3: { ...stageDataRef.current.stage3, rows, fileAssociations } };
     stageDataRef.current = nextData;
     setStageData(nextData);
     return null;
+  };
+
+  const markGuestSafetyPassed = async (selected: number) => {
+    const previous = stageDataRef.current;
+    const quiz = previous.stage3?.safetyQuiz;
+    if (!quiz || selected !== quiz.correct) throw new Error('安全问答答案无效');
+    const nextData: StageData = {
+      ...previous,
+      stage3: {
+        ...(previous.stage3 ?? { rows: [] }),
+        safetyQuiz: { ...quiz, selected, passed: true },
+      },
+    };
+    needQuizRef.current = false;
+    stageDataRef.current = nextData;
+    setStageData(nextData);
   };
 
   const saveStage5 = async (conclusion: string, reflection: string) => {
@@ -281,6 +303,7 @@ export default function GuestWorkspace() {
             onSave={saveStage3}
             onComplete={() => advanceLocal(4)}
             allowUpload={false}
+            disabledReason={stageData.stage3?.safetyQuiz?.passed === true ? undefined : '请先在左侧完成安全问答，答对后才能录入实验数据。'}
           />
         );
       case 4:
@@ -299,7 +322,7 @@ export default function GuestWorkspace() {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <ConversationChat initialMessages={welcome} stage={stage} completed={completed} send={send} onResult={onChatResult} onPhaseConfirm={onPhaseConfirm} injectedMessage={injectedMessage} />
+        <ConversationChat initialMessages={welcome} stage={stage} completed={completed} send={send} onResult={onChatResult} onSafetyPassed={markGuestSafetyPassed} onPhaseConfirm={onPhaseConfirm} injectedMessage={injectedMessage} />
       </div>
       {panel && <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">{panel}</div>}
       {completed && <Fireworks />}

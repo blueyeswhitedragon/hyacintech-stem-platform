@@ -1,13 +1,7 @@
 #!/usr/bin/env tsx
-import { readFile } from 'fs/promises';
-import path from 'path';
 import bcrypt from 'bcryptjs';
 import { db } from '../app/lib/db';
-import { importDatasetBatch } from '../app/lib/dataLab/service';
-import type { SessionUser } from '../app/lib/session';
-
-const DATASET = path.join(process.cwd(), 'data/sft/sharegpt-distill-dsv4-all-clean.json');
-const MANIFEST = path.join(process.cwd(), 'data/sft/merge-manifest-distill-dsv4-all.json');
+import './load-script-env';
 
 async function main() {
   const username = process.env.ADMIN_USERNAME?.trim();
@@ -22,22 +16,7 @@ async function main() {
     update: { role: 'admin', displayName, passwordHash: await bcrypt.hash(password, 10) },
     create: { username, role: 'admin', displayName, passwordHash: await bcrypt.hash(password, 10) },
   });
-  const user: SessionUser = { id: admin.id, username: admin.username, displayName: admin.displayName, role: 'admin' };
-  const existing = await db.datasetBatch.findUnique({ where: { name: 'dataset-base-v1' } });
-  if (existing) {
-    console.log(JSON.stringify({ admin: admin.username, batch: existing.name, status: 'already-imported' }, null, 2));
-    return;
-  }
-  const [raw, manifestRaw] = await Promise.all([readFile(DATASET, 'utf8'), readFile(MANIFEST, 'utf8')]);
-  const result = await importDatasetBatch({
-    name: 'dataset-base-v1',
-    sourceType: 'sharegpt_clean',
-    sourceFileName: path.basename(DATASET),
-    raw,
-    manifest: JSON.parse(manifestRaw),
-    user,
-  });
-  console.log(JSON.stringify({ admin: admin.username, batch: result.batch.name, summary: result.summary }, null, 2));
+  console.log(JSON.stringify({ admin: admin.username, status: 'ready', note: '管理员初始化不会自动导入任何数据集' }, null, 2));
 }
 
 main().catch((error) => {

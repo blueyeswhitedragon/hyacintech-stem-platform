@@ -30,10 +30,16 @@ const schema2: StageData = {
 
 console.log('canAdvance:');
 
+// 3→4：即使数据完整，未通过服务端安全题也必须拒绝
+{
+  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 7.2 }, { trial: 2, height: 7.5 }, { trial: 3, height: 7.8 }] } };
+  check('3→4 未通过安全题被拒', canAdvance(3, 4, sd).ok === false);
+}
+
 // 3→4：行非空 + 必填齐 → ok
 {
   const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 7.2 }, { trial: 2, height: 7.5 }, { trial: 3, height: 7.8 }] } };
-  check('3→4 必填齐通过', canAdvance(3, 4, sd).ok === true);
+  check('3→4 必填齐且安全题通过', canAdvance(3, 4, sd, { safetyQuizCompleted: true }).ok === true);
 }
 // 3→4：无行 → 拒绝
 {
@@ -44,7 +50,7 @@ console.log('canAdvance:');
 // 3→4：未达到 schema.minRows → 拒绝
 {
   const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 5 }, { trial: 2, height: 6 }] } };
-  const r = canAdvance(3, 4, sd);
+  const r = canAdvance(3, 4, sd, { safetyQuizCompleted: true });
   check('3→4 未达到 minRows 被拒', r.ok === false && r.error?.includes('3 行') === true);
 }
 // 3→4：必填列缺值 → 拒绝
@@ -55,7 +61,7 @@ console.log('canAdvance:');
 // 3→4：非必填列缺值 → 仍通过
 {
   const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 5 }, { trial: 2, height: 6 }, { trial: 3, height: 7 }] } };
-  check('3→4 非必填缺值仍通过', canAdvance(3, 4, sd).ok === true);
+  check('3→4 非必填缺值仍通过', canAdvance(3, 4, sd, { safetyQuizCompleted: true }).ok === true);
 }
 // 4→5：分析不足 → 拒绝
 {

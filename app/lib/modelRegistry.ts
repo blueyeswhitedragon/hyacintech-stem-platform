@@ -33,8 +33,9 @@ export function getRuntimeModelIdentity(): RuntimeModelIdentity | null {
   if (!config.valid || !config.provider || !config.model) return null;
 
   const configuredTag = process.env.LLM_MODEL_TAG?.trim();
+  const baseTag = configuredTag || `${config.provider}:${config.model}`;
   return {
-    tag: cleanTag(configuredTag || `${config.provider}:${config.model}`),
+    tag: cleanTag(`${baseTag}:${PROMPT_POLICY_VERSION}`),
     provider: config.provider,
     externalModelId: config.model,
     promptPolicyVersion: PROMPT_POLICY_VERSION,
@@ -56,26 +57,28 @@ export async function ensureRuntimeModelVersion() {
     if (
       existing &&
       (existing.provider !== identity.provider ||
-        existing.externalModelId !== identity.externalModelId)
+        existing.externalModelId !== identity.externalModelId ||
+        existing.promptPolicyVersion !== identity.promptPolicyVersion ||
+        existing.contractVersion !== identity.contractVersion)
     ) {
       throw new Error(
-        `模型标签 ${identity.tag} 已绑定到其他 provider/model；请设置唯一的 LLM_MODEL_TAG`
+        `模型标签 ${identity.tag} 已绑定到其他 provider/model/prompt contract；请设置唯一的 LLM_MODEL_TAG`
       );
     }
-
-    const model =
-      existing ??
-      (await tx.modelVersion.create({
-        data: {
-          ...identity,
-          status: 'DEPLOYED',
-        },
-      }));
 
     const activeDeployment = await tx.modelDeployment.findFirst({
       where: { environment: 'PRODUCTION', status: 'ACTIVE' },
       orderBy: { startedAt: 'desc' },
     });
+    const model =
+      existing ??
+      (await tx.modelVersion.create({
+        data: {
+          ...identity,
+          status: activeDeployment ? 'DRAFT' : 'DEPLOYED',
+        },
+      }));
+
     if (!activeDeployment) {
       await tx.modelDeployment.create({
         data: {
@@ -86,6 +89,30 @@ export async function ensureRuntimeModelVersion() {
           startedAt: new Date(),
         },
       });
+    } else if (
+      activeDeployment.modelVersionId !== model.id &&
+      process.env.PROMOTE_RUNTIME_PROMPT_BASELINE === 'true'
+    ) {
+      await tx.modelDeployment.update({
+        where: { id: activeDeployment.id },
+        data: { status: 'COMPLETED', endedAt: new Date() },
+      });
+      await tx.modelDeployment.create({
+        data: {
+          modelVersionId: model.id,
+          previousModelVersionId: activeDeployment.modelVersionId,
+          environment: 'PRODUCTION',
+          rolloutPercent: 100,
+          status: 'ACTIVE',
+          startedAt: new Date(),
+          gateReportJson: JSON.stringify({
+            reason: 'PROMPT_CONTRACT_BASELINE_PROMOTION',
+            promptPolicyVersion: identity.promptPolicyVersion,
+            contractVersion: identity.contractVersion,
+          }),
+        },
+      });
+      await tx.modelVersion.update({ where: { id: model.id }, data: { status: 'DEPLOYED' } });
     }
 
     return model;

@@ -49,6 +49,7 @@ const structured: StageData = {
       controlledVariables: ['水量'],
       materials: ['烧杯', '秒表'],
       procedure: ['加入等量水', '记录溶解时间'],
+      repeatCount: 3,
       safetyNotes: ['避免烫伤'],
     },
     schema: {

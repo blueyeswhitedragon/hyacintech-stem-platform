@@ -64,6 +64,7 @@ export default async function StudentConversationPage(
             initialStageData={result.stageData}
             initialStatus={result.status}
             initialStyleFamily={result.styleFamily}
+            initialSafetyQuizCompleted={result.safetyQuizCompleted}
           />
         </div>
       </div>

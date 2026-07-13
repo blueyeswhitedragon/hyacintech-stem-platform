@@ -94,7 +94,8 @@ async function main() {
     '轨迹数据不保存原始学生请求内容'
   );
   check(traceData.promptSha256.length === 64, '系统提示词保存 SHA-256 指纹');
-  check(traceData.systemPromptSnapshot === '阶段2系统提示词', '轨迹保存完整生产 system prompt 供训练上下文追溯');
+  check(traceData.systemPromptSnapshot !== '阶段2系统提示词' && traceData.systemPromptSnapshot.includes('阶段'), '轨迹只保存版本化提示模板，不复制本轮业务上下文');
+  check(traceData.trainingSystemPromptSnapshot === '', '未显式授权时不保存完整训练上下文');
   check(traceData.triggerType === 'USER_MESSAGE', '普通教学轮次默认标记 USER_MESSAGE');
 
   await persistGenerationTurn(input);
@@ -105,7 +106,18 @@ async function main() {
   check(storedConversation.messages === JSON.stringify(messages), '消息与轨迹在同一事务落库');
   check(storedTrace.modelVersionId === model.id, '轨迹关联稳定模型版本');
   check(storedTrace.styleFamily === 'evidence_analyst', '轨迹固化目标风格');
-  check(storedTrace.systemPromptSnapshot === '阶段2系统提示词', '数据库轨迹持久化完整 system prompt');
+  check(storedTrace.systemPromptSnapshot === traceData.systemPromptSnapshot, '数据库轨迹持久化版本化提示模板');
+  check(storedTrace.trainingSystemPromptSnapshot === '', '数据库轨迹不保存未授权完整上下文');
+
+  const consentedTrace = buildGenerationTraceData({
+    ...input,
+    assistantMessageId: randomUUID(),
+    trainingSystemPromptSnapshot: input.systemPrompt,
+  });
+  check(
+    consentedTrace.trainingSystemPromptSnapshot === input.systemPrompt,
+    '显式授权后可固化模型当轮实际看到的训练上下文'
+  );
 
   let duplicateRejected = false;
   try {

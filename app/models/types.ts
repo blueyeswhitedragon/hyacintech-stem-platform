@@ -43,6 +43,7 @@ export interface ExperimentPlan {
   controlledVariables: string[];
   materials: string[];
   procedure: string[];
+  repeatCount: number;
   safetyNotes: string[];
 }
 

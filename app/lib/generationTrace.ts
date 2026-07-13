@@ -4,6 +4,8 @@ import { db } from '@/app/lib/db';
 import { sha256 } from '@/app/lib/dataLab/validation';
 import type { RuntimeModelIdentity } from '@/app/lib/modelRegistry';
 import type { StageTriggerType } from '@/app/lib/stageContract';
+import { getPromptForPhase } from '@/app/prompts';
+import { PhaseEnum } from '@/app/models/types';
 
 export interface GenerationTraceInput {
   conversationId: string;
@@ -20,6 +22,8 @@ export interface GenerationTraceInput {
   assistantMessageId: string;
   userMessage: string;
   systemPrompt: string;
+  /** Exact rendered prompt; callers must supply it only after explicit consent. */
+  trainingSystemPromptSnapshot?: string;
   response: ChatResponse;
   modelVersionId: string;
   modelIdentity: RuntimeModelIdentity;
@@ -31,6 +35,13 @@ export interface GenerationTraceInput {
 
 export function buildGenerationTraceData(input: GenerationTraceInput) {
   const responseJson = JSON.stringify(input.response);
+  // Store the versioned template and style/trigger contract, not the fully
+  // rendered prompt containing student rows, reports or teacher feedback.
+  const tracePromptTemplate = getPromptForPhase((input.traceStage ?? input.currentStage) as PhaseEnum, {
+    styleFamily: input.styleFamily as import('@/app/lib/stylePolicy').StyleFamily,
+    stylePolicyVersion: input.stylePolicyVersion,
+    triggerType: input.triggerType,
+  });
   return {
     conversationId: input.conversationId,
     assistantMessageId: input.assistantMessageId,
@@ -43,7 +54,8 @@ export function buildGenerationTraceData(input: GenerationTraceInput) {
     externalModelSnapshot: input.modelIdentity.externalModelId,
     promptVersion: input.modelIdentity.promptPolicyVersion,
     promptSha256: sha256(input.systemPrompt),
-    systemPromptSnapshot: input.systemPrompt,
+    systemPromptSnapshot: tracePromptTemplate,
+    trainingSystemPromptSnapshot: input.trainingSystemPromptSnapshot ?? '',
     styleFamily: input.styleFamily,
     stylePolicyVersion: input.stylePolicyVersion,
     requestMessageSha256: sha256(input.userMessage),

@@ -10,6 +10,7 @@ import {
 import type { ShareGPTRecord } from '@/app/lib/dataLab/types';
 import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
 import { parseJson, sha256, validateShareGPTRecord } from '@/app/lib/dataLab/validation';
+import { ACTIVE_DATASET_BATCH_STATUS } from '@/app/lib/dataLab/datasetPolicy';
 
 export const DATA_POLICY_VERSION = 'student-data-policy-v1';
 export const CONSENT_STATUSES = ['PENDING', 'GRANTED', 'DECLINED', 'WITHDRAWN'] as const;
@@ -119,10 +120,18 @@ export async function nominateProductionCandidate(input: {
   if (studentAssignment.assignment.dataContributionMode !== 'CONSENT_REQUIRED') throw new Error('该作业未开启数据回流');
   if (studentAssignment.dataConsentStatus !== 'GRANTED') throw new Error('学生尚未授权或已撤回授权');
   if (trace.conversation.traceCoverage !== 'COMPLETE') throw new Error('历史不可验证会话不能进入候选池');
+  if (!trace.trainingSystemPromptSnapshot.trim()) {
+    throw new Error('该生成轨迹未保存经授权的完整训练上下文，不能进入正向训练候选池');
+  }
 
   const messages = parseMessages(trace.conversation.messages);
-  const userMessage = messages.find((message) => message.id === trace.userMessageId);
-  if (!userMessage) throw new Error('无法找到轨迹对应的学生消息');
+  const userMessageIndex = messages.findIndex((message) => message.id === trace.userMessageId);
+  const userMessage = messages[userMessageIndex];
+  if (!userMessage || userMessage.role !== 'user') throw new Error('无法找到轨迹对应的学生消息');
+  const modelVisibleHistory = messages
+    .slice(0, userMessageIndex)
+    .filter((message) => message.role === 'user' || message.role === 'assistant')
+    .map((message) => ({ role: message.role, content: message.content }));
   const response = parseJson<Record<string, unknown>>(trace.responseJson, {});
   const record: ShareGPTRecord = {
     id: `production-trace-${trace.id}`,
@@ -140,8 +149,9 @@ export async function nominateProductionCandidate(input: {
       styleFamily: trace.styleFamily as ShareGPTRecord['meta'] extends { styleFamily?: infer T } ? T : never,
       stylePolicyVersion: trace.stylePolicyVersion,
       stageContractVersion: STAGE_CONTRACT_VERSION,
-      systemPrompt: trace.systemPromptSnapshot,
+      systemPrompt: trace.trainingSystemPromptSnapshot,
       stageTriggerType: trace.triggerType,
+      generationContext: { modelVisibleHistory },
     },
   };
   const { record: redacted, report } = redactProductionRecord(record, [
@@ -244,6 +254,7 @@ export async function convertProductionCandidates(input: { ids: string[]; batchN
         sourceType: 'production_trace',
         sourceFileName: `production-candidates-${batchId}.json`,
         sourceSha256: sha256(JSON.stringify(records)),
+        status: ACTIVE_DATASET_BATCH_STATUS,
         manifestJson: JSON.stringify({ schemaVersion: 1, candidateIds: ids, dataPolicyVersion: DATA_POLICY_VERSION }),
         summaryJson: JSON.stringify(summary),
         importedById: input.adminId,

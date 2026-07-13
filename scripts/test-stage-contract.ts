@@ -11,8 +11,8 @@ function check(name: string, condition: boolean) {
 function response(extra: Partial<ChatResponse>): ChatResponse {
   return { dialogue: '请继续说明。', next_action_type: 'text_input', phase_complete: false, ...extra };
 }
-function codes(phase: number, value: ChatResponse, triggerType: StageTriggerType = 'USER_MESSAGE') {
-  return validateStageResponseBehavior(phase, value, { triggerType, visibleContext: '{"a":2,"b":5}' }).map((item) => item.code);
+function codes(phase: number, value: ChatResponse, triggerType: StageTriggerType = 'USER_MESSAGE', visibleContext = '{"a":2,"b":3,"c":5}') {
+  return validateStageResponseBehavior(phase, value, { triggerType, visibleContext }).map((item) => item.code);
 }
 
 console.log('stage-contract-v2:');
@@ -33,7 +33,7 @@ check('P1 选择菜单被拒', codes(1, response({ next_action_type: 'ask_choice
 const plan = {
   independentVariable: { name: '光照时长', levels: ['短', '长'] },
   dependentVariable: { name: '发芽数', measurement: '每天同一时间计数' },
-  controlledVariables: ['种子数'], materials: ['绿豆'], procedure: ['连续记录'], safetyNotes: [],
+  controlledVariables: ['种子数'], materials: ['绿豆'], procedure: ['连续记录'], repeatCount: 3, safetyNotes: [],
 };
 const schema = {
   columns: [
@@ -45,6 +45,7 @@ const schema = {
 };
 check('P2 方案与宽表通过', codes(2, response({ next_action_type: 'confirmation', experiment_plan: plan, data_table_schema: schema })).filter((code) => code.startsWith('P2_')).length === 0);
 check('P2 缺结构化方案被拒', codes(2, response({ next_action_type: 'confirmation', data_table_schema: schema })).includes('P2_PLAN_MISSING'));
+check('P2 方案数字必须由学生或前序状态确认', codes(2, response({ next_action_type: 'confirmation', experiment_plan: plan, data_table_schema: schema }), 'USER_MESSAGE', '{"学生说":"比较2个水平"}').includes('P2_UNGROUNDED_PLAN_NUMBER'));
 
 check('P3 首次进入必须安全题', codes(3, response({}), 'STAGE_ENTER').includes('P3_SAFETY_QUIZ_MISSING'));
 check('P3 提前分析被拒', codes(3, response({ dialogue: '数据显示第二组变化趋势更明显。' })).includes('P3_ANALYSIS_OVERREACH'));

@@ -10,7 +10,12 @@ export interface AdvanceCheck {
  * 处理由「学生点按钮」驱动的推进：1→2、3→4、4→5。
  * 2→3 由教师审核驱动，不走这里。
  */
-export function canAdvance(from: number, to: number, stageData: StageData): AdvanceCheck {
+export function canAdvance(
+  from: number,
+  to: number,
+  stageData: StageData,
+  context: { safetyQuizCompleted?: boolean } = {},
+): AdvanceCheck {
   if (to !== from + 1) {
     return { ok: false, error: '只能逐阶段推进' };
   }
@@ -28,6 +33,9 @@ export function canAdvance(from: number, to: number, stageData: StageData): Adva
   }
 
   if (from === 3 && to === 4) {
+    if (context.safetyQuizCompleted !== true && stageData.stage3?.safetyQuiz?.passed !== true) {
+      return { ok: false, error: '请先完成并通过本实验的安全问答' };
+    }
     const rows = stageData.stage3?.rows ?? [];
     const minRows = stageData.stage2?.schema?.minRows ?? 1;
     if (rows.length < minRows) {

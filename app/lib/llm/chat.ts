@@ -80,6 +80,21 @@ export async function callLLMWithTrace(
   contract?: LLMRuntimeContract,
   runtimeModel?: { provider: string; model: string }
 ): Promise<LLMCallTrace> {
+  // Behavioral grounding may use facts supplied in the current student turn
+  // and earlier student turns. Assistant history is deliberately excluded so
+  // a prior model hallucination cannot become an accepted source of truth.
+  const groundedContract = contract
+    ? {
+        ...contract,
+        visibleContext: JSON.stringify({
+          businessContext: contract.visibleContext ?? null,
+          currentStudentMessage: userMessage,
+          priorStudentMessages: history
+            .filter((message) => message.role === 'user')
+            .map((message) => message.content),
+        }),
+      }
+    : undefined;
   const messages: LLMMessage[] = [
     { role: 'system', content: systemPrompt },
     ...history.map((msg) => ({
@@ -94,7 +109,7 @@ export async function callLLMWithTrace(
   // Attempt 1: with response_format (JSON mode)
   const raw1 = await provider.chat(messages, { useJsonFormat: true });
   const parsed1 = safeParseChatResponse(raw1);
-  const checked1 = validateRuntimeContract(parsed1, contract);
+  const checked1 = validateRuntimeContract(parsed1, groundedContract);
 
   // JSON/语义契约都通过才返回。schema 已存在但 action 错误属于可确定修复，不额外调用模型。
   if (!APOLOGY_DIALOGUES.includes(parsed1.dialogue) && checked1.ok) {
@@ -141,7 +156,7 @@ export async function callLLMWithTrace(
 
   const raw2 = await provider.chat(retryMessages, { useJsonFormat: false });
   const parsed2 = safeParseChatResponse(raw2);
-  const checked2 = validateRuntimeContract(parsed2, contract);
+  const checked2 = validateRuntimeContract(parsed2, groundedContract);
   if (APOLOGY_DIALOGUES.includes(parsed2.dialogue) || !checked2.ok) {
     const codes = checked2.issues.map((item) => item.code).join(',') || 'JSON_PARSE_FAILED';
     console.error('Second LLM attempt failed response contract:', codes);

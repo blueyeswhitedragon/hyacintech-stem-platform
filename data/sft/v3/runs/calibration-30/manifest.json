@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 3,
+  "runId": "calibration-30",
+  "planFile": "data\\sft\\v3\\plans\\calibration-30.json",
+  "stageContractVersion": "stage-contract-v2",
+  "updatedAt": "2026-07-13T18:06:18.945Z",
+  "selectedTaskCount": 30,
+  "completedTaskCount": 30,
+  "candidateCount": 25,
+  "rejectedCount": 5,
+  "runtimes": {
+    "tutor": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro"
+    },
+    "student": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro"
+    },
+    "evaluator": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro"
+    }
+  },
+  "evaluatorIndependent": false,
+  "byPhase": {
+    "P1": 3,
+    "P2": 2,
+    "P3": 5,
+    "P4": 5,
+    "P5": 5,
+    "P6": 5
+  },
+  "byStyle": {
+    "socratic_concise": 5,
+    "warm_companion": 5,
+    "engineering_mentor": 4,
+    "evidence_analyst": 6,
+    "classroom_coach": 5
+  },
+  "byTier": {
+    "needs_review": 25
+  }
+}

@@ -53,7 +53,7 @@ export default async function CampaignsPage() {
 
   return <div className="space-y-6">
     <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">管理员</p><h1 className="mt-1 text-2xl font-semibold">标注任务分配</h1><p className="mt-1 text-sm text-gray-500">选择数据、人员和审核强度，系统自动按队列分发。</p></div><Link href="/data-lab/workload" className="rounded-lg border bg-white px-4 py-2 text-sm text-blue-700 hover:bg-blue-50">查看有效标注统计</Link></div>
-    <CampaignManager batches={batches.map((batch) => ({ id: batch.id, name: batch.name }))} annotators={annotators} />
+    <CampaignManager batches={batches.filter((batch) => batch.status === 'ACTIVE').map((batch) => ({ id: batch.id, name: batch.name }))} annotators={annotators} />
 
     <section className="space-y-3">
       <div><h2 className="font-semibold">当前活动</h2><p className="mt-1 text-xs text-gray-500">任务条数按每位参与者的一次独立标注计算；双标样本会产生两条任务。不再使用的活动请结束并归档，不要删除历史提交。</p></div>

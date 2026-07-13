@@ -172,7 +172,20 @@ function responseText(response: ChatResponse): string {
 }
 
 function numericTokens(value: string): Set<string> {
-  return new Set((value.match(/-?\d+(?:\.\d+)?/g) ?? []).map((item) => String(Number(item))));
+  const tokens = new Set((value.match(/-?\d+(?:\.\d+)?/g) ?? []).map((item) => String(Number(item))));
+  const digits: Record<string, number> = { 零: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+  for (const match of value.matchAll(/([零一二两三四五六七八九十]+)\s*(?=次|个|组|颗|粒|株|皿|天|小时|分钟|秒|℃|摄氏度|毫升|ml|%|档|水平)/gi)) {
+    const chinese = match[1];
+    let number: number | undefined;
+    if (chinese.includes('十')) {
+      const [left, right] = chinese.split('十');
+      number = (left ? digits[left] : 1) * 10 + (right ? digits[right] : 0);
+    } else if (chinese.length === 1) {
+      number = digits[chinese];
+    }
+    if (number !== undefined && Number.isFinite(number)) tokens.add(String(number));
+  }
+  return tokens;
 }
 
 function unseenNumericTokens(text: string, visibleContext?: string): string[] {
@@ -244,9 +257,11 @@ export function validateStageResponseBehavior(
       } else if (
         response.experiment_plan.independentVariable.levels.length < 2 ||
         !response.experiment_plan.dependentVariable.measurement.trim() ||
-        response.experiment_plan.procedure.length === 0
+        response.experiment_plan.procedure.length === 0 ||
+        !Number.isInteger(response.experiment_plan.repeatCount) ||
+        response.experiment_plan.repeatCount < 1
       ) {
-        issues.push(issue('P2_PLAN_INCOMPLETE', 'error', 'experiment_plan 必须包含至少两个水平、因变量测量方式和非空步骤'));
+        issues.push(issue('P2_PLAN_INCOMPLETE', 'error', 'experiment_plan 必须包含至少两个水平、因变量测量方式、非空步骤和有效重复次数'));
       }
       if (response.next_action_type !== 'confirmation') {
         issues.push(issue('P2_SCHEMA_ACTION_MISMATCH', 'error', '生成数据表时 next_action_type 必须为 confirmation'));
@@ -272,6 +287,17 @@ export function validateStageResponseBehavior(
       }
       if (keys.some((key) => /^(group|condition|treatment)(?:_name|_label)?$/.test(key))) {
         issues.push(issue('P2_LONG_FORMAT_GROUP_COLUMN', 'warning', '当前图表流程优先使用每个组别独立数值列的宽表结构'));
+      }
+    }
+    if (response.experiment_plan) {
+      const unseenPlanNumbers = unseenNumericTokens(JSON.stringify(response.experiment_plan), context.visibleContext);
+      if (unseenPlanNumbers.length > 0) {
+        issues.push(issue(
+          'P2_UNGROUNDED_PLAN_NUMBER',
+          'error',
+          `实验方案包含学生或前序状态未确认的数字：${unseenPlanNumbers.join('、')}`,
+          JSON.stringify(response.experiment_plan),
+        ));
       }
     }
   }

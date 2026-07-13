@@ -88,6 +88,7 @@ console.log('extractStageData:');
         controlledVariables: ['种子数量'],
         materials: ['绿豆'],
         procedure: ['按方案培养并记录'],
+        repeatCount: 3,
         safetyNotes: [],
       },
       data_table_schema: {
@@ -114,7 +115,10 @@ console.log('extractStageData:');
       evidenceCitations: ['第1天：2 对 5', '第2天：3 对 7'],
       studentEvidenceAccepted: true,
     },
-  }), { stage4: { analysisCount: 1 } });
+  }), { stage4: { analysisCount: 1 } }, {
+    studentMessage: '第1天两组是2和5，第2天两组是3和7。',
+    dataRows: [{ day: 1, group_a: 2, group_b: 5 }, { day: 2, group_a: 3, group_b: 7 }],
+  });
   check('stage4 有效证据轮次加一', r.stageData.stage4?.analysisCount === 2);
   check('stage4 保存证据引用', r.stageData.stage4?.evidenceCitations?.length === 2);
 }
@@ -247,7 +251,7 @@ console.log('safeParseChatResponse 透传:');
     experiment_plan: {
       independentVariable: { name: '温度', levels: ['低', '高'] },
       dependentVariable: { name: '溶解时间', measurement: '秒表记录秒数' },
-      controlledVariables: ['水量'], materials: ['烧杯'], procedure: ['记录时间'], safetyNotes: [],
+      controlledVariables: ['水量'], materials: ['烧杯'], procedure: ['记录时间'], repeatCount: 3, safetyNotes: [],
     },
     analysis_progress: {
       observation: '高温组更快', evidenceCitations: ['20秒与35秒'], studentEvidenceAccepted: true,

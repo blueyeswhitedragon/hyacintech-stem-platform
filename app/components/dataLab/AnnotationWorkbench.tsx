@@ -191,6 +191,7 @@ function Phase2Editor({ response, onChange }: { response: ChatResponse; onChange
     controlledVariables: [],
     materials: [],
     procedure: [],
+    repeatCount: 3,
     safetyNotes: [],
   };
   const splitLines = (value: string) => value.split('\n').map((item) => item.trim()).filter(Boolean);
@@ -202,6 +203,7 @@ function Phase2Editor({ response, onChange }: { response: ChatResponse; onChange
         <label className="text-xs">自变量水平（每行一个）<textarea value={plan.independentVariable.levels.join('\n')} onChange={(event) => onChange({ experiment_plan: { ...plan, independentVariable: { ...plan.independentVariable, levels: splitLines(event.target.value) } } })} className="mt-1 min-h-20 w-full border p-2 text-sm" /></label>
         <label className="text-xs">因变量名称<input value={plan.dependentVariable.name} onChange={(event) => onChange({ experiment_plan: { ...plan, dependentVariable: { ...plan.dependentVariable, name: event.target.value } } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>
         <label className="text-xs">测量方式<input value={plan.dependentVariable.measurement} onChange={(event) => onChange({ experiment_plan: { ...plan, dependentVariable: { ...plan.dependentVariable, measurement: event.target.value } } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>
+        <label className="text-xs">每个水平重复次数<input type="number" min={1} value={plan.repeatCount} onChange={(event) => onChange({ experiment_plan: { ...plan, repeatCount: Math.max(1, Number(event.target.value) || 1) } })} className="mt-1 w-full border px-2 py-1.5 text-sm" /></label>
         {([
           ['controlledVariables', '控制变量'],
           ['materials', '材料'],

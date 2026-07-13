@@ -42,7 +42,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     return NextResponse.json({ error: '会话不存在或无权访问' }, { status: 404 });
   }
 
-  const check = canAdvance(conv.currentStage, body.to, conv.stageData);
+  const check = canAdvance(conv.currentStage, body.to, conv.stageData, {
+    safetyQuizCompleted: conv.safetyQuizCompleted,
+  });
   if (!check.ok) {
     return NextResponse.json({ error: check.error }, { status: 400 });
   }

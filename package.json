@@ -8,10 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "tsx scripts/deploy-database.ts",
     "db:seed": "tsx prisma/seed.ts",
     "data-lab:init": "tsx scripts/init-data-lab.ts",
+    "data-lab:import": "tsx scripts/import-data-lab-batch.ts",
     "data-lab:pilot": "tsx scripts/setup-data-lab-pilot.ts",
-    "data-lab:test": "tsx scripts/test-style-policy.ts && tsx scripts/test-style-persistence.ts && tsx scripts/test-generation-trace.ts && tsx scripts/test-production-candidates.ts && tsx scripts/test-training-eligibility.ts && tsx scripts/test-deployment-gate.ts && tsx scripts/test-data-lab.ts && tsx scripts/test-workload-review.ts && tsx scripts/test-campaign-lifecycle.ts && tsx scripts/test-account-lifecycle.ts && tsx scripts/test-data-lab-integration.ts",
+    "data-lab:test:setup": "tsx scripts/setup-data-lab-test-fixtures.ts",
+    "data-lab:test": "tsx scripts/test-stage-contract.ts && tsx scripts/test-stage-extraction.ts && tsx scripts/test-stage-advance.ts && tsx scripts/test-report-summary.ts && tsx scripts/test-style-policy.ts && tsx scripts/test-style-persistence.ts && tsx scripts/test-generation-trace.ts && tsx scripts/test-production-candidates.ts && tsx scripts/test-training-eligibility.ts && tsx scripts/test-deployment-gate.ts && tsx scripts/test-data-lab.ts && tsx scripts/test-workload-review.ts && tsx scripts/test-campaign-lifecycle.ts && tsx scripts/test-account-lifecycle.ts && tsx scripts/test-data-lab-integration.ts",
     "model:bootstrap": "tsx scripts/bootstrap-model-registry.ts",
     "data-lab:test:session": "tsx scripts/test-session-revalidation.ts",
     "data-lab:audit-contract": "tsx scripts/audit-chat-contract.ts",
@@ -21,7 +24,9 @@
     "platform:launcher": "powershell -ExecutionPolicy Bypass -File ./scripts/launcher.ps1",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "data-lab:distill-rollout": "tsx scripts/distill-stage-contract-rollout.ts"
+    "data-lab:build-v3-plan": "tsx scripts/build-dataset-v3-plan.ts",
+    "data-lab:distill-rollout": "tsx scripts/distill-dataset-v3.ts",
+    "data-lab:validate-v3": "tsx scripts/validate-dataset-v3.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

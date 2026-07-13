@@ -20,6 +20,7 @@ interface Props {
   initialStageData: StageData;
   initialStatus: AssignmentStatus;
   initialStyleFamily: StyleFamily;
+  initialSafetyQuizCompleted: boolean;
 }
 
 export default function ConversationWorkspace({
@@ -29,12 +30,14 @@ export default function ConversationWorkspace({
   initialStageData,
   initialStatus,
   initialStyleFamily,
+  initialSafetyQuizCompleted,
 }: Props) {
   const [stage, setStage] = useState(initialStage);
   const [stageData, setStageData] = useState<StageData>(initialStageData);
   const [status, setStatus] = useState<AssignmentStatus>(initialStatus);
   const [completed, setCompleted] = useState(initialStatus === 'COMPLETED');
   const [injectedMessage, setInjectedMessage] = useState<Message | null>(null);
+  const [safetyQuizCompleted, setSafetyQuizCompleted] = useState(initialSafetyQuizCompleted);
   // 发送消息到会话端点（ConversationChat 注入；服务端已有历史，忽略 history 参数）
   const sendChat = async (message: string): Promise<ChatApiResponse> => {
     const res = await fetch(`/api/conversations/${conversationId}/chat`, {
@@ -47,12 +50,16 @@ export default function ConversationWorkspace({
     return data as ChatApiResponse;
   };
 
-  const markSafetyPassed = async () => {
-    await fetch(`/api/conversations/${conversationId}/safety-quiz`, {
+  const markSafetyPassed = async (selected: number) => {
+    const response = await fetch(`/api/conversations/${conversationId}/safety-quiz`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passed: true }),
+      body: JSON.stringify({ answer: selected }),
     });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || '安全问答提交失败');
+    setSafetyQuizCompleted(true);
+    if (data.stageData) setStageData(data.stageData);
   };
 
   // chat 响应后，以服务端返回的真相更新 stage / stageData
@@ -254,6 +261,7 @@ export default function ConversationWorkspace({
               initial={stageData.stage3}
               onSave={saveStage3}
               onComplete={() => advanceTo(4)}
+              disabledReason={safetyQuizCompleted || stageData.stage3?.safetyQuiz?.passed === true ? undefined : '请先在左侧完成安全问答，答对后才能录入实验数据。'}
             />
           </div>
         );

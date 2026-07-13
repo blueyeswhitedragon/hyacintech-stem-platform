@@ -133,7 +133,10 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     const response = llmResult.response;
 
     // 结构化提取（纯函数）
-    const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData);
+    const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData, {
+      studentMessage: message,
+      dataRows: conv.stageData.stage3?.rows ?? [],
+    });
 
     // 记录本阶段轮次
     stageData.roundCounts = { ...prevRounds, [stage]: roundCount };
@@ -179,6 +182,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       assistantMessageId: assistantMessage.id,
       userMessage: message,
       systemPrompt,
+      trainingSystemPromptSnapshot: conv.dataConsentStatus === 'GRANTED' ? systemPrompt : '',
       response,
       modelVersionId: modelVersion.id,
       modelIdentity,

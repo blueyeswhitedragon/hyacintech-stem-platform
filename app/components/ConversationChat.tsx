@@ -27,7 +27,7 @@ interface Props {
   /** 每次 chat 响应后回调，供 workspace 更新 stage / stageData。 */
   onResult?: (data: ChatApiResponse) => void;
   /** 安全问答答对后的回调（正式模式 POST safety-quiz；体验模式本地无操作）。 */
-  onSafetyPassed?: () => void | Promise<void>;
+  onSafetyPassed?: (selected: number) => void | Promise<void>;
   /** 当阶段完成且用户点击"确认"时，直接推进阶段（不再发 LLM 请求）。 */
   onPhaseConfirm?: () => Promise<string | null>;
   /** 本阶段累计对话轮次，用于判断是否显示「我已准备好，进入下一步」逃生按钮。 */
@@ -165,9 +165,10 @@ export default function ConversationChat({ initialMessages, stage, completed, se
     }
     // 答对 → 通知调用方（正式模式 POST safety-quiz；体验模式无操作）
     try {
-      await onSafetyPassed?.();
-    } catch {
-      // 标记失败不阻断；下次进入会重新出题
+      await onSafetyPassed?.(quizChoice);
+    } catch (error) {
+      setQuizError(error instanceof Error ? error.message : '安全问答提交失败，请重试。');
+      return;
     }
     setQuiz(null);
     setMessages((prev) => [

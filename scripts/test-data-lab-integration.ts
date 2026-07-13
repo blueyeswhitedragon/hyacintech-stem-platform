@@ -43,7 +43,7 @@ async function main() {
     db.user.findFirstOrThrow({ where: { role: 'admin', isActive: true } }),
     db.user.findMany({ where: { role: 'annotator', isActive: true }, orderBy: { username: 'asc' }, take: 2 }),
     db.user.findFirstOrThrow({ where: { role: 'reviewer', isActive: true }, orderBy: { username: 'asc' } }),
-    db.annotationCampaign.findUniqueOrThrow({ where: { name: 'dataset-base-v1-pilot-12' } }),
+    db.annotationCampaign.findUniqueOrThrow({ where: { name: process.env.DATA_LAB_TEST_CAMPAIGN ?? 'dataset-base-v1-pilot-12' } }),
   ]);
   if (annotatorRows.length < 2) throw new Error('集成测试至少需要 2 个启用中的标注员账号');
   const [annotator1Row, annotator2Row] = annotatorRows;

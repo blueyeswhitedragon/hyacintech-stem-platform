@@ -4,9 +4,6 @@ ALTER TABLE "GenerationTrace" ADD COLUMN "systemPromptSnapshot" TEXT NOT NULL DE
 
 CREATE INDEX "GenerationTrace_triggerType_createdAt_idx" ON "GenerationTrace"("triggerType", "createdAt");
 
--- Existing deployed model rows must describe the prompt/contract actually used after this refactor.
-UPDATE "ModelVersion"
-SET "promptPolicyVersion" = 'stem-six-phase-v2',
-    "contractVersion" = 'stage-contract-v2'
-WHERE "promptPolicyVersion" = 'stem-six-phase-v1'
-   OR "contractVersion" = 'chat-contract-v1';
+-- Historical ModelVersion rows are intentionally left untouched. A prompt or
+-- contract change is registered as a new version by model:bootstrap so past
+-- evaluations and deployments remain truthful.

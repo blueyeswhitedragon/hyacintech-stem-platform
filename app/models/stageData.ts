@@ -49,6 +49,8 @@ export interface Stage2ExperimentPlan {
   controlledVariables: string[];
   materials: string[];
   procedure: string[];
+  /** 每个自变量水平至少重复多少次；用于区分“组别数”和“重复测量次数”。 */
+  repeatCount: number;
   safetyNotes: string[];
 }
 
@@ -74,6 +76,13 @@ export interface Stage3FileAssociation {
 export interface Stage3Data {
   rows: Record<string, unknown>[]; // 每行都是 { [colKey]: value }
   fileAssociations?: Stage3FileAssociation[];
+  safetyQuiz?: {
+    question: string;
+    options: string[];
+    correct: number;
+    selected?: number;
+    passed: boolean;
+  };
   /** 学生点 3→4 推进时置 true，进入教师「数据表待过目（可选）」清单（非阻塞）。 */
   submitted?: boolean;
   /** 教师审核结果：true=已过目认可；false=被打回需修改；undefined=未过目。 */
@@ -88,6 +97,13 @@ export interface Stage4Data {
   evidenceCitations?: string[];
   anomalies?: string[];
   interpretations?: string[];
+  evidenceRounds?: Array<{
+    observation: string;
+    citations: string[];
+    matchedValues: string[];
+    anomaly?: string;
+    interpretation?: string;
+  }>;
 }
 
 export interface Stage5Sections {
