@@ -333,31 +333,130 @@ export async function listCampaignProgress() {
         select: {
           status: true,
           sampleId: true,
+          draftJson: true,
           workReviews: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true } },
         },
       },
       reviewCases: { select: { status: true } },
+      releases: { select: { id: true } },
     },
   });
   return campaigns.map((campaign) => {
     const bySample = new Map<string, typeof campaign.tasks>();
     for (const task of campaign.tasks) bySample.set(task.sampleId, [...(bySample.get(task.sampleId) ?? []), task]);
     const approvedTasks = campaign.tasks.filter((task) => task.workReviews[0]?.status === 'APPROVED').length;
+    const unfinishedTasks = campaign.tasks.filter((task) => ['PENDING', 'IN_PROGRESS', 'RETURNED'].includes(task.status));
     return {
       id: campaign.id,
       name: campaign.name,
       status: campaign.status,
       createdBy: campaign.createdBy,
+      completedAt: campaign.completedAt?.toISOString() ?? null,
       participantCount: campaign.participants.length,
       taskCount: campaign.tasks.length,
       submittedTaskCount: campaign.tasks.filter((task) => task.status === 'SUBMITTED').length,
+      cancelledTaskCount: campaign.tasks.filter((task) => task.status === 'CANCELLED').length,
+      unfinishedTaskCount: unfinishedTasks.length,
+      inProgressTaskCount: unfinishedTasks.filter((task) => ['IN_PROGRESS', 'RETURNED'].includes(task.status)).length,
+      draftTaskCount: unfinishedTasks.filter((task) => hasMeaningfulDraft(task.draftJson)).length,
       approvedTaskCount: approvedTasks,
       pendingWorkReviewCount: campaign.tasks.filter((task) => task.workReviews[0]?.status === 'PENDING').length,
       sampleCount: bySample.size,
       completedSampleCount: [...bySample.values()].filter((tasks) => tasks.length > 0 && tasks.every((task) => task.workReviews[0]?.status === 'APPROVED')).length,
       pendingReviewCount: campaign.reviewCases.filter((item) => ['PENDING', 'IN_REVIEW'].includes(item.status)).length,
       decidedReviewCount: campaign.reviewCases.filter((item) => item.status === 'DECIDED').length,
+      releaseCount: campaign.releases.length,
+      canDelete: campaign.status === 'DRAFT'
+        && campaign.tasks.length === 0
+        && campaign.reviewCases.length === 0
+        && campaign.releases.length === 0,
     };
+  });
+}
+
+export async function archiveCampaign(id: string, reason: string, user: SessionUser) {
+  if (!isAdmin(user.role)) throw new Error('仅管理员可以结束标注活动');
+  const trimmedReason = reason.trim();
+  if (!trimmedReason) throw new Error('请填写结束活动的原因');
+
+  return db.$transaction(async (tx) => {
+    const campaign = await tx.annotationCampaign.findUnique({
+      where: { id },
+      include: {
+        tasks: {
+          select: {
+            status: true,
+            draftJson: true,
+            workReviews: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true } },
+          },
+        },
+        reviewCases: { select: { status: true } },
+        releases: { select: { id: true } },
+      },
+    });
+    if (!campaign) throw new Error('标注活动不存在');
+    if (campaign.status === 'DRAFT') throw new Error('草稿活动尚未产生任务，请使用永久删除');
+    if (campaign.status === 'ARCHIVED') throw new Error('标注活动已经归档');
+    if (campaign.status !== 'ACTIVE') throw new Error('只有进行中的活动可以结束并归档');
+
+    const unfinished = campaign.tasks.filter((task) => ['PENDING', 'IN_PROGRESS', 'RETURNED'].includes(task.status));
+    const cancelled = await tx.annotationTask.updateMany({
+      where: { campaignId: id, status: { in: ['PENDING', 'IN_PROGRESS', 'RETURNED'] } },
+      data: { status: 'CANCELLED', leaseExpiresAt: null },
+    });
+    await tx.campaignParticipant.updateMany({ where: { campaignId: id, active: true }, data: { active: false } });
+    await tx.annotationCampaign.update({
+      where: { id },
+      data: { status: 'ARCHIVED', completedAt: new Date() },
+    });
+
+    const summary = {
+      reason: trimmedReason,
+      previousStatus: campaign.status,
+      cancelledTaskCount: cancelled.count,
+      inProgressTaskCount: unfinished.filter((task) => ['IN_PROGRESS', 'RETURNED'].includes(task.status)).length,
+      draftTaskCount: unfinished.filter((task) => hasMeaningfulDraft(task.draftJson)).length,
+      submittedTaskCount: campaign.tasks.filter((task) => task.status === 'SUBMITTED').length,
+      pendingWorkReviewCount: campaign.tasks.filter((task) => task.workReviews[0]?.status === 'PENDING').length,
+      pendingReviewCount: campaign.reviewCases.filter((item) => ['PENDING', 'IN_REVIEW'].includes(item.status)).length,
+      releaseCount: campaign.releases.length,
+    };
+    await tx.dataLabAuditLog.create({
+      data: {
+        actorId: user.id,
+        action: 'CAMPAIGN_ARCHIVED',
+        entityType: 'AnnotationCampaign',
+        entityId: id,
+        payloadJson: JSON.stringify(summary),
+      },
+    });
+    return summary;
+  });
+}
+
+export async function deleteDraftCampaign(id: string, user: SessionUser) {
+  if (!isAdmin(user.role)) throw new Error('仅管理员可以删除标注活动');
+  return db.$transaction(async (tx) => {
+    const campaign = await tx.annotationCampaign.findUnique({
+      where: { id },
+      include: { _count: { select: { tasks: true, reviewCases: true, releases: true } } },
+    });
+    if (!campaign) throw new Error('标注活动不存在');
+    if (campaign.status !== 'DRAFT') throw new Error('已启动的活动必须归档，不能永久删除');
+    if (campaign._count.tasks > 0 || campaign._count.reviewCases > 0 || campaign._count.releases > 0) {
+      throw new Error('该活动已有任务、仲裁或发布记录，不能永久删除');
+    }
+    await tx.annotationCampaign.delete({ where: { id } });
+    await tx.dataLabAuditLog.create({
+      data: {
+        actorId: user.id,
+        action: 'UNUSED_CAMPAIGN_DELETED',
+        entityType: 'AnnotationCampaign',
+        entityId: id,
+        payloadJson: JSON.stringify({ name: campaign.name }),
+      },
+    });
+    return { ok: true };
   });
 }
 
@@ -470,6 +569,7 @@ export async function claimAnnotationTask(user: SessionUser) {
     where: {
       assignedToId: user.id,
       status: { in: ['IN_PROGRESS', 'RETURNED'] },
+      campaign: { status: 'ACTIVE' },
     },
     orderBy: { updatedAt: 'desc' },
   });
@@ -477,7 +577,16 @@ export async function claimAnnotationTask(user: SessionUser) {
     const expired = !active.leaseExpiresAt || active.leaseExpiresAt <= now;
     if (active.status === 'RETURNED' || expired) {
       const leaseExpiresAt = new Date(Date.now() + LEASE_MS);
-      await db.annotationTask.update({ where: { id: active.id }, data: { status: 'IN_PROGRESS', leaseExpiresAt } });
+      const renewed = await db.annotationTask.updateMany({
+        where: {
+          id: active.id,
+          assignedToId: user.id,
+          status: active.status,
+          campaign: { status: 'ACTIVE' },
+        },
+        data: { status: 'IN_PROGRESS', leaseExpiresAt },
+      });
+      if (renewed.count !== 1) return claimAnnotationTask(user);
       await audit(user.id, 'ANNOTATION_TASK_RENEWED', 'AnnotationTask', active.id, { previousStatus: active.status, expired });
     }
     return taskPayload(active.id, user.id);
@@ -499,6 +608,7 @@ export async function claimAnnotationTask(user: SessionUser) {
     where: {
       id: fallback.id,
       draftJson: fallback.draftJson,
+      campaign: { status: 'ACTIVE' },
       OR: [
         { status: 'PENDING', assignedToId: null },
         { status: 'IN_PROGRESS', leaseExpiresAt: { lt: now } },
@@ -536,13 +646,12 @@ export async function claimAnnotationTaskWithStatus(user: SessionUser) {
 }
 
 export async function saveTaskDraft(taskId: string, input: RevisionInput, user: SessionUser) {
-  const task = await db.annotationTask.findUnique({ where: { id: taskId } });
-  if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS') throw new Error('任务不可编辑');
   const normalized = normalizeLegacyEmptyStage2Schemas(input);
-  await db.annotationTask.update({
-    where: { id: taskId },
+  const updated = await db.annotationTask.updateMany({
+    where: { id: taskId, assignedToId: user.id, status: 'IN_PROGRESS', campaign: { status: 'ACTIVE' } },
     data: { draftJson: JSON.stringify(normalized.input), leaseExpiresAt: new Date(Date.now() + LEASE_MS) },
   });
+  if (updated.count !== 1) throw new Error('任务不可编辑，所属活动可能已经结束');
   if (normalized.removedMessageIndexes.length > 0) {
     await audit(user.id, 'EMPTY_STAGE2_SCHEMA_NORMALIZED', 'AnnotationTask', taskId, { messageIndexes: normalized.removedMessageIndexes });
   }
@@ -566,6 +675,11 @@ export async function submitAnnotationTask(taskId: string, input: RevisionInput,
   if (check.status === 'error') throw new Error(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；'));
 
   const revision = await db.$transaction(async (tx) => {
+    const currentTask = await tx.annotationTask.findFirst({
+      where: { id: taskId, assignedToId: user.id, status: 'IN_PROGRESS', campaign: { status: 'ACTIVE' } },
+      select: { id: true },
+    });
+    if (!currentTask) throw new Error('任务不可提交，所属活动可能已经结束');
     const latest = await tx.annotationRevision.findFirst({ where: { taskId }, orderBy: { version: 'desc' } });
     const created = await tx.annotationRevision.create({
       data: {
@@ -638,10 +752,13 @@ export async function reviewAnnotationWork(input: {
     where: { id: input.reviewId },
     include: {
       revision: true,
-      task: { include: { revisions: { orderBy: { version: 'desc' }, take: 1 } } },
+      task: { include: { campaign: { select: { status: true } }, revisions: { orderBy: { version: 'desc' }, take: 1 } } },
     },
   });
   if (!review || review.status !== 'PENDING') throw new Error('该提交已审核或不存在');
+  if (input.status === 'RETURNED' && review.task.campaign.status !== 'ACTIVE') {
+    throw new Error('活动已结束，不能再退回给标注员修改；可以审核通过或标记无效');
+  }
   if (review.revision.authorId === input.user.id) throw new Error('不能审核自己的标注提交');
   if (review.task.revisions[0]?.id !== review.revisionId) throw new Error('该提交已被更新，请审核最新版本');
   const reviewCase = await db.reviewCase.findUnique({
@@ -667,15 +784,22 @@ export async function reviewAnnotationWork(input: {
     });
     await ensureReviewCaseReady(review.task.campaignId, review.task.sampleId);
   } else {
-    const nextTaskData = input.status === 'RETURNED'
-      ? {
-          status: 'RETURNED',
-          draftJson: JSON.stringify({ ...revisionDraft(review.revision), changeReason: `${review.revision.changeReason}\n工作量审核退回：${note}`.trim() }),
-          leaseExpiresAt: null,
-          submittedAt: null,
-        }
-      : { status: 'PENDING', assignedToId: null, draftJson: '{}', leaseExpiresAt: null, submittedAt: null };
     await db.$transaction(async (tx) => {
+      const campaign = await tx.annotationCampaign.findUnique({ where: { id: review.task.campaignId }, select: { status: true } });
+      if (!campaign) throw new Error('标注活动不存在');
+      if (input.status === 'RETURNED' && campaign.status !== 'ACTIVE') {
+        throw new Error('活动已结束，不能再退回给标注员修改；可以审核通过或标记无效');
+      }
+      const nextTaskData = input.status === 'RETURNED'
+        ? {
+            status: 'RETURNED',
+            draftJson: JSON.stringify({ ...revisionDraft(review.revision), changeReason: `${review.revision.changeReason}\n工作量审核退回：${note}`.trim() }),
+            leaseExpiresAt: null,
+            submittedAt: null,
+          }
+        : campaign.status === 'ACTIVE'
+          ? { status: 'PENDING', assignedToId: null, draftJson: '{}', leaseExpiresAt: null, submittedAt: null }
+          : { status: 'CANCELLED', leaseExpiresAt: null };
       await tx.annotationWorkReview.update({
         where: { id: review.id },
         data: { status: input.status, note, reviewerId: input.user.id, reviewedAt: new Date() },
@@ -694,7 +818,7 @@ async function currentWorkReviewRows() {
     include: {
       reviewer: { select: { displayName: true } },
       revision: { include: { author: { select: { id: true, username: true, displayName: true, role: true } } } },
-      task: { include: { campaign: { select: { id: true, name: true } }, sample: { select: { sourceRecordId: true, phase: true, scenario: true } } } },
+      task: { include: { campaign: { select: { id: true, name: true, status: true } }, sample: { select: { sourceRecordId: true, phase: true, scenario: true } } } },
     },
   });
   const latest = new Map<string, (typeof rows)[number]>();
@@ -872,7 +996,10 @@ export async function claimReviewCase(user: SessionUser) {
 }
 
 async function reviewPayload(reviewCaseId: string, reviewerId: string) {
-  const item = await db.reviewCase.findUnique({ where: { id: reviewCaseId }, include: { sample: true } });
+  const item = await db.reviewCase.findUnique({
+    where: { id: reviewCaseId },
+    include: { sample: true, campaign: { select: { status: true } } },
+  });
   if (!item || item.assignedReviewerId !== reviewerId) throw new Error('复审任务不存在');
   const ids = parseJson<string[]>(item.candidateRevisionIdsJson, []);
   const revisions = await db.annotationRevision.findMany({
@@ -901,6 +1028,7 @@ async function reviewPayload(reviewCaseId: string, reviewerId: string) {
     styleFamily: styleFamilies.length === 1 ? styleFamilies[0] : null,
     stylePolicyVersion: styleVersions.length === 1 ? styleVersions[0] : DEFAULT_STYLE_POLICY_VERSION,
     styleTargetMismatch: styleFamilies.length > 1,
+    campaignStatus: item.campaign.status,
     autoCheck: parseJson(item.sample.autoCheckJson, {}),
   };
 }
@@ -915,7 +1043,10 @@ export async function decideReview(input: {
   reason: string;
   user: SessionUser;
 }) {
-  const reviewCase = await db.reviewCase.findUnique({ where: { id: input.reviewCaseId }, include: { sample: true } });
+  const reviewCase = await db.reviewCase.findUnique({
+    where: { id: input.reviewCaseId },
+    include: { sample: true, campaign: { select: { status: true } } },
+  });
   if (!reviewCase || reviewCase.assignedReviewerId !== input.user.id || reviewCase.status !== 'IN_REVIEW') throw new Error('复审任务不可提交');
   const candidateIds = parseJson<string[]>(reviewCase.candidateRevisionIdsJson, []);
   const selfAuthored = await db.annotationRevision.count({ where: { id: { in: candidateIds }, authorId: input.user.id } });
@@ -923,11 +1054,18 @@ export async function decideReview(input: {
   if (input.selectedRevisionId && !candidateIds.includes(input.selectedRevisionId)) throw new Error('所选 revision 不属于该复审任务');
 
   if (input.action === 'RETURN') {
+    if (reviewCase.campaign.status !== 'ACTIVE') {
+      throw new Error('活动已结束，不能再退回给标注员修改；请选择、合并或拒绝现有版本');
+    }
     const tasks = await db.annotationTask.findMany({
       where: { campaignId: reviewCase.campaignId, sampleId: reviewCase.sampleId },
       include: { revisions: { orderBy: { version: 'desc' }, take: 1 } },
     });
     await db.$transaction(async (tx) => {
+      const campaign = await tx.annotationCampaign.findUnique({ where: { id: reviewCase.campaignId }, select: { status: true } });
+      if (campaign?.status !== 'ACTIVE') {
+        throw new Error('活动已结束，不能再退回给标注员修改；请选择、合并或拒绝现有版本');
+      }
       for (const task of tasks) {
         const latest = task.revisions[0];
         const draft: RevisionInput | undefined = latest ? {
