@@ -1,14 +1,7 @@
 import type { ChatResponse } from '@/app/models/types';
-
-export const STYLE_FAMILIES = [
-  'socratic_concise',
-  'warm_companion',
-  'engineering_mentor',
-  'evidence_analyst',
-  'classroom_coach',
-] as const;
-
-export type StyleFamily = (typeof STYLE_FAMILIES)[number];
+export { STYLE_FAMILIES, STYLE_LABELS } from '@/app/lib/stylePolicy';
+export type { StyleFamily } from '@/app/lib/stylePolicy';
+import type { StyleFamily } from '@/app/lib/stylePolicy';
 
 export const WORK_REVIEW_STATUSES = ['PENDING', 'APPROVED', 'RETURNED', 'INVALID'] as const;
 export type WorkReviewStatus = (typeof WORK_REVIEW_STATUSES)[number];
@@ -18,14 +11,6 @@ export const WORK_REVIEW_LABELS: Record<WorkReviewStatus, string> = {
   APPROVED: '审核通过',
   RETURNED: '退回修改',
   INVALID: '无效',
-};
-
-export const STYLE_LABELS: Record<StyleFamily, string> = {
-  socratic_concise: '苏格拉底简洁型',
-  warm_companion: '温和陪伴型',
-  engineering_mentor: '工程导师型',
-  evidence_analyst: '证据分析型',
-  classroom_coach: '课堂教练型',
 };
 
 export const ISSUE_TAGS = [
@@ -97,7 +82,16 @@ export interface ShareGPTRecord {
     sourceKind?: string;
     distillTaskId?: string;
     personaId?: string;
+    styleFamily?: StyleFamily;
+    stylePolicyVersion?: string;
   };
+}
+
+export interface TrainingShareGPTRecord extends Omit<ShareGPTRecord, 'conversations'> {
+  conversations: Array<{
+    from: 'system' | 'human' | 'gpt';
+    value: string;
+  }>;
 }
 
 export interface AutoCheckIssue {
@@ -122,15 +116,28 @@ export interface RevisionInput {
   issueTags: string[];
   changeReason: string;
   noChange: boolean;
+  transformationType?: TransformationType;
 }
+
+export const TRANSFORMATION_TYPES = ['NO_CHANGE', 'LIGHT_EDIT', 'MATERIAL_CORRECTION', 'HUMAN_REWRITE'] as const;
+export type TransformationType = (typeof TRANSFORMATION_TYPES)[number];
+
+export const TRANSFORMATION_LABELS: Record<TransformationType, string> = {
+  NO_CHANGE: '无需修改',
+  LIGHT_EDIT: '轻微润色',
+  MATERIAL_CORRECTION: '实质纠正',
+  HUMAN_REWRITE: '人工重写',
+};
 
 export interface AnnotationPayload {
   taskId: string;
   sampleId: string;
   sourceRecordId: string;
+  sourceKind: string;
   phase: number;
   scenario: string;
   styleFamily: StyleFamily | null;
+  stylePolicyVersion: string;
   conversations: Array<{
     index: number;
     from: 'human' | 'gpt';

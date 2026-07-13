@@ -5,6 +5,7 @@ import { ensureStudentConversation } from '@/app/lib/conversation';
 import { db } from '@/app/lib/db';
 import AuthNav from '@/app/components/AuthNav';
 import ConversationWorkspace from '@/app/components/ConversationWorkspace';
+import DataConsentCard from '@/app/components/DataConsentCard';
 
 export default async function StudentConversationPage(
   ctx: PageProps<'/student/assignments/[id]'>
@@ -23,7 +24,15 @@ export default async function StudentConversationPage(
 
   const assignment = await db.assignment.findUnique({
     where: { id: assignmentId },
-    select: { title: true },
+    select: {
+      title: true,
+      dataContributionMode: true,
+      studentAssignments: {
+        where: { studentId: user.id },
+        select: { id: true, dataConsentStatus: true },
+        take: 1,
+      },
+    },
   });
 
   return (
@@ -41,6 +50,12 @@ export default async function StudentConversationPage(
       </header>
 
       <div className="flex-1 max-w-6xl w-full mx-auto p-4 min-h-0">
+        {assignment?.dataContributionMode === 'CONSENT_REQUIRED' && assignment.studentAssignments[0] && (
+          <DataConsentCard
+            studentAssignmentId={assignment.studentAssignments[0].id}
+            initialStatus={assignment.studentAssignments[0].dataConsentStatus}
+          />
+        )}
         <div className="h-[calc(100vh-8rem)]">
           <ConversationWorkspace
             conversationId={result.conversationId}
@@ -48,6 +63,7 @@ export default async function StudentConversationPage(
             initialStage={result.currentStage}
             initialStageData={result.stageData}
             initialStatus={result.status}
+            initialStyleFamily={result.styleFamily}
           />
         </div>
       </div>

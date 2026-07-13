@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { requireRole } from '@/app/lib/auth';
 import { getClassAssignments } from '@/app/lib/queries';
+import {
+  DEFAULT_STYLE_POLICY_VERSION,
+  isAssistantStyleSelection,
+  type AssistantStyleSelection,
+} from '@/app/lib/stylePolicy';
+import { DATA_POLICY_VERSION } from '@/app/lib/productionCandidates';
 
 // 校验班级存在且归属当前教师
 async function assertClassOwnership(classId: string, teacherId: string) {
@@ -20,7 +26,7 @@ export async function POST(request: Request) {
   const auth = await requireRole('teacher');
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  let body: { classId?: string; title?: string; topicDirection?: string; dueDate?: string };
+  let body: { classId?: string; title?: string; topicDirection?: string; dueDate?: string; assistantStyleFamily?: AssistantStyleSelection; allowDataContribution?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -31,6 +37,10 @@ export async function POST(request: Request) {
   const title = body.title?.trim();
   if (!classId) return NextResponse.json({ error: '请选择班级' }, { status: 400 });
   if (!title) return NextResponse.json({ error: '请填写作业标题' }, { status: 400 });
+  const assistantStyleFamily = body.assistantStyleFamily ?? 'auto';
+  if (!isAssistantStyleSelection(assistantStyleFamily)) {
+    return NextResponse.json({ error: '导师回复风格无效' }, { status: 400 });
+  }
 
   const own = await assertClassOwnership(classId, auth.user.id);
   if (!own.ok) return NextResponse.json({ error: own.error }, { status: own.status });
@@ -49,9 +59,13 @@ export async function POST(request: Request) {
       classId,
       title,
       topicDirection: body.topicDirection?.trim() || null,
+      assistantStyleFamily,
+      stylePolicyVersion: DEFAULT_STYLE_POLICY_VERSION,
+      dataContributionMode: body.allowDataContribution ? 'CONSENT_REQUIRED' : 'DISABLED',
+      dataPolicyVersion: body.allowDataContribution ? DATA_POLICY_VERSION : null,
       dueDate,
     },
-    select: { id: true, title: true, topicDirection: true, dueDate: true, createdAt: true },
+    select: { id: true, title: true, topicDirection: true, assistantStyleFamily: true, stylePolicyVersion: true, dataContributionMode: true, dataPolicyVersion: true, dueDate: true, createdAt: true },
   });
 
   return NextResponse.json({ assignment }, { status: 201 });

@@ -21,8 +21,28 @@ export async function callLLM(
   systemPrompt: string,
   userMessage: string,
   history: Message[],
-  contract?: { stage: number; hasStage2Schema?: boolean }
+  contract?: { stage: number; hasStage2Schema?: boolean },
+  runtimeModel?: { provider: string; model: string }
 ): Promise<ChatResponse> {
+  return (await callLLMWithTrace(systemPrompt, userMessage, history, contract, runtimeModel)).response;
+}
+
+export interface LLMCallTrace {
+  response: ChatResponse;
+  trace: {
+    generationParams: Record<string, unknown>;
+    contractCheck: Record<string, unknown>;
+  };
+}
+
+/** Same behavior as callLLM, plus non-secret evidence needed by GenerationTrace. */
+export async function callLLMWithTrace(
+  systemPrompt: string,
+  userMessage: string,
+  history: Message[],
+  contract?: { stage: number; hasStage2Schema?: boolean },
+  runtimeModel?: { provider: string; model: string }
+): Promise<LLMCallTrace> {
   const messages: LLMMessage[] = [
     { role: 'system', content: systemPrompt },
     ...history.map((msg) => ({
@@ -32,7 +52,7 @@ export async function callLLM(
     { role: 'user', content: userMessage },
   ];
 
-  const provider = createLLMProvider();
+  const provider = createLLMProvider(runtimeModel);
 
   // Attempt 1: with response_format (JSON mode)
   const raw1 = await provider.chat(messages, { useJsonFormat: true });
@@ -46,7 +66,25 @@ export async function callLLM(
     if (checked1.repairs.length > 0) {
       console.warn('LLM response contract repaired:', checked1.repairs.map((item) => item.code).join(','));
     }
-    return checked1.response;
+    return {
+      response: checked1.response,
+      trace: {
+        generationParams: {
+          temperature: 0.3,
+          maxTokens: process.env.LLM_MAX_TOKENS
+            ? Number(process.env.LLM_MAX_TOKENS)
+            : 2000,
+          responseFormat: 'json_object',
+          successfulAttempt: 1,
+        },
+        contractCheck: {
+          ok: true,
+          stage: contract?.stage ?? null,
+          issues: checked1.issues,
+          repairs: checked1.repairs,
+        },
+      },
+    };
   }
 
   // Attempt 2: JSON 解析失败或跨字段契约不一致时，只重试一次。
@@ -83,5 +121,24 @@ export async function callLLM(
   if (checked2.repairs.length > 0) {
     console.warn('Retried LLM response contract repaired:', checked2.repairs.map((item) => item.code).join(','));
   }
-  return checked2.response;
+  return {
+    response: checked2.response,
+    trace: {
+      generationParams: {
+        temperature: 0.3,
+        maxTokens: process.env.LLM_MAX_TOKENS
+          ? Number(process.env.LLM_MAX_TOKENS)
+          : 2000,
+        responseFormat: 'plain_retry',
+        successfulAttempt: 2,
+      },
+      contractCheck: {
+        ok: true,
+        stage: contract?.stage ?? null,
+        firstAttemptIssues: checked1.issues,
+        issues: checked2.issues,
+        repairs: checked2.repairs,
+      },
+    },
+  };
 }

@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       status?: string;
       modelTag?: string;
       notes?: string;
+      parentModelVersionId?: string;
     };
     if (!body.name?.trim() || !body.releaseId || !body.baseModel?.trim()) return NextResponse.json({ error: 'name、releaseId、baseModel 必填' }, { status: 400 });
     const run = await createTrainingRun({ ...body, name: body.name.trim(), releaseId: body.releaseId, baseModel: body.baseModel.trim(), user: auth.user });

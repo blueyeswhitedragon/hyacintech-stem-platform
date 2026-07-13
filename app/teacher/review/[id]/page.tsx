@@ -5,6 +5,7 @@ import { getReviewItem } from '@/app/lib/queries';
 import { parseStageData } from '@/app/lib/conversation';
 import AuthNav from '@/app/components/AuthNav';
 import ReviewActionForm from '@/app/components/ReviewActionForm';
+import CandidateNominationPanel from '@/app/components/CandidateNominationPanel';
 
 export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/review/[id]'>) {
   const user = await getCurrentUser();
@@ -172,6 +173,26 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
               </div>
             )}
           </section>
+        )}
+
+        {item.assignment.dataContributionMode === 'CONSENT_REQUIRED' && (
+          <CandidateNominationPanel
+            studentAssignmentId={item.id}
+            consentStatus={item.dataConsentStatus}
+            traces={(item.conversation?.generationTraces ?? []).map((trace) => {
+              let dialogue = '（结构化回复）';
+              try {
+                const parsed = JSON.parse(trace.responseJson) as { dialogue?: string };
+                dialogue = parsed.dialogue ?? dialogue;
+              } catch {}
+              return {
+                assistantMessageId: trace.assistantMessageId,
+                stage: trace.stage,
+                dialogue,
+                candidateStatus: trace.productionCandidate?.status ?? null,
+              };
+            })}
+          />
         )}
 
         <ReviewActionForm studentAssignmentId={item.id} stage={reviewStage} />

@@ -3,6 +3,14 @@ import { db } from './db';
 import type { Message } from '@/app/models/types';
 import type { AssignmentStatus, StageData } from '@/app/models/stageData';
 import { initialWelcomeMessage } from './welcome';
+import {
+  DEFAULT_STYLE_FAMILY,
+  DEFAULT_STYLE_POLICY_VERSION,
+  isStyleFamily,
+  resolveStyleFamily,
+  type AssistantStyleSelection,
+  type StyleFamily,
+} from './stylePolicy';
 
 export { initialWelcomeMessage };
 
@@ -35,6 +43,8 @@ export type EnsureConversationResult =
       messages: Message[];
       stageData: StageData;
       status: AssignmentStatus;
+      styleFamily: StyleFamily;
+      stylePolicyVersion: string;
     }
   | { ok: false; error: 'not_found' | 'forbidden' };
 
@@ -48,7 +58,16 @@ export async function ensureStudentConversation(
 ): Promise<EnsureConversationResult> {
   const assignment = await db.assignment.findUnique({
     where: { id: assignmentId },
-    select: { id: true, classId: true, title: true, topicDirection: true },
+    select: {
+      id: true,
+      classId: true,
+      title: true,
+      topicDirection: true,
+      assistantStyleFamily: true,
+      stylePolicyVersion: true,
+      dataContributionMode: true,
+      dataPolicyVersion: true,
+    },
   });
   if (!assignment) return { ok: false, error: 'not_found' };
 
@@ -60,12 +79,12 @@ export async function ensureStudentConversation(
 
   const existing = await db.studentAssignment.findUnique({
     where: { assignmentId_studentId: { assignmentId, studentId } },
-    select: { id: true, conversationId: true, currentStage: true, status: true },
+    select: { id: true, conversationId: true, currentStage: true, status: true, dataConsentStatus: true },
   });
   if (existing?.conversationId) {
     const conv = await db.conversation.findUnique({
       where: { id: existing.conversationId },
-      select: { messages: true, stageData: true },
+      select: { messages: true, stageData: true, resolvedStyleFamily: true, stylePolicyVersion: true },
     });
     return {
       ok: true,
@@ -75,6 +94,8 @@ export async function ensureStudentConversation(
       messages: parseMessages(conv?.messages ?? '[]'),
       stageData: parseStageData(conv?.stageData ?? '{}'),
       status: existing.status as AssignmentStatus,
+      styleFamily: isStyleFamily(conv?.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
+      stylePolicyVersion: conv?.stylePolicyVersion ?? DEFAULT_STYLE_POLICY_VERSION,
     };
   }
 
@@ -82,15 +103,32 @@ export async function ensureStudentConversation(
     assignmentTitle: assignment.title,
     topicDirection: assignment.topicDirection ?? undefined,
   })];
+  const styleSelection: AssistantStyleSelection = assignment.assistantStyleFamily === 'auto' || isStyleFamily(assignment.assistantStyleFamily)
+    ? assignment.assistantStyleFamily
+    : 'auto';
+  const resolvedStyleFamily = resolveStyleFamily(styleSelection, assignment.id, studentId);
   const result = await db.$transaction(async (tx) => {
     const conversation = await tx.conversation.create({
-      data: { userId: studentId, messages: JSON.stringify(welcome) },
+      data: {
+        userId: studentId,
+        messages: JSON.stringify(welcome),
+        resolvedStyleFamily,
+        stylePolicyVersion: assignment.stylePolicyVersion,
+        traceCoverage: 'COMPLETE',
+      },
       select: { id: true },
     });
     const studentAssignment = existing
       ? await tx.studentAssignment.update({
           where: { id: existing.id },
-          data: { conversationId: conversation.id, status: 'IN_PROGRESS', currentStage: 1 },
+          data: {
+            conversationId: conversation.id,
+            status: 'IN_PROGRESS',
+            currentStage: 1,
+            ...(assignment.dataContributionMode === 'CONSENT_REQUIRED' && existing.dataConsentStatus === 'NOT_APPLICABLE'
+              ? { dataConsentStatus: 'PENDING', dataConsentPolicyVersion: assignment.dataPolicyVersion }
+              : {}),
+          },
           select: { id: true },
         })
       : await tx.studentAssignment.create({
@@ -100,6 +138,8 @@ export async function ensureStudentConversation(
             conversationId: conversation.id,
             status: 'IN_PROGRESS',
             currentStage: 1,
+            dataConsentStatus: assignment.dataContributionMode === 'CONSENT_REQUIRED' ? 'PENDING' : 'NOT_APPLICABLE',
+            dataConsentPolicyVersion: assignment.dataContributionMode === 'CONSENT_REQUIRED' ? assignment.dataPolicyVersion : null,
           },
           select: { id: true },
         });
@@ -114,6 +154,8 @@ export async function ensureStudentConversation(
     messages: welcome,
     stageData: {},
     status: 'IN_PROGRESS',
+    styleFamily: resolvedStyleFamily,
+    stylePolicyVersion: assignment.stylePolicyVersion,
   };
 }
 
@@ -127,6 +169,8 @@ export interface ConversationForUser {
   assignmentId: string;
   topicDirection: string | null;
   safetyQuizCompleted: boolean;
+  styleFamily: StyleFamily;
+  stylePolicyVersion: string;
 }
 
 /**
@@ -145,6 +189,8 @@ export async function getConversationForUser(
       messages: true,
       stageData: true,
       safetyQuizCompleted: true,
+      resolvedStyleFamily: true,
+      stylePolicyVersion: true,
       studentAssignment: {
         select: {
           id: true,
@@ -168,5 +214,7 @@ export async function getConversationForUser(
     assignmentId: conv.studentAssignment.assignmentId,
     topicDirection: conv.studentAssignment.assignment.topicDirection,
     safetyQuizCompleted: conv.safetyQuizCompleted,
+    styleFamily: isStyleFamily(conv.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
+    stylePolicyVersion: conv.stylePolicyVersion || DEFAULT_STYLE_POLICY_VERSION,
   };
 }

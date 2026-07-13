@@ -8,8 +8,8 @@ export async function GET(_request: Request, ctx: RouteContext<'/api/data-lab/re
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
   try {
     const { id, kind } = await ctx.params;
-    if (!['clean', 'gold', 'silver', 'manifest'].includes(kind)) return NextResponse.json({ error: '导出类型无效' }, { status: 400 });
-    const file = await releaseForDownload(id, kind as 'clean' | 'gold' | 'silver' | 'manifest');
+    if (!['clean', 'gold', 'silver', 'training', 'preference', 'manifest'].includes(kind)) return NextResponse.json({ error: '导出类型无效' }, { status: 400 });
+    const file = await releaseForDownload(id, kind as 'clean' | 'gold' | 'silver' | 'training' | 'preference' | 'manifest');
     const content = await readFile(file.filePath);
     return new Response(content, {
       headers: {

@@ -29,18 +29,22 @@ model User {
   studentAssignments StudentAssignment[]
   conversations      Conversation[]
 
-  importedDatasetBatches DatasetBatch[]       @relation("DatasetBatchImporter")
-  createdCampaigns       AnnotationCampaign[] @relation("CampaignCreator")
+  importedDatasetBatches DatasetBatch[]         @relation("DatasetBatchImporter")
+  createdCampaigns       AnnotationCampaign[]   @relation("CampaignCreator")
   campaignParticipations CampaignParticipant[]
-  annotationTasks        AnnotationTask[]     @relation("TaskAssignee")
-  annotationRevisions    AnnotationRevision[] @relation("RevisionAuthor")
+  annotationTasks        AnnotationTask[]       @relation("TaskAssignee")
+  annotationRevisions    AnnotationRevision[]   @relation("RevisionAuthor")
   completedWorkReviews   AnnotationWorkReview[] @relation("WorkReviewReviewer")
-  assignedReviewCases    ReviewCase[]         @relation("ReviewCaseAssignee")
-  reviewDecisions        ReviewDecision[]     @relation("DecisionReviewer")
-  createdDatasetReleases DatasetRelease[]     @relation("ReleaseCreator")
-  createdTrainingRuns    TrainingRun[]        @relation("TrainingRunCreator")
-  createdEvaluationRuns  EvaluationRun[]      @relation("EvaluationRunCreator")
-  dataLabAuditLogs       DataLabAuditLog[]    @relation("AuditActor")
+  assignedReviewCases    ReviewCase[]           @relation("ReviewCaseAssignee")
+  reviewDecisions        ReviewDecision[]       @relation("DecisionReviewer")
+  createdDatasetReleases DatasetRelease[]       @relation("ReleaseCreator")
+  createdTrainingRuns    TrainingRun[]          @relation("TrainingRunCreator")
+  createdEvaluationRuns  EvaluationRun[]        @relation("EvaluationRunCreator")
+  createdModelVersions   ModelVersion[]         @relation("ModelVersionCreator")
+  createdDeployments     ModelDeployment[]      @relation("ModelDeploymentCreator")
+  nominatedCandidates    ProductionCandidate[] @relation("CandidateNominator")
+  processedCandidates    ProductionCandidate[] @relation("CandidateProcessor")
+  dataLabAuditLogs       DataLabAuditLog[]      @relation("AuditActor")
 
   @@index([role, isActive])
 }
@@ -70,12 +74,16 @@ model ClassMember {
 }
 
 model Assignment {
-  id             String    @id @default(uuid())
-  classId        String
-  title          String
-  topicDirection String? // 可选，限定阶段1的研究方向
-  dueDate        DateTime?
-  createdAt      DateTime  @default(now())
+  id                   String    @id @default(uuid())
+  classId              String
+  title                String
+  topicDirection       String? // 可选，限定阶段1的研究方向
+  assistantStyleFamily String    @default("auto")
+  stylePolicyVersion   String    @default("style-v1")
+  dataContributionMode String    @default("DISABLED")
+  dataPolicyVersion    String?
+  dueDate              DateTime?
+  createdAt            DateTime  @default(now())
 
   class              Class               @relation(fields: [classId], references: [id])
   studentAssignments StudentAssignment[]
@@ -89,6 +97,9 @@ model StudentAssignment {
   status         String  @default("NOT_STARTED")
   // 状态可选值: NOT_STARTED, IN_PROGRESS, PENDING_STAGE2, PENDING_STAGE5, COMPLETED
   currentStage   Int     @default(0) // 0-6
+  dataConsentStatus        String    @default("NOT_APPLICABLE")
+  dataConsentPolicyVersion String?
+  dataConsentDecidedAt     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,6 +118,10 @@ model Conversation {
   messages            String  @default("[]") // JSON 数组，存储完整的对话历史
   stageData           String  @default("{}") // JSON 对象，存储所有阶段快照
   safetyQuizCompleted Boolean @default(false) // 阶段3安全问答是否已完成（正式模式）
+  resolvedStyleFamily String  @default("classroom_coach")
+  stylePolicyVersion  String  @default("style-v1")
+  traceCoverage       String  @default("LEGACY_UNVERIFIED")
+  deployedModelVersionId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -115,6 +130,8 @@ model Conversation {
   // 1:1 关系的外键持有方是 StudentAssignment.conversationId，此处为虚拟反向关系。
   // （框架2在两侧都写了外键，Prisma 不允许循环 1:1，故只在 StudentAssignment 侧保留 FK。）
   studentAssignment StudentAssignment?
+  generationTraces  GenerationTrace[]
+  deployedModelVersion ModelVersion? @relation("ConversationDeployedModel", fields: [deployedModelVersionId], references: [id], onDelete: SetNull)
 }
 
 model DatasetBatch {
@@ -152,6 +169,7 @@ model DatasetSample {
   revisions    AnnotationRevision[]
   reviewCases  ReviewCase[]
   releaseItems DatasetReleaseItem[]
+  productionCandidate ProductionCandidate?
 
   @@index([phase])
   @@index([candidateTier])
@@ -165,6 +183,7 @@ model AnnotationCampaign {
   selectionJson             String    @default("{}")
   protocol                  String    @default("GOLD_DOUBLE_SILVER_SINGLE")
   styleQuotaJson            String    @default("{}")
+  stylePolicyVersion        String    @default("style-v1")
   goldSlots                 Int       @default(2)
   silverDoubleReviewPercent Int       @default(30)
   maxActivePerAnnotator     Int       @default(1)
@@ -174,11 +193,11 @@ model AnnotationCampaign {
   startedAt                 DateTime?
   completedAt               DateTime?
 
-  createdBy   User             @relation("CampaignCreator", fields: [createdById], references: [id])
-  tasks       AnnotationTask[]
+  createdBy    User                  @relation("CampaignCreator", fields: [createdById], references: [id])
+  tasks        AnnotationTask[]
   participants CampaignParticipant[]
-  reviewCases ReviewCase[]
-  releases    DatasetRelease[]
+  reviewCases  ReviewCase[]
+  releases     DatasetRelease[]
 }
 
 model CampaignParticipant {
@@ -197,23 +216,24 @@ model CampaignParticipant {
 }
 
 model AnnotationTask {
-  id             String    @id @default(uuid())
-  campaignId     String
-  sampleId       String
-  slot           Int
-  styleFamily    String?
-  status         String    @default("PENDING")
-  assignedToId   String?
-  draftJson      String    @default("{}")
-  leaseExpiresAt DateTime?
-  submittedAt    DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                 String    @id @default(uuid())
+  campaignId         String
+  sampleId           String
+  slot               Int
+  styleFamily        String?
+  stylePolicyVersion String    @default("style-v1")
+  status             String    @default("PENDING")
+  assignedToId       String?
+  draftJson          String    @default("{}")
+  leaseExpiresAt     DateTime?
+  submittedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  campaign   AnnotationCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  sample     DatasetSample        @relation(fields: [sampleId], references: [id], onDelete: Cascade)
-  assignedTo User?                @relation("TaskAssignee", fields: [assignedToId], references: [id])
-  revisions  AnnotationRevision[]
+  campaign    AnnotationCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  sample      DatasetSample          @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  assignedTo  User?                  @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  revisions   AnnotationRevision[]
   workReviews AnnotationWorkReview[]
 
   @@unique([campaignId, sampleId, slot])
@@ -222,26 +242,30 @@ model AnnotationTask {
 }
 
 model AnnotationRevision {
-  id               String   @id @default(uuid())
-  taskId           String
-  sampleId         String
-  authorId         String
-  version          Int
-  contentJson      String
-  fullRecordJson   String
-  issueTagsJson    String   @default("[]")
-  changeReason     String   @default("")
-  noChange         Boolean  @default(false)
-  parentRevisionId String?
-  createdAt        DateTime @default(now())
+  id                 String   @id @default(uuid())
+  taskId             String
+  sampleId           String
+  authorId           String
+  version            Int
+  contentJson        String
+  fullRecordJson     String
+  issueTagsJson      String   @default("[]")
+  changeReason       String   @default("")
+  noChange           Boolean  @default(false)
+  styleFamily        String?
+  stylePolicyVersion String?
+  transformationType        String   @default("UNCLASSIFIED")
+  transformationMetricsJson String   @default("{}")
+  parentRevisionId   String?
+  createdAt          DateTime @default(now())
 
-  task           AnnotationTask       @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  sample         DatasetSample        @relation(fields: [sampleId], references: [id], onDelete: Cascade)
-  author         User                 @relation("RevisionAuthor", fields: [authorId], references: [id])
-  parentRevision AnnotationRevision?  @relation("RevisionChain", fields: [parentRevisionId], references: [id], onDelete: SetNull)
-  childRevisions AnnotationRevision[] @relation("RevisionChain")
-  selectedBy     ReviewDecision[]     @relation("SelectedRevision")
-  mergedBy       ReviewDecision[]     @relation("MergedRevision")
+  task           AnnotationTask        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  sample         DatasetSample         @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  author         User                  @relation("RevisionAuthor", fields: [authorId], references: [id])
+  parentRevision AnnotationRevision?   @relation("RevisionChain", fields: [parentRevisionId], references: [id], onDelete: SetNull)
+  childRevisions AnnotationRevision[]  @relation("RevisionChain")
+  selectedBy     ReviewDecision[]      @relation("SelectedRevision")
+  mergedBy       ReviewDecision[]      @relation("MergedRevision")
   releaseItems   DatasetReleaseItem[]
   workReview     AnnotationWorkReview?
 
@@ -322,6 +346,11 @@ model DatasetRelease {
   goldSha256     String?
   silverPath     String?
   silverSha256   String?
+  trainingPath   String?
+  trainingSha256 String?
+  preferencePath   String?
+  preferenceSha256 String?
+  eligibilityReportJson String @default("{}")
   manifestPath   String?
   manifestSha256 String?
   createdById    String
@@ -335,15 +364,19 @@ model DatasetRelease {
 }
 
 model DatasetReleaseItem {
-  id              String   @id @default(uuid())
-  releaseId       String
-  sampleId        String
-  revisionId      String?
-  tier            String
-  weight          Float    @default(1)
-  inclusionReason String
-  recordJson      String
-  createdAt       DateTime @default(now())
+  id                 String   @id @default(uuid())
+  releaseId          String
+  sampleId           String
+  revisionId         String?
+  tier               String
+  weight             Float    @default(1)
+  inclusionReason    String
+  recordJson         String
+  styleFamily        String?
+  stylePolicyVersion String?
+  trainingEligibility String @default("SFT_ALLOWED")
+  eligibilityReasonJson String @default("[]")
+  createdAt          DateTime @default(now())
 
   release  DatasetRelease      @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   sample   DatasetSample       @relation(fields: [sampleId], references: [id])
@@ -362,6 +395,9 @@ model TrainingRun {
   parametersJson String   @default("{}")
   status         String   @default("DRAFT")
   modelTag       String?
+  parentModelVersionId String?
+  eligibilityReportJson String @default("{}")
+  policyVersion String @default("training-policy-v1")
   notes          String   @default("")
   createdById    String
   createdAt      DateTime @default(now())
@@ -369,22 +405,151 @@ model TrainingRun {
 
   release   DatasetRelease @relation(fields: [releaseId], references: [id])
   createdBy User           @relation("TrainingRunCreator", fields: [createdById], references: [id])
+  outputModelVersion ModelVersion?
+  parentModelVersion ModelVersion? @relation("TrainingParent", fields: [parentModelVersionId], references: [id], onDelete: SetNull)
 }
 
 model EvaluationRun {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  status      String   @default("IMPORTED")
-  modelATag   String
-  modelBTag   String
-  scope       String
-  summaryJson String   @default("{}")
-  createdById String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  name               String   @unique
+  status             String   @default("IMPORTED")
+  modelATag          String
+  modelBTag          String
+  scope              String
+  summaryJson        String   @default("{}")
+  styleFamily        String?
+  stylePolicyVersion String?
+  modelAVersionId    String?
+  modelBVersionId    String?
+  gateResult         String   @default("NOT_EVALUATED")
+  gateReportJson     String   @default("{}")
+  createdById        String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   createdBy User                 @relation("EvaluationRunCreator", fields: [createdById], references: [id])
   artifacts EvaluationArtifact[]
+  deployments ModelDeployment[]
+  modelAVersion ModelVersion? @relation("EvaluationModelA", fields: [modelAVersionId], references: [id], onDelete: SetNull)
+  modelBVersion ModelVersion? @relation("EvaluationModelB", fields: [modelBVersionId], references: [id], onDelete: SetNull)
+}
+
+model ModelVersion {
+  id                  String   @id @default(uuid())
+  tag                 String   @unique
+  provider            String
+  externalModelId     String
+  parentModelVersionId String?
+  trainingRunId       String?  @unique
+  promptPolicyVersion String   @default("stem-six-phase-v1")
+  contractVersion     String   @default("chat-contract-v1")
+  status              String   @default("DRAFT")
+  createdById         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  parent              ModelVersion?      @relation("ModelLineage", fields: [parentModelVersionId], references: [id], onDelete: SetNull)
+  children            ModelVersion[]     @relation("ModelLineage")
+  trainingRun         TrainingRun?       @relation(fields: [trainingRunId], references: [id], onDelete: SetNull)
+  createdBy           User?              @relation("ModelVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  generationTraces    GenerationTrace[]
+  deployments         ModelDeployment[]  @relation("DeploymentModel")
+  previousDeployments ModelDeployment[]  @relation("PreviousDeploymentModel")
+  childTrainingRuns   TrainingRun[]       @relation("TrainingParent")
+  deployedConversations Conversation[]    @relation("ConversationDeployedModel")
+  evaluationsAsA      EvaluationRun[]     @relation("EvaluationModelA")
+  evaluationsAsB      EvaluationRun[]     @relation("EvaluationModelB")
+
+  @@index([provider, externalModelId])
+  @@index([parentModelVersionId])
+  @@index([status])
+}
+
+model ModelDeployment {
+  id                     String    @id @default(uuid())
+  modelVersionId         String
+  previousModelVersionId String?
+  environment            String    @default("PRODUCTION")
+  rolloutPercent         Int       @default(100)
+  status                 String    @default("DRAFT")
+  evaluationRunId        String?
+  createdById            String?
+  startedAt              DateTime?
+  endedAt                DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  gateReportJson         String    @default("{}")
+
+  modelVersion         ModelVersion     @relation("DeploymentModel", fields: [modelVersionId], references: [id])
+  previousModelVersion ModelVersion?    @relation("PreviousDeploymentModel", fields: [previousModelVersionId], references: [id], onDelete: SetNull)
+  evaluationRun        EvaluationRun?   @relation(fields: [evaluationRunId], references: [id], onDelete: SetNull)
+  createdBy            User?            @relation("ModelDeploymentCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([environment, status])
+  @@index([modelVersionId])
+}
+
+model GenerationTrace {
+  id                    String   @id @default(uuid())
+  conversationId        String
+  assistantMessageId    String   @unique
+  userMessageId         String
+  stage                 Int
+  modelVersionId        String
+  modelTagSnapshot      String
+  providerSnapshot      String
+  externalModelSnapshot String
+  promptVersion         String
+  promptSha256          String
+  styleFamily           String
+  stylePolicyVersion    String
+  requestMessageSha256  String
+  responseJson          String
+  responseSha256        String
+  generationParamsJson  String   @default("{}")
+  contractVersion       String
+  contractCheckJson     String   @default("{}")
+  createdAt             DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id])
+  productionCandidate ProductionCandidate?
+
+  @@index([conversationId, createdAt])
+  @@index([modelVersionId, createdAt])
+  @@index([stage])
+}
+
+model ProductionCandidate {
+  id                    String    @id @default(uuid())
+  generationTraceId     String    @unique
+  status                String    @default("NOMINATED")
+  triggerType           String
+  triggerNote           String    @default("")
+  signalJson            String    @default("{}")
+  consentStatusSnapshot String
+  dataPolicyVersion     String
+  redactedRecordJson    String
+  redactionReportJson   String    @default("{}")
+  contentSha256         String
+  familyKey             String
+  leakageCheckJson      String    @default("{}")
+  nominatedById         String?
+  processedById         String?
+  rejectionReason       String    @default("")
+  convertedSampleId     String?   @unique
+  processedAt           DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  generationTrace GenerationTrace @relation(fields: [generationTraceId], references: [id], onDelete: Cascade)
+  nominatedBy     User?             @relation("CandidateNominator", fields: [nominatedById], references: [id], onDelete: SetNull)
+  processedBy     User?             @relation("CandidateProcessor", fields: [processedById], references: [id], onDelete: SetNull)
+  convertedSample DatasetSample?    @relation(fields: [convertedSampleId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([contentSha256])
+  @@index([familyKey])
 }
 
 model EvaluationArtifact {

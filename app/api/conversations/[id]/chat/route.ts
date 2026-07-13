@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '@/app/lib/db';
 import { requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import { checkBlacklistedKeywords, getPromptForPhase, type PromptContext } from '@/app/prompts';
 import { classifyError } from '@/app/lib/llm/errors';
-import { callLLM } from '@/app/lib/llm/chat';
+import { callLLMWithTrace } from '@/app/lib/llm/chat';
+import { persistGenerationTurn } from '@/app/lib/generationTrace';
+import {
+  type RuntimeModelIdentity,
+} from '@/app/lib/modelRegistry';
+import { resolveConversationModel } from '@/app/lib/deployment';
 import { extractStageData } from '@/app/lib/stageExtraction';
 import { buildPriorSummary } from '@/app/lib/reportSummary';
 import { shouldNudgeConvergence } from '@/app/lib/pacing';
@@ -16,18 +20,24 @@ function buildContext(stage: number, conv: {
   topicDirection: string | null;
   stageData: StageData;
   safetyQuizCompleted: boolean;
+  styleFamily: import('@/app/lib/stylePolicy').StyleFamily;
+  stylePolicyVersion: string;
 }): PromptContext | undefined {
+  const styleContext: PromptContext = {
+    styleFamily: conv.styleFamily,
+    stylePolicyVersion: conv.stylePolicyVersion,
+  };
   switch (stage) {
     case PhaseEnum.TopicSelection:
-      return conv.topicDirection ? { topicDirection: conv.topicDirection } : undefined;
+      return conv.topicDirection ? { ...styleContext, topicDirection: conv.topicDirection } : styleContext;
     case PhaseEnum.Execution:
-      return conv.safetyQuizCompleted ? undefined : { needSafetyQuiz: true };
+      return conv.safetyQuizCompleted ? styleContext : { ...styleContext, needSafetyQuiz: true };
     case PhaseEnum.DataAnalysis:
-      return { dataRows: conv.stageData.stage3?.rows ?? [] };
+      return { ...styleContext, dataRows: conv.stageData.stage3?.rows ?? [] };
     case PhaseEnum.ResultsFormation:
-      return { priorSummary: buildPriorSummary(conv.stageData) };
+      return { ...styleContext, priorSummary: buildPriorSummary(conv.stageData) };
     default:
-      return undefined;
+      return styleContext;
   }
 }
 
@@ -77,10 +87,19 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       context = { ...(context ?? {}), nudgeConverge: true };
     }
     const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
-    const response = await callLLM(systemPrompt, message, conv.messages, {
+    const modelVersion = await resolveConversationModel(conversationId);
+    const modelIdentity: RuntimeModelIdentity = {
+      tag: modelVersion.tag,
+      provider: modelVersion.provider,
+      externalModelId: modelVersion.externalModelId,
+      promptPolicyVersion: modelVersion.promptPolicyVersion,
+      contractVersion: modelVersion.contractVersion,
+    };
+    const llmResult = await callLLMWithTrace(systemPrompt, message, conv.messages, {
       stage,
       hasStage2Schema: (conv.stageData.stage2?.schema.columns.length ?? 0) > 0,
-    });
+    }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
+    const response = llmResult.response;
 
     // 结构化提取（纯函数）
     const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData);
@@ -120,26 +139,28 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     // 6→完成走 stage6-respond。phase_complete 仅作 UI 提示，不再驱动阶段。
     const nextStage = advanceTo ?? conv.currentStage;
 
-    const stageChanged = nextStage !== conv.currentStage;
     const stageDataChanged = JSON.stringify(stageData) !== JSON.stringify(conv.stageData);
 
-    await db.$transaction([
-      db.conversation.update({
-        where: { id: conversationId },
-        data: {
-          messages: JSON.stringify(updatedMessages),
-          ...(stageDataChanged ? { stageData: JSON.stringify(stageData) } : {}),
-        },
-      }),
-      ...(stageChanged
-        ? [
-            db.studentAssignment.update({
-              where: { id: conv.studentAssignmentId },
-              data: { currentStage: nextStage },
-            }),
-          ]
-        : []),
-    ]);
+    await persistGenerationTurn({
+      conversationId,
+      studentAssignmentId: conv.studentAssignmentId,
+      currentStage: conv.currentStage,
+      nextStage,
+      updatedMessages,
+      stageData,
+      stageDataChanged,
+      userMessageId: userMessage.id,
+      assistantMessageId: assistantMessage.id,
+      userMessage: message,
+      systemPrompt,
+      response,
+      modelVersionId: modelVersion.id,
+      modelIdentity,
+      styleFamily: conv.styleFamily,
+      stylePolicyVersion: conv.stylePolicyVersion,
+      generationParams: llmResult.trace.generationParams,
+      contractCheck: llmResult.trace.contractCheck,
+    });
 
     return NextResponse.json({ ...response, currentStage: nextStage, stageData });
   } catch (err) {
