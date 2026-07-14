@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 3,
+  "runId": "calibration-30-h0-r2",
+  "planFile": "data\\sft\\v3\\plans\\calibration-30-h0.json",
+  "stageContractVersion": "stage-contract-v2",
+  "updatedAt": "2026-07-14T03:17:13.014Z",
+  "selectedTaskCount": 6,
+  "completedTaskCount": 6,
+  "candidateCount": 2,
+  "rejectedAttemptCount": 13,
+  "failedCellCount": 4,
+  "failedCells": [
+    "P2:socratic_concise",
+    "P3:socratic_concise",
+    "P4:socratic_concise",
+    "P5:socratic_concise"
+  ],
+  "maxAttemptsPerCell": 3,
+  "runtimes": {
+    "tutor": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro"
+    },
+    "student": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro"
+    },
+    "evaluator": {
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro"
+    }
+  },
+  "evaluatorIndependent": false,
+  "automaticHumanGoldCount": 0,
+  "humanDoubleReviewRequired": true,
+  "humanReviewRequiredCount": 2,
+  "byPhase": {
+    "P1": 1,
+    "P2": 0,
+    "P3": 0,
+    "P4": 0,
+    "P5": 0,
+    "P6": 1
+  },
+  "byStyle": {
+    "socratic_concise": 2,
+    "warm_companion": 0,
+    "engineering_mentor": 0,
+    "evidence_analyst": 0,
+    "classroom_coach": 0
+  },
+  "byTier": {
+    "needs_review": 2
+  }
+}

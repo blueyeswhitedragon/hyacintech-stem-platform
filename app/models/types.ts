@@ -38,8 +38,10 @@ export interface TopicDirection {
 }
 
 export interface ExperimentPlan {
+  researchQuestion?: string;
+  hypothesis?: string;
   independentVariable: { name: string; levels: string[] };
-  dependentVariable: { name: string; measurement: string };
+  dependentVariable: { name: string; measurement: string; unit?: string };
   controlledVariables: string[];
   materials: string[];
   procedure: string[];
@@ -71,6 +73,13 @@ export interface ChatResponse {
   /** 可选提示/引导建议（思维引导，不直接给答案）。点击填入输入框而非直接发送。 */
   hints?: string[];
   phase_complete: boolean;
+  /** 可审计来源片段；只能逐字引用当前已批准状态。 */
+  grounding_refs?: string[];
+  /** 由服务端组合的事实性结构，不依赖模型自由生成。 */
+  artifact_provenance?: {
+    data_table_schema?: 'server_composed';
+    report_sections?: 'server_composed';
+  };
 
   // ---- M4 结构化产出（可选，按阶段在合适时机出现）----
   // 阶段1：学生确认研究问题后

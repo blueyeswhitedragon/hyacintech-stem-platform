@@ -64,6 +64,17 @@ function validateChatResponse(obj: unknown): ChatResponse {
     ? raw.hints as string[]
     : undefined;
 
+  const grounding_refs = Array.isArray(raw.grounding_refs) && raw.grounding_refs.every((item: unknown) => typeof item === 'string')
+    ? (raw.grounding_refs as string[]).map((item) => item.trim()).filter(Boolean)
+    : undefined;
+  const provenance = asRecord(raw.artifact_provenance);
+  const artifact_provenance = provenance
+    ? {
+        ...(provenance.data_table_schema === 'server_composed' ? { data_table_schema: 'server_composed' as const } : {}),
+        ...(provenance.report_sections === 'server_composed' ? { report_sections: 'server_composed' as const } : {}),
+      }
+    : undefined;
+
   const phase_complete = typeof raw.phase_complete === 'boolean'
     ? raw.phase_complete
     : false;
@@ -73,6 +84,8 @@ function validateChatResponse(obj: unknown): ChatResponse {
     next_action_type,
     options,
     hints,
+    grounding_refs,
+    artifact_provenance: artifact_provenance && Object.keys(artifact_provenance).length > 0 ? artifact_provenance : undefined,
     phase_complete,
     ...extractStructuredFields(raw),
   };
@@ -169,6 +182,12 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
     isStrArray(experimentPlan.safetyNotes)
   ) {
     out.experiment_plan = {
+      researchQuestion: isStr(experimentPlan.researchQuestion) && experimentPlan.researchQuestion.trim()
+        ? experimentPlan.researchQuestion.trim()
+        : undefined,
+      hypothesis: isStr(experimentPlan.hypothesis) && experimentPlan.hypothesis.trim()
+        ? experimentPlan.hypothesis.trim()
+        : undefined,
       independentVariable: {
         name: independentVariable.name.trim(),
         levels: independentVariable.levels.map((item) => item.trim()),
@@ -176,6 +195,9 @@ function extractStructuredFields(raw: Record<string, unknown>): Partial<ChatResp
       dependentVariable: {
         name: dependentVariable.name.trim(),
         measurement: dependentVariable.measurement.trim(),
+        unit: isStr(dependentVariable.unit) && dependentVariable.unit.trim()
+          ? dependentVariable.unit.trim()
+          : undefined,
       },
       controlledVariables: experimentPlan.controlledVariables.map((item) => item.trim()).filter(Boolean),
       materials: experimentPlan.materials.map((item) => item.trim()).filter(Boolean),
@@ -379,5 +401,25 @@ export function safeParseChatResponse(raw: string | null | undefined): ChatRespo
       };
     }
     return heuristic;
+  }
+}
+
+/**
+ * Dataset generation and structured runtime retries must never convert plain
+ * text into a seemingly valid ChatResponse. They use this strict parser and
+ * decide explicitly whether to retry or fail.
+ */
+export function parseChatResponseStrict(raw: string | null | undefined): ChatResponse | null {
+  if (!raw?.trim()) return null;
+  try {
+    const parsed = extractJSON(raw);
+    const result = validateChatResponse(parsed);
+    if (
+      result.dialogue === '抱歉，我暂时无法处理您的请求，请重新描述您的问题。'
+      || !result.dialogue.trim()
+    ) return null;
+    return result;
+  } catch {
+    return null;
   }
 }

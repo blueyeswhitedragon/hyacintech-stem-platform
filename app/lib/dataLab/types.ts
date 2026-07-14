@@ -104,6 +104,8 @@ export interface AutoCheckIssue {
   severity: 'error' | 'warning';
   message: string;
   evidence?: string;
+  /** 对应 ShareGPT conversations 中的导师消息下标；未指定时属于整条记录。 */
+  messageIndex?: number;
 }
 
 export interface AutoCheckResult {

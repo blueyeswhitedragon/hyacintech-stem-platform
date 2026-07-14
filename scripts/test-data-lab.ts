@@ -2,7 +2,7 @@
 import { readFile } from 'fs/promises';
 import path from 'path';
 import type { ChatResponse } from '../app/models/types';
-import { applyRevision, assertRevisionIntent, canonicalizeRecord, familyKey, normalizeLegacyEmptyStage2Schemas, parseShareGPTDataset, validateShareGPTRecord } from '../app/lib/dataLab/validation';
+import { applyRevision, assertRevisionIntent, canonicalizeRecord, familyKey, normalizeLegacyEmptyStage2Schemas, parseShareGPTDataset, validateAnnotationRevision, validateShareGPTRecord } from '../app/lib/dataLab/validation';
 import { chooseAnnotationCandidate, claimUnavailableReason, hasMeaningfulDraft } from '../app/lib/dataLab/assignment';
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
 
@@ -36,6 +36,10 @@ async function main() {
   const revised = applyRevision(first, input);
   check('human messages unchanged after revision', revised.conversations.filter((message) => message.from === 'human').every((message, index) => message.value === first.conversations.filter((source) => source.from === 'human')[index].value));
   check('revision roundtrip remains valid', validateShareGPTRecord(revised).status !== 'error');
+  const sharedValidation = validateAnnotationRevision(first, input, { mode: 'submit' });
+  const directCheck = validateShareGPTRecord(revised, 'submit');
+  const issueSignature = (issues: typeof directCheck.issues) => issues.map((item) => `${item.ruleCode}:${item.severity}:${item.messageIndex ?? 'record'}`).sort().join('|');
+  check('共享修订校验与直接记录校验规则码及严重度一致', sharedValidation.check.status === directCheck.status && issueSignature(sharedValidation.check.issues) === issueSignature(directCheck.issues));
 
   const incomplete = structuredClone(first);
   const finalAssistant = [...incomplete.conversations].reverse().find((message) => message.from === 'gpt');

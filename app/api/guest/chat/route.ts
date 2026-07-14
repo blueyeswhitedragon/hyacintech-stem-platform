@@ -4,7 +4,7 @@ import { classifyError } from '@/app/lib/llm/errors';
 import { callLLM } from '@/app/lib/llm/chat';
 import { checkRateLimit } from '@/app/lib/guestRateLimit';
 import { PhaseEnum, type Message } from '@/app/models/types';
-import type { Stage2Data } from '@/app/models/stageData';
+import type { Stage2Data, StageData } from '@/app/models/stageData';
 import type { StageTriggerType } from '@/app/lib/stageContract';
 
 const MAX_MESSAGE_LEN = 2000;
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
     history?: Message[];
     dataRows?: Record<string, unknown>[];
     dataSchema?: Stage2Data['schema'];
+    stageData?: StageData;
     needSafetyQuiz?: boolean;
     priorSummary?: string;
     hasStage2Schema?: boolean;
@@ -93,7 +94,7 @@ export async function POST(req: Request) {
     const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
     const visibleContext = stage === PhaseEnum.DataAnalysis
       ? JSON.stringify({ schema: body.dataSchema, rows: body.dataRows ?? [], rowNumbers: (body.dataRows ?? []).map((_, index) => index + 1) })
-      : body.priorSummary;
+      : JSON.stringify({ stageData: body.stageData, priorSummary: body.priorSummary });
     const response = await callLLM(systemPrompt, message, history, {
       stage,
       hasStage2Schema: body.hasStage2Schema === true,

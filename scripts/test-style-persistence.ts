@@ -56,7 +56,7 @@ async function main() {
         next_action_type: 'text_input',
         phase_complete: false,
         analysis_progress: {
-          observation: '学生已引用两次记录',
+          observation: '第1次短光照2粒、长光照5粒；第2次短光照3粒、长光照7粒。',
           evidenceCitations: ['第1次：2和5', '第2次：3和7'],
           studentEvidenceAccepted: true,
         },
@@ -67,7 +67,10 @@ async function main() {
       stageContractVersion: STAGE_CONTRACT_VERSION,
       systemPrompt: getPromptForPhase(PhaseEnum.DataAnalysis, { styleFamily: 'evidence_analyst', stylePolicyVersion: DEFAULT_STYLE_POLICY_VERSION }),
       stageTriggerType: 'USER_MESSAGE',
-      visibleContext: '{"values":[1,2,3,5,7]}',
+      visibleContext: JSON.stringify({
+        tutorVisible: { dataRows: [{ short: 2, long: 5 }, { short: 3, long: 7 }] },
+        studentMessages: ['第1次短光照2粒、长光照5粒；第2次短光照3粒、长光照7粒。'],
+      }),
       generationContext: { turnSystemPrompts: [getPromptForPhase(PhaseEnum.DataAnalysis, { styleFamily: 'evidence_analyst', stylePolicyVersion: DEFAULT_STYLE_POLICY_VERSION })], turnTriggerTypes: ['USER_MESSAGE'] },
     },
   };

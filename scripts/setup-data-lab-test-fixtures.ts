@@ -31,7 +31,7 @@ function record(index: number): ShareGPTRecord {
         next_action_type: 'text_input',
         phase_complete: false,
         analysis_progress: {
-          observation: '学生已提供两轮可核验数据',
+          observation: '第一轮低条件2、高条件5；第二轮低条件3、高条件7。',
           evidenceCitations: ['第一轮2和5', '第二轮3和7'],
           studentEvidenceAccepted: true,
         },
@@ -45,7 +45,10 @@ function record(index: number): ShareGPTRecord {
       stageContractVersion: STAGE_CONTRACT_VERSION,
       systemPrompt: prompt,
       stageTriggerType: 'USER_MESSAGE',
-      visibleContext: '{"values":[1,2,3,5,7]}',
+      visibleContext: JSON.stringify({
+        tutorVisible: { dataRows: [{ trial: 1, low: 2, high: 5 }, { trial: 2, low: 3, high: 7 }] },
+        studentMessages: ['第一轮低条件2、高条件5；第二轮低条件3、高条件7。'],
+      }),
       generationContext: { turnSystemPrompts: [prompt], turnTriggerTypes: ['USER_MESSAGE'] },
     },
   };

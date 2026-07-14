@@ -62,6 +62,7 @@ export function validateChatContract(
 
   const currentHasSchema = hasValidStage2Schema(response);
   const schemaAvailable = currentHasSchema || context.hasStage2Schema === true;
+  const claimsArtifactReady = claimsStage2ArtifactReady(response.dialogue);
 
   if (currentHasSchema && response.next_action_type !== 'confirmation') {
     const mismatch: ChatContractIssue = {
@@ -77,13 +78,22 @@ export function validateChatContract(
   }
 
   if (response.next_action_type === 'confirmation' && !schemaAvailable) {
-    issues.push({
+    const mismatch: ChatContractIssue = {
       code: 'P2_CONFIRMATION_WITHOUT_SCHEMA',
       message: '请求确认方案前，必须先生成有效的 data_table_schema',
-    });
+    };
+    // 模型有时会把“请确认这一项方案信息”误写成 confirmation。只要它没有
+    // 声称数据表已生成，也没有结束阶段，运行时可安全降级为普通文本输入；
+    // Data Lab（canonicalize=false）仍保留原始契约错误用于数据审查。
+    if (canonicalize && !claimsArtifactReady && !response.phase_complete) {
+      next.next_action_type = 'text_input';
+      repairs.push(mismatch);
+    } else {
+      issues.push(mismatch);
+    }
   }
 
-  if (claimsStage2ArtifactReady(response.dialogue) && !schemaAvailable) {
+  if (claimsArtifactReady && !schemaAvailable) {
     issues.push({
       code: 'P2_ARTIFACT_CLAIM_WITHOUT_SCHEMA',
       message: '回复声称数据表已经生成，但当前及此前都没有有效的 data_table_schema',

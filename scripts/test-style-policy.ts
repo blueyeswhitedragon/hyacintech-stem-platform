@@ -5,12 +5,13 @@ import {
   STYLE_FAMILIES,
   STYLE_POLICIES,
   buildStyleInstruction,
+  evaluateStyleAuthenticity,
   resolveStyleFamily,
 } from '../app/lib/stylePolicy';
 import { stylesForSampleSlots, weightedStyleSequence } from '../app/lib/dataLab/assignment';
 import { getPromptForPhase } from '../app/prompts';
 import { PhaseEnum } from '../app/models/types';
-import { resolveRecordStyle, summarizeStyles, toTrainingShareGPTRecord, toTrainingShareGPTRecords, withStyleMetadata } from '../app/lib/dataLab/styleMetadata';
+import { assertTrainingConversationFormat, resolveRecordStyle, summarizeStyles, toTrainingShareGPTRecord, toTrainingShareGPTRecords, withStyleMetadata } from '../app/lib/dataLab/styleMetadata';
 import { aggregateEvaluationsByStyle } from '../app/lib/dataLab/evaluation';
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
 
@@ -44,6 +45,32 @@ const weighted = weightedStyleSequence({ socratic_concise: 2, warm_companion: 1,
 check('风格权重生成预期轮换序列', weighted.join(',') === 'socratic_concise,socratic_concise,warm_companion');
 const slots = stylesForSampleSlots(2, 3, { socratic_concise: 1, warm_companion: 1 });
 check('同一样本的所有独立标注槽位共享目标风格', slots.length === 3 && new Set(slots).size === 1);
+
+const styleResponse = (dialogue: string) => ({ dialogue, next_action_type: 'text_input' as const, phase_complete: false });
+check('苏格拉底风格用短且唯一的开放问题作为可观察证据', evaluateStyleAuthenticity('socratic_concise', styleResponse('你能先指出最关键的一条证据吗？'), { phase: 4 }).issues.length === 0);
+check('温和陪伴风格缺少具体承接时不能只靠标签过关', evaluateStyleAuthenticity('warm_companion', styleResponse('请继续回答。'), { phase: 2 }).issues.length > 0);
+check('工程导师风格需要出现约束、参数或验证视角', evaluateStyleAuthenticity('engineering_mentor', styleResponse('先核对这个参数是否在可测范围内。'), { phase: 2 }).issues.length === 0);
+check('证据分析风格需要指向证据或不确定性', evaluateStyleAuthenticity('evidence_analyst', styleResponse('请引用两个数值，并区分观察和解释。'), { phase: 4 }).issues.length === 0);
+check('课堂教练风格需要清晰任务或检查点', evaluateStyleAuthenticity('classroom_coach', styleResponse('本轮先完成一项检查，核对后再进入下一步。'), { phase: 2 }).issues.length === 0);
+check('固定安全触发可标记为中性而不冒充风格证据', evaluateStyleAuthenticity('warm_companion', { ...styleResponse('请完成安全确认。'), safety_quiz: { question: '怎么做？', options: ['安全', '危险'], correct: 0 } }, { phase: 3, triggerType: 'STAGE_ENTER' }).neutralSystemResponse);
+check('P1 结构化确认轮不被强迫追加开放问题', evaluateStyleAuthenticity('socratic_concise', {
+  ...styleResponse('请查看探究问题确认书。'),
+  next_action_type: 'confirmation',
+  stage1_confirmed: true,
+  snapshot: '研究问题确认书',
+  theme_mapping: { originalInterest: '植物', retainedFeature: '光照', classroomProxy: '绿豆', researchQuestion: '光照如何影响绿豆？' },
+  topic_direction: { factor: '光照', phenomenon: '绿豆生长' },
+}, { phase: 1 }).neutralSystemResponse);
+check('P2 方案与表格确认轮不被强迫追加开放问题', evaluateStyleAuthenticity('socratic_concise', {
+  ...styleResponse('方案和数据表已经生成，请核对。'),
+  next_action_type: 'confirmation',
+  experiment_plan: {
+    independentVariable: { name: '光照时长', levels: ['4小时', '8小时'] },
+    dependentVariable: { name: '株高', measurement: '第5天测量株高（cm）' },
+    controlledVariables: ['品种'], materials: ['绿豆'], procedure: ['测量'], repeatCount: 3, safetyNotes: [],
+  },
+  data_table_schema: { columns: [{ key: 'notes', title: '备注', type: 'text', required: false }], minRows: 3, maxRows: 200 },
+}, { phase: 2 }).neutralSystemResponse);
 
 for (const family of STYLE_FAMILIES) {
   const instruction = buildStyleInstruction(family);
@@ -86,7 +113,36 @@ const multiTurn = toTrainingShareGPTRecords({
 }, recordStyle);
 check('多轮记录按导师轮次拆成两个训练样本', multiTurn.length === 2);
 check('每个训练样本只有开头一条 system 消息', multiTurn.every((item) => item.conversations.filter((message) => message.from === 'system').length === 1 && item.conversations[0].from === 'system'));
-check('第二轮训练样本保留此前对话但不混入旧 system', multiTurn[1].conversations.length === 5 && multiTurn[1].conversations[0].value === '第二轮生产提示词');
+check(
+  '第二轮训练样本使用纯 dialogue 历史且只把当前目标保留为 JSON',
+  multiTurn[1].conversations.length === 5
+    && multiTurn[1].conversations[0].value === '第二轮生产提示词'
+    && multiTurn[1].conversations[2].value === '先回答第一问。'
+    && JSON.parse(multiTurn[1].conversations[4].value).dialogue === '再回答第二问。'
+);
+check(
+  '所有多轮训练样本通过历史导师 JSON 硬门禁',
+  multiTurn.every((item) => {
+    try {
+      assertTrainingConversationFormat(item);
+      return true;
+    } catch {
+      return false;
+    }
+  })
+);
+let rejectedHistoricalJson = false;
+try {
+  assertTrainingConversationFormat({
+    ...multiTurn[1],
+    conversations: multiTurn[1].conversations.map((message, index) => index === 2
+      ? { ...message, value: JSON.stringify({ dialogue: '错误历史格式', next_action_type: 'text_input', phase_complete: false }) }
+      : message),
+  });
+} catch {
+  rejectedHistoricalJson = true;
+}
+check('发布门禁拒绝历史导师 ChatResponse JSON', rejectedHistoricalJson);
 const productionHistory = toTrainingShareGPTRecord({
   ...enriched,
   id: 'production-history-export',

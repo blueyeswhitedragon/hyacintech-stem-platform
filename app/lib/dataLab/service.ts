@@ -29,8 +29,6 @@ import {
   type RecordStyle,
 } from './styleMetadata';
 import {
-  applyRevision,
-  assertRevisionIntent,
   canonicalizeRecord,
   familyKey,
   parseAssistantResponse,
@@ -38,12 +36,11 @@ import {
   parseShareGPTDataset,
   normalizeLegacyEmptyStage2Schemas,
   sha256,
+  validateAnnotationRevision,
   validateShareGPTRecord,
 } from './validation';
 import {
-  assertTransformationType,
   buildPreferenceRecord,
-  computeTransformationMetrics,
   evaluateTrainingEligibility,
   TRAINING_POLICY_VERSION,
 } from '@/app/lib/trainingEligibility';
@@ -692,22 +689,50 @@ export async function saveTaskDraft(taskId: string, input: RevisionInput, user: 
   }
 }
 
+export class AnnotationValidationError extends Error {
+  constructor(public readonly check: AutoCheckResult) {
+    super(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；') || '修订未通过校验');
+    this.name = 'AnnotationValidationError';
+  }
+}
+
+function validateTaskRevision(
+  task: { sample: { originalRecordJson: string }; styleFamily: string | null; stylePolicyVersion: string },
+  input: RevisionInput,
+) {
+  const original = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
+  return validateAnnotationRevision(original, input, {
+    mode: 'submit',
+    styleFamily: isStyleFamily(task.styleFamily) ? task.styleFamily : null,
+    stylePolicyVersion: task.stylePolicyVersion,
+  });
+}
+
+/** 只读预检：不保存草稿、不续租、不写审计日志。 */
+export async function validateAnnotationTaskRevision(taskId: string, input: RevisionInput, user: SessionUser) {
+  const task = await db.annotationTask.findUnique({
+    where: { id: taskId },
+    include: { sample: true, campaign: { select: { status: true } } },
+  });
+  if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS' || task.campaign.status !== 'ACTIVE') {
+    throw new Error('任务不可校验，所属活动可能已经结束');
+  }
+  return validateTaskRevision(task, input).check;
+}
+
 export async function submitAnnotationTask(taskId: string, input: RevisionInput, user: SessionUser) {
   const task = await db.annotationTask.findUnique({ where: { id: taskId }, include: { sample: true } });
   if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS') throw new Error('任务不可提交');
-  const normalizedInput = normalizeLegacyEmptyStage2Schemas(input).input;
-  const original = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
-  assertRevisionIntent(original, normalizedInput);
-  const style = resolveRecordStyle(original, task.styleFamily, task.stylePolicyVersion);
-  const revised = withStyleMetadata(applyRevision(original, normalizedInput), style);
-  const transformationType: TransformationType = normalizedInput.transformationType
-    && TRANSFORMATION_TYPES.includes(normalizedInput.transformationType)
-      ? normalizedInput.transformationType
-      : normalizedInput.noChange ? 'NO_CHANGE' : 'LIGHT_EDIT';
-  const transformationMetrics = computeTransformationMetrics(original, revised);
-  assertTransformationType(transformationType, transformationMetrics);
-  const check = validateShareGPTRecord(revised, 'submit');
-  if (check.status === 'error') throw new Error(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；'));
+  const validation = validateTaskRevision(task, input);
+  if (validation.check.status === 'error' || !validation.revisedRecord || !validation.transformationType || !validation.transformationMetrics) {
+    throw new AnnotationValidationError(validation.check);
+  }
+  const normalizedInput = validation.normalizedInput;
+  const revised = validation.revisedRecord;
+  const transformationType = validation.transformationType;
+  const transformationMetrics = validation.transformationMetrics;
+  const check = validation.check;
+  const style = resolveRecordStyle(revised, task.styleFamily, task.stylePolicyVersion);
 
   const revision = await db.$transaction(async (tx) => {
     const currentTask = await tx.annotationTask.findFirst({
@@ -804,6 +829,10 @@ export async function reviewAnnotationWork(input: {
   }
 
   if (input.status === 'APPROVED') {
+    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(review.revision.fullRecordJson, {} as ShareGPTRecord), 'submit');
+    if (check.status === 'error') {
+      throw new AnnotationValidationError(check);
+    }
     const duplicate = await db.annotationWorkReview.count({
       where: {
         id: { not: review.id },
@@ -892,6 +921,7 @@ export async function workloadDashboard() {
   const items = rows.slice(0, 300).map((row) => {
     const record = parseJson<ShareGPTRecord>(row.revision.fullRecordJson, {} as ShareGPTRecord);
     const preview = record.conversations.filter((message) => message.from === 'gpt').slice(0, 4).map((message) => parseAssistantResponse(message.value)?.dialogue ?? message.value);
+    const check = validateShareGPTRecord(record, 'submit');
     return {
       id: row.id,
       taskId: row.taskId,
@@ -906,6 +936,7 @@ export async function workloadDashboard() {
       note: row.note,
       reviewer: row.reviewer,
       preview,
+      check,
     };
   });
   return {
@@ -1049,7 +1080,10 @@ async function reviewPayload(reviewCaseId: string, reviewerId: string) {
     conversations: record.conversations,
   });
   const candidates = revisions
-    .map((revision) => ({ id: revision.id, record: anonymize(parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord)) }))
+    .map((revision) => {
+      const fullRecord = parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord);
+      return { id: revision.id, record: anonymize(fullRecord), check: validateShareGPTRecord(fullRecord, 'submit') };
+    })
     .sort((a, b) => sha256(`${item.id}:${a.id}`).localeCompare(sha256(`${item.id}:${b.id}`)))
     .map((candidate, index) => ({ label: String.fromCharCode(65 + index), ...candidate }));
   const styleFamilies = [...new Set(revisions.map((revision) => revision.task.styleFamily).filter(isStyleFamily))];
@@ -1136,15 +1170,17 @@ export async function decideReview(input: {
     const syntheticTask = await db.annotationTask.findFirst({ where: { campaignId: reviewCase.campaignId, sampleId: reviewCase.sampleId }, orderBy: { slot: 'asc' } });
     if (!syntheticTask) throw new Error('缺少关联标注任务');
     const style = resolveRecordStyle(original, syntheticTask.styleFamily, syntheticTask.stylePolicyVersion);
-    const mergedRecord = withStyleMetadata(applyRevision(original, input.mergedInput), style);
-    const mergedMetrics = computeTransformationMetrics(original, mergedRecord);
-    const mergedType: TransformationType = input.mergedInput.transformationType
-      && TRANSFORMATION_TYPES.includes(input.mergedInput.transformationType)
-      ? input.mergedInput.transformationType
-      : mergedMetrics.recommendedType;
-    assertTransformationType(mergedType, mergedMetrics);
-    const check = validateShareGPTRecord(mergedRecord, 'submit');
-    if (check.status === 'error') throw new Error('合并版本未通过自动检查');
+    const validation = validateAnnotationRevision(original, input.mergedInput, {
+      mode: 'submit',
+      styleFamily: style.styleFamily,
+      stylePolicyVersion: style.stylePolicyVersion,
+    });
+    if (validation.check.status === 'error' || !validation.revisedRecord || !validation.transformationType || !validation.transformationMetrics) {
+      throw new AnnotationValidationError(validation.check);
+    }
+    const mergedRecord = validation.revisedRecord;
+    const mergedMetrics = validation.transformationMetrics;
+    const mergedType = validation.transformationType;
     const revision = await db.annotationRevision.create({
       data: {
         taskId: syntheticTask.id,
@@ -1168,7 +1204,7 @@ export async function decideReview(input: {
   if (input.action === 'SELECT' && input.selectedRevisionId) {
     const selected = await db.annotationRevision.findUnique({ where: { id: input.selectedRevisionId } });
     if (!selected) throw new Error('所选 revision 不存在');
-    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(selected.fullRecordJson, {} as ShareGPTRecord), 'release');
+    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(selected.fullRecordJson, {} as ShareGPTRecord), 'submit');
     if (check.status === 'error') {
       throw new Error(`所选版本未通过结构契约：${check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；')}`);
     }

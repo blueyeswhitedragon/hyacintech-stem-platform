@@ -14,7 +14,7 @@
     "data-lab:import": "tsx scripts/import-data-lab-batch.ts",
     "data-lab:pilot": "tsx scripts/setup-data-lab-pilot.ts",
     "data-lab:test:setup": "tsx scripts/setup-data-lab-test-fixtures.ts",
-    "data-lab:test": "tsx scripts/test-stage-contract.ts && tsx scripts/test-stage-extraction.ts && tsx scripts/test-stage-advance.ts && tsx scripts/test-report-summary.ts && tsx scripts/test-style-policy.ts && tsx scripts/test-style-persistence.ts && tsx scripts/test-generation-trace.ts && tsx scripts/test-production-candidates.ts && tsx scripts/test-training-eligibility.ts && tsx scripts/test-deployment-gate.ts && tsx scripts/test-data-lab.ts && tsx scripts/test-workload-review.ts && tsx scripts/test-campaign-lifecycle.ts && tsx scripts/test-account-lifecycle.ts && tsx scripts/test-data-lab-integration.ts",
+    "data-lab:test": "tsx scripts/test-stage-contract.ts && tsx scripts/test-stage-artifacts.ts && tsx scripts/test-dataset-v3-gates.ts && tsx scripts/test-stage-extraction.ts && tsx scripts/test-stage-advance.ts && tsx scripts/test-report-summary.ts && tsx scripts/test-style-policy.ts && tsx scripts/test-style-persistence.ts && tsx scripts/test-generation-trace.ts && tsx scripts/test-production-candidates.ts && tsx scripts/test-training-eligibility.ts && tsx scripts/test-deployment-gate.ts && tsx scripts/test-data-lab.ts && tsx scripts/test-workload-review.ts && tsx scripts/test-campaign-lifecycle.ts && tsx scripts/test-account-lifecycle.ts && tsx scripts/test-data-lab-integration.ts",
     "model:bootstrap": "tsx scripts/bootstrap-model-registry.ts",
     "data-lab:test:session": "tsx scripts/test-session-revalidation.ts",
     "data-lab:audit-contract": "tsx scripts/audit-chat-contract.ts",

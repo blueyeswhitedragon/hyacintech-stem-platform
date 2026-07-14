@@ -12,7 +12,6 @@ import phaseSixPrompt from './phase6-reflection';
 import { PhaseEnum } from '../models/types';
 import type { Stage2Data } from '../models/stageData';
 import { buildStageContractInstruction, type StageTriggerType } from '../lib/stageContract';
-import { pickTopicExamples, renderTopicExamples } from '../lib/topicLibrary';
 import {
   buildStyleInstruction,
   DEFAULT_STYLE_FAMILY,
@@ -84,7 +83,8 @@ export interface PromptContext {
   styleFamily?: StyleFamily;
   stylePolicyVersion?: string;
   topicDirection?: string; // 阶段1：作业限定的研究方向
-  topicExamples?: string; // 阶段1：动态选题案例库（由 topicLibrary 渲染）
+  /** @deprecated M10H0 起不再把案例库注入 P1，避免模型把示例变成答案菜单。 */
+  topicExamples?: string;
   dataRows?: Record<string, unknown>[]; // 阶段4：stage3 收集的数据
   dataSchema?: Stage2Data['schema']; // 阶段4：列标题和类型
   priorSummary?: string; // 阶段5/6：前序结构化摘要
@@ -142,18 +142,14 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
   )}`;
 
   if (ctx.nudgeConverge) {
-    prompt += `\n\n【对话节奏提醒——该收敛了】\n本阶段对话轮次已较多。请在本轮尽快收敛：若学生已满足本阶段最低要求，就立即输出阶段完成信号（第一阶段输出 stage1_confirmed 与确认书；第二阶段输出 data_table_schema），不要再提出新的追问。`;
+    prompt += `\n\n【对话节奏提醒——该收敛了】\n本阶段对话轮次已较多。请在本轮尽快收敛：若学生已满足本阶段最低要求，就立即输出阶段完成信号（第一阶段输出 stage1_confirmed 与确认书；第二阶段输出完整 experiment_plan，数据表由平台生成），不要再提出新的追问。`;
   }
 
   if (phase === PhaseEnum.TopicSelection) {
     if (ctx.topicDirection) {
-      prompt += `\n\n【本作业限定研究方向】\n本次作业要求围绕「${ctx.topicDirection}」展开。请在选题引导中自然地把学生引向这个方向，但仍让学生自己提出具体问题与变量。`;
+      prompt += `\n\n【本作业限定研究方向】\n本次作业要求围绕「${ctx.topicDirection}」展开。请只用开放问题帮助学生表达想保留的机制与关注现象，不得给出候选课题、变量水平或测量方法。`;
     }
-
-    const topicExamples = ctx.topicExamples ?? renderTopicExamples(
-      pickTopicExamples({ topicDirection: ctx.topicDirection, count: 8 })
-    );
-    prompt += `\n\n【动态转化模式库（来自国家智慧教育平台公开资源，供内部启发，勿照搬）】\n${topicExamples}\n\n【工程/跨学科主题转化规则】\n当学生想做“装置/模型/机器人/系统/作品”时，不要否定它不够像实验，也不要直接给作品方案；请把它转化为可探究问题：\n1. 保留原作品里的关键约束或机制，例如自动判断、材料保护、能量转换、资源限制。\n2. 找一个课堂可改变的代理参数（材料、尺寸、角度、结构、程序阈值、传感器位置等），作为自变量方向。\n3. 再找一个可观察的表现方向（距离、承重、净化效果、成功率、响应时间、稳定性等）。具体测量方式、步骤、数据表与控制变量留到阶段2。`;
+    prompt += `\n\n【P1 不泄露候选答案】\n不要引用案例库，不要列举可能的机制、代理参数、表现指标或课题示例。即使示例只放在正文、括号或 hints 中，也会变成隐藏选项。工程或跨学科主题只追问学生本人最想保留的一个真实机制；具体代理和操作化内容留到阶段2。`;
   }
 
   if (phase === PhaseEnum.PlanDesign && ctx.priorSummary) {
@@ -178,7 +174,7 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
   }
 
   if (phase === PhaseEnum.ResultsFormation && ctx.priorSummary) {
-    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。你必须在本次回复中自动生成 report_sections 字段。只能使用摘要中明确存在的内容；缺失信息写明“待学生补充”，不得使用通用 A/B/C 数据。conclusion 和 reflection 留给学生自己填写。\n\n${ctx.priorSummary}`;
+    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。report_sections 由平台从同一结构化状态确定性生成，你不要自行输出或补写这些字段。dialogue 只能承接真实内容；conclusion 和 reflection 留给学生自己填写。\n\n${ctx.priorSummary}`;
   }
 
   if (phase === PhaseEnum.Reflection && ctx.priorSummary) {

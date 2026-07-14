@@ -1,3 +1,6 @@
+import type { ChatResponse } from '@/app/models/types';
+import type { StageTriggerType } from '@/app/lib/stageContract';
+
 export const STYLE_FAMILIES = [
   'socratic_concise',
   'warm_companion',
@@ -21,6 +24,12 @@ export interface StylePolicy {
   systemInstruction: string;
   annotationRubric: readonly string[];
   forbiddenPatterns: readonly string[];
+}
+
+export interface StyleAuthenticityResult {
+  neutralSystemResponse: boolean;
+  indicators: string[];
+  issues: string[];
 }
 
 export const STYLE_LABELS: Record<StyleFamily, string> = {
@@ -137,4 +146,59 @@ export function buildStyleInstruction(
 ): string {
   const policy = getStylePolicy(family, version);
   return `【导师回复风格：${policy.label}（${policy.version}）】\n${policy.systemInstruction}\n风格只能改变表达和引导策略，不能覆盖当前实验阶段、结构化输出、安全要求或学生主导性规则。`;
+}
+
+/** Deterministic, observable style evidence. Metadata alone is never enough. */
+export function evaluateStyleAuthenticity(
+  family: StyleFamily,
+  response: ChatResponse,
+  context: { phase: number; triggerType?: StageTriggerType },
+): StyleAuthenticityResult {
+  const text = [response.dialogue, ...(response.hints ?? [])].join('\n');
+  const questionCount = (response.dialogue.match(/[？?]/g) ?? []).length;
+  const neutralSystemResponse = (
+    context.triggerType === 'STAGE_ENTER' && !!response.safety_quiz
+  ) || (
+    context.triggerType === 'REPORT_BOOTSTRAP' && !!response.report_sections
+  ) || (
+    // 阶段收敛轮的首要职责是交付结构化确认物，不应为了证明“苏格拉底
+    // 风格”而额外追问。风格真实性由同一记录中的引导轮证明。
+    context.phase === 1
+    && response.stage1_confirmed === true
+    && response.next_action_type === 'confirmation'
+  ) || (
+    context.phase === 2
+    && !!response.experiment_plan
+    && !!response.data_table_schema
+    && response.next_action_type === 'confirmation'
+  );
+  if (neutralSystemResponse) return { neutralSystemResponse: true, indicators: [], issues: [] };
+
+  const indicators: string[] = [];
+  const issues: string[] = [];
+  if (family === 'socratic_concise') {
+    if (questionCount === 1) indicators.push('single_open_question');
+    if (response.dialogue.length <= 180) indicators.push('concise');
+    if (questionCount !== 1) issues.push('缺少唯一的开放问题');
+    if (response.dialogue.length > 180) issues.push('回复不够简洁');
+  }
+  if (family === 'warm_companion') {
+    if (/我理解|听起来|你已经|别着急|可以先|我们先|这个想法|这个困难|你注意到/.test(text)) indicators.push('specific_emotional_bridge');
+    if (/先|一步|从.{0,12}开始|试着/.test(text)) indicators.push('small_step');
+    if (!indicators.includes('specific_emotional_bridge')) issues.push('缺少对学生当前想法或困难的具体承接');
+  }
+  if (family === 'engineering_mentor') {
+    if (/约束|参数|可测|范围|验证|核对|一致|重复|原型|记录位置/.test(text)) indicators.push('engineering_constraint_or_validation');
+    if (indicators.length === 0) issues.push('缺少工程约束、参数或验证视角');
+  }
+  if (family === 'evidence_analyst') {
+    if (/证据|数据|数值|观察|异常|不确定|解释|相关|因果|误差/.test(text)) indicators.push('evidence_or_uncertainty');
+    if (indicators.length === 0) issues.push('缺少证据位置或不确定性表达');
+  }
+  if (family === 'classroom_coach') {
+    if (/本轮|先|下一步|请|完成|检查|核对|填写|指出/.test(text)) indicators.push('task_scaffold');
+    if (/下一步|完成后|然后|检查点|核对后/.test(text)) indicators.push('checkpoint');
+    if (indicators.length === 0) issues.push('缺少清晰任务、支架或检查点');
+  }
+  return { neutralSystemResponse: false, indicators, issues };
 }

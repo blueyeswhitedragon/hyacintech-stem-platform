@@ -23,14 +23,16 @@ export function buildPriorSummary(stageData: StageData): string {
     const plan = stageData.stage2.experimentPlan;
     parts.push([
       '【结构化实验方案】',
+      plan.researchQuestion ? `研究问题：${plan.researchQuestion}` : '',
+      plan.hypothesis ? `假设：${plan.hypothesis}` : '',
       `自变量：${plan.independentVariable.name}；水平：${plan.independentVariable.levels.join('、')}`,
-      `因变量：${plan.dependentVariable.name}；测量方式：${plan.dependentVariable.measurement}`,
+      `因变量：${plan.dependentVariable.name}；测量方式：${plan.dependentVariable.measurement}${plan.dependentVariable.unit ? `；单位：${plan.dependentVariable.unit}` : ''}`,
       `控制变量：${plan.controlledVariables.join('、') || '无'}`,
       `材料：${plan.materials.join('、') || '待补充'}`,
       `步骤：${plan.procedure.join('；') || '待补充'}`,
       `每个水平重复：${plan.repeatCount}次`,
       `安全：${plan.safetyNotes.join('；') || '无特殊风险'}`,
-    ].join('\n'));
+    ].filter(Boolean).join('\n'));
   }
 
   if (stageData.stage2?.schema) {

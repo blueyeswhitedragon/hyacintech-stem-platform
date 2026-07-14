@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAnyRole } from '@/app/lib/auth';
-import { submitAnnotationTask } from '@/app/lib/dataLab/service';
+import { AnnotationValidationError, submitAnnotationTask } from '@/app/lib/dataLab/service';
 import type { RevisionInput } from '@/app/lib/dataLab/types';
 
 export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/tasks/[id]/submit'>) {
@@ -11,6 +11,9 @@ export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/ta
     const body = await request.json() as RevisionInput;
     return NextResponse.json(await submitAnnotationTask(id, body, auth.user));
   } catch (error) {
+    if (error instanceof AnnotationValidationError) {
+      return NextResponse.json({ error: error.message, check: error.check }, { status: 422 });
+    }
     return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
   }
 }

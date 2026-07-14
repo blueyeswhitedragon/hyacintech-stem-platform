@@ -74,7 +74,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       const llmResult = await callLLMWithTrace(systemPrompt, STAGE2_TRANSITION_TRIGGER, conv.messages, {
         stage: 2,
         triggerType: 'STAGE_TRANSITION',
-        visibleContext: priorSummary,
+        visibleContext: JSON.stringify({ stageData: conv.stageData, priorSummary }),
       }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
       const transitionMessage = buildAssistantTransitionMessage(llmResult.response, uuidv4());
       await persistGenerationTurn({
@@ -215,7 +215,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       const llmResult = await callLLMWithTrace(systemPrompt, STAGE5_BOOTSTRAP_TRIGGER, conv.messages, {
         stage: 5,
         triggerType: 'REPORT_BOOTSTRAP',
-        visibleContext: priorSummary,
+        visibleContext: JSON.stringify({ stageData: conv.stageData, priorSummary }),
       }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
       const { stageData } = extractStageData(5, llmResult.response, conv.stageData);
       const transitionMessage = buildAssistantTransitionMessage(llmResult.response, uuidv4());

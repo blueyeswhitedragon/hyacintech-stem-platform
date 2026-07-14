@@ -123,7 +123,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     };
     const visibleContext = stage === PhaseEnum.DataAnalysis
       ? JSON.stringify({ schema: context?.dataSchema, rows: context?.dataRows ?? [], rowNumbers: (context?.dataRows ?? []).map((_, index) => index + 1) })
-      : context?.priorSummary;
+      : JSON.stringify({ stageData: conv.stageData, priorSummary: context?.priorSummary });
     const llmResult = await callLLMWithTrace(systemPrompt, message, conv.messages, {
       stage,
       hasStage2Schema: (conv.stageData.stage2?.schema.columns.length ?? 0) > 0,

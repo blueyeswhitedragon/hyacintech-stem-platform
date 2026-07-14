@@ -44,8 +44,10 @@ export interface Stage2RiskAnnotation {
 }
 
 export interface Stage2ExperimentPlan {
+  researchQuestion?: string;
+  hypothesis?: string;
   independentVariable: { name: string; levels: string[] };
-  dependentVariable: { name: string; measurement: string };
+  dependentVariable: { name: string; measurement: string; unit?: string };
   controlledVariables: string[];
   materials: string[];
   procedure: string[];
