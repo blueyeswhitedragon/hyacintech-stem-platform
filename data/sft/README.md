@@ -1,6 +1,8 @@
 # STEM Tutor SFT Seed Data
 
-This directory stores hand-crafted seed data for fine-tuning/post-training the Qwen model in this repository's STEM tutor workflow.
+This directory stores scenario seeds, quarantined legacy artifacts, and dataset schema v3 rollout assets for the STEM tutor workflow.
+
+> **Training boundary:** `sharegpt-distill-dsv4-all-clean.json` and all derivatives of the historical 489 records are `LEGACY_QUARANTINED`. They are not positive SFT data. Only their scenario identity may seed a new role-separated rollout; old assistant answers must never be copied into v3 tutor or student context.
 
 ## Goal
 
@@ -23,7 +25,12 @@ The first seed set is tied to blind-eval v3 evidence under `data/blind-eval/`, e
 - `sharegpt-auto-*-pure.json` files strip metadata and keep only `{ conversations }` for platform import.
 - `scripts/build-sharegpt-seed.ts` is the editable hand-crafted source.
 - `scripts/transcript-to-sharegpt.ts` converts `data/blind-eval/transcript-*.json` into ShareGPT records.
-- `scripts/distill-dsv4-sharegpt.ts` plans, generates, cleans, and splits DSV4 distilled samples.
+- `v3/plans/*.json` separates `studentVisible`, `tutorVisible`, and `evaluatorOnly` inputs.
+- `v3/legacy-489-disposition.json` records the non-SFT disposition of every historical record.
+- `scripts/build-dataset-v3-plan.ts` derives scenario-only v3 plans without reading legacy assistant answers.
+- `scripts/distill-dataset-v3.ts` performs resumable student/tutor/evaluator rollouts through the production Tutor prompt and contract path.
+- `scripts/validate-dataset-v3.ts` validates v3 plans and candidate/release records.
+- `scripts/distill-dsv4-sharegpt.ts` is legacy-only and refuses normal generation unless explicitly overridden.
 - `scripts/test-sharegpt-dataset.ts` validates structure and rubric-critical constraints.
 
 ## Format
@@ -61,24 +68,28 @@ npx tsx scripts/transcript-to-sharegpt.ts --source-tag dsv4-smoke --out data/sft
 npx tsx scripts/test-sharegpt-dataset.ts
 npx tsx scripts/test-sharegpt-dataset.ts data/sft/sharegpt-auto-smoke.json
 
-# Build a 600-item six-phase DSV4 distillation plan
-npx tsx scripts/distill-dsv4-sharegpt.ts plan --target 600
+# Build and validate the balanced 30-item calibration plan
+npm run data-lab:build-v3-plan -- --target 30 --out data/sft/v3/plans/calibration-30.json
+npm run data-lab:validate-v3 -- --kind plan --file data/sft/v3/plans/calibration-30.json
 
-# Inspect the first planned DSV4 prompt without calling the API
-npx tsx scripts/distill-dsv4-sharegpt.ts generate --limit 1 --dry-run true
+# Inspect selection without API calls
+npm run data-lab:distill-rollout -- --plan data/sft/v3/plans/calibration-30.json --run-id calibration-30 --dry-run
 
-# Generate a resumable teacher batch, then clean/split outputs
-LLM_PROVIDER=deepseek LLM_MODEL=deepseek-v4-pro LLM_TIMEOUT_MS=180000 LLM_MAX_TOKENS=6000 \
-  npx tsx scripts/distill-dsv4-sharegpt.ts generate --limit 30
-npx tsx scripts/distill-dsv4-sharegpt.ts clean
+# Generate or resume the calibration run
+npm run data-lab:distill-rollout -- --plan data/sft/v3/plans/calibration-30.json --run-id calibration-30 --limit 30
+
+# Validate candidates before importing them to Data Lab
+npm run data-lab:validate-v3 -- --kind candidates --file data/sft/v3/runs/calibration-30/candidates.json
 ```
 
 ## Expansion Rules
 
 - Prefer small, high-signal examples tied to a rubric failure over bulk synthetic data.
-- Every phase 1 confirmation must include `theme_mapping`, `snapshot`, and `variables.independent`.
+- Every phase 1 confirmation must include `theme_mapping`, `snapshot`, and `topic_direction`, without formalizing P2 variables early.
 - Engineering topics must preserve the original mechanism. Do not turn threshold-trigger systems into unrelated material-effect experiments.
 - Stage 1 must not use `ask_choice` or non-empty `options`.
 - One assistant turn should ask at most one core question plus one light follow-up.
-- Stage 2 confirmation must include `data_table_schema` with a `notes` column and `maxRows: 200`.
-- DSV4-distilled records are `gold_candidate` until a human review accepts them as gold.
+- Stage 2 confirmation must include a full `experiment_plan` (including `repeatCount`) and a wide `data_table_schema` with a `notes` column, `minRows >= 3`, and `maxRows: 200`.
+- Stage 3 entry must include a relevant `safety_quiz`; passing is server-authoritative.
+- Stage 4 accepted progress requires at least two real table values written by the student in that same turn.
+- A same-model evaluator can only produce `needs_review`, never an automatic gold candidate. No model-produced record is Gold until human review accepts it.

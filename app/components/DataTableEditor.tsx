@@ -10,9 +10,11 @@ interface Props {
   onComplete: () => Promise<string | null>;
   /** 体验模式禁用图片上传。 */
   allowUpload?: boolean;
+  /** 安全问答未通过时禁用所有数据录入操作。 */
+  disabledReason?: string;
 }
 
-export default function DataTableEditor({ schema, initial, onSave, onComplete, allowUpload = true }: Props) {
+export default function DataTableEditor({ schema, initial, onSave, onComplete, allowUpload = true, disabledReason }: Props) {
   const [rows, setRows] = useState<Record<string, unknown>[]>(initial?.rows ?? []);
   const [fileAssoc, setFileAssoc] = useState<Stage3FileAssociation[]>(initial?.fileAssociations ?? []);
   const [saving, setSaving] = useState(false);
@@ -29,6 +31,7 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
   }
 
   const { columns, minRows, maxRows } = schema;
+  const disabled = Boolean(disabledReason);
 
   const setCell = (rowIdx: number, key: string, value: unknown) => {
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)));
@@ -106,12 +109,13 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={String(row[c.key])} alt="" className="h-10 w-10 object-cover rounded" />
                           ) : null}
-                          <label className="text-blue-600 text-xs cursor-pointer hover:underline">
+                          <label className={`text-blue-600 text-xs hover:underline ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
                             {row[c.key] ? '更换' : '上传'}
                             <input
                               type="file"
                               accept="image/*"
                               className="hidden"
+                              disabled={disabled}
                               onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(i, c.key, f); }}
                             />
                           </label>
@@ -126,13 +130,14 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
                         onChange={(e) =>
                           setCell(i, c.key, c.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value)
                         }
+                        disabled={disabled}
                         className="w-full border rounded px-1 py-0.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                     )}
                   </td>
                 ))}
                 <td className="p-1 border text-center">
-                  <button onClick={() => removeRow(i)} className="text-red-400 hover:text-red-600 text-xs">删除</button>
+                  <button onClick={() => removeRow(i)} disabled={disabled} className="text-red-400 hover:text-red-600 text-xs disabled:opacity-40">删除</button>
                 </td>
               </tr>
             ))}
@@ -141,23 +146,24 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
       </div>
 
       <div className="flex items-center gap-2 mt-3 flex-wrap">
+        {disabledReason && <div className="w-full rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">⚠️ {disabledReason}</div>}
         <button
           onClick={addRow}
-          disabled={rows.length >= maxRows}
+          disabled={disabled || rows.length >= maxRows}
           className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded hover:bg-gray-100 disabled:opacity-50"
         >
           + 添加一行
         </button>
         <button
           onClick={handleSave}
-          disabled={saving || completing}
+          disabled={disabled || saving || completing}
           className="px-4 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
         >
           {saving ? '保存中…' : '保存'}
         </button>
         <button
           onClick={handleComplete}
-          disabled={saving || completing}
+          disabled={disabled || saving || completing}
           className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
         >
           {completing ? '推进中…' : '完成数据收集，进入分析'}

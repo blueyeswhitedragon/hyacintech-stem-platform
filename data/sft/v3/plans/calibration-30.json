@@ -1,0 +1,1908 @@
+{
+  "schemaVersion": 3,
+  "stageContractVersion": "stage-contract-v2",
+  "createdAt": "2026-07-13T17:07:34.773Z",
+  "sourceFile": "data\\sft\\sharegpt-distill-dsv4-all-clean.json",
+  "sourceUsage": "SCENARIO_SEEDS_ONLY",
+  "tasks": [
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-high-concept-mars-light-v1-0887ad0be6-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-high-concept-mars-light-v1-0887ad0be6-v1",
+      "familyKey": "high-concept-mars-light",
+      "phase": 1,
+      "scenario": "高概念降级型-火星基地植物",
+      "styleFamily": "socratic_concise",
+      "triggerType": "USER_MESSAGE",
+      "studentVisible": {
+        "profile": "high_concept",
+        "openingMessage": "我对“高概念降级型-火星基地植物”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“高概念降级型-火星基地植物”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "火星基地植物生存",
+          "retainedFeature": "基地环境条件需要人工控制",
+          "classroomProxy": "不同人工光照时长",
+          "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+          "independentVariable": "人工光照时长",
+          "dependentDirection": "发芽和早期生长情况",
+          "safetyNotes": [
+            "人工光源用LED，不用高压灯具"
+          ],
+          "mustKeepTerms": [
+            [
+              "火星"
+            ],
+            [
+              "基地"
+            ],
+            [
+              "人工",
+              "控制"
+            ]
+          ],
+          "proxyTerms": [
+            [
+              "人工",
+              "光照"
+            ],
+            [
+              "光照",
+              "时长"
+            ]
+          ]
+        },
+        "failureModes": [
+          "theme_loss",
+          "proxy_drift",
+          "weak_confirmation_doc"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "structure_compliance",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-safety-acid-rain-plant-v1-8604030f90-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-safety-acid-rain-plant-v1-8604030f90-v1",
+      "familyKey": "safety-acid-rain-plant",
+      "phase": 2,
+      "scenario": "安全风险型-酸雨与植物",
+      "styleFamily": "warm_companion",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "safety_risk",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“安全风险型-酸雨与植物”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】不同酸度的稀酸溶液是否影响绿豆发芽？\n【课堂代理】不同pH的稀酸溶液（白醋调配，远离强酸）\n【因素与现象方向】拟改变：稀酸溶液pH；关注：发芽和生长情况"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "酸雨对植物的危害",
+          "retainedFeature": "酸性程度影响植物生长",
+          "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+          "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+          "independentVariable": "稀酸溶液pH",
+          "dependentDirection": "发芽和生长情况",
+          "safetyNotes": [
+            "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+            "佩戴护目镜和手套",
+            "不直接接触或闻溶液"
+          ]
+        },
+        "failureModes": [
+          "safety_softness"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-cooperative-light-color-v1-58131fe096-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-cooperative-light-color-v1-58131fe096-v1",
+      "familyKey": "cooperative-light-color",
+      "phase": 3,
+      "scenario": "配合型-光色与绿豆发芽",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "STAGE_ENTER",
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与当前方案相关的安全问答。",
+        "brief": [
+          "我正在做“配合型-光色与绿豆发芽”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】不同颜色的光是否影响绿豆发芽速度？\n【课堂代理】不同颜色的光（红蓝绿白）\n【因素与现象方向】拟改变：光的颜色；关注：发芽速度/发芽数\n【教师已审核方案】自变量：光的颜色；水平：较低光的颜色、中等光的颜色、较高光的颜色；因变量：发芽速度/发芽数；每个水平重复3次；安全：避免使用220V强光灯具，用LED或手电筒"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "光照对植物的影响",
+          "retainedFeature": "光的不同属性会影响植物",
+          "classroomProxy": "不同颜色的光（红蓝绿白）",
+          "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+          "independentVariable": "光的颜色",
+          "dependentDirection": "发芽速度/发芽数",
+          "safetyNotes": [
+            "避免使用220V强光灯具，用LED或手电筒"
+          ]
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-fuzzy-water-amount-v1-09ff09dfc8-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-fuzzy-water-amount-v1-09ff09dfc8-v1",
+      "familyKey": "fuzzy-water-amount",
+      "phase": 4,
+      "scenario": "模糊型-浇水多少",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“模糊型-浇水多少”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 10,
+            "level_2_result": 12,
+            "level_3_result": 14,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 11,
+            "level_2_result": 14,
+            "level_3_result": 15,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 3,
+            "level_1_result": 12,
+            "level_2_result": 14,
+            "level_3_result": 16,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】每天浇水量不同是否影响绿豆发芽率？\n【课堂代理】不同浇水量\n【因素与现象方向】拟改变：每天浇水量；关注：发芽率\n【教师已审核方案】自变量：每天浇水量；水平：较低每天浇水量、中等每天浇水量、较高每天浇水量；因变量：发芽率；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低每天浇水量的发芽率=10；中等每天浇水量的发芽率=12；较高每天浇水量的发芽率=14；备注=\n2. 重复次数=2；较低每天浇水量的发芽率=11；中等每天浇水量的发芽率=14；较高每天浇水量的发芽率=15；备注=本次记录与相邻重复略有差异，需在分析中说明\n3. 重复次数=3；较低每天浇水量的发芽率=12；中等每天浇水量的发芽率=14；较高每天浇水量的发芽率=16；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "level_1_result": 10,
+            "level_2_result": 12,
+            "level_3_result": 14,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 11,
+            "level_2_result": 14,
+            "level_3_result": 15,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 3,
+            "level_1_result": 12,
+            "level_2_result": 14,
+            "level_3_result": 16,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复次数",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_1_result",
+              "title": "较低每天浇水量的发芽率",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_2_result",
+              "title": "中等每天浇水量的发芽率",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_3_result",
+              "title": "较高每天浇水量的发芽率",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "种子发芽",
+          "retainedFeature": "水分多少影响发芽",
+          "classroomProxy": "不同浇水量",
+          "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+          "independentVariable": "每天浇水量",
+          "dependentDirection": "发芽率"
+        },
+        "failureModes": [
+          "over_questioning",
+          "weak_confirmation_doc"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "structure_compliance",
+          "student_agency",
+          "teaching_guidance",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-smartedu-0009-v1-ed79fea655-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-smartedu-0009-v1-ed79fea655-v1",
+      "familyKey": "smartedu-0009",
+      "phase": 5,
+      "scenario": "化学实验探究",
+      "styleFamily": "classroom_coach",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“化学实验探究”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 7,
+            "level_2_result": 10,
+            "level_3_result": 11,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 2,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 9,
+            "level_2_result": 11,
+            "level_3_result": 13,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「化学实验探究」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「化学实验探究」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果\n【教师已审核方案】自变量：一个可人为改变的条件；水平：较低一个可人为改变的条件、中等一个可人为改变的条件、较高一个可人为改变的条件；因变量：可观察或可测量的结果；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。\n【学生真实数据】\n1. 重复次数=1；较低一个可人为改变的条件的可观察或可测量的结果=7；中等一个可人为改变的条件的可观察或可测量的结果=10；较高一个可人为改变的条件的可观察或可测量的结果=11；备注=本次记录与相邻重复略有差异，需在分析中说明\n2. 重复次数=2；较低一个可人为改变的条件的可观察或可测量的结果=8；中等一个可人为改变的条件的可观察或可测量的结果=10；较高一个可人为改变的条件的可观察或可测量的结果=12；备注=\n3. 重复次数=3；较低一个可人为改变的条件的可观察或可测量的结果=9；中等一个可人为改变的条件的可观察或可测量的结果=11；较高一个可人为改变的条件的可观察或可测量的结果=13；备注=\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "化学实验探究",
+          "retainedFeature": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-smartedu-0012-v1-2fdae34c53-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-smartedu-0012-v1-2fdae34c53-v1",
+      "familyKey": "smartedu-0012",
+      "phase": 6,
+      "scenario": "《控制变量法在初中化学实验探究中的应用》",
+      "styleFamily": "socratic_concise",
+      "triggerType": "OPTIONAL_COACHING",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "我正在反思“《控制变量法在初中化学实验探究中的应用》”这次实验，想检查自己有没有忽略重要局限。",
+        "brief": [
+          "我正在做“《控制变量法在初中化学实验探究中的应用》”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 5,
+            "level_2_result": 7,
+            "level_3_result": 9,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 4,
+            "level_2_result": 6,
+            "level_3_result": 8,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 3,
+            "level_2_result": 6,
+            "level_3_result": 7,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果\n【教师已审核方案】自变量：一个可人为改变的条件；水平：较低一个可人为改变的条件、中等一个可人为改变的条件、较高一个可人为改变的条件；因变量：可观察或可测量的结果；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。\n【学生真实数据】\n1. 重复次数=1；较低一个可人为改变的条件的可观察或可测量的结果=5；中等一个可人为改变的条件的可观察或可测量的结果=7；较高一个可人为改变的条件的可观察或可测量的结果=9；备注=\n2. 重复次数=2；较低一个可人为改变的条件的可观察或可测量的结果=4；中等一个可人为改变的条件的可观察或可测量的结果=6；较高一个可人为改变的条件的可观察或可测量的结果=8；备注=\n3. 重复次数=3；较低一个可人为改变的条件的可观察或可测量的结果=3；中等一个可人为改变的条件的可观察或可测量的结果=6；较高一个可人为改变的条件的可观察或可测量的结果=7；备注=本次记录与相邻重复略有差异，需在分析中说明\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。\n【已提交报告】报告已包含目的、假设、材料、步骤、数据摘要和分析；结论与局限由学生本人反思。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "《控制变量法在初中化学实验探究中的应用》",
+          "retainedFeature": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-ecology-bottle-balance-v1-647ce28752-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-ecology-bottle-balance-v1-647ce28752-v1",
+      "familyKey": "ecology-bottle-balance",
+      "phase": 1,
+      "scenario": "过度宏大型-生态瓶平衡",
+      "styleFamily": "warm_companion",
+      "triggerType": "USER_MESSAGE",
+      "studentVisible": {
+        "profile": "over_broad",
+        "openingMessage": "我对“过度宏大型-生态瓶平衡”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“过度宏大型-生态瓶平衡”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "生态瓶/微型生态系统",
+          "retainedFeature": "生物数量比例影响系统稳定性",
+          "classroomProxy": "不同水草与小鱼数量比例",
+          "researchQuestion": "水草与小鱼数量比例是否影响生态瓶存活天数？",
+          "independentVariable": "水草与小鱼数量比例",
+          "dependentDirection": "生态瓶存活天数"
+        },
+        "failureModes": [
+          "theme_loss",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-safety-bread-mold-preservative-v1-f6c9fddb4b-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-safety-bread-mold-preservative-v1-f6c9fddb4b-v1",
+      "familyKey": "safety-bread-mold-preservative",
+      "phase": 2,
+      "scenario": "安全风险型-面包防腐",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "safety_risk",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“安全风险型-面包防腐”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】不同防腐处理是否影响面包发霉速度？\n【课堂代理】不同防腐处理（冷藏/干燥/真空密封）\n【因素与现象方向】拟改变：防腐处理方式；关注：发霉速度"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "食物怎么防腐",
+          "retainedFeature": "防腐方式抑制微生物",
+          "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+          "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+          "independentVariable": "防腐处理方式",
+          "dependentDirection": "发霉速度",
+          "safetyNotes": [
+            "发霉食物只观察不食用，可能产生毒素",
+            "避免吸入霉菌孢子"
+          ]
+        },
+        "failureModes": [
+          "safety_softness"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-premature-shade-plant-height-v1-59aae2fa50-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-premature-shade-plant-height-v1-59aae2fa50-v1",
+      "familyKey": "premature-shade-plant-height",
+      "phase": 3,
+      "scenario": "细节过早型-遮阴与株高",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "STAGE_ENTER",
+      "studentVisible": {
+        "profile": "premature_details",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与当前方案相关的安全问答。",
+        "brief": [
+          "我正在做“细节过早型-遮阴与株高”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】遮阴程度是否影响绿豆幼苗株高？\n【课堂代理】不同遮阴程度\n【因素与现象方向】拟改变：遮阴程度；关注：幼苗株高\n【教师已审核方案】自变量：遮阴程度；水平：较低遮阴程度、中等遮阴程度、较高遮阴程度；因变量：幼苗株高；每个水平重复3次；安全：遵守课堂实验安全要求"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "植物长不高",
+          "retainedFeature": "光照强弱影响株高",
+          "classroomProxy": "不同遮阴程度",
+          "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+          "independentVariable": "遮阴程度",
+          "dependentDirection": "幼苗株高"
+        },
+        "failureModes": [
+          "premature_stage2"
+        ],
+        "rubricTargets": [
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v1-a7c0549057-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v1-a7c0549057-v1",
+      "familyKey": "fuzzy-yogurt-temperature",
+      "phase": 4,
+      "scenario": "模糊型-酸奶与温度",
+      "styleFamily": "classroom_coach",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“模糊型-酸奶与温度”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 9,
+            "level_2_result": 11,
+            "level_3_result": 13,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 10,
+            "level_2_result": 13,
+            "level_3_result": 14,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】存放温度是否影响酸奶变质快慢？\n【课堂代理】不同存放温度\n【因素与现象方向】拟改变：存放温度；关注：变质快慢\n【教师已审核方案】自变量：存放温度；水平：较低存放温度、中等存放温度、较高存放温度；因变量：变质快慢；每个水平重复3次；安全：变质食物只观察不食用、闻气味用手扇，不直接凑近\n【学生真实数据】\n1. 重复次数=1；较低存放温度的变质快慢=8；中等存放温度的变质快慢=10；较高存放温度的变质快慢=12；备注=\n2. 重复次数=2；较低存放温度的变质快慢=9；中等存放温度的变质快慢=11；较高存放温度的变质快慢=13；备注=\n3. 重复次数=3；较低存放温度的变质快慢=10；中等存放温度的变质快慢=13；较高存放温度的变质快慢=14；备注=本次记录与相邻重复略有差异，需在分析中说明",
+        "dataRows": [
+          {
+            "trial": 1,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 9,
+            "level_2_result": 11,
+            "level_3_result": 13,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 10,
+            "level_2_result": 13,
+            "level_3_result": 14,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复次数",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_1_result",
+              "title": "较低存放温度的变质快慢",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_2_result",
+              "title": "中等存放温度的变质快慢",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_3_result",
+              "title": "较高存放温度的变质快慢",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "食物保存",
+          "retainedFeature": "温度影响微生物活动",
+          "classroomProxy": "不同存放温度",
+          "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+          "independentVariable": "存放温度",
+          "dependentDirection": "变质快慢",
+          "safetyNotes": [
+            "变质食物只观察不食用",
+            "闻气味用手扇，不直接凑近"
+          ]
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-smartedu-0016-v1-0ae26e6f35-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-smartedu-0016-v1-0ae26e6f35-v1",
+      "familyKey": "smartedu-0016",
+      "phase": 5,
+      "scenario": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+      "styleFamily": "socratic_concise",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 10,
+            "level_2_result": 13,
+            "level_3_result": 14,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 2,
+            "level_1_result": 9,
+            "level_2_result": 11,
+            "level_3_result": 13,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？\n【课堂代理】把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。\n【因素与现象方向】拟改变：过滤材料种类或过滤层数；关注：过滤后水的浑浊程度/颜色变化\n【教师已审核方案】自变量：过滤材料种类或过滤层数；水平：较低过滤材料种类或过滤层数、中等过滤材料种类或过滤层数、较高过滤材料种类或过滤层数；因变量：过滤后水的浑浊程度/颜色变化；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。\n【学生真实数据】\n1. 重复次数=1；较低过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=10；中等过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=13；较高过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=14；备注=本次记录与相邻重复略有差异，需在分析中说明\n2. 重复次数=2；较低过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=9；中等过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=11；较高过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=13；备注=\n3. 重复次数=3；较低过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=8；中等过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=10；较高过滤材料种类或过滤层数的过滤后水的浑浊程度/颜色变化=12；备注=\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+          "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+          "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+          "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+          "independentVariable": "过滤材料种类或过滤层数",
+          "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-variable-confusion-apple-browning-v1-60684033e1-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-variable-confusion-apple-browning-v1-60684033e1-v1",
+      "familyKey": "variable-confusion-apple-browning",
+      "phase": 6,
+      "scenario": "变量混乱型-苹果褐变",
+      "styleFamily": "warm_companion",
+      "triggerType": "OPTIONAL_COACHING",
+      "studentVisible": {
+        "profile": "variable_confusion",
+        "openingMessage": "我正在反思“变量混乱型-苹果褐变”这次实验，想检查自己有没有忽略重要局限。",
+        "brief": [
+          "我正在做“变量混乱型-苹果褐变”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 6,
+            "level_2_result": 8,
+            "level_3_result": 10,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 7,
+            "level_2_result": 9,
+            "level_3_result": 11,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 8,
+            "level_2_result": 11,
+            "level_3_result": 12,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】不同处理是否影响苹果切面褐变速度？\n【课堂代理】不同抗褐变处理（盐水浸泡/柠檬汁/不处理）\n【因素与现象方向】拟改变：抗褐变处理方式；关注：褐变速度\n【教师已审核方案】自变量：抗褐变处理方式；水平：较低抗褐变处理方式、中等抗褐变处理方式、较高抗褐变处理方式；因变量：褐变速度；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低抗褐变处理方式的褐变速度=6；中等抗褐变处理方式的褐变速度=8；较高抗褐变处理方式的褐变速度=10；备注=\n2. 重复次数=2；较低抗褐变处理方式的褐变速度=7；中等抗褐变处理方式的褐变速度=9；较高抗褐变处理方式的褐变速度=11；备注=\n3. 重复次数=3；较低抗褐变处理方式的褐变速度=8；中等抗褐变处理方式的褐变速度=11；较高抗褐变处理方式的褐变速度=12；备注=本次记录与相邻重复略有差异，需在分析中说明\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。\n【已提交报告】报告已包含目的、假设、材料、步骤、数据摘要和分析；结论与局限由学生本人反思。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "苹果切开变色",
+          "retainedFeature": "隔绝氧气可延缓褐变",
+          "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+          "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+          "independentVariable": "抗褐变处理方式",
+          "dependentDirection": "褐变速度"
+        },
+        "failureModes": [
+          "variable_confusion",
+          "premature_stage2"
+        ],
+        "rubricTargets": [
+          "expression",
+          "stage_discipline",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-smartedu-0011-v1-b9379d19db-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-smartedu-0011-v1-b9379d19db-v1",
+      "familyKey": "smartedu-0011",
+      "phase": 1,
+      "scenario": "控制变量法在初中化学实验探究中的应用",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "USER_MESSAGE",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "我对“控制变量法在初中化学实验探究中的应用”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“控制变量法在初中化学实验探究中的应用”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "控制变量法在初中化学实验探究中的应用",
+          "retainedFeature": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-engineering-bridge-load-v1-b762ca3ae6-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-engineering-bridge-load-v1-b762ca3ae6-v1",
+      "familyKey": "engineering-bridge-load",
+      "phase": 2,
+      "scenario": "工程项目型-纸桥承重",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "engineering_project",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“工程项目型-纸桥承重”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】桥身结构形式是否影响纸桥承重？\n【课堂代理】不同桥身结构形式\n【因素与现象方向】拟改变：桥身结构形式；关注：承重能力"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "纸桥承重",
+          "retainedFeature": "结构形式影响承重能力",
+          "classroomProxy": "不同桥身结构形式",
+          "researchQuestion": "桥身结构形式是否影响纸桥承重？",
+          "independentVariable": "桥身结构形式",
+          "dependentDirection": "承重能力"
+        },
+        "failureModes": [
+          "engineering_flattening",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "interdisciplinary_integration",
+          "proxy_quality",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance",
+          "theme_fidelity"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-smartedu-0020-v1-a4f200a1d9-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-smartedu-0020-v1-a4f200a1d9-v1",
+      "familyKey": "smartedu-0020",
+      "phase": 3,
+      "scenario": "探究影响光合作用的因素（实验）",
+      "styleFamily": "classroom_coach",
+      "triggerType": "STAGE_ENTER",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与当前方案相关的安全问答。",
+        "brief": [
+          "我正在做“探究影响光合作用的因素（实验）”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果\n【教师已审核方案】自变量：一个可人为改变的条件；水平：较低一个可人为改变的条件、中等一个可人为改变的条件、较高一个可人为改变的条件；因变量：可观察或可测量的结果；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究影响光合作用的因素（实验）",
+          "retainedFeature": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5-v1",
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "phase": 4,
+      "scenario": "模糊型-小车与斜面",
+      "styleFamily": "socratic_concise",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“模糊型-小车与斜面”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 4,
+            "level_2_result": 7,
+            "level_3_result": 8,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 2,
+            "level_1_result": 3,
+            "level_2_result": 5,
+            "level_3_result": 7,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 2,
+            "level_2_result": 4,
+            "level_3_result": 6,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】斜面角度是否影响小车下滑距离？\n【课堂代理】不同斜面角度\n【因素与现象方向】拟改变：斜面角度；关注：下滑距离\n【教师已审核方案】自变量：斜面角度；水平：较低斜面角度、中等斜面角度、较高斜面角度；因变量：下滑距离；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低斜面角度的下滑距离=4；中等斜面角度的下滑距离=7；较高斜面角度的下滑距离=8；备注=本次记录与相邻重复略有差异，需在分析中说明\n2. 重复次数=2；较低斜面角度的下滑距离=3；中等斜面角度的下滑距离=5；较高斜面角度的下滑距离=7；备注=\n3. 重复次数=3；较低斜面角度的下滑距离=2；中等斜面角度的下滑距离=4；较高斜面角度的下滑距离=6；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "level_1_result": 4,
+            "level_2_result": 7,
+            "level_3_result": 8,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 2,
+            "level_1_result": 3,
+            "level_2_result": 5,
+            "level_3_result": 7,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 2,
+            "level_2_result": 4,
+            "level_3_result": 6,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复次数",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_1_result",
+              "title": "较低斜面角度的下滑距离",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_2_result",
+              "title": "中等斜面角度的下滑距离",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_3_result",
+              "title": "较高斜面角度的下滑距离",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "小车下坡",
+          "retainedFeature": "坡度影响下滑加速度",
+          "classroomProxy": "不同斜面角度",
+          "researchQuestion": "斜面角度是否影响小车下滑距离？",
+          "independentVariable": "斜面角度",
+          "dependentDirection": "下滑距离"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-all-at-once-parachute-area-v1-7a494d653d-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-all-at-once-parachute-area-v1-7a494d653d-v1",
+      "familyKey": "all-at-once-parachute-area",
+      "phase": 5,
+      "scenario": "一次给全型-降落伞面积",
+      "styleFamily": "warm_companion",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "studentVisible": {
+        "profile": "all_at_once",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“一次给全型-降落伞面积”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 6,
+            "level_2_result": 8,
+            "level_3_result": 10,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 5,
+            "level_2_result": 7,
+            "level_3_result": 9,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 4,
+            "level_2_result": 7,
+            "level_3_result": 8,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】降落伞伞面面积是否影响下落时间？\n【课堂代理】不同伞面面积\n【因素与现象方向】拟改变：伞面面积；关注：下落时间\n【教师已审核方案】自变量：伞面面积；水平：较低伞面面积、中等伞面面积、较高伞面面积；因变量：下落时间；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低伞面面积的下落时间=6；中等伞面面积的下落时间=8；较高伞面面积的下落时间=10；备注=\n2. 重复次数=2；较低伞面面积的下落时间=5；中等伞面面积的下落时间=7；较高伞面面积的下落时间=9；备注=\n3. 重复次数=3；较低伞面面积的下落时间=4；中等伞面面积的下落时间=7；较高伞面面积的下落时间=8；备注=本次记录与相邻重复略有差异，需在分析中说明\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "降落伞下落快慢",
+          "retainedFeature": "伞面面积影响空气阻力",
+          "classroomProxy": "不同伞面面积",
+          "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+          "independentVariable": "伞面面积",
+          "dependentDirection": "下落时间"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-smartedu-0023-v1-1797ee48c0-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-smartedu-0023-v1-1797ee48c0-v1",
+      "familyKey": "smartedu-0023",
+      "phase": 6,
+      "scenario": "探究弹性势能的影响因素",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "OPTIONAL_COACHING",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "我正在反思“探究弹性势能的影响因素”这次实验，想检查自己有没有忽略重要局限。",
+        "brief": [
+          "我正在做“探究弹性势能的影响因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 9,
+            "level_2_result": 11,
+            "level_3_result": 13,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 10,
+            "level_2_result": 12,
+            "level_3_result": 14,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 11,
+            "level_2_result": 14,
+            "level_3_result": 15,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果\n【教师已审核方案】自变量：一个可人为改变的条件；水平：较低一个可人为改变的条件、中等一个可人为改变的条件、较高一个可人为改变的条件；因变量：可观察或可测量的结果；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。\n【学生真实数据】\n1. 重复次数=1；较低一个可人为改变的条件的可观察或可测量的结果=9；中等一个可人为改变的条件的可观察或可测量的结果=11；较高一个可人为改变的条件的可观察或可测量的结果=13；备注=\n2. 重复次数=2；较低一个可人为改变的条件的可观察或可测量的结果=10；中等一个可人为改变的条件的可观察或可测量的结果=12；较高一个可人为改变的条件的可观察或可测量的结果=14；备注=\n3. 重复次数=3；较低一个可人为改变的条件的可观察或可测量的结果=11；中等一个可人为改变的条件的可观察或可测量的结果=14；较高一个可人为改变的条件的可观察或可测量的结果=15；备注=本次记录与相邻重复略有差异，需在分析中说明\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。\n【已提交报告】报告已包含目的、假设、材料、步骤、数据摘要和分析；结论与局限由学生本人反思。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究弹性势能的影响因素",
+          "retainedFeature": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-over-broad-vehicle-fuel-v1-6ee3ea8739-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v1-6ee3ea8739-v1",
+      "familyKey": "over-broad-vehicle-fuel",
+      "phase": 1,
+      "scenario": "过度宏大型-新能源车续航",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "USER_MESSAGE",
+      "studentVisible": {
+        "profile": "over_broad",
+        "openingMessage": "我对“过度宏大型-新能源车续航”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“过度宏大型-新能源车续航”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "新能源汽车续航",
+          "retainedFeature": "能量来源影响续航",
+          "classroomProxy": "不同橡皮筋数量（模拟能量储备）",
+          "researchQuestion": "橡皮筋数量是否影响动力小车行驶距离？",
+          "independentVariable": "橡皮筋数量",
+          "dependentDirection": "行驶距离"
+        },
+        "failureModes": [
+          "theme_loss",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-real-world-classroom-shade-heat-v1-51bf2d8516-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v1-51bf2d8516-v1",
+      "familyKey": "real-world-classroom-shade-heat",
+      "phase": 2,
+      "scenario": "现实问题抽象型-教室遮光降温",
+      "styleFamily": "classroom_coach",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“现实问题抽象型-教室遮光降温”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】遮光材料是否影响纸盒内温度变化？\n【课堂代理】不同遮光材料盖纸盒\n【因素与现象方向】拟改变：遮光材料；关注：纸盒内温度变化"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "教室夏天太热",
+          "retainedFeature": "遮挡阳光可降温",
+          "classroomProxy": "不同遮光材料盖纸盒",
+          "researchQuestion": "遮光材料是否影响纸盒内温度变化？",
+          "independentVariable": "遮光材料",
+          "dependentDirection": "纸盒内温度变化"
+        },
+        "failureModes": [
+          "theme_loss"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance",
+          "theme_fidelity"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-cooperative-thermal-insulation-v1-b9a7d9d183-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-cooperative-thermal-insulation-v1-b9a7d9d183-v1",
+      "familyKey": "cooperative-thermal-insulation",
+      "phase": 3,
+      "scenario": "配合型-保温材料",
+      "styleFamily": "socratic_concise",
+      "triggerType": "STAGE_ENTER",
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与当前方案相关的安全问答。",
+        "brief": [
+          "我正在做“配合型-保温材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】包覆材料是否影响热水降温速度？\n【课堂代理】不同包覆材料\n【因素与现象方向】拟改变：包覆材料；关注：降温速度\n【教师已审核方案】自变量：包覆材料；水平：较低包覆材料、中等包覆材料、较高包覆材料；因变量：降温速度；每个水平重复3次；安全：热水温度控制在60-70℃，避免烫伤"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "保温杯保温",
+          "retainedFeature": "材料隔热性能差异",
+          "classroomProxy": "不同包覆材料",
+          "researchQuestion": "包覆材料是否影响热水降温速度？",
+          "independentVariable": "包覆材料",
+          "dependentDirection": "降温速度",
+          "safetyNotes": [
+            "热水温度控制在60-70℃，避免烫伤"
+          ]
+        },
+        "failureModes": [
+          "format_discipline"
+        ],
+        "rubricTargets": [
+          "expression",
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-smartedu-0026-v1-35e497f896-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-smartedu-0026-v1-35e497f896-v1",
+      "familyKey": "smartedu-0026",
+      "phase": 4,
+      "scenario": "探究影响电磁铁磁性强弱的因素",
+      "styleFamily": "warm_companion",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“探究影响电磁铁磁性强弱的因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 6,
+            "level_2_result": 9,
+            "level_3_result": 10,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 2,
+            "level_1_result": 7,
+            "level_2_result": 9,
+            "level_3_result": 11,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果\n【教师已审核方案】自变量：一个可人为改变的条件；水平：较低一个可人为改变的条件、中等一个可人为改变的条件、较高一个可人为改变的条件；因变量：可观察或可测量的结果；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。\n【学生真实数据】\n1. 重复次数=1；较低一个可人为改变的条件的可观察或可测量的结果=6；中等一个可人为改变的条件的可观察或可测量的结果=9；较高一个可人为改变的条件的可观察或可测量的结果=10；备注=本次记录与相邻重复略有差异，需在分析中说明\n2. 重复次数=2；较低一个可人为改变的条件的可观察或可测量的结果=7；中等一个可人为改变的条件的可观察或可测量的结果=9；较高一个可人为改变的条件的可观察或可测量的结果=11；备注=\n3. 重复次数=3；较低一个可人为改变的条件的可观察或可测量的结果=8；中等一个可人为改变的条件的可观察或可测量的结果=10；较高一个可人为改变的条件的可观察或可测量的结果=12；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "level_1_result": 6,
+            "level_2_result": 9,
+            "level_3_result": 10,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 2,
+            "level_1_result": 7,
+            "level_2_result": 9,
+            "level_3_result": 11,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复次数",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_1_result",
+              "title": "较低一个可人为改变的条件的可观察或可测量的结果",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_2_result",
+              "title": "中等一个可人为改变的条件的可观察或可测量的结果",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_3_result",
+              "title": "较高一个可人为改变的条件的可观察或可测量的结果",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究影响电磁铁磁性强弱的因素",
+          "retainedFeature": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-engineering-waterproof-material-v1-f8addcf76c-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-engineering-waterproof-material-v1-f8addcf76c-v1",
+      "familyKey": "engineering-waterproof-material",
+      "phase": 5,
+      "scenario": "工程项目型-防水材料",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "studentVisible": {
+        "profile": "engineering_project",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“工程项目型-防水材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 9,
+            "level_2_result": 11,
+            "level_3_result": 13,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 8,
+            "level_2_result": 11,
+            "level_3_result": 12,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 3,
+            "level_1_result": 7,
+            "level_2_result": 9,
+            "level_3_result": 11,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】涂层材料是否影响纸板渗水时间？\n【课堂代理】不同涂层材料\n【因素与现象方向】拟改变：涂层材料；关注：渗水时间\n【教师已审核方案】自变量：涂层材料；水平：较低涂层材料、中等涂层材料、较高涂层材料；因变量：渗水时间；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低涂层材料的渗水时间=9；中等涂层材料的渗水时间=11；较高涂层材料的渗水时间=13；备注=\n2. 重复次数=2；较低涂层材料的渗水时间=8；中等涂层材料的渗水时间=11；较高涂层材料的渗水时间=12；备注=本次记录与相邻重复略有差异，需在分析中说明\n3. 重复次数=3；较低涂层材料的渗水时间=7；中等涂层材料的渗水时间=9；较高涂层材料的渗水时间=11；备注=\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "做防水的东西",
+          "retainedFeature": "材料表面影响渗水",
+          "classroomProxy": "不同涂层材料",
+          "researchQuestion": "涂层材料是否影响纸板渗水时间？",
+          "independentVariable": "涂层材料",
+          "dependentDirection": "渗水时间"
+        },
+        "failureModes": [
+          "engineering_flattening"
+        ],
+        "rubricTargets": [
+          "expression",
+          "interdisciplinary_integration",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-fuzzy-absorbent-paper-v1-fbdc9240ca-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-fuzzy-absorbent-paper-v1-fbdc9240ca-v1",
+      "familyKey": "fuzzy-absorbent-paper",
+      "phase": 6,
+      "scenario": "模糊型-吸水材料",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "OPTIONAL_COACHING",
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "我正在反思“模糊型-吸水材料”这次实验，想检查自己有没有忽略重要局限。",
+        "brief": [
+          "我正在做“模糊型-吸水材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 10,
+            "level_2_result": 12,
+            "level_3_result": 14,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 9,
+            "level_2_result": 12,
+            "level_3_result": 13,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 3,
+            "level_1_result": 8,
+            "level_2_result": 10,
+            "level_3_result": 12,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】纸条材质是否影响吸水高度？\n【课堂代理】不同纸条材质\n【因素与现象方向】拟改变：纸条材质；关注：吸水高度\n【教师已审核方案】自变量：纸条材质；水平：较低纸条材质、中等纸条材质、较高纸条材质；因变量：吸水高度；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低纸条材质的吸水高度=10；中等纸条材质的吸水高度=12；较高纸条材质的吸水高度=14；备注=\n2. 重复次数=2；较低纸条材质的吸水高度=9；中等纸条材质的吸水高度=12；较高纸条材质的吸水高度=13；备注=本次记录与相邻重复略有差异，需在分析中说明\n3. 重复次数=3；较低纸条材质的吸水高度=8；中等纸条材质的吸水高度=10；较高纸条材质的吸水高度=12；备注=\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。\n【已提交报告】报告已包含目的、假设、材料、步骤、数据摘要和分析；结论与局限由学生本人反思。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "纸吸水",
+          "retainedFeature": "材质影响吸水高度",
+          "classroomProxy": "不同纸条材质",
+          "researchQuestion": "纸条材质是否影响吸水高度？",
+          "independentVariable": "纸条材质",
+          "dependentDirection": "吸水高度"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "expression",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-engineering-oil-separation-v1-00dcecb636-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-engineering-oil-separation-v1-00dcecb636-v1",
+      "familyKey": "engineering-oil-separation",
+      "phase": 1,
+      "scenario": "工程项目型-油污分离装置",
+      "styleFamily": "classroom_coach",
+      "triggerType": "USER_MESSAGE",
+      "studentVisible": {
+        "profile": "engineering_project",
+        "openingMessage": "我对“工程项目型-油污分离装置”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“工程项目型-油污分离装置”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "油污处理装置",
+          "retainedFeature": "材料亲水/疏油差异影响分离",
+          "classroomProxy": "不同吸附材料",
+          "researchQuestion": "吸附材料是否影响从水面除油效率？",
+          "independentVariable": "吸附材料",
+          "dependentDirection": "除油效率"
+        },
+        "failureModes": [
+          "engineering_flattening",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "interdisciplinary_integration",
+          "proxy_quality",
+          "stem_fit",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-smartedu-0018-v1-f69464bf80-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-smartedu-0018-v1-f69464bf80-v1",
+      "familyKey": "smartedu-0018",
+      "phase": 2,
+      "scenario": "探究光合作用的影响因素",
+      "styleFamily": "socratic_concise",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“探究光合作用的影响因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究光合作用的影响因素",
+          "retainedFeature": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-smartedu-0030-v1-ba5f5f52c9-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-smartedu-0030-v1-ba5f5f52c9-v1",
+      "familyKey": "smartedu-0030",
+      "phase": 3,
+      "scenario": "探究影响结构稳定性的主要因素",
+      "styleFamily": "warm_companion",
+      "triggerType": "STAGE_ENTER",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与当前方案相关的安全问答。",
+        "brief": [
+          "我正在做“探究影响结构稳定性的主要因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】不同结构形状会怎样影响模型的承重能力？\n【课堂代理】把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。\n【因素与现象方向】拟改变：结构形状或支撑方式；关注：最大承重质量\n【教师已审核方案】自变量：结构形状或支撑方式；水平：较低结构形状或支撑方式、中等结构形状或支撑方式、较高结构形状或支撑方式；因变量：最大承重质量；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究影响结构稳定性的主要因素",
+          "retainedFeature": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+          "classroomProxy": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+          "researchQuestion": "不同结构形状会怎样影响模型的承重能力？",
+          "independentVariable": "结构形状或支撑方式",
+          "dependentDirection": "最大承重质量",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-cooperative-water-filter-v1-afbf673716-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-cooperative-water-filter-v1-afbf673716-v1",
+      "familyKey": "cooperative-water-filter",
+      "phase": 4,
+      "scenario": "配合型-净水过滤材料",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "STAGE_TRANSITION",
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“配合型-净水过滤材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 5,
+            "level_2_result": 7,
+            "level_3_result": 9,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 4,
+            "level_2_result": 6,
+            "level_3_result": 8,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 3,
+            "level_2_result": 6,
+            "level_3_result": 7,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】过滤材料是否影响浑水澄清程度？\n【课堂代理】不同过滤材料\n【因素与现象方向】拟改变：过滤材料；关注：澄清程度\n【教师已审核方案】自变量：过滤材料；水平：较低过滤材料、中等过滤材料、较高过滤材料；因变量：澄清程度；每个水平重复3次；安全：净化后的水不可饮用，仅观察\n【学生真实数据】\n1. 重复次数=1；较低过滤材料的澄清程度=5；中等过滤材料的澄清程度=7；较高过滤材料的澄清程度=9；备注=\n2. 重复次数=2；较低过滤材料的澄清程度=4；中等过滤材料的澄清程度=6；较高过滤材料的澄清程度=8；备注=\n3. 重复次数=3；较低过滤材料的澄清程度=3；中等过滤材料的澄清程度=6；较高过滤材料的澄清程度=7；备注=本次记录与相邻重复略有差异，需在分析中说明",
+        "dataRows": [
+          {
+            "trial": 1,
+            "level_1_result": 5,
+            "level_2_result": 7,
+            "level_3_result": 9,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 4,
+            "level_2_result": 6,
+            "level_3_result": 8,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "level_1_result": 3,
+            "level_2_result": 6,
+            "level_3_result": 7,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复次数",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_1_result",
+              "title": "较低过滤材料的澄清程度",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_2_result",
+              "title": "中等过滤材料的澄清程度",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "level_3_result",
+              "title": "较高过滤材料的澄清程度",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "把脏水变清",
+          "retainedFeature": "过滤材料拦截杂质",
+          "classroomProxy": "不同过滤材料",
+          "researchQuestion": "过滤材料是否影响浑水澄清程度？",
+          "independentVariable": "过滤材料",
+          "dependentDirection": "澄清程度",
+          "safetyNotes": [
+            "净化后的水不可饮用，仅观察"
+          ]
+        },
+        "failureModes": [
+          "format_discipline"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "expression",
+          "stem_fit",
+          "structure_compliance",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-smartedu-0047-v1-7d6deea38b-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-smartedu-0047-v1-7d6deea38b-v1",
+      "familyKey": "smartedu-0047",
+      "phase": 5,
+      "scenario": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“探究「初中化学实验设计与评价（中考专题复习）」中的影响因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 5,
+            "level_2_result": 7,
+            "level_3_result": 9,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 6,
+            "level_2_result": 9,
+            "level_3_result": 10,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 3,
+            "level_1_result": 7,
+            "level_2_result": 9,
+            "level_3_result": 11,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？\n【课堂代理】围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？\n【因素与现象方向】拟改变：一个可人为改变的条件；关注：可观察或可测量的结果\n【教师已审核方案】自变量：一个可人为改变的条件；水平：较低一个可人为改变的条件、中等一个可人为改变的条件、较高一个可人为改变的条件；因变量：可观察或可测量的结果；每个水平重复3次；安全：优先选择低风险、材料易得、可在教师指导下完成的方案。\n【学生真实数据】\n1. 重复次数=1；较低一个可人为改变的条件的可观察或可测量的结果=5；中等一个可人为改变的条件的可观察或可测量的结果=7；较高一个可人为改变的条件的可观察或可测量的结果=9；备注=\n2. 重复次数=2；较低一个可人为改变的条件的可观察或可测量的结果=6；中等一个可人为改变的条件的可观察或可测量的结果=9；较高一个可人为改变的条件的可观察或可测量的结果=10；备注=本次记录与相邻重复略有差异，需在分析中说明\n3. 重复次数=3；较低一个可人为改变的条件的可观察或可测量的结果=7；中等一个可人为改变的条件的可观察或可测量的结果=9；较高一个可人为改变的条件的可观察或可测量的结果=11；备注=\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素",
+          "retainedFeature": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-variable-confusion-turbidity-settle-v1-fd37e1f659-v1",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-variable-confusion-turbidity-settle-v1-fd37e1f659-v1",
+      "familyKey": "variable-confusion-turbidity-settle",
+      "phase": 6,
+      "scenario": "变量混乱型-泥沙沉降",
+      "styleFamily": "classroom_coach",
+      "triggerType": "OPTIONAL_COACHING",
+      "studentVisible": {
+        "profile": "variable_confusion",
+        "openingMessage": "我正在反思“变量混乱型-泥沙沉降”这次实验，想检查自己有没有忽略重要局限。",
+        "brief": [
+          "我正在做“变量混乱型-泥沙沉降”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "level_1_result": 7,
+            "level_2_result": 9,
+            "level_3_result": 11,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "level_1_result": 6,
+            "level_2_result": 9,
+            "level_3_result": 10,
+            "notes": "本次记录与相邻重复略有差异，需在分析中说明"
+          },
+          {
+            "trial": 3,
+            "level_1_result": 5,
+            "level_2_result": 7,
+            "level_3_result": 9,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】静置时间是否影响泥水浊度？\n【课堂代理】不同静置时间\n【因素与现象方向】拟改变：静置时间；关注：浊度\n【教师已审核方案】自变量：静置时间；水平：较低静置时间、中等静置时间、较高静置时间；因变量：浊度；每个水平重复3次；安全：遵守课堂实验安全要求\n【学生真实数据】\n1. 重复次数=1；较低静置时间的浊度=7；中等静置时间的浊度=9；较高静置时间的浊度=11；备注=\n2. 重复次数=2；较低静置时间的浊度=6；中等静置时间的浊度=9；较高静置时间的浊度=10；备注=本次记录与相邻重复略有差异，需在分析中说明\n3. 重复次数=3；较低静置时间的浊度=5；中等静置时间的浊度=7；较高静置时间的浊度=9；备注=\n【已完成的数据分析】学生已比较各条件的具体记录，指出一条偏离相邻重复的记录，并把观察与解释分开。\n【已提交报告】报告已包含目的、假设、材料、步骤、数据摘要和分析；结论与局限由学生本人反思。"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "泥水变清",
+          "retainedFeature": "静置时间影响沉降程度",
+          "classroomProxy": "不同静置时间",
+          "researchQuestion": "静置时间是否影响泥水浊度？",
+          "independentVariable": "静置时间",
+          "dependentDirection": "浊度"
+        },
+        "failureModes": [
+          "variable_confusion"
+        ],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    }
+  ]
+}

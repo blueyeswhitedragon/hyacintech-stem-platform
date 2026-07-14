@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import type { Message } from '../models/types';
 import type { StageData, Stage3FileAssociation, AssignmentStatus } from '../models/stageData';
 import ConversationChat, { type ChatApiResponse } from './ConversationChat';
@@ -20,6 +20,7 @@ interface Props {
   initialStageData: StageData;
   initialStatus: AssignmentStatus;
   initialStyleFamily: StyleFamily;
+  initialSafetyQuizCompleted: boolean;
 }
 
 export default function ConversationWorkspace({
@@ -29,17 +30,14 @@ export default function ConversationWorkspace({
   initialStageData,
   initialStatus,
   initialStyleFamily,
+  initialSafetyQuizCompleted,
 }: Props) {
   const [stage, setStage] = useState(initialStage);
   const [stageData, setStageData] = useState<StageData>(initialStageData);
   const [status, setStatus] = useState<AssignmentStatus>(initialStatus);
   const [completed, setCompleted] = useState(initialStatus === 'COMPLETED');
-  // ConversationChat 注册的程序化发送：消息正常进入聊天流（用户可见 AI 的开场/框架回复）
-  const autoSendRef = useRef<((text: string) => Promise<void>) | null>(null);
-  const registerAutoSend = (fn: (text: string) => Promise<void>) => {
-    autoSendRef.current = fn;
-  };
-
+  const [injectedMessage, setInjectedMessage] = useState<Message | null>(null);
+  const [safetyQuizCompleted, setSafetyQuizCompleted] = useState(initialSafetyQuizCompleted);
   // 发送消息到会话端点（ConversationChat 注入；服务端已有历史，忽略 history 参数）
   const sendChat = async (message: string): Promise<ChatApiResponse> => {
     const res = await fetch(`/api/conversations/${conversationId}/chat`, {
@@ -52,12 +50,16 @@ export default function ConversationWorkspace({
     return data as ChatApiResponse;
   };
 
-  const markSafetyPassed = async () => {
-    await fetch(`/api/conversations/${conversationId}/safety-quiz`, {
+  const markSafetyPassed = async (selected: number) => {
+    const response = await fetch(`/api/conversations/${conversationId}/safety-quiz`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passed: true }),
+      body: JSON.stringify({ answer: selected }),
     });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || '安全问答提交失败');
+    setSafetyQuizCompleted(true);
+    if (data.stageData) setStageData(data.stageData);
   };
 
   // chat 响应后，以服务端返回的真相更新 stage / stageData
@@ -139,54 +141,11 @@ export default function ConversationWorkspace({
     if (!res.ok) return data.error || '推进失败';
     setStage(data.currentStage);
     if (data.stageData) setStageData(data.stageData);
+    if (data.transitionMessage) setInjectedMessage(data.transitionMessage as Message);
     return null;
   };
 
-  const generateStage5ReportFramework = async (): Promise<string | null> => {
-    if (stageData.stage5?.sections) return null;
-    // 优先走聊天流（用户可见 AI 的开场回复与"已生成报告框架"提示）
-    if (autoSendRef.current) {
-      await autoSendRef.current('开始报告成型');
-      return null;
-    }
-    try {
-      const res = await fetch(`/api/conversations/${conversationId}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: '开始报告成型' }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) return data.message || data.error || '报告框架生成失败，请稍后重试。';
-      if (data.stageData) setStageData(data.stageData);
-      return null;
-    } catch {
-      return '报告框架生成失败，请稍后重试。';
-    }
-  };
-
-  // 兜底：处于阶段5但报告框架缺失（如生成失败后刷新页面）→ 自动重新触发。
-  // 1→2 推进后自动发送承接消息，让 AI 给出方案设计阶段的开场与路线图。
-  // 用 effect 监听 stage 变化：确保子组件已重新注册 autoSend（闭包新鲜），且 typing 指示器正常显示。
-  const prevStageRef = useRef(initialStage);
-  const stage5FallbackFired = useRef(false);
-  useEffect(() => {
-    const prev = prevStageRef.current;
-    prevStageRef.current = stage;
-    if (prev === 1 && stage === 2) {
-      void autoSendRef.current?.('我已确认选题，现在开始设计实验方案。');
-      return;
-    }
-    if (stage === 5 && !stageData.stage5?.sections && !stage5FallbackFired.current) {
-      stage5FallbackFired.current = true;
-      void generateStage5ReportFramework();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage]);
-
-  const advanceToStage5 = async (): Promise<string | null> => {
-    // 进入阶段5后，上方 useEffect 会自动触发报告框架生成
-    return advanceTo(5);
-  };
+  const advanceToStage5 = async (): Promise<string | null> => advanceTo(5);
 
   /** 导出报告为 docx 并触发浏览器下载。 */
   const exportReportDocx = async (): Promise<string | null> => {
@@ -229,8 +188,7 @@ export default function ConversationWorkspace({
     }
   };
 
-  /** 阶段完成后的确认推进（直接调 advance 端点，不发 LLM 请求）。
-   * 推进后的自动触发消息（1→2 承接、进入5生成报告框架）由监听 stage 变化的 useEffect 统一处理。 */
+  /** 阶段完成后的确认推进；/advance 会原子生成并返回助手主动过渡消息。 */
   const onPhaseConfirm = async (): Promise<string | null> => {
     return advanceTo(stage + 1);
   };
@@ -303,6 +261,7 @@ export default function ConversationWorkspace({
               initial={stageData.stage3}
               onSave={saveStage3}
               onComplete={() => advanceTo(4)}
+              disabledReason={safetyQuizCompleted || stageData.stage3?.safetyQuiz?.passed === true ? undefined : '请先在左侧完成安全问答，答对后才能录入实验数据。'}
             />
           </div>
         );
@@ -362,7 +321,7 @@ export default function ConversationWorkspace({
             onSafetyPassed={markSafetyPassed}
             onPhaseConfirm={onPhaseConfirm}
             roundCount={stageData.roundCounts?.[stage] ?? 0}
-            registerAutoSend={registerAutoSend}
+            injectedMessage={injectedMessage}
           />
         </div>
       </div>

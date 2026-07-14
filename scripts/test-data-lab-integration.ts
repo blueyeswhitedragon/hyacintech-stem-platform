@@ -14,6 +14,7 @@ import {
   importEvaluation,
   reviewAnnotationWork,
   submitAnnotationTask,
+  validateAnnotationTaskRevision,
 } from '../app/lib/dataLab/service';
 
 let passed = 0;
@@ -43,7 +44,7 @@ async function main() {
     db.user.findFirstOrThrow({ where: { role: 'admin', isActive: true } }),
     db.user.findMany({ where: { role: 'annotator', isActive: true }, orderBy: { username: 'asc' }, take: 2 }),
     db.user.findFirstOrThrow({ where: { role: 'reviewer', isActive: true }, orderBy: { username: 'asc' } }),
-    db.annotationCampaign.findUniqueOrThrow({ where: { name: 'dataset-base-v1-pilot-12' } }),
+    db.annotationCampaign.findUniqueOrThrow({ where: { name: process.env.DATA_LAB_TEST_CAMPAIGN ?? 'dataset-base-v1-pilot-12' } }),
   ]);
   if (annotatorRows.length < 2) throw new Error('集成测试至少需要 2 个启用中的标注员账号');
   const [annotator1Row, annotator2Row] = annotatorRows;
@@ -60,8 +61,17 @@ async function main() {
     check('double annotation uses same sample', taskA?.sampleId === taskB?.sampleId);
     check('double annotation uses different slots/tasks', taskA?.taskId !== taskB?.taskId);
     if (!taskA || !taskB) throw new Error('无法领取双标任务');
-    const submissionA = await submitAnnotationTask(taskA.taskId, noChangeInput(taskA), annotator1);
-    const submissionB = await submitAnnotationTask(taskB.taskId, noChangeInput(taskB), annotator2);
+    const inputA = noChangeInput(taskA);
+    const inputB = noChangeInput(taskB);
+    const [preflightA, preflightB] = await Promise.all([
+      validateAnnotationTaskRevision(taskA.taskId, inputA, annotator1),
+      validateAnnotationTaskRevision(taskB.taskId, inputB, annotator2),
+    ]);
+    const submissionA = await submitAnnotationTask(taskA.taskId, inputA, annotator1);
+    const submissionB = await submitAnnotationTask(taskB.taskId, inputB, annotator2);
+    const signature = (checkResult: typeof preflightA) => checkResult.issues.map((item) => `${item.ruleCode}:${item.severity}:${item.messageIndex ?? 'record'}`).sort().join('|');
+    check('标注预检与正式提交A返回完全相同的规则码及严重度', preflightA.status === submissionA.check.status && signature(preflightA) === signature(submissionA.check));
+    check('标注预检与正式提交B返回完全相同的规则码及严重度', preflightB.status === submissionB.check.status && signature(preflightB) === signature(submissionB.check));
     const [workA, workB] = await Promise.all([
       db.annotationWorkReview.findUniqueOrThrow({ where: { revisionId: submissionA.revision.id } }),
       db.annotationWorkReview.findUniqueOrThrow({ where: { revisionId: submissionB.revision.id } }),

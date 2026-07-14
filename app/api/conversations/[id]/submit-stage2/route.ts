@@ -16,8 +16,8 @@ export async function POST(_req: Request, ctx: RouteContext<'/api/conversations/
   if (conv.currentStage !== 2) {
     return NextResponse.json({ error: '当前不在方案设计阶段' }, { status: 400 });
   }
-  if (!conv.stageData.stage2?.schema) {
-    return NextResponse.json({ error: '请先与 AI 确定方案并生成数据表结构' }, { status: 400 });
+  if (!conv.stageData.stage2?.schema || !conv.stageData.stage2.experimentPlan) {
+    return NextResponse.json({ error: '请先与 AI 完成结构化实验方案并生成一致的数据表' }, { status: 400 });
   }
 
   const stageData: StageData = {

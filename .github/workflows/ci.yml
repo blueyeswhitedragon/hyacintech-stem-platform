@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: file:./ci.db
+      SESSION_SECRET: ci-only-session-secret-at-least-32-characters
+      DEEPSEEK_API_KEY: sk-ci-placeholder-never-used-at-runtime
+      LLM_PROVIDER: deepseek
+      LLM_MODEL: deepseek-chat
+      ADMIN_USERNAME: ci-admin
+      ADMIN_PASSWORD: ci-admin-password
+      ADMIN_DISPLAY_NAME: CI 管理员
+      DATA_LAB_TEST_CAMPAIGN: ci-dataset-v3-pilot
+      DATA_LAB_USE_TEST_RELEASE_DIR: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run db:deploy
+      - run: npm run db:seed
+      - run: npm run data-lab:init
+      - run: npm run model:bootstrap
+      - run: npm run data-lab:test:setup
+      - run: npm run lint
+      - run: npm run data-lab:test
+      - run: npm run build

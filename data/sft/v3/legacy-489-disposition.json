@@ -1,0 +1,4898 @@
+{
+  "schemaVersion": 1,
+  "sourceFile": "data\\sft\\sharegpt-distill-dsv4-all-clean.json",
+  "disposition": "LEGACY_QUARANTINED",
+  "sftEligibility": "BLOCKED",
+  "records": [
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-light-v1-0887ad0be6-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-acid-rain-plant-v1-452eacca4e-v1",
+      "phase": 1,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v1-647ce28752-v1",
+      "phase": 1,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-bread-mold-preservative-v1-5cf6a849bf-v1",
+      "phase": 1,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0011-v1-b9379d19db-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0011",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-bridge-load-v1-1070183355-v1",
+      "phase": 1,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v1-6ee3ea8739-v1",
+      "phase": 1,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v1-31a49080a8-v1",
+      "phase": 1,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-oil-separation-v1-00dcecb636-v1",
+      "phase": 1,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0018-v1-30ac9b12d0-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0018",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-light-v1-6db6f725f0-v1",
+      "phase": 2,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v1-8604030f90-v1",
+      "phase": 2,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v1-932020f0cc-v1",
+      "phase": 2,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-bread-mold-preservative-v1-f6c9fddb4b-v1",
+      "phase": 2,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0011-v1-4a0911fcb3-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0011",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-bridge-load-v1-b762ca3ae6-v1",
+      "phase": 2,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-vehicle-fuel-v1-a91bd62524-v1",
+      "phase": 2,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v1-51bf2d8516-v1",
+      "phase": 2,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-light-color-v1-58131fe096-v1",
+      "phase": 3,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-water-amount-v1-9f520384e3-v1",
+      "phase": 3,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0009-v1-dc4788e5a8-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0009",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-cooperative-light-color-v1-48d5bcf376-v1",
+      "phase": 4,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-water-amount-v1-09ff09dfc8-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0009-v1-f63d7d852c-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0009",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-mars-light-v1-3f09d0958e-v1",
+      "phase": 4,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-light-color-v1-02f490f567-v1",
+      "phase": 5,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-fuzzy-water-amount-v1-664f2af1a8-v1",
+      "phase": 5,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0009-v1-ed79fea655-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0009",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-cooperative-light-color-v1-02a9c2dd39-v1",
+      "phase": 6,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-fuzzy-water-amount-v1-537dfd5520-v1",
+      "phase": 6,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v1-a60252ce19-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v1-ef0d013ae6-v1",
+      "phase": 1,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-circuit-brightness-v1-b995f2bc0e-v1",
+      "phase": 1,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-watering-threshold-v1-9cbed14e99-v1",
+      "phase": 1,
+      "familyKey": "engineering-watering-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0023-v1-5047a410b3-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-alarm-sensitivity-v1-a390dfa660-v1",
+      "phase": 1,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-sorting-color-sensor-v1-977e8bf54c-v1",
+      "phase": 1,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-door-reminder-distance-v1-938ca6fed2-v1",
+      "phase": 1,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-plant-light-auto-duration-v1-b71393ff43-v1",
+      "phase": 1,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0028-v1-42a458b725-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0028",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v1-5c2592c088-v1",
+      "phase": 1,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-city-cooling-roof-v1-5aa574380e-v1",
+      "phase": 1,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-ai-recognition-threshold-v1-0bcabd6343-v1",
+      "phase": 1,
+      "familyKey": "high-concept-ai-recognition-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0048-v1-3cff5463fd-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0048",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-light-color-v1-194bab9fd9-v1",
+      "phase": 1,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-water-amount-v1-b7e0b120dd-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-all-at-once-salt-germination-v1-eb99ecd474-v1",
+      "phase": 1,
+      "familyKey": "all-at-once-salt-germination",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-light-v1-c903ea1c60-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0054-v1-59f9854143-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0054",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v1-8e7551cb2e-v1",
+      "phase": 1,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-premature-shade-plant-height-v1-0ff49424be-v1",
+      "phase": 1,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-yogurt-temperature-v1-559098c2f1-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-dough-fermentation-v1-f8bf90855e-v1",
+      "phase": 1,
+      "familyKey": "cooperative-dough-fermentation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0059-v1-881a1ef9a0-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0059",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v1-c56b526ad4-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-paper-airplane-distance-v1-c80397b17e-v1",
+      "phase": 1,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-vehicle-ramp-angle-v1-2268913c24-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-all-at-once-parachute-area-v1-4cd6d2bbdd-v1",
+      "phase": 1,
+      "familyKey": "all-at-once-parachute-area",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0065-v1-f4e8dff2d9-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0065",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v1-a1dc408ea4-v1",
+      "phase": 1,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-thermal-insulation-v2-6561fc8517-v1",
+      "phase": 1,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v2-27d1848bc1-v1",
+      "phase": 1,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-waterproof-material-v2-3e4c980bdc-v1",
+      "phase": 1,
+      "familyKey": "engineering-waterproof-material",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0074-v2-159af67115-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0074",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-low-effort-egg-drop-v2-b2e0b88f68-v1",
+      "phase": 1,
+      "familyKey": "low-effort-egg-drop",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-water-filter-v2-8f8b6bcc37-v1",
+      "phase": 1,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-oil-separation-v1-d8cd4f5e93-v1",
+      "phase": 2,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0018-v1-f69464bf80-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0018",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-turbidity-settle-v1-6389a51fa2-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-solar-car-angle-v1-7dd6496c9e-v1",
+      "phase": 2,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-circuit-brightness-v1-e5bcc14bd2-v1",
+      "phase": 2,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-watering-threshold-v1-ca4675601f-v1",
+      "phase": 2,
+      "familyKey": "engineering-watering-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0023-v1-d43a409a6d-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-sorting-color-sensor-v1-e8f472a3f8-v1",
+      "phase": 2,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-door-reminder-distance-v1-8b06927dc3-v1",
+      "phase": 2,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-plant-light-auto-duration-v1-b757c296e6-v1",
+      "phase": 2,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0028-v1-77b54c8604-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0028",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-smart-campus-energy-v1-8533f76419-v1",
+      "phase": 2,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-city-cooling-roof-v1-52013eadbd-v1",
+      "phase": 2,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-low-carbon-commute-v1-0690ccae67-v1",
+      "phase": 2,
+      "familyKey": "high-concept-low-carbon-commute",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-ai-recognition-threshold-v1-f2a1278dd9-v1",
+      "phase": 2,
+      "familyKey": "high-concept-ai-recognition-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0048-v1-85b0a18d8e-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0048",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-light-color-v1-9d2d2f6bf7-v1",
+      "phase": 2,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-water-amount-v1-cdb77bb8d1-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-all-at-once-salt-germination-v1-6a6c35a6ef-v1",
+      "phase": 2,
+      "familyKey": "all-at-once-salt-germination",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-light-v1-85e103988f-v1",
+      "phase": 2,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v1-2c035f8bb6-v1",
+      "phase": 2,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-premature-shade-plant-height-v1-8d85177153-v1",
+      "phase": 2,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-yogurt-temperature-v1-41dcaa66c8-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-dough-fermentation-v1-5199bc5d00-v1",
+      "phase": 2,
+      "familyKey": "cooperative-dough-fermentation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0059-v1-02083cb2b0-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0059",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-apple-browning-v1-7ccd616138-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-high-concept-mars-light-v1-569e456ce7-v1",
+      "phase": 3,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-safety-acid-rain-plant-v1-8ca518628f-v1",
+      "phase": 3,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0012-v1-22191ce4d3-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0012",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-premature-shade-plant-height-v1-59aae2fa50-v1",
+      "phase": 3,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-yogurt-temperature-v1-a97d6a9ee7-v1",
+      "phase": 3,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0016-v1-1391d46605-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0016",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-safety-bread-mold-preservative-v1-6538db9086-v1",
+      "phase": 3,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-variable-confusion-apple-browning-v1-016d628f66-v1",
+      "phase": 3,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0020-v1-a4f200a1d9-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0020",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-safety-acid-rain-plant-v1-224c6adf7d-v1",
+      "phase": 4,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0012-v1-832ba80eae-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0012",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-premature-shade-plant-height-v1-44e78ac4db-v1",
+      "phase": 4,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v1-a7c0549057-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0016-v1-985d547477-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0016",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-safety-bread-mold-preservative-v1-c3b8b79897-v1",
+      "phase": 4,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-variable-confusion-apple-browning-v1-57b882e89e-v1",
+      "phase": 4,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0020-v1-8e9563a402-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0020",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-all-at-once-parachute-area-v1-4ff4db80a9-v1",
+      "phase": 4,
+      "familyKey": "all-at-once-parachute-area",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0023-v1-cc162c4a12-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-over-broad-vehicle-fuel-v1-4560b3d424-v1",
+      "phase": 4,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-cooperative-thermal-insulation-v1-1f8e13b4d7-v1",
+      "phase": 4,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-safety-acid-rain-plant-v1-d7d90a0163-v1",
+      "phase": 5,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0012-v1-f494dda2a4-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0012",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-premature-shade-plant-height-v1-edc5b7e0e8-v1",
+      "phase": 5,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-fuzzy-yogurt-temperature-v1-6f726332df-v1",
+      "phase": 5,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0016-v1-0ae26e6f35-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0016",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-safety-bread-mold-preservative-v1-a5038874f2-v1",
+      "phase": 5,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-variable-confusion-apple-browning-v1-cc9337c89e-v1",
+      "phase": 5,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0020-v1-f795bc5031-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0020",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0009-v1-79bd08ab5b-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0009",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-high-concept-mars-light-v1-84e0f11ab2-v1",
+      "phase": 6,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-safety-acid-rain-plant-v1-62de28705d-v1",
+      "phase": 6,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0012-v1-2fdae34c53-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0012",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-premature-shade-plant-height-v1-09adc53484-v1",
+      "phase": 6,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-fuzzy-yogurt-temperature-v1-6d5c3c01ad-v1",
+      "phase": 6,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-oil-separation-v2-b222d58eec-v1",
+      "phase": 1,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v2-f58d52624e-v1",
+      "phase": 1,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0079-v2-84a2bc1fc4-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0079",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-electromagnet-coils-v2-6f205b2d21-v1",
+      "phase": 1,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v2-4e99606dc7-v1",
+      "phase": 1,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-windmill-blades-v2-cfc9fa9d39-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-circuit-brightness-v2-0e9ef1c5a8-v1",
+      "phase": 1,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0090-v2-28200a7914-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0090",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-smart-shade-threshold-v2-a79430f4e1-v1",
+      "phase": 1,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-alarm-sensitivity-v2-40d5cbbb92-v1",
+      "phase": 1,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-sorting-color-sensor-v2-f167d4d11d-v1",
+      "phase": 1,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-door-reminder-distance-v2-923c80b997-v1",
+      "phase": 1,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0106-v2-7dfceb1e91-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0106",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-fan-temperature-threshold-v2-5fe9de3568-v1",
+      "phase": 1,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v2-7f12b252aa-v1",
+      "phase": 1,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-city-cooling-roof-v2-609b3470da-v1",
+      "phase": 1,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-low-carbon-commute-v2-f0d64d158e-v1",
+      "phase": 1,
+      "familyKey": "high-concept-low-carbon-commute",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0112-v2-fe55ae288f-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0112",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-water-recycle-v2-8da1f4d36b-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-water-recycle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-light-v2-90563a5a47-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-acid-rain-plant-v2-36e31e1542-v1",
+      "phase": 1,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v2-ceba5b5b5f-v1",
+      "phase": 1,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0117-v2-05fb44262c-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0117",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v2-fbf3f9a7bf-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-bridge-load-v2-c80fc8c335-v1",
+      "phase": 1,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v2-b9552d6397-v1",
+      "phase": 1,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v2-85dfbc9bab-v1",
+      "phase": 1,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0124-v2-3fa39209f1-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0124",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v2-d321725667-v1",
+      "phase": 1,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v2-188fb5c3d7-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v2-f026d4e55b-v1",
+      "phase": 1,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-circuit-brightness-v2-000fefb68e-v1",
+      "phase": 1,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0143-v2-92e558fef9-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0143",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-smart-shade-threshold-v2-af6ee43c1e-v1",
+      "phase": 1,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-alarm-sensitivity-v2-c5f43fc943-v1",
+      "phase": 1,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-paper-airplane-distance-v1-7df171d079-v1",
+      "phase": 2,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-vehicle-ramp-angle-v1-5ccb96b046-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-all-at-once-parachute-area-v1-ed7ad6a96f-v1",
+      "phase": 2,
+      "familyKey": "all-at-once-parachute-area",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0065-v1-a1a85bb272-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0065",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-vehicle-fuel-v1-8709f56f30-v1",
+      "phase": 2,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-thermal-insulation-v2-aa79c090f3-v1",
+      "phase": 2,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v2-3c6e81d85c-v1",
+      "phase": 2,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-waterproof-material-v2-77ea24a6c5-v1",
+      "phase": 2,
+      "familyKey": "engineering-waterproof-material",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-low-effort-egg-drop-v2-6e3f13f451-v1",
+      "phase": 2,
+      "familyKey": "low-effort-egg-drop",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-water-filter-v2-de4990f3f9-v1",
+      "phase": 2,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-oil-separation-v2-582c6333a1-v1",
+      "phase": 2,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-trash-sorting-v2-b1a622f16a-v1",
+      "phase": 2,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0079-v2-0ebc5d3894-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0079",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-electromagnet-coils-v2-7727a5ed8b-v1",
+      "phase": 2,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-solar-car-angle-v2-742ddf0427-v1",
+      "phase": 2,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-windmill-blades-v2-a939d52a43-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-circuit-brightness-v2-49bb61a83e-v1",
+      "phase": 2,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-smart-shade-threshold-v2-f30c1f84a2-v1",
+      "phase": 2,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-alarm-sensitivity-v2-6ce87c89f2-v1",
+      "phase": 2,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-sorting-color-sensor-v2-bdbfb9e1cf-v1",
+      "phase": 2,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-door-reminder-distance-v2-b0bbb11354-v1",
+      "phase": 2,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0106-v2-1979a7d439-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0106",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-fan-temperature-threshold-v2-a5ab074812-v1",
+      "phase": 2,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-smart-campus-energy-v2-87ea47d428-v1",
+      "phase": 2,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-city-cooling-roof-v2-a3a53190ed-v1",
+      "phase": 2,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-low-carbon-commute-v2-e66d3385b6-v1",
+      "phase": 2,
+      "familyKey": "high-concept-low-carbon-commute",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-vehicle-ramp-angle-v1-8b84d30dc0-v1",
+      "phase": 3,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-all-at-once-parachute-area-v1-fc3a3ae70e-v1",
+      "phase": 3,
+      "familyKey": "all-at-once-parachute-area",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0023-v1-83daaed7fc-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-over-broad-vehicle-fuel-v1-b76ecb77de-v1",
+      "phase": 3,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-thermal-insulation-v1-b9a7d9d183-v1",
+      "phase": 3,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0026-v1-deecd0dbe5-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0026",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-waterproof-material-v1-3567a46f06-v1",
+      "phase": 3,
+      "familyKey": "engineering-waterproof-material",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-absorbent-paper-v1-c1ca8fadeb-v1",
+      "phase": 3,
+      "familyKey": "fuzzy-absorbent-paper",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0030-v1-ba5f5f52c9-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0030",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0026-v1-35e497f896-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0026",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-waterproof-material-v1-b8e5229026-v1",
+      "phase": 4,
+      "familyKey": "engineering-waterproof-material",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-absorbent-paper-v1-75b0485347-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-absorbent-paper",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0030-v1-f217060257-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0030",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-cooperative-water-filter-v1-afbf673716-v1",
+      "phase": 4,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-oil-separation-v1-0c7c60fcf6-v1",
+      "phase": 4,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0047-v1-5dbe0faa0e-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0047",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-variable-confusion-turbidity-settle-v1-e0a098f938-v1",
+      "phase": 4,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-cooperative-electromagnet-coils-v1-8f87fe3ba2-v1",
+      "phase": 4,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0050-v1-ad88564e0d-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0050",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-windmill-blades-v1-a2a1117c1c-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-safety-circuit-brightness-v1-82169c0f3b-v1",
+      "phase": 4,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0054-v1-c2f52d3c38-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0054",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-fuzzy-vehicle-ramp-angle-v1-62f1e88267-v1",
+      "phase": 5,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-all-at-once-parachute-area-v1-7a494d653d-v1",
+      "phase": 5,
+      "familyKey": "all-at-once-parachute-area",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0023-v1-a808b117bd-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-over-broad-vehicle-fuel-v1-10104f56e1-v1",
+      "phase": 5,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0026-v1-889d772fd8-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0026",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-waterproof-material-v1-f8addcf76c-v1",
+      "phase": 5,
+      "familyKey": "engineering-waterproof-material",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-fuzzy-absorbent-paper-v1-eea0de95bb-v1",
+      "phase": 5,
+      "familyKey": "fuzzy-absorbent-paper",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0016-v1-359955c073-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0016",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-safety-bread-mold-preservative-v1-6ff6a6f756-v1",
+      "phase": 6,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-variable-confusion-apple-browning-v1-60684033e1-v1",
+      "phase": 6,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0020-v1-48e5b2047f-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0020",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-fuzzy-vehicle-ramp-angle-v1-0171275aa2-v1",
+      "phase": 6,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-all-at-once-parachute-area-v1-6a1e3c5ebc-v1",
+      "phase": 6,
+      "familyKey": "all-at-once-parachute-area",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-sorting-color-sensor-v3-a376fc3a01-v1",
+      "phase": 1,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-door-reminder-distance-v3-08d6b87f36-v1",
+      "phase": 1,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0148-v3-c3fccb584d-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0148",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-fan-temperature-threshold-v3-562f03417c-v1",
+      "phase": 1,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v3-c2a8e634ff-v1",
+      "phase": 1,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-city-cooling-roof-v3-86f27bec81-v1",
+      "phase": 1,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-low-carbon-commute-v3-b52233a5e6-v1",
+      "phase": 1,
+      "familyKey": "high-concept-low-carbon-commute",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0154-v3-d9b462ad56-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0154",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-water-recycle-v3-72d75f28ab-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-water-recycle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-light-color-v3-24b2d8d836-v1",
+      "phase": 1,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-water-amount-v3-84a250e2e8-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-all-at-once-salt-germination-v3-830efa4676-v1",
+      "phase": 1,
+      "familyKey": "all-at-once-salt-germination",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0159-v3-da0edb51bf-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0159",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-acid-rain-plant-v3-2cfa74b9d2-v1",
+      "phase": 1,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v3-68e8a36e9b-v1",
+      "phase": 1,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-premature-shade-plant-height-v3-d6c8b1043c-v1",
+      "phase": 1,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-yogurt-temperature-v3-24301b3fde-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0164-v3-b27f0d1960-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0164",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-bread-mold-preservative-v3-fa5a7ab760-v1",
+      "phase": 1,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v3-0552ef09f1-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-paper-airplane-distance-v3-c6f4364e3d-v1",
+      "phase": 1,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-vehicle-ramp-angle-v3-ff9bf4da1d-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0169-v3-144b6f964e-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0169",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-bridge-load-v3-192d992dec-v1",
+      "phase": 1,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v3-5497f03ae3-v1",
+      "phase": 1,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-thermal-insulation-v3-a54aa624d2-v1",
+      "phase": 1,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v3-2e3bee8ed7-v1",
+      "phase": 1,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0174-v3-14c794bd54-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0174",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-absorbent-paper-v3-c760080a98-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-absorbent-paper",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-low-effort-egg-drop-v3-4fc22b0743-v1",
+      "phase": 1,
+      "familyKey": "low-effort-egg-drop",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-water-filter-v3-8789842715-v1",
+      "phase": 1,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-oil-separation-v3-6da83cde6c-v1",
+      "phase": 1,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0112-v2-6de74f04b9-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0112",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-water-recycle-v2-5dd9625dbc-v1",
+      "phase": 2,
+      "familyKey": "high-concept-mars-water-recycle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-light-v2-cd37f3f8bd-v1",
+      "phase": 2,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v2-a855df0b24-v1",
+      "phase": 2,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v2-5bcaa4ae91-v1",
+      "phase": 2,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0117-v2-561a8f0d9b-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0117",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-apple-browning-v2-98ff07f63c-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-bridge-load-v2-98e3c8ebab-v1",
+      "phase": 2,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-vehicle-fuel-v2-49c00af10b-v1",
+      "phase": 2,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v2-41e621a397-v1",
+      "phase": 2,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0124-v2-cdb468a16f-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0124",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-trash-sorting-v2-9144fa27b3-v1",
+      "phase": 2,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-turbidity-settle-v2-3121078db2-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-solar-car-angle-v2-0020611083-v1",
+      "phase": 2,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-circuit-brightness-v2-e8d8ac5b34-v1",
+      "phase": 2,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0143-v2-e6d4c783f0-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0143",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-smart-shade-threshold-v2-d5c5d2e507-v1",
+      "phase": 2,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-alarm-sensitivity-v2-7afdd0018a-v1",
+      "phase": 2,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-door-reminder-distance-v3-12f0256841-v1",
+      "phase": 2,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0148-v3-fee4590134-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0148",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-fan-temperature-threshold-v3-5cfaf9483a-v1",
+      "phase": 2,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-smart-campus-energy-v3-5abb1562f7-v1",
+      "phase": 2,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-city-cooling-roof-v3-4651494ac9-v1",
+      "phase": 2,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-low-carbon-commute-v3-e9e371c67e-v1",
+      "phase": 2,
+      "familyKey": "high-concept-low-carbon-commute",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0154-v3-858ebf604f-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0154",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-water-recycle-v3-d8b2e1ae80-v1",
+      "phase": 2,
+      "familyKey": "high-concept-mars-water-recycle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-light-color-v3-d35a5e6e4a-v1",
+      "phase": 2,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-water-amount-v3-8463b2984f-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-all-at-once-salt-germination-v3-ae6edb6811-v1",
+      "phase": 2,
+      "familyKey": "all-at-once-salt-germination",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0159-v3-64ae11bea2-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0159",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v3-eff5819b51-v1",
+      "phase": 2,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-water-filter-v1-6d7aaf32a8-v1",
+      "phase": 3,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-oil-separation-v1-0f31eef5f3-v1",
+      "phase": 3,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0047-v1-2d53996313-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0047",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-variable-confusion-turbidity-settle-v1-634da63148-v1",
+      "phase": 3,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-electromagnet-coils-v1-c76765c47d-v1",
+      "phase": 3,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0050-v1-ff376bd97a-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0050",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-windmill-blades-v1-0a6f0929f5-v1",
+      "phase": 3,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-safety-circuit-brightness-v1-e7d755b12e-v1",
+      "phase": 3,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0054-v1-11659a4a90-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0054",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-smart-shade-threshold-v1-a04e16ef24-v1",
+      "phase": 4,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-alarm-sensitivity-v1-372f3eb1d5-v1",
+      "phase": 4,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0057-v1-99252cc3a0-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0057",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-door-reminder-distance-v1-47554c95ad-v1",
+      "phase": 4,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-plant-light-auto-duration-v1-3c12fde7f3-v1",
+      "phase": 4,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0060-v1-fb1c8ae908-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0060",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-smart-campus-energy-v1-5333fee220-v1",
+      "phase": 4,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-city-cooling-roof-v1-5172f99b94-v1",
+      "phase": 4,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0063-v1-5ce265f1b5-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0063",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-ai-recognition-threshold-v1-240b481c3a-v1",
+      "phase": 4,
+      "familyKey": "high-concept-ai-recognition-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-high-concept-mars-water-recycle-v1-6343d668ac-v1",
+      "phase": 4,
+      "familyKey": "high-concept-mars-water-recycle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0067-v2-c2384f1b9a-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0067",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-water-filter-v1-38ed787c23-v1",
+      "phase": 5,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-oil-separation-v1-1cd3e41274-v1",
+      "phase": 5,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0047-v1-7d6deea38b-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0047",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-variable-confusion-turbidity-settle-v1-7501cae38d-v1",
+      "phase": 5,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-electromagnet-coils-v1-00b3f4df2a-v1",
+      "phase": 5,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0050-v1-7e46bd291f-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0050",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-fuzzy-windmill-blades-v1-269d41d46b-v1",
+      "phase": 5,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-safety-circuit-brightness-v1-9e504758aa-v1",
+      "phase": 5,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0054-v1-efe097c650-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0054",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0023-v1-1797ee48c0-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-over-broad-vehicle-fuel-v1-f488deadf6-v1",
+      "phase": 6,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-cooperative-thermal-insulation-v1-c298caf4c9-v1",
+      "phase": 6,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0026-v1-c69d79eca2-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0026",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-engineering-waterproof-material-v1-73b061c6a8-v1",
+      "phase": 6,
+      "familyKey": "engineering-waterproof-material",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-fuzzy-absorbent-paper-v1-fbdc9240ca-v1",
+      "phase": 6,
+      "familyKey": "fuzzy-absorbent-paper",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0179-v3-c706496dce-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0179",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v3-1cb436118f-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-electromagnet-coils-v3-a42c145dd4-v1",
+      "phase": 1,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v3-084baf4518-v1",
+      "phase": 1,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-fuzzy-windmill-blades-v3-48c679249d-v1",
+      "phase": 1,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0184-v3-999a0bbdc7-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0184",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-watering-threshold-v3-d7087085b5-v1",
+      "phase": 1,
+      "familyKey": "engineering-watering-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-smart-shade-threshold-v3-bfb86c67de-v1",
+      "phase": 1,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-alarm-sensitivity-v3-5c2c8271fc-v1",
+      "phase": 1,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-sorting-color-sensor-v4-0470d5f3d1-v1",
+      "phase": 1,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0011-v4-a4ea412047-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0011",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-plant-light-auto-duration-v4-8951267ea3-v1",
+      "phase": 1,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-fan-temperature-threshold-v4-9427f22fef-v1",
+      "phase": 1,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v4-d56358ad5a-v1",
+      "phase": 1,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-city-cooling-roof-v4-a363a18eb1-v1",
+      "phase": 1,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0018-v4-5a936da8c6-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0018",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-ai-recognition-threshold-v4-4bfc21cee6-v1",
+      "phase": 1,
+      "familyKey": "high-concept-ai-recognition-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-water-recycle-v4-a885472639-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-water-recycle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-light-v4-1c4a79fb31-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-acid-rain-plant-v4-7a590a6123-v1",
+      "phase": 1,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0023-v4-abaf29e9c2-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0023",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-bread-mold-preservative-v4-18b1d11df6-v1",
+      "phase": 1,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v4-64ef4ecbdf-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-bridge-load-v4-2c8b1f7ab7-v1",
+      "phase": 1,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v4-e1f81c7088-v1",
+      "phase": 1,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0028-v4-4ef8f347de-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0028",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-oil-separation-v4-5001a9c5a5-v1",
+      "phase": 1,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v4-8faa927b3a-v1",
+      "phase": 1,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v4-b8f9ef8df8-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v4-8715af5212-v1",
+      "phase": 1,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v3-31f67fda93-v1",
+      "phase": 2,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-premature-shade-plant-height-v3-03471e5bca-v1",
+      "phase": 2,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-yogurt-temperature-v3-6e34f0b405-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0164-v3-4a9fa48d7e-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0164",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-bread-mold-preservative-v3-3fba02431c-v1",
+      "phase": 2,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-apple-browning-v3-2f17b091e6-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-paper-airplane-distance-v3-dea59501f8-v1",
+      "phase": 2,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-vehicle-ramp-angle-v3-992fa788f6-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0169-v3-2c63fe1bc6-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0169",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-bridge-load-v3-e5b3897d5c-v1",
+      "phase": 2,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-over-broad-vehicle-fuel-v3-4b58525302-v1",
+      "phase": 2,
+      "familyKey": "over-broad-vehicle-fuel",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-thermal-insulation-v3-167eab8bb0-v1",
+      "phase": 2,
+      "familyKey": "cooperative-thermal-insulation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v3-ff4ec35c45-v1",
+      "phase": 2,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0174-v3-55cfdce9f5-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0174",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-absorbent-paper-v3-dc57299b69-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-absorbent-paper",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-low-effort-egg-drop-v3-b6137f0cda-v1",
+      "phase": 2,
+      "familyKey": "low-effort-egg-drop",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-water-filter-v3-7b039e51a9-v1",
+      "phase": 2,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-oil-separation-v3-01bed9461f-v1",
+      "phase": 2,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0179-v3-62c3582341-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0179",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-turbidity-settle-v3-5ea14c5049-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-electromagnet-coils-v3-f41e0cbbe8-v1",
+      "phase": 2,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-solar-car-angle-v3-aaff126847-v1",
+      "phase": 2,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-windmill-blades-v3-1e32d53a03-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-windmill-blades",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0184-v3-c590f83dbc-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0184",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-watering-threshold-v3-ea32248bd1-v1",
+      "phase": 2,
+      "familyKey": "engineering-watering-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-smart-shade-threshold-v3-ec8aed6a43-v1",
+      "phase": 2,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-alarm-sensitivity-v3-9f27567e59-v1",
+      "phase": 2,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-sorting-color-sensor-v4-baa02ea1bc-v1",
+      "phase": 2,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0011-v4-f53161e0a8-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0011",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-plant-light-auto-duration-v4-5ed862e894-v1",
+      "phase": 2,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-engineering-fan-temperature-threshold-v4-1389c0a6b7-v1",
+      "phase": 2,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-smart-campus-energy-v4-5840c452cc-v1",
+      "phase": 2,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-city-cooling-roof-v4-3ebc86c128-v1",
+      "phase": 2,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0018-v4-83f2508458-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0018",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-smart-shade-threshold-v1-23e6a95d05-v1",
+      "phase": 3,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-alarm-sensitivity-v1-fb0df5e345-v1",
+      "phase": 3,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0057-v1-bae22df802-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0057",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-door-reminder-distance-v1-28a181fcc0-v1",
+      "phase": 3,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-engineering-plant-light-auto-duration-v1-e75687f940-v1",
+      "phase": 3,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0060-v1-895fa28efe-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0060",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-high-concept-smart-campus-energy-v1-c0dc11911b-v1",
+      "phase": 3,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-high-concept-city-cooling-roof-v1-2e0e682e55-v1",
+      "phase": 3,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-water-amount-v2-2752267c78-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-all-at-once-salt-germination-v2-2902c96d13-v1",
+      "phase": 4,
+      "familyKey": "all-at-once-salt-germination",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0074-v2-90efd3cf94-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0074",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-safety-acid-rain-plant-v2-8e261a09b5-v1",
+      "phase": 4,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-ecology-bottle-balance-v2-965851bf0e-v1",
+      "phase": 4,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0077-v2-78d720ab8d-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0077",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v2-076814d084-v1",
+      "phase": 4,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-cooperative-dough-fermentation-v2-d81c7ec574-v1",
+      "phase": 4,
+      "familyKey": "cooperative-dough-fermentation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0081-v2-7ae0ebb226-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0081",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-variable-confusion-apple-browning-v2-eb447eae41-v1",
+      "phase": 4,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-cooperative-paper-airplane-distance-v2-e611f66eac-v1",
+      "phase": 4,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0088-v2-9883411fb6-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0088",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-smart-shade-threshold-v1-c6cf8f0a89-v1",
+      "phase": 5,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-alarm-sensitivity-v1-f30c12b506-v1",
+      "phase": 5,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0057-v1-32d02ac68c-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0057",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-door-reminder-distance-v1-320d18913c-v1",
+      "phase": 5,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-engineering-plant-light-auto-duration-v1-3a400170ac-v1",
+      "phase": 5,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0060-v1-cfccb670a1-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0060",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-high-concept-smart-campus-energy-v1-a4192205de-v1",
+      "phase": 5,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-high-concept-city-cooling-roof-v1-3791816cb8-v1",
+      "phase": 5,
+      "familyKey": "high-concept-city-cooling-roof",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0063-v1-8410921a18-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0063",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-high-concept-ai-recognition-threshold-v1-75cbb4da3d-v1",
+      "phase": 5,
+      "familyKey": "high-concept-ai-recognition-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0030-v1-ee40246744-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0030",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-cooperative-water-filter-v1-256b06e50c-v1",
+      "phase": 6,
+      "familyKey": "cooperative-water-filter",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-engineering-oil-separation-v1-b04ecd10af-v1",
+      "phase": 6,
+      "familyKey": "engineering-oil-separation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0047-v1-2ad6b4fc15-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0047",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-variable-confusion-turbidity-settle-v1-fd37e1f659-v1",
+      "phase": 6,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-cooperative-electromagnet-coils-v1-052f13a378-v1",
+      "phase": 6,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v5-ec9490a377-v1",
+      "phase": 1,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v5-a51ca64b24-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-cooperative-electromagnet-coils-v5-67ccd83b7f-v1",
+      "phase": 1,
+      "familyKey": "cooperative-electromagnet-coils",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-solar-car-angle-v5-dcad6ba9b3-v1",
+      "phase": 1,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0112-v5-ed6ebc25a7-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0112",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-circuit-brightness-v5-fe744c3793-v1",
+      "phase": 1,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-watering-threshold-v5-16a54ac43f-v1",
+      "phase": 1,
+      "familyKey": "engineering-watering-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-smart-shade-threshold-v5-4e76580820-v1",
+      "phase": 1,
+      "familyKey": "engineering-smart-shade-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-alarm-sensitivity-v5-048f492455-v1",
+      "phase": 1,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0117-v5-b7f1d7bf8e-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0117",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-door-reminder-distance-v5-10255bb7b6-v1",
+      "phase": 1,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-plant-light-auto-duration-v5-eb51ab7bf1-v1",
+      "phase": 1,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-fan-temperature-threshold-v5-16cfbcb428-v1",
+      "phase": 1,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-smart-campus-energy-v5-f71b476dc5-v1",
+      "phase": 1,
+      "familyKey": "high-concept-smart-campus-energy",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0124-v5-3269d02873-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0124",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-low-carbon-commute-v5-236ca73708-v1",
+      "phase": 1,
+      "familyKey": "high-concept-low-carbon-commute",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-ai-recognition-threshold-v5-55dd9c27d8-v1",
+      "phase": 1,
+      "familyKey": "high-concept-ai-recognition-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-high-concept-mars-light-v5-3b5038ff80-v1",
+      "phase": 1,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0143-v5-a7150172b8-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0143",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-ecology-bottle-balance-v5-f8ff6d97b8-v1",
+      "phase": 1,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-safety-bread-mold-preservative-v5-5d84841677-v1",
+      "phase": 1,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-apple-browning-v5-7eb8c686c0-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-engineering-bridge-load-v5-bb117f2393-v1",
+      "phase": 1,
+      "familyKey": "engineering-bridge-load",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0148-v5-b32572ec41-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0148",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-real-world-classroom-shade-heat-v6-546b18e17c-v1",
+      "phase": 1,
+      "familyKey": "real-world-classroom-shade-heat",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-over-broad-trash-sorting-v6-fdf32cfd19-v1",
+      "phase": 1,
+      "familyKey": "over-broad-trash-sorting",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-variable-confusion-turbidity-settle-v6-dff2e1fdca-v1",
+      "phase": 1,
+      "familyKey": "variable-confusion-turbidity-settle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p1-smartedu-0154-v6-fa5a82501d-v1",
+      "phase": 1,
+      "familyKey": "smartedu-0154",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-light-color-v4-8cdf66e4ac-v1",
+      "phase": 2,
+      "familyKey": "cooperative-light-color",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-fuzzy-water-amount-v4-f109b89be1-v1",
+      "phase": 2,
+      "familyKey": "fuzzy-water-amount",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0065-v4-fd0f17d918-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0065",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-high-concept-mars-light-v4-80c9252aa6-v1",
+      "phase": 2,
+      "familyKey": "high-concept-mars-light",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-acid-rain-plant-v4-31b56b8926-v1",
+      "phase": 2,
+      "familyKey": "safety-acid-rain-plant",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-ecology-bottle-balance-v4-bbaac13908-v1",
+      "phase": 2,
+      "familyKey": "ecology-bottle-balance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-premature-shade-plant-height-v4-94e54f0bc3-v1",
+      "phase": 2,
+      "familyKey": "premature-shade-plant-height",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-smartedu-0074-v5-d98f0474ac-v1",
+      "phase": 2,
+      "familyKey": "smartedu-0074",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-cooperative-dough-fermentation-v5-d320e721ac-v1",
+      "phase": 2,
+      "familyKey": "cooperative-dough-fermentation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-safety-bread-mold-preservative-v5-f723205a58-v1",
+      "phase": 2,
+      "familyKey": "safety-bread-mold-preservative",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p2-variable-confusion-apple-browning-v5-ebf264b6ce-v1",
+      "phase": 2,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0077-v2-1c42fc4760-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0077",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-fuzzy-yogurt-temperature-v2-1ffec32dec-v1",
+      "phase": 3,
+      "familyKey": "fuzzy-yogurt-temperature",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-dough-fermentation-v2-af09c4c961-v1",
+      "phase": 3,
+      "familyKey": "cooperative-dough-fermentation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0081-v2-d6ebafca9c-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0081",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-variable-confusion-apple-browning-v2-feadd4e2e9-v1",
+      "phase": 3,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-cooperative-paper-airplane-distance-v2-ff7177a376-v1",
+      "phase": 3,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p3-smartedu-0088-v2-e2fe776abf-v1",
+      "phase": 3,
+      "familyKey": "smartedu-0088",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-solar-car-angle-v2-ba730e75df-v1",
+      "phase": 4,
+      "familyKey": "engineering-solar-car-angle",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0116-v2-34bcaf6795-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0116",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-safety-circuit-brightness-v2-16c45ea264-v1",
+      "phase": 4,
+      "familyKey": "safety-circuit-brightness",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-watering-threshold-v2-dbb24075cd-v1",
+      "phase": 4,
+      "familyKey": "engineering-watering-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0120-v2-c5b5e1f046-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0120",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-alarm-sensitivity-v2-bacfa68151-v1",
+      "phase": 4,
+      "familyKey": "engineering-alarm-sensitivity",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-sorting-color-sensor-v2-3e8b26187f-v1",
+      "phase": 4,
+      "familyKey": "engineering-sorting-color-sensor",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0124-v2-70a522d806-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0124",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-plant-light-auto-duration-v2-bade5fe298-v1",
+      "phase": 4,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-engineering-fan-temperature-threshold-v2-3f755aab42-v1",
+      "phase": 4,
+      "familyKey": "engineering-fan-temperature-threshold",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p4-smartedu-0131-v2-53f4a8e6fb-v1",
+      "phase": 4,
+      "familyKey": "smartedu-0131",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-dough-fermentation-v2-afae4e5b50-v1",
+      "phase": 5,
+      "familyKey": "cooperative-dough-fermentation",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0081-v2-fcfe8a4aca-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0081",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-variable-confusion-apple-browning-v2-6f9ca455db-v1",
+      "phase": 5,
+      "familyKey": "variable-confusion-apple-browning",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-cooperative-paper-airplane-distance-v2-184b198306-v1",
+      "phase": 5,
+      "familyKey": "cooperative-paper-airplane-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p5-smartedu-0088-v2-d9868eac0a-v1",
+      "phase": 5,
+      "familyKey": "smartedu-0088",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0057-v1-d772bc13bb-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0057",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-engineering-door-reminder-distance-v1-7ea7edcda5-v1",
+      "phase": 6,
+      "familyKey": "engineering-door-reminder-distance",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-engineering-plant-light-auto-duration-v1-ff76bbbae1-v1",
+      "phase": 6,
+      "familyKey": "engineering-plant-light-auto-duration",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    },
+    {
+      "id": "stem-distill-dsv4-p6-smartedu-0060-v1-cd7773807b-v1",
+      "phase": 6,
+      "familyKey": "smartedu-0060",
+      "allowedUses": [
+        "scenario_seed",
+        "rejected_preference",
+        "regression_case"
+      ]
+    }
+  ]
+}

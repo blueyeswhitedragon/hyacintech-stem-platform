@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import { db } from '../app/lib/db';
+import './load-script-env';
 import {
   ensureRuntimeModelVersion,
   getRuntimeModelIdentity,

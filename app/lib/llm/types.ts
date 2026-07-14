@@ -11,17 +11,52 @@ export interface LLMProviderConfig {
   apiKey: string;
   baseURL: string;
   model: string;
+  provider: 'openai' | 'deepseek';
   temperature?: number;
   maxTokens?: number;
   timeoutMs?: number;
+  thinking?: 'enabled' | 'disabled';
+  reasoningEffort?: 'high' | 'max';
 }
 
 export interface ChatOptions {
   useJsonFormat?: boolean;
+  maxTokens?: number;
+  timeoutMs?: number;
+  thinking?: 'enabled' | 'disabled';
+  reasoningEffort?: 'high' | 'max';
+}
+
+export interface LLMCompletion {
+  content: string;
+  finishReason: string | null;
+  reasoningChars: number;
+  usage: {
+    promptTokens?: number;
+    completionTokens?: number;
+    reasoningTokens?: number;
+    totalTokens?: number;
+  };
+  request: {
+    jsonFormat: boolean;
+    maxTokens: number;
+    timeoutMs: number;
+    thinking: 'enabled' | 'disabled' | null;
+    reasoningEffort: 'high' | 'max' | null;
+  };
 }
 
 export interface LLMProvider {
+  complete(messages: LLMMessage[], options?: ChatOptions): Promise<LLMCompletion>;
   chat(messages: LLMMessage[], options?: ChatOptions): Promise<string>;
+}
+
+export type LLMRuntimeRole = 'TUTOR' | 'STUDENT' | 'EVALUATOR';
+
+export interface LLMRuntimeOverride {
+  provider: string;
+  model: string;
+  role?: LLMRuntimeRole;
 }
 
 // ---- Error classification ----

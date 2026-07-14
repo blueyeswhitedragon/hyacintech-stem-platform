@@ -9,6 +9,7 @@ import path from 'path';
 import { safeParseChatResponse } from '../app/lib/llm/parser';
 import type { ChatResponse } from '../app/models/types';
 import { evaluateShareGPTRecordSemantic } from './semantic-guardrails';
+import { STAGE_CONTRACT_VERSION, validateStageResponseBehavior, type StageTriggerType } from '../app/lib/stageContract';
 
 const DEFAULT_DATASET = path.join(process.cwd(), 'data/sft/sharegpt-stem-seed.json');
 const DATASET = process.argv[2] ? path.resolve(process.argv[2]) : DEFAULT_DATASET;
@@ -36,6 +37,10 @@ interface ShareGPTRecord {
     expectedTransformation?: unknown;
     tier?: string;
     sourceTag?: string;
+    stageContractVersion?: string;
+    stageTriggerType?: string;
+    systemPrompt?: string;
+    generationContext?: Record<string, unknown>;
   };
 }
 
@@ -94,6 +99,11 @@ function validateRecord(record: ShareGPTRecord) {
   check(`${record.id}: starts with human`, record.conversations[0]?.from === 'human');
   const semantic = evaluateShareGPTRecordSemantic(record);
   check(`${record.id}: semantic guardrails pass${semantic.reason ? ` (${semantic.reason})` : ''}`, semantic.status === 'ok');
+  const isV2 = record.meta?.stageContractVersion === STAGE_CONTRACT_VERSION;
+  if (isV2) {
+    check(`${record.id}: v2 has system prompt snapshot`, typeof record.meta?.systemPrompt === 'string' && record.meta.systemPrompt.trim().length > 0);
+    check(`${record.id}: v2 has trigger type`, typeof record.meta?.stageTriggerType === 'string' && record.meta.stageTriggerType.length > 0);
+  }
 
   for (let i = 0; i < record.conversations.length; i++) {
     const msg = record.conversations[i];
@@ -118,14 +128,22 @@ function validateRecord(record: ShareGPTRecord) {
         check(`${record.id}: phase1 confirmation has stage1_confirmed`, parsed.stage1_confirmed === true);
         check(`${record.id}: phase1 confirmation has theme_mapping`, !!parsed.theme_mapping);
         check(`${record.id}: phase1 confirmation has snapshot`, !!parsed.snapshot?.trim());
-        check(`${record.id}: phase1 confirmation has independent variable`, !!parsed.variables?.independent?.trim());
+        if (isV2) {
+          check(`${record.id}: phase1 confirmation has factor direction`, !!parsed.topic_direction?.factor?.trim());
+          check(`${record.id}: phase1 confirmation has phenomenon direction`, !!parsed.topic_direction?.phenomenon?.trim());
+          check(`${record.id}: phase1 confirmation does not operationalize dependent/control`, !parsed.variables?.dependent?.trim() && !(parsed.variables?.controlled?.length));
+        } else {
+          check(`${record.id}: legacy phase1 confirmation has independent variable`, !!parsed.variables?.independent?.trim());
+        }
       }
     }
 
-    if (record.phase === 2 && parsed.phase_complete === true) {
+    if (record.phase === 2 && (parsed.data_table_schema || parsed.next_action_type === 'confirmation' || parsed.phase_complete === true)) {
       check(`${record.id}: phase2 confirmation has schema`, !!parsed.data_table_schema);
       check(`${record.id}: phase2 schema has notes`, hasNotesColumn(parsed));
+      check(`${record.id}: phase2 schema minRows at least 3`, (parsed.data_table_schema?.minRows ?? 0) >= 3);
       check(`${record.id}: phase2 schema maxRows 200`, parsed.data_table_schema?.maxRows === 200);
+      if (isV2) check(`${record.id}: phase2 v2 has experiment_plan`, !!parsed.experiment_plan);
     }
 
     if (record.phase === 5) {
@@ -136,6 +154,16 @@ function validateRecord(record: ShareGPTRecord) {
           check(`${record.id}: phase5 section ${key}`, sections[key].trim().length > 0);
         }
       }
+    }
+
+    if (isV2) {
+      const assistantTurnIndex = record.conversations.slice(0, i).filter((message) => message.from === 'gpt').length;
+      const turnTriggerTypes = record.meta?.generationContext?.turnTriggerTypes;
+      const triggerType = (Array.isArray(turnTriggerTypes) && typeof turnTriggerTypes[assistantTurnIndex] === 'string'
+        ? turnTriggerTypes[assistantTurnIndex]
+        : record.meta?.stageTriggerType ?? 'USER_MESSAGE') as StageTriggerType;
+      const stageIssues = validateStageResponseBehavior(record.phase, parsed, { triggerType, visibleContext: record.meta?.systemPrompt });
+      check(`${record.id}: assistant ${i} stage-contract has no errors`, !stageIssues.some((issue) => issue.severity === 'error'));
     }
   }
 }

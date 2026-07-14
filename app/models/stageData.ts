@@ -19,6 +19,9 @@ export interface Stage1Data {
   confirmed: boolean;
   snapshot: string; // 纯文本《探究问题确认书》
   themeMapping?: ThemeMapping;
+  factorDirection?: string;
+  phenomenonDirection?: string;
+  /** @deprecated 兼容旧会话；新流程在阶段2才正式定义变量。 */
   variables: {
     independent: string;
     /** 第一阶段只确定自变量方向；因变量的具体测量方式下沉到第二阶段，故此处可空。 */
@@ -40,10 +43,24 @@ export interface Stage2RiskAnnotation {
   severity: 'low' | 'medium' | 'high';
 }
 
+export interface Stage2ExperimentPlan {
+  researchQuestion?: string;
+  hypothesis?: string;
+  independentVariable: { name: string; levels: string[] };
+  dependentVariable: { name: string; measurement: string; unit?: string };
+  controlledVariables: string[];
+  materials: string[];
+  procedure: string[];
+  /** 每个自变量水平至少重复多少次；用于区分“组别数”和“重复测量次数”。 */
+  repeatCount: number;
+  safetyNotes: string[];
+}
+
 export interface Stage2Data {
   submitted: boolean;
   approved: boolean | null; // null=未审核
   teacherFeedback?: string;
+  experimentPlan?: Stage2ExperimentPlan;
   schema: {
     columns: Stage2Column[];
     minRows: number;
@@ -61,6 +78,13 @@ export interface Stage3FileAssociation {
 export interface Stage3Data {
   rows: Record<string, unknown>[]; // 每行都是 { [colKey]: value }
   fileAssociations?: Stage3FileAssociation[];
+  safetyQuiz?: {
+    question: string;
+    options: string[];
+    correct: number;
+    selected?: number;
+    passed: boolean;
+  };
   /** 学生点 3→4 推进时置 true，进入教师「数据表待过目（可选）」清单（非阻塞）。 */
   submitted?: boolean;
   /** 教师审核结果：true=已过目认可；false=被打回需修改；undefined=未过目。 */
@@ -71,6 +95,17 @@ export interface Stage3Data {
 // 阶段4：分析轮次计数（至少2轮有效分析才能进入阶段5）
 export interface Stage4Data {
   analysisCount: number;
+  observations?: string[];
+  evidenceCitations?: string[];
+  anomalies?: string[];
+  interpretations?: string[];
+  evidenceRounds?: Array<{
+    observation: string;
+    citations: string[];
+    matchedValues: string[];
+    anomaly?: string;
+    interpretation?: string;
+  }>;
 }
 
 export interface Stage5Sections {

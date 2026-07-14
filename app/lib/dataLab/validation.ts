@@ -3,12 +3,22 @@ import type { ChatResponse } from '@/app/models/types';
 import { safeParseChatResponse } from '@/app/lib/llm/parser';
 import { claimsStage2ArtifactReady, hasResponseStage2Schema, validateChatContract } from '@/app/lib/llm/chatContract';
 import { evaluateShareGPTRecordSemantic } from '@/scripts/semantic-guardrails';
+import { STAGE_CONTRACT_VERSION, validateStageResponseBehavior, type StageTriggerType } from '@/app/lib/stageContract';
+import { evaluateStyleAuthenticity, isStyleFamily } from '@/app/lib/stylePolicy';
+import {
+  assertTransformationType,
+  computeTransformationMetrics,
+  type TransformationMetrics,
+} from '@/app/lib/trainingEligibility';
 import type {
   AutoCheckIssue,
   AutoCheckResult,
   RevisionInput,
   ShareGPTRecord,
+  StyleFamily,
+  TransformationType,
 } from './types';
+import { TRANSFORMATION_TYPES } from './types';
 
 export const MAX_IMPORT_BYTES = 10 * 1024 * 1024;
 export type ValidationMode = 'import' | 'submit' | 'release';
@@ -57,18 +67,99 @@ export function familyKey(record: ShareGPTRecord): string {
     .replace(/-v\d+$/i, '');
 }
 
-function issue(ruleCode: string, message: string, evidence?: string, severity: 'error' | 'warning' = 'error'): AutoCheckIssue {
-  return { ruleCode, severity, message, evidence };
+function issue(ruleCode: string, message: string, evidence?: string, severity: 'error' | 'warning' = 'error', messageIndex?: number): AutoCheckIssue {
+  return { ruleCode, severity, message, evidence, messageIndex };
+}
+
+function finalizeCheck(issues: AutoCheckIssue[]): AutoCheckResult {
+  const deduplicated = new Map<string, AutoCheckIssue>();
+  for (const item of issues) {
+    const inferredIndex = item.messageIndex ?? (() => {
+      const match = item.message.match(/导师消息\s+(\d+)/);
+      return match ? Number(match[1]) : undefined;
+    })();
+    const normalized = inferredIndex === undefined ? item : { ...item, messageIndex: inferredIndex };
+    const key = `${normalized.ruleCode}:${normalized.severity}:${normalized.messageIndex ?? 'record'}:${normalized.message}`;
+    if (!deduplicated.has(key)) deduplicated.set(key, normalized);
+  }
+  const normalizedIssues = [...deduplicated.values()];
+  const status = normalizedIssues.some((item) => item.severity === 'error') ? 'error' : normalizedIssues.length > 0 ? 'warning' : 'ok';
+  return { status, issues: normalizedIssues };
 }
 
 function hasNotesColumn(response: ChatResponse): boolean {
   return !!response.data_table_schema?.columns.some((column) => column.key === 'notes' && column.type === 'text');
 }
 
+function recordBusinessContext(record: ShareGPTRecord): unknown {
+  if (typeof record.meta?.visibleContext !== 'string' || !record.meta.visibleContext.trim()) return null;
+  try {
+    const parsed = JSON.parse(record.meta.visibleContext) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return parsed;
+    const object = parsed as Record<string, unknown>;
+    return object.tutorVisible ?? object.businessContext ?? parsed;
+  } catch {
+    return record.meta.visibleContext;
+  }
+}
+
+function turnVisibleContext(record: ShareGPTRecord, assistantMessageIndex: number): string {
+  const studentMessages = record.conversations
+    .slice(0, assistantMessageIndex)
+    .filter((message) => message.from === 'human')
+    .map((message) => message.value);
+  return JSON.stringify({
+    businessContext: recordBusinessContext(record),
+    currentStudentMessage: studentMessages.at(-1) ?? '',
+    priorStudentMessages: studentMessages.slice(0, -1),
+  });
+}
+
 export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationMode = 'import'): AutoCheckResult {
   const issues: AutoCheckIssue[] = [];
   const strict = mode !== 'import';
+  const releaseStrict = mode === 'release';
   let hasPriorStage2Schema = false;
+  let styleEvidenceTurns = 0;
+  let neutralSystemTurns = 0;
+  const styleFailureDetails: string[] = [];
+  if (record.meta?.stageContractVersion !== STAGE_CONTRACT_VERSION) {
+    issues.push(issue(
+      'STAGE_CONTRACT_VERSION_MISSING',
+      `记录未声明当前阶段合同 ${STAGE_CONTRACT_VERSION}`,
+      String(record.meta?.stageContractVersion ?? '缺失'),
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
+  if (typeof record.meta?.systemPrompt !== 'string' || !record.meta.systemPrompt.trim()) {
+    issues.push(issue(
+      'SYSTEM_PROMPT_SNAPSHOT_MISSING',
+      '记录缺少生成时完整 system prompt，不能确认训练可见上下文与生产一致',
+      undefined,
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
+  if (typeof record.meta?.stageTriggerType !== 'string' || !record.meta.stageTriggerType.trim()) {
+    issues.push(issue(
+      'STAGE_TRIGGER_TYPE_MISSING',
+      '记录缺少 USER_MESSAGE/STAGE_ENTER/STAGE_TRANSITION 等触发类型',
+      undefined,
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
+  const humanTurnCount = record.conversations?.filter((message) => message.from === 'human').length ?? 0;
+  const turnSystemPrompts = record.meta?.generationContext?.turnSystemPrompts;
+  if (
+    turnSystemPrompts !== undefined &&
+    (!Array.isArray(turnSystemPrompts) || turnSystemPrompts.length !== humanTurnCount || turnSystemPrompts.some((value) => typeof value !== 'string' || !value.trim()))
+  ) {
+    issues.push(issue(
+      'TURN_SYSTEM_PROMPTS_INVALID',
+      '逐轮 system prompt 数量必须与 human/gpt 轮次数一致且均非空',
+      undefined,
+      releaseStrict ? 'error' : 'warning'
+    ));
+  }
   if (!record.id?.trim()) issues.push(issue('ID_MISSING', '缺少记录 ID'));
   if (!record.scenario?.trim()) issues.push(issue('SCENARIO_MISSING', '缺少场景名称'));
   if (!Number.isInteger(record.phase) || record.phase < 1 || record.phase > 6) issues.push(issue('PHASE_INVALID', '阶段必须为 1-6'));
@@ -93,6 +184,24 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
         // parseAssistantResponse 会生成统一的可读错误。
       }
       const response = parseAssistantResponse(message.value);
+      const assistantTurnIndex = record.conversations
+        .slice(0, index)
+        .filter((item) => item.from === 'gpt').length;
+      const turnTriggerTypes = record.meta?.generationContext?.turnTriggerTypes;
+      const perTurnTrigger = Array.isArray(turnTriggerTypes) && typeof turnTriggerTypes[assistantTurnIndex] === 'string'
+        ? turnTriggerTypes[assistantTurnIndex] as StageTriggerType
+        : undefined;
+      const declaredTrigger = perTurnTrigger ?? (typeof record.meta?.stageTriggerType === 'string'
+        ? record.meta.stageTriggerType as StageTriggerType
+        : undefined);
+      const inferredTrigger: StageTriggerType = declaredTrigger
+        ?? (record.phase === 3 && index === 1
+          ? 'STAGE_ENTER'
+          : record.phase === 5 && index === 1
+            ? 'REPORT_BOOTSTRAP'
+            : record.phase === 6
+              ? 'OPTIONAL_COACHING'
+              : 'USER_MESSAGE');
       const rawAction = rawResponse.next_action_type;
       if (typeof rawAction !== 'string' || !['ask_choice', 'text_input', 'confirmation', 'info'].includes(rawAction)) {
         issues.push(issue(
@@ -105,9 +214,14 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
       if ((response.options?.length ?? 0) > 0 && response.next_action_type !== 'ask_choice') {
         issues.push(issue('OPTIONS_ACTION_MISMATCH', `导师消息 ${index} 的 options 与动作类型不一致`));
       }
-      if (record.phase === 1 && response.phase_complete) {
-        if (!response.stage1_confirmed || !response.theme_mapping || !response.snapshot?.trim() || !response.variables?.independent?.trim()) {
-          issues.push(issue('PHASE1_CONFIRMATION_INCOMPLETE', `导师消息 ${index} 缺少阶段1确认结构`));
+      if (record.phase === 1 && response.stage1_confirmed) {
+        if (!response.theme_mapping || !response.snapshot?.trim() || !response.topic_direction?.factor?.trim() || !response.topic_direction?.phenomenon?.trim()) {
+          issues.push(issue(
+            'PHASE1_CONFIRMATION_INCOMPLETE',
+            `导师消息 ${index} 缺少新版阶段1确认结构（theme_mapping/snapshot/topic_direction）`,
+            response.dialogue,
+            strict ? 'error' : 'warning'
+          ));
         }
       }
       if (record.phase === 2) {
@@ -132,12 +246,57 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
         }
         if (hasResponseStage2Schema(response)) hasPriorStage2Schema = true;
       }
-      if (record.phase === 5) {
+      if (record.phase === 5 && inferredTrigger === 'REPORT_BOOTSTRAP') {
         const sections = response.report_sections;
         if (!sections || Object.values(sections).some((value) => !value.trim())) {
           issues.push(issue('PHASE5_SECTIONS_INCOMPLETE', `导师消息 ${index} 的报告框架不完整`));
         }
       }
+
+      for (const contractIssue of validateStageResponseBehavior(record.phase, response, {
+        triggerType: inferredTrigger,
+        visibleContext: turnVisibleContext(record, index),
+      })) {
+        issues.push(issue(
+          contractIssue.code,
+          `导师消息 ${index}：${contractIssue.message}`,
+          contractIssue.evidence ?? response.dialogue,
+          contractIssue.severity === 'warning' || !strict ? 'warning' : 'error'
+        ));
+      }
+      if (isStyleFamily(record.meta?.styleFamily)) {
+        const styleCheck = evaluateStyleAuthenticity(record.meta.styleFamily, response, {
+          phase: record.phase,
+          triggerType: inferredTrigger,
+        });
+        if (styleCheck.neutralSystemResponse) {
+          neutralSystemTurns++;
+        } else if (styleCheck.issues.length > 0) {
+          styleFailureDetails.push(`导师消息 ${index}：${styleCheck.issues.join('；')}；原文：${response.dialogue}`);
+        } else {
+          styleEvidenceTurns++;
+        }
+      }
+      if (record.phase === 5 && response.report_sections) {
+        const missingContext = Object.values(response.report_sections)
+          .some((value) => /待学生补充|信息缺失|尚未提供|未提供/.test(value));
+        const reportPath = record.meta?.generationContext?.reportPath;
+        if (missingContext && reportPath !== 'fallback') {
+          issues.push(issue(
+            'P5_FALLBACK_NOT_CLASSIFIED',
+            `导师消息 ${index} 含缺失信息占位，但记录没有标记为 fallback`,
+            JSON.stringify(response.report_sections),
+          ));
+        }
+        if (!missingContext && reportPath === 'fallback') {
+          issues.push(issue(
+            'P5_FALLBACK_CLASSIFICATION_MISMATCH',
+            `导师消息 ${index} 没有缺失信息占位，却被标记为 fallback`,
+            JSON.stringify(response.report_sections),
+          ));
+        }
+      }
+
       const questionMarks = (response.dialogue.match(/[？?]/g) ?? []).length;
       if (questionMarks > 2) {
         issues.push(issue('COGNITIVE_LOAD_RISK', `导师消息 ${index} 一次提出了 ${questionMarks} 个问题`, response.dialogue, 'warning'));
@@ -150,6 +309,17 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
     }
   }
 
+  if (isStyleFamily(record.meta?.styleFamily) && styleEvidenceTurns === 0) {
+    issues.push(issue(
+      'STYLE_NOT_OBSERVABLE',
+      neutralSystemTurns > 0
+        ? '该记录只有中性结构化交付轮或其他不具备目标风格证据的回复，不能证明目标风格已经学到'
+        : '该记录没有任何一轮呈现可观察的目标风格证据',
+      styleFailureDetails.join('\n') || undefined,
+      'warning',
+    ));
+  }
+
   const semantic = evaluateShareGPTRecordSemantic(record);
   if (semantic.status !== 'ok') {
     issues.push(issue(
@@ -160,8 +330,81 @@ export function validateShareGPTRecord(record: ShareGPTRecord, mode: ValidationM
     ));
   }
 
-  const status = issues.some((item) => item.severity === 'error') ? 'error' : issues.length > 0 ? 'warning' : 'ok';
-  return { status, issues };
+  return finalizeCheck(issues);
+}
+
+export interface RevisionValidationOptions {
+  mode?: ValidationMode;
+  styleFamily?: StyleFamily | null;
+  stylePolicyVersion?: string | null;
+}
+
+export interface AnnotationRevisionValidation {
+  normalizedInput: RevisionInput;
+  revisedRecord?: ShareGPTRecord;
+  check: AutoCheckResult;
+  transformationType?: TransformationType;
+  transformationMetrics?: TransformationMetrics;
+}
+
+/**
+ * Data Lab 修订的唯一纯校验入口。预检、正式提交和复审合并版本必须复用它，
+ * 以保证同一输入得到相同的规则码与严重度。
+ */
+export function validateAnnotationRevision(
+  original: ShareGPTRecord,
+  input: RevisionInput,
+  options: RevisionValidationOptions = {},
+): AnnotationRevisionValidation {
+  const normalizedInput = normalizeLegacyEmptyStage2Schemas(input).input;
+  const preliminary: AutoCheckIssue[] = [];
+  let revisedRecord: ShareGPTRecord;
+
+  try {
+    assertRevisionIntent(original, normalizedInput);
+    revisedRecord = applyRevision(original, normalizedInput);
+  } catch (error) {
+    preliminary.push(issue(
+      'REVISION_INPUT_INVALID',
+      error instanceof Error ? error.message : String(error),
+    ));
+    return { normalizedInput, check: finalizeCheck(preliminary) };
+  }
+
+  if (isStyleFamily(options.styleFamily)) {
+    revisedRecord = {
+      ...revisedRecord,
+      meta: {
+        ...(revisedRecord.meta ?? {}),
+        styleFamily: options.styleFamily,
+        stylePolicyVersion: options.stylePolicyVersion?.trim()
+          || (typeof revisedRecord.meta?.stylePolicyVersion === 'string' ? revisedRecord.meta.stylePolicyVersion : undefined),
+      },
+    };
+  }
+
+  const transformationMetrics = computeTransformationMetrics(original, revisedRecord);
+  const transformationType: TransformationType = normalizedInput.transformationType
+    && TRANSFORMATION_TYPES.includes(normalizedInput.transformationType)
+      ? normalizedInput.transformationType
+      : normalizedInput.noChange ? 'NO_CHANGE' : transformationMetrics.recommendedType;
+  try {
+    assertTransformationType(transformationType, transformationMetrics);
+  } catch (error) {
+    preliminary.push(issue(
+      'TRANSFORMATION_TYPE_INVALID',
+      error instanceof Error ? error.message : String(error),
+    ));
+  }
+
+  const recordCheck = validateShareGPTRecord(revisedRecord, options.mode ?? 'submit');
+  return {
+    normalizedInput,
+    revisedRecord,
+    check: finalizeCheck([...preliminary, ...recordCheck.issues]),
+    transformationType,
+    transformationMetrics,
+  };
 }
 
 export function applyRevision(record: ShareGPTRecord, input: RevisionInput): ShareGPTRecord {

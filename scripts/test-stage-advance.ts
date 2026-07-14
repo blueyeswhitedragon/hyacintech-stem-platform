@@ -22,7 +22,7 @@ const schema2: StageData = {
         { key: 'height', title: '株高', type: 'number', required: true },
         { key: 'note', title: '备注', type: 'text', required: false },
       ],
-      minRows: 1,
+      minRows: 3,
       maxRows: 200,
     },
   },
@@ -30,10 +30,16 @@ const schema2: StageData = {
 
 console.log('canAdvance:');
 
+// 3→4：即使数据完整，未通过服务端安全题也必须拒绝
+{
+  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 7.2 }, { trial: 2, height: 7.5 }, { trial: 3, height: 7.8 }] } };
+  check('3→4 未通过安全题被拒', canAdvance(3, 4, sd).ok === false);
+}
+
 // 3→4：行非空 + 必填齐 → ok
 {
-  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 7.2 }] } };
-  check('3→4 必填齐通过', canAdvance(3, 4, sd).ok === true);
+  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 7.2 }, { trial: 2, height: 7.5 }, { trial: 3, height: 7.8 }] } };
+  check('3→4 必填齐且安全题通过', canAdvance(3, 4, sd, { safetyQuizCompleted: true }).ok === true);
 }
 // 3→4：无行 → 拒绝
 {
@@ -41,15 +47,21 @@ console.log('canAdvance:');
   const r = canAdvance(3, 4, sd);
   check('3→4 无行被拒', r.ok === false && !!r.error);
 }
+// 3→4：未达到 schema.minRows → 拒绝
+{
+  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 5 }, { trial: 2, height: 6 }] } };
+  const r = canAdvance(3, 4, sd, { safetyQuizCompleted: true });
+  check('3→4 未达到 minRows 被拒', r.ok === false && r.error?.includes('3 行') === true);
+}
 // 3→4：必填列缺值 → 拒绝
 {
-  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: '' }] } };
+  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: '' }, { trial: 2, height: 5 }, { trial: 3, height: 6 }] } };
   check('3→4 必填缺值被拒', canAdvance(3, 4, sd).ok === false);
 }
 // 3→4：非必填列缺值 → 仍通过
 {
-  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 5 }] } };
-  check('3→4 非必填缺值仍通过', canAdvance(3, 4, sd).ok === true);
+  const sd: StageData = { ...schema2, stage3: { rows: [{ trial: 1, height: 5 }, { trial: 2, height: 6 }, { trial: 3, height: 7 }] } };
+  check('3→4 非必填缺值仍通过', canAdvance(3, 4, sd, { safetyQuizCompleted: true }).ok === true);
 }
 // 4→5：分析不足 → 拒绝
 {
@@ -68,19 +80,19 @@ console.log('canAdvance:');
 {
   check('1→2 无数据被拒', canAdvance(1, 2, {}).ok === false);
 }
-// 1→2：有确认+自变量 → 通过
+// 1→2：已确认因素方向与现象方向 → 通过
 {
   const sd: StageData = {
-    stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '光照', dependent: '株高' } },
+    stage1: { confirmed: true, snapshot: 'snap', factorDirection: '光照', phenomenonDirection: '发芽表现', variables: { independent: '光照' } },
   };
-  check('1→2 已确认通过', canAdvance(1, 2, sd).ok === true);
+  check('1→2 已确认双方向通过', canAdvance(1, 2, sd).ok === true);
 }
-// 1→2：仅自变量（无因变量，新口径：因变量下沉到第二阶段）→ 通过
+// 1→2：只有因素方向而没有现象/研究问题 → 拒绝
 {
   const sd: StageData = {
     stage1: { confirmed: true, snapshot: 'snap', variables: { independent: '光照' } },
   };
-  check('1→2 仅自变量也通过', canAdvance(1, 2, sd).ok === true);
+  check('1→2 缺关注现象被拒', canAdvance(1, 2, sd).ok === false);
 }
 // 1→2：有确认但自变量为空 → 拒绝
 {

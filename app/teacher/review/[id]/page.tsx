@@ -52,21 +52,30 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
             <div className="p-4 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
               {stageData.stage1.snapshot}
             </div>
-            {stageData.stage1.variables && (
-              <div className="px-4 pb-3 text-sm text-gray-600">
-                自变量：{stageData.stage1.variables.independent || '—'}
-                {stageData.stage1.variables.dependent ? ` · 因变量：${stageData.stage1.variables.dependent}` : ''}
-                {stageData.stage1.variables.controlled?.length
-                  ? ` · 控制变量：${stageData.stage1.variables.controlled.join('、')}`
-                  : ''}
-              </div>
-            )}
+            <div className="px-4 pb-3 text-sm text-gray-600">
+              拟改变因素方向：{stageData.stage1.factorDirection || stageData.stage1.variables?.independent || '—'}
+              {' · '}关注现象方向：{stageData.stage1.phenomenonDirection || stageData.stage1.variables?.dependent || '—'}
+              <div className="mt-1 text-xs text-amber-700">变量水平、测量方式与控制变量在方案设计阶段审核。</div>
+            </div>
           </section>
         )}
 
         {reviewStage === 2 && stageData.stage2 && (
           <section className="bg-white border rounded-lg p-4">
             <h2 className="font-medium mb-3">实验方案 · 数据表结构</h2>
+            {stageData.stage2.experimentPlan && (() => {
+              const plan = stageData.stage2.experimentPlan;
+              return (
+                <div className="mb-4 grid gap-2 rounded border bg-gray-50 p-3 text-sm md:grid-cols-2">
+                  <div><span className="font-medium">自变量：</span>{plan.independentVariable.name}（{plan.independentVariable.levels.join('、')}）</div>
+                  <div><span className="font-medium">因变量：</span>{plan.dependentVariable.name}；{plan.dependentVariable.measurement}</div>
+                  <div><span className="font-medium">控制变量：</span>{plan.controlledVariables.join('、') || '—'}</div>
+                  <div><span className="font-medium">材料：</span>{plan.materials.join('、') || '—'}</div>
+                  <div className="md:col-span-2"><span className="font-medium">步骤：</span>{plan.procedure.join('；') || '—'}</div>
+                  <div className="md:col-span-2"><span className="font-medium">安全：</span>{plan.safetyNotes.join('；') || '无特殊风险'}</div>
+                </div>
+              );
+            })()}
             <table className="w-full text-sm border mb-3">
               <thead className="bg-gray-50 text-gray-600">
                 <tr><th className="p-2 border text-left">键</th><th className="p-2 border text-left">列名</th><th className="p-2 border text-left">类型</th><th className="p-2 border text-left">必填</th></tr>

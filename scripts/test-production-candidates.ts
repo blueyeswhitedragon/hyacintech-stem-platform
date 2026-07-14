@@ -47,10 +47,70 @@ async function main() {
   const userMessageId = randomUUID();
   const assistantMessageId = randomUUID();
   const response = { dialogue: `你好${student.displayName}，请访问 https://example.com/file.png`, next_action_type: 'text_input', phase_complete: false };
-  const conversation = await db.conversation.create({ data: { userId: student.id, traceCoverage: 'COMPLETE', messages: JSON.stringify([{ id: userMessageId, role: 'user', content: `我是${student.displayName}，电话13812345678` }, { id: assistantMessageId, role: 'assistant', content: response.dialogue }]) } });
+  const conversation = await db.conversation.create({ data: { userId: student.id, traceCoverage: 'COMPLETE', messages: JSON.stringify([{ id: randomUUID(), role: 'assistant', content: `欢迎${student.displayName}开始探究` }, { id: randomUUID(), role: 'user', content: '我先观察了第一组。' }, { id: randomUUID(), role: 'assistant', content: '请说说你记录到了什么。' }, { id: userMessageId, role: 'user', content: `我是${student.displayName}，电话13812345678` }, { id: assistantMessageId, role: 'assistant', content: response.dialogue }]) } });
   const studentAssignment = await db.studentAssignment.create({ data: { assignmentId: assignment.id, studentId: student.id, conversationId: conversation.id, status: 'IN_PROGRESS', currentStage: 1, dataConsentStatus: 'GRANTED', dataConsentPolicyVersion: 'student-data-policy-v1' } });
   const model = await db.modelVersion.create({ data: { tag: `candidate-test-${suffix}`, provider: 'test', externalModelId: 'test-model' } });
-  const trace = await db.generationTrace.create({ data: { conversationId: conversation.id, assistantMessageId, userMessageId, stage: 1, modelVersionId: model.id, modelTagSnapshot: model.tag, providerSnapshot: 'test', externalModelSnapshot: 'test-model', promptVersion: 'p1', promptSha256: 'a'.repeat(64), styleFamily: 'classroom_coach', stylePolicyVersion: 'style-v1', requestMessageSha256: 'b'.repeat(64), responseJson: JSON.stringify(response), responseSha256: 'c'.repeat(64), contractVersion: 'c1' } });
+  const trace = await db.generationTrace.create({ data: { conversationId: conversation.id, assistantMessageId, userMessageId, stage: 1, modelVersionId: model.id, modelTagSnapshot: model.tag, providerSnapshot: 'test', externalModelSnapshot: 'test-model', promptVersion: 'p1', promptSha256: 'a'.repeat(64), trainingSystemPromptSnapshot: `阶段1完整上下文：${student.displayName}`, styleFamily: 'classroom_coach', stylePolicyVersion: 'style-v1', requestMessageSha256: 'b'.repeat(64), responseJson: JSON.stringify(response), responseSha256: 'c'.repeat(64), contractVersion: 'c1' } });
+  const systemAssistantMessageId = randomUUID();
+  const systemTrace = await db.generationTrace.create({
+    data: {
+      conversationId: conversation.id,
+      assistantMessageId: systemAssistantMessageId,
+      userMessageId: randomUUID(),
+      triggerType: 'STAGE_TRANSITION',
+      stage: 4,
+      modelVersionId: model.id,
+      modelTagSnapshot: model.tag,
+      providerSnapshot: 'test',
+      externalModelSnapshot: 'test-model',
+      promptVersion: 'p4',
+      promptSha256: 'd'.repeat(64),
+      systemPromptSnapshot: '阶段4主动过渡提示词',
+      styleFamily: 'classroom_coach',
+      stylePolicyVersion: 'style-v1',
+      requestMessageSha256: 'e'.repeat(64),
+      responseJson: JSON.stringify(response),
+      responseSha256: 'f'.repeat(64),
+      contractVersion: 'stage-contract-v2',
+    },
+  });
+  let systemTraceRejected = false;
+  try {
+    await nominateProductionCandidate({ studentAssignmentId: studentAssignment.id, assistantMessageId: systemAssistantMessageId, teacherId: teacher.id, triggerType: 'TEACHER_NOMINATION' });
+  } catch (error) {
+    systemTraceRejected = error instanceof Error && error.message.includes('系统主动生成');
+  }
+  check(systemTraceRejected, '系统触发的阶段消息不能进入生产候选池');
+
+  const legacyTraceAssistantMessageId = randomUUID();
+  const legacyTrace = await db.generationTrace.create({
+    data: {
+      conversationId: conversation.id,
+      assistantMessageId: legacyTraceAssistantMessageId,
+      userMessageId: randomUUID(),
+      stage: 1,
+      modelVersionId: model.id,
+      modelTagSnapshot: model.tag,
+      providerSnapshot: 'test',
+      externalModelSnapshot: 'test-model',
+      promptVersion: 'p1',
+      promptSha256: '1'.repeat(64),
+      styleFamily: 'classroom_coach',
+      stylePolicyVersion: 'style-v1',
+      requestMessageSha256: '2'.repeat(64),
+      responseJson: JSON.stringify(response),
+      responseSha256: '3'.repeat(64),
+      contractVersion: 'c1',
+    },
+  });
+  let legacyContextRejected = false;
+  try {
+    await nominateProductionCandidate({ studentAssignmentId: studentAssignment.id, assistantMessageId: legacyTraceAssistantMessageId, teacherId: teacher.id, triggerType: 'TEACHER_NOMINATION' });
+  } catch (error) {
+    legacyContextRejected = error instanceof Error && error.message.includes('完整训练上下文');
+  }
+  check(legacyContextRejected, '缺少经授权完整上下文的历史轨迹不能进入正向训练候选池');
+
   const teacherSession: SessionUser = { id: teacher.id, username: teacher.username, displayName: teacher.displayName, role: 'teacher' };
   const adminSession: SessionUser = { id: admin.id, username: admin.username, displayName: admin.displayName, role: 'admin' };
 
@@ -58,6 +118,8 @@ async function main() {
   check(candidate.status === 'NOMINATED', '教师提名进入隔离候选池');
   check(!candidate.redactedRecordJson.includes(student.displayName), '候选快照不含学生显示名');
   check(!candidate.redactedRecordJson.includes(klass.name), '候选快照不含班级名');
+  check(candidate.redactedRecordJson.includes('阶段1完整上下文'), '候选快照保留模型当轮实际可见上下文');
+  check(candidate.redactedRecordJson.includes('我先观察了第一组'), '候选快照保留脱敏后的模型可见对话历史');
   await reviewProductionCandidate({ id: candidate.id, action: 'APPROVE', adminId: admin.id });
   const batchName = `production-batch-${suffix}`;
   const converted = await convertProductionCandidates({ ids: [candidate.id], batchName, adminId: admin.id });
@@ -76,7 +138,7 @@ async function main() {
   await db.annotationCampaign.delete({ where: { id: campaign.id } });
   await db.productionCandidate.delete({ where: { id: candidate.id } });
   await db.datasetBatch.delete({ where: { id: converted.batch.id } });
-  await db.generationTrace.delete({ where: { id: trace.id } });
+  await db.generationTrace.deleteMany({ where: { id: { in: [trace.id, systemTrace.id, legacyTrace.id] } } });
   await db.studentAssignment.delete({ where: { id: studentAssignment.id } });
   await db.conversation.delete({ where: { id: conversation.id } });
   await db.assignment.delete({ where: { id: assignment.id } });

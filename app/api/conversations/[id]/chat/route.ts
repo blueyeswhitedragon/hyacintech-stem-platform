@@ -26,16 +26,42 @@ function buildContext(stage: number, conv: {
   const styleContext: PromptContext = {
     styleFamily: conv.styleFamily,
     stylePolicyVersion: conv.stylePolicyVersion,
+    triggerType: 'USER_MESSAGE',
   };
   switch (stage) {
     case PhaseEnum.TopicSelection:
       return conv.topicDirection ? { ...styleContext, topicDirection: conv.topicDirection } : styleContext;
+    case PhaseEnum.PlanDesign:
+      return {
+        ...styleContext,
+        priorSummary: buildPriorSummary(conv.stageData),
+      };
     case PhaseEnum.Execution:
-      return conv.safetyQuizCompleted ? styleContext : { ...styleContext, needSafetyQuiz: true };
+      return {
+        ...styleContext,
+        priorSummary: buildPriorSummary(conv.stageData),
+        ...(conv.safetyQuizCompleted
+          ? {}
+          : { needSafetyQuiz: true, triggerType: 'STAGE_ENTER' as const }),
+      };
     case PhaseEnum.DataAnalysis:
-      return { ...styleContext, dataRows: conv.stageData.stage3?.rows ?? [] };
+      return {
+        ...styleContext,
+        dataRows: conv.stageData.stage3?.rows ?? [],
+        dataSchema: conv.stageData.stage2?.schema,
+      };
     case PhaseEnum.ResultsFormation:
-      return { ...styleContext, priorSummary: buildPriorSummary(conv.stageData) };
+      return {
+        ...styleContext,
+        priorSummary: buildPriorSummary(conv.stageData),
+        triggerType: conv.stageData.stage5?.sections ? 'USER_MESSAGE' : 'REPORT_BOOTSTRAP',
+      };
+    case PhaseEnum.Reflection:
+      return {
+        ...styleContext,
+        priorSummary: buildPriorSummary(conv.stageData),
+        triggerType: 'OPTIONAL_COACHING',
+      };
     default:
       return styleContext;
   }
@@ -95,19 +121,22 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       promptPolicyVersion: modelVersion.promptPolicyVersion,
       contractVersion: modelVersion.contractVersion,
     };
+    const visibleContext = stage === PhaseEnum.DataAnalysis
+      ? JSON.stringify({ schema: context?.dataSchema, rows: context?.dataRows ?? [], rowNumbers: (context?.dataRows ?? []).map((_, index) => index + 1) })
+      : JSON.stringify({ stageData: conv.stageData, priorSummary: context?.priorSummary });
     const llmResult = await callLLMWithTrace(systemPrompt, message, conv.messages, {
       stage,
       hasStage2Schema: (conv.stageData.stage2?.schema.columns.length ?? 0) > 0,
+      triggerType: context?.triggerType ?? 'USER_MESSAGE',
+      visibleContext,
     }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
     const response = llmResult.response;
 
     // 结构化提取（纯函数）
-    const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData);
-
-    // 阶段4：每发一条学生消息，分析轮次 +1
-    if (conv.currentStage === 4) {
-      stageData.stage4 = { analysisCount: (conv.stageData.stage4?.analysisCount ?? 0) + 1 };
-    }
+    const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData, {
+      studentMessage: message,
+      dataRows: conv.stageData.stage3?.rows ?? [],
+    });
 
     // 记录本阶段轮次
     stageData.roundCounts = { ...prevRounds, [stage]: roundCount };
@@ -153,6 +182,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       assistantMessageId: assistantMessage.id,
       userMessage: message,
       systemPrompt,
+      trainingSystemPromptSnapshot: conv.dataConsentStatus === 'GRANTED' ? systemPrompt : '',
       response,
       modelVersionId: modelVersion.id,
       modelIdentity,
@@ -160,6 +190,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       stylePolicyVersion: conv.stylePolicyVersion,
       generationParams: llmResult.trace.generationParams,
       contractCheck: llmResult.trace.contractCheck,
+      triggerType: context?.triggerType ?? 'USER_MESSAGE',
     });
 
     return NextResponse.json({ ...response, currentStage: nextStage, stageData });

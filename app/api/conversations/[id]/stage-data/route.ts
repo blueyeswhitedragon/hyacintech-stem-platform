@@ -63,7 +63,11 @@ export async function PATCH(req: Request, ctx: RouteContext<'/api/conversations/
     if (!Array.isArray(body.stage3.rows)) {
       return NextResponse.json({ error: 'rows 必须为数组' }, { status: 400 });
     }
+    if (!conv.safetyQuizCompleted && conv.stageData.stage3?.safetyQuiz?.passed !== true) {
+      return NextResponse.json({ error: '请先完成并通过本实验的安全问答，再录入数据' }, { status: 400 });
+    }
     stageData.stage3 = {
+      ...conv.stageData.stage3,
       rows: body.stage3.rows,
       fileAssociations: Array.isArray(body.stage3.fileAssociations)
         ? body.stage3.fileAssociations

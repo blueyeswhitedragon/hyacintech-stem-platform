@@ -24,13 +24,11 @@ import { DEFAULT_STYLE_POLICY_VERSION, isStyleFamily, type StyleFamily } from '@
 import {
   resolveRecordStyle,
   summarizeStyles,
-  toTrainingShareGPTRecord,
+  toTrainingShareGPTRecords,
   withStyleMetadata,
   type RecordStyle,
 } from './styleMetadata';
 import {
-  applyRevision,
-  assertRevisionIntent,
   canonicalizeRecord,
   familyKey,
   parseAssistantResponse,
@@ -38,22 +36,28 @@ import {
   parseShareGPTDataset,
   normalizeLegacyEmptyStage2Schemas,
   sha256,
+  validateAnnotationRevision,
   validateShareGPTRecord,
 } from './validation';
 import {
-  assertTransformationType,
   buildPreferenceRecord,
-  computeTransformationMetrics,
   evaluateTrainingEligibility,
   TRAINING_POLICY_VERSION,
 } from '@/app/lib/trainingEligibility';
 import { refreshModelDeploymentGate } from '@/app/lib/deployment';
+import {
+  DATASET_BATCH_STATUSES,
+  isTrainableBatchStatus,
+  resolveImportedBatchStatus,
+} from './datasetPolicy';
 
 const DATA_LAB_ROLES: UserRole[] = ['annotator', 'reviewer', 'admin'];
 const REVIEW_ROLES: UserRole[] = ['reviewer', 'admin'];
 const ADMIN_ROLES: UserRole[] = ['admin'];
 const LEASE_MS = 45 * 60 * 1000;
-const RELEASE_DIR = path.join(process.cwd(), 'data/releases');
+const RELEASE_DIR = process.env.DATA_LAB_USE_TEST_RELEASE_DIR === 'true'
+  ? path.join(process.cwd(), 'tmp', 'data-lab-releases')
+  : path.join(process.cwd(), 'data', 'releases');
 
 export function canUseDataLab(role: UserRole) {
   return DATA_LAB_ROLES.includes(role);
@@ -87,10 +91,21 @@ export async function importDatasetBatch(input: {
   sourceFileName: string;
   raw: string;
   manifest?: unknown;
+  status?: string;
   user: SessionUser;
 }) {
   const records = parseShareGPTDataset(input.raw).map(canonicalizeRecord);
   const fileSha = sha256(input.raw);
+  if (input.status && !DATASET_BATCH_STATUSES.includes(input.status as (typeof DATASET_BATCH_STATUSES)[number])) {
+    throw new Error(`未知批次状态：${input.status}`);
+  }
+  const policy = resolveImportedBatchStatus({
+    name: input.name,
+    sourceFileName: input.sourceFileName,
+    recordIds: records.map((record) => record.id),
+    requestedStatus: input.status as (typeof DATASET_BATCH_STATUSES)[number] | undefined,
+  });
+  const effectiveStatus = policy.status;
   const seen = new Set<string>();
   for (const record of records) {
     if (seen.has(record.id)) throw new Error(`导入文件存在重复 ID：${record.id}`);
@@ -112,6 +127,10 @@ export async function importDatasetBatch(input: {
   });
   const summary = {
     records: records.length,
+    usagePolicy: {
+      status: effectiveStatus,
+      reason: policy.reason,
+    },
     byPhase,
     byTier,
     autoCheck: {
@@ -128,6 +147,7 @@ export async function importDatasetBatch(input: {
         sourceType: input.sourceType,
         sourceFileName: input.sourceFileName,
         sourceSha256: fileSha,
+        status: effectiveStatus,
         manifestJson: JSON.stringify(input.manifest ?? {}),
         summaryJson: JSON.stringify(summary),
         importedById: input.user.id,
@@ -238,6 +258,17 @@ export async function createCampaign(input: {
   participants?: CampaignParticipantInput[];
   user: SessionUser;
 }) {
+  if (input.selection.batchIds?.length) {
+    const selectedBatches = await db.datasetBatch.findMany({
+      where: { id: { in: input.selection.batchIds } },
+      select: { id: true, name: true, status: true },
+    });
+    if (selectedBatches.length !== input.selection.batchIds.length) throw new Error('选择的数据批次不存在');
+    const blocked = selectedBatches.filter((batch) => !isTrainableBatchStatus(batch.status));
+    if (blocked.length) {
+      throw new Error(`以下批次已隔离，不能下发标注任务：${blocked.map((batch) => batch.name).join('、')}`);
+    }
+  }
   const participantMap = new Map((input.participants ?? []).map((item) => [item.userId, Math.max(0, Math.floor(item.taskLimit ?? 0))]));
   const participantIds = [...participantMap.keys()];
   if (participantIds.length > 0) {
@@ -274,7 +305,8 @@ export async function startCampaign(id: string, user: SessionUser) {
   if (campaign.status !== 'DRAFT') throw new Error('只有草稿活动可以启动');
   const selection = parseJson<CampaignSelection>(campaign.selectionJson, {});
   const styles = parseJson<StyleQuota>(campaign.styleQuotaJson, Object.fromEntries(STYLE_FAMILIES.map((style) => [style, 1])) as StyleQuota);
-  const matchedSamples = (await db.datasetSample.findMany({ include: { productionCandidate: { select: { status: true } } }, orderBy: [{ phase: 'asc' }, { sourceRecordId: 'asc' }] }))
+  const matchedSamples = (await db.datasetSample.findMany({ include: { batch: { select: { status: true } }, productionCandidate: { select: { status: true } } }, orderBy: [{ phase: 'asc' }, { sourceRecordId: 'asc' }] }))
+    .filter((sample) => isTrainableBatchStatus(sample.batch.status))
     .filter((sample) => !sample.productionCandidate || sample.productionCandidate.status === 'CONVERTED')
     .filter((sample) => selectedByCampaign(sample, selection));
   const samples = stratifiedCampaignSamples(matchedSamples, selection.limit);
@@ -657,22 +689,50 @@ export async function saveTaskDraft(taskId: string, input: RevisionInput, user: 
   }
 }
 
+export class AnnotationValidationError extends Error {
+  constructor(public readonly check: AutoCheckResult) {
+    super(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；') || '修订未通过校验');
+    this.name = 'AnnotationValidationError';
+  }
+}
+
+function validateTaskRevision(
+  task: { sample: { originalRecordJson: string }; styleFamily: string | null; stylePolicyVersion: string },
+  input: RevisionInput,
+) {
+  const original = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
+  return validateAnnotationRevision(original, input, {
+    mode: 'submit',
+    styleFamily: isStyleFamily(task.styleFamily) ? task.styleFamily : null,
+    stylePolicyVersion: task.stylePolicyVersion,
+  });
+}
+
+/** 只读预检：不保存草稿、不续租、不写审计日志。 */
+export async function validateAnnotationTaskRevision(taskId: string, input: RevisionInput, user: SessionUser) {
+  const task = await db.annotationTask.findUnique({
+    where: { id: taskId },
+    include: { sample: true, campaign: { select: { status: true } } },
+  });
+  if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS' || task.campaign.status !== 'ACTIVE') {
+    throw new Error('任务不可校验，所属活动可能已经结束');
+  }
+  return validateTaskRevision(task, input).check;
+}
+
 export async function submitAnnotationTask(taskId: string, input: RevisionInput, user: SessionUser) {
   const task = await db.annotationTask.findUnique({ where: { id: taskId }, include: { sample: true } });
   if (!task || task.assignedToId !== user.id || task.status !== 'IN_PROGRESS') throw new Error('任务不可提交');
-  const normalizedInput = normalizeLegacyEmptyStage2Schemas(input).input;
-  const original = parseJson<ShareGPTRecord>(task.sample.originalRecordJson, {} as ShareGPTRecord);
-  assertRevisionIntent(original, normalizedInput);
-  const style = resolveRecordStyle(original, task.styleFamily, task.stylePolicyVersion);
-  const revised = withStyleMetadata(applyRevision(original, normalizedInput), style);
-  const transformationType: TransformationType = normalizedInput.transformationType
-    && TRANSFORMATION_TYPES.includes(normalizedInput.transformationType)
-      ? normalizedInput.transformationType
-      : normalizedInput.noChange ? 'NO_CHANGE' : 'LIGHT_EDIT';
-  const transformationMetrics = computeTransformationMetrics(original, revised);
-  assertTransformationType(transformationType, transformationMetrics);
-  const check = validateShareGPTRecord(revised, 'submit');
-  if (check.status === 'error') throw new Error(check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；'));
+  const validation = validateTaskRevision(task, input);
+  if (validation.check.status === 'error' || !validation.revisedRecord || !validation.transformationType || !validation.transformationMetrics) {
+    throw new AnnotationValidationError(validation.check);
+  }
+  const normalizedInput = validation.normalizedInput;
+  const revised = validation.revisedRecord;
+  const transformationType = validation.transformationType;
+  const transformationMetrics = validation.transformationMetrics;
+  const check = validation.check;
+  const style = resolveRecordStyle(revised, task.styleFamily, task.stylePolicyVersion);
 
   const revision = await db.$transaction(async (tx) => {
     const currentTask = await tx.annotationTask.findFirst({
@@ -769,6 +829,10 @@ export async function reviewAnnotationWork(input: {
   }
 
   if (input.status === 'APPROVED') {
+    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(review.revision.fullRecordJson, {} as ShareGPTRecord), 'submit');
+    if (check.status === 'error') {
+      throw new AnnotationValidationError(check);
+    }
     const duplicate = await db.annotationWorkReview.count({
       where: {
         id: { not: review.id },
@@ -857,6 +921,7 @@ export async function workloadDashboard() {
   const items = rows.slice(0, 300).map((row) => {
     const record = parseJson<ShareGPTRecord>(row.revision.fullRecordJson, {} as ShareGPTRecord);
     const preview = record.conversations.filter((message) => message.from === 'gpt').slice(0, 4).map((message) => parseAssistantResponse(message.value)?.dialogue ?? message.value);
+    const check = validateShareGPTRecord(record, 'submit');
     return {
       id: row.id,
       taskId: row.taskId,
@@ -871,6 +936,7 @@ export async function workloadDashboard() {
       note: row.note,
       reviewer: row.reviewer,
       preview,
+      check,
     };
   });
   return {
@@ -1014,7 +1080,10 @@ async function reviewPayload(reviewCaseId: string, reviewerId: string) {
     conversations: record.conversations,
   });
   const candidates = revisions
-    .map((revision) => ({ id: revision.id, record: anonymize(parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord)) }))
+    .map((revision) => {
+      const fullRecord = parseJson<ShareGPTRecord>(revision.fullRecordJson, {} as ShareGPTRecord);
+      return { id: revision.id, record: anonymize(fullRecord), check: validateShareGPTRecord(fullRecord, 'submit') };
+    })
     .sort((a, b) => sha256(`${item.id}:${a.id}`).localeCompare(sha256(`${item.id}:${b.id}`)))
     .map((candidate, index) => ({ label: String.fromCharCode(65 + index), ...candidate }));
   const styleFamilies = [...new Set(revisions.map((revision) => revision.task.styleFamily).filter(isStyleFamily))];
@@ -1101,15 +1170,17 @@ export async function decideReview(input: {
     const syntheticTask = await db.annotationTask.findFirst({ where: { campaignId: reviewCase.campaignId, sampleId: reviewCase.sampleId }, orderBy: { slot: 'asc' } });
     if (!syntheticTask) throw new Error('缺少关联标注任务');
     const style = resolveRecordStyle(original, syntheticTask.styleFamily, syntheticTask.stylePolicyVersion);
-    const mergedRecord = withStyleMetadata(applyRevision(original, input.mergedInput), style);
-    const mergedMetrics = computeTransformationMetrics(original, mergedRecord);
-    const mergedType: TransformationType = input.mergedInput.transformationType
-      && TRANSFORMATION_TYPES.includes(input.mergedInput.transformationType)
-      ? input.mergedInput.transformationType
-      : mergedMetrics.recommendedType;
-    assertTransformationType(mergedType, mergedMetrics);
-    const check = validateShareGPTRecord(mergedRecord, 'submit');
-    if (check.status === 'error') throw new Error('合并版本未通过自动检查');
+    const validation = validateAnnotationRevision(original, input.mergedInput, {
+      mode: 'submit',
+      styleFamily: style.styleFamily,
+      stylePolicyVersion: style.stylePolicyVersion,
+    });
+    if (validation.check.status === 'error' || !validation.revisedRecord || !validation.transformationType || !validation.transformationMetrics) {
+      throw new AnnotationValidationError(validation.check);
+    }
+    const mergedRecord = validation.revisedRecord;
+    const mergedMetrics = validation.transformationMetrics;
+    const mergedType = validation.transformationType;
     const revision = await db.annotationRevision.create({
       data: {
         taskId: syntheticTask.id,
@@ -1133,7 +1204,7 @@ export async function decideReview(input: {
   if (input.action === 'SELECT' && input.selectedRevisionId) {
     const selected = await db.annotationRevision.findUnique({ where: { id: input.selectedRevisionId } });
     if (!selected) throw new Error('所选 revision 不存在');
-    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(selected.fullRecordJson, {} as ShareGPTRecord), 'release');
+    const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(selected.fullRecordJson, {} as ShareGPTRecord), 'submit');
     if (check.status === 'error') {
       throw new Error(`所选版本未通过结构契约：${check.issues.filter((item) => item.severity === 'error').map((item) => item.message).join('；')}`);
     }
@@ -1254,6 +1325,14 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
   const candidates = await releaseCandidates(release.campaignId);
   const selected = candidates.filter((item) => item.tier === 'human_gold' ? recipe.includeHumanGold : recipe.includeReviewedSilver);
   if (selected.length === 0) throw new Error('没有符合发布条件的人工审定样本');
+  const selectedSamples = await db.datasetSample.findMany({
+    where: { id: { in: selected.map((item) => item.sampleId) } },
+    include: { batch: { select: { name: true, status: true } } },
+  });
+  const quarantined = selectedSamples.filter((sample) => !isTrainableBatchStatus(sample.batch.status));
+  if (quarantined.length > 0) {
+    throw new Error(`发布集中包含 ${quarantined.length} 条隔离数据，来源批次：${[...new Set(quarantined.map((sample) => sample.batch.name))].join('、')}`);
+  }
   const invalid = selected.flatMap((item) => {
     const check = validateShareGPTRecord(parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord), 'release');
     return check.issues
@@ -1271,6 +1350,7 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
       db.datasetSample.findUnique({
         where: { id: item.sampleId },
         include: {
+          batch: { select: { status: true } },
           productionCandidate: {
             include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } },
           },
@@ -1284,6 +1364,8 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
     const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(revision.transformationMetricsJson, {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
     const result = evaluateTrainingEligibility({
       sourceKind: sample.sourceKind,
+      batchStatus: sample.batch.status,
+      stageContractVersion: parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord).meta?.stageContractVersion as string | undefined,
       candidateStatus: candidate?.status,
       consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus,
       leakageBlocked: leakage.blocked,
@@ -1295,7 +1377,7 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
     return { item, sample, revision, candidate, metrics, ...result };
   }));
   const eligibleSelected = eligibilityItems.filter((entry) => entry.eligibility === 'SFT_ALLOWED');
-  const training = eligibleSelected.map(({ item }) => toTrainingShareGPTRecord(
+  const training = eligibleSelected.flatMap(({ item }) => toTrainingShareGPTRecords(
     parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord),
     { styleFamily: item.styleFamily, stylePolicyVersion: item.stylePolicyVersion },
   ));
@@ -1450,7 +1532,7 @@ export async function createTrainingRun(input: {
   const requestedStatus = input.status ?? 'DRAFT';
   const release = await db.datasetRelease.findUnique({
     where: { id: input.releaseId },
-    include: { items: { include: { sample: { include: { productionCandidate: { include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } } } } }, revision: { include: { workReview: true } } } } },
+    include: { items: { include: { sample: { include: { batch: true, productionCandidate: { include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } } } } }, revision: { include: { workReview: true } } } } },
   });
   if (!release || release.status !== 'FROZEN') throw new Error('训练只能使用已冻结数据版本');
   if (requestedStatus !== 'DRAFT' && !input.parentModelVersionId) throw new Error('提交或运行训练前必须选择父模型版本');
@@ -1459,7 +1541,8 @@ export async function createTrainingRun(input: {
     const candidate = item.sample.productionCandidate;
     const leakage = candidate ? parseJson<{ blocked?: boolean }>(candidate.leakageCheckJson, {}) : {};
     const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(item.revision?.transformationMetricsJson ?? '{}', {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
-    return evaluateTrainingEligibility({ sourceKind: item.sample.sourceKind, candidateStatus: candidate?.status, consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus, leakageBlocked: leakage.blocked, transformationType: item.revision?.transformationType, metrics, workReviewApproved: item.revision?.workReview?.status === 'APPROVED' || Boolean(candidate), finallySelected: true });
+    const record = parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord);
+    return evaluateTrainingEligibility({ sourceKind: item.sample.sourceKind, batchStatus: item.sample.batch.status, stageContractVersion: record.meta?.stageContractVersion as string | undefined, candidateStatus: candidate?.status, consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus, leakageBlocked: leakage.blocked, transformationType: item.revision?.transformationType, metrics, workReviewApproved: item.revision?.workReview?.status === 'APPROVED' || Boolean(candidate), finallySelected: true });
   });
   const report = { policyVersion: TRAINING_POLICY_VERSION, checkedAt: new Date().toISOString(), parentModelVersionId: input.parentModelVersionId ?? null, sftAllowed: results.filter((result) => result.eligibility === 'SFT_ALLOWED').length, monitoringOnly: results.filter((result) => result.eligibility === 'MONITORING_ONLY').length, blocked: results.filter((result) => result.eligibility === 'BLOCKED').length, reasons: [...new Set(results.flatMap((result) => result.reasons))] };
   if (requestedStatus !== 'DRAFT' && (report.blocked > 0 || report.sftAllowed === 0)) throw new Error(`训练资格检查未通过：可训练 ${report.sftAllowed}，阻断 ${report.blocked}；${report.reasons.join('、')}`);

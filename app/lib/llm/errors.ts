@@ -138,11 +138,14 @@ function classifyHttpError(status: number, body: string): ClassifiedError {
 export class LLMError extends Error {
   code: ErrorCode;
   httpStatus: number;
+  /** Internal-only generation diagnostics. API error classifiers intentionally do not expose it. */
+  diagnostics?: unknown;
 
-  constructor(code: ErrorCode, detail: string, httpStatus: number) {
+  constructor(code: ErrorCode, detail: string, httpStatus: number, diagnostics?: unknown) {
     super(detail);
     this.name = 'LLMError';
     this.code = code;
     this.httpStatus = httpStatus;
+    this.diagnostics = diagnostics;
   }
 }

@@ -1,0 +1,6200 @@
+{
+  "schemaVersion": 3,
+  "stageContractVersion": "stage-contract-v2",
+  "createdAt": "2026-07-14T07:38:43.312Z",
+  "sourceFile": "data\\sft\\sharegpt-distill-dsv4-all-clean.json",
+  "sourceUsage": "SCENARIO_SEEDS_ONLY",
+  "tasks": [
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-high-concept-mars-light-v1-0887ad0be6-v1",
+      "cellKey": "P1:socratic_concise",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-high-concept-mars-light-v1-0887ad0be6-v1",
+      "familyKey": "high-concept-mars-light",
+      "phase": 1,
+      "scenario": "高概念降级型-火星基地植物",
+      "styleFamily": "socratic_concise",
+      "triggerType": "USER_MESSAGE",
+      "domainSpec": {
+        "researchQuestion": "每日人工光照时长如何影响第7天幼苗株高？",
+        "hypothesis": "不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。",
+        "independentVariable": {
+          "name": "每日人工光照时长",
+          "levels": [
+            "4 h",
+            "8 h",
+            "12 h"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第7天幼苗株高",
+          "measurement": "第7天从土面到幼苗顶端测量高度",
+          "unit": "mm",
+          "reasonableRange": [
+            0,
+            160
+          ]
+        },
+        "controlledVariables": [
+          "绿豆数量",
+          "土壤质量",
+          "每日浇水量",
+          "灯距"
+        ],
+        "materials": [
+          "绿豆",
+          "相同花盆",
+          "土壤",
+          "LED灯",
+          "刻度尺"
+        ],
+        "procedure": [
+          "播种等量绿豆",
+          "分别设置三种每日光照时长",
+          "每天同一时间浇等量水",
+          "第7天测量株高"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "避免直视LED灯",
+          "浇水时先切断灯具电源"
+        ],
+        "dataPattern": "rising",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "high_concept",
+        "openingMessage": "我对“高概念降级型-火星基地植物”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“高概念降级型-火星基地植物”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "decisionFacts": [
+          "我真正感兴趣的是每日人工光照时长与观察现象之间的关系，但尚未决定水平、测量或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "火星基地植物生存",
+          "retainedFeature": "基地环境条件需要人工控制",
+          "classroomProxy": "不同人工光照时长",
+          "researchQuestion": "不同人工光照时长是否影响绿豆发芽和早期生长？",
+          "independentVariable": "人工光照时长",
+          "dependentDirection": "发芽和早期生长情况",
+          "safetyNotes": [
+            "人工光源用LED，不用高压灯具"
+          ],
+          "mustKeepTerms": [
+            [
+              "火星"
+            ],
+            [
+              "基地"
+            ],
+            [
+              "人工",
+              "控制"
+            ]
+          ],
+          "proxyTerms": [
+            [
+              "人工",
+              "光照"
+            ],
+            [
+              "光照",
+              "时长"
+            ]
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "每日人工光照时长如何影响第7天幼苗株高？",
+          "hypothesis": "不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。",
+          "independentVariable": {
+            "name": "每日人工光照时长",
+            "levels": [
+              "4 h",
+              "8 h",
+              "12 h"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第7天幼苗株高",
+            "measurement": "第7天从土面到幼苗顶端测量高度",
+            "unit": "mm",
+            "reasonableRange": [
+              0,
+              160
+            ]
+          },
+          "controlledVariables": [
+            "绿豆数量",
+            "土壤质量",
+            "每日浇水量",
+            "灯距"
+          ],
+          "materials": [
+            "绿豆",
+            "相同花盆",
+            "土壤",
+            "LED灯",
+            "刻度尺"
+          ],
+          "procedure": [
+            "播种等量绿豆",
+            "分别设置三种每日光照时长",
+            "每天同一时间浇等量水",
+            "第7天测量株高"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "避免直视LED灯",
+            "浇水时先切断灯具电源"
+          ],
+          "dataPattern": "rising",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "theme_loss",
+          "proxy_drift",
+          "weak_confirmation_doc"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "structure_compliance",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-safety-acid-rain-plant-v1-8604030f90-v1",
+      "cellKey": "P2:socratic_concise",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-safety-acid-rain-plant-v1-8604030f90-v1",
+      "familyKey": "safety-acid-rain-plant",
+      "phase": 2,
+      "scenario": "安全风险型-酸雨与植物",
+      "styleFamily": "socratic_concise",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "白醋稀释液pH如何影响第5天发芽率？",
+        "hypothesis": "不同白醋稀释液pH水平会使第5天发芽率出现可测差异。",
+        "independentVariable": {
+          "name": "白醋稀释液pH",
+          "levels": [
+            "pH 4.5",
+            "pH 5.5",
+            "pH 6.5"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第5天发芽率",
+          "measurement": "以胚根突破种皮为已发芽；第5天统计已发芽种子数并计算百分比",
+          "unit": "%",
+          "reasonableRange": [
+            0,
+            100
+          ]
+        },
+        "controlledVariables": [
+          "绿豆数量",
+          "培养温度",
+          "每日溶液体积",
+          "光照时长"
+        ],
+        "materials": [
+          "绿豆",
+          "白醋稀释液",
+          "培养皿",
+          "滴管",
+          "pH试纸"
+        ],
+        "procedure": [
+          "配制并核对三种pH稀释液",
+          "每皿放入相同数量绿豆",
+          "每天加入相同体积对应溶液",
+          "第5天按胚根突破种皮的标准统计发芽数"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "只使用教师配制的白醋稀释液并佩戴护目镜",
+          "液体接触皮肤后立即用清水冲洗"
+        ],
+        "dataPattern": "falling",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "safety_risk",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“安全风险型-酸雨与植物”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择白醋稀释液pH，具体水平为pH 4.5、pH 5.5、pH 6.5。",
+          "我提出的假设是：不同白醋稀释液pH水平会使第5天发芽率出现可测差异。",
+          "我要测量第5天发芽率：以胚根突破种皮为已发芽；第5天统计已发芽种子数并计算百分比，单位%。",
+          "我会控制绿豆数量、培养温度、每日溶液体积、光照时长。",
+          "我选择的材料是绿豆、白醋稀释液、培养皿、滴管、pH试纸。",
+          "我确认的步骤是配制并核对三种pH稀释液；每皿放入相同数量绿豆；每天加入相同体积对应溶液；第5天按胚根突破种皮的标准统计发芽数。",
+          "每个水平重复3次；安全要求是只使用教师配制的白醋稀释液并佩戴护目镜、液体接触皮肤后立即用清水冲洗。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】白醋稀释液pH如何影响第5天发芽率？\n【因素与现象方向】拟改变：白醋稀释液pH；关注：第5天发芽率"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "酸雨对植物的危害",
+          "retainedFeature": "酸性程度影响植物生长",
+          "classroomProxy": "不同pH的稀酸溶液（白醋调配，远离强酸）",
+          "researchQuestion": "不同酸度的稀酸溶液是否影响绿豆发芽？",
+          "independentVariable": "稀酸溶液pH",
+          "dependentDirection": "发芽和生长情况",
+          "safetyNotes": [
+            "严禁使用强酸（硫酸/盐酸），用白醋调配稀溶液",
+            "佩戴护目镜和手套",
+            "不直接接触或闻溶液"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "白醋稀释液pH如何影响第5天发芽率？",
+          "hypothesis": "不同白醋稀释液pH水平会使第5天发芽率出现可测差异。",
+          "independentVariable": {
+            "name": "白醋稀释液pH",
+            "levels": [
+              "pH 4.5",
+              "pH 5.5",
+              "pH 6.5"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第5天发芽率",
+            "measurement": "以胚根突破种皮为已发芽；第5天统计已发芽种子数并计算百分比",
+            "unit": "%",
+            "reasonableRange": [
+              0,
+              100
+            ]
+          },
+          "controlledVariables": [
+            "绿豆数量",
+            "培养温度",
+            "每日溶液体积",
+            "光照时长"
+          ],
+          "materials": [
+            "绿豆",
+            "白醋稀释液",
+            "培养皿",
+            "滴管",
+            "pH试纸"
+          ],
+          "procedure": [
+            "配制并核对三种pH稀释液",
+            "每皿放入相同数量绿豆",
+            "每天加入相同体积对应溶液",
+            "第5天按胚根突破种皮的标准统计发芽数"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "只使用教师配制的白醋稀释液并佩戴护目镜",
+            "液体接触皮肤后立即用清水冲洗"
+          ],
+          "dataPattern": "falling",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "safety_softness"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-cooperative-light-color-v1-58131fe096-v1",
+      "cellKey": "P3:socratic_concise",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-cooperative-light-color-v1-58131fe096-v1",
+      "familyKey": "cooperative-light-color",
+      "phase": 3,
+      "scenario": "配合型-光色与绿豆发芽",
+      "styleFamily": "socratic_concise",
+      "triggerType": "STAGE_ENTER",
+      "domainSpec": {
+        "researchQuestion": "光的颜色如何影响第4天发芽数？",
+        "hypothesis": "不同光的颜色水平会使第4天发芽数出现可测差异。",
+        "independentVariable": {
+          "name": "光的颜色",
+          "levels": [
+            "红光",
+            "蓝光",
+            "白光"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第4天发芽数",
+          "measurement": "以胚根突破种皮为已发芽；第4天统计每皿已发芽绿豆数量",
+          "unit": "粒",
+          "reasonableRange": [
+            0,
+            20
+          ]
+        },
+        "controlledVariables": [
+          "每皿绿豆数量",
+          "光照时长",
+          "灯距",
+          "浇水量"
+        ],
+        "materials": [
+          "绿豆",
+          "培养皿",
+          "红蓝白LED灯",
+          "滴管"
+        ],
+        "procedure": [
+          "将等量绿豆分入培养皿",
+          "分别置于三种颜色灯光下",
+          "每天同一时间补充等量清水",
+          "第4天统计发芽数"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "避免直视LED灯",
+          "电源和滴水区域保持分离"
+        ],
+        "dataPattern": "weak_trend",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与已审核风险相关的安全问答。",
+        "brief": [
+          "我正在做“配合型-光色与绿豆发芽”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择光的颜色，具体水平为红光、蓝光、白光。",
+          "我提出的假设是：不同光的颜色水平会使第4天发芽数出现可测差异。",
+          "我要测量第4天发芽数：以胚根突破种皮为已发芽；第4天统计每皿已发芽绿豆数量，单位粒。",
+          "我会控制每皿绿豆数量、光照时长、灯距、浇水量。",
+          "我选择的材料是绿豆、培养皿、红蓝白LED灯、滴管。",
+          "我确认的步骤是将等量绿豆分入培养皿；分别置于三种颜色灯光下；每天同一时间补充等量清水；第4天统计发芽数。",
+          "每个水平重复3次；安全要求是避免直视LED灯、电源和滴水区域保持分离。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】光的颜色如何影响第4天发芽数？\n【已确认假设】不同光的颜色水平会使第4天发芽数出现可测差异。\n【已审核变量】自变量：光的颜色；水平：红光、蓝光、白光；因变量：第4天发芽数；测量：以胚根突破种皮为已发芽；第4天统计每皿已发芽绿豆数量；单位：粒\n【已审核控制变量】每皿绿豆数量、光照时长、灯距、浇水量\n【已审核重复次数】每个水平3次\n【已审核安全】避免直视LED灯、电源和滴水区域保持分离\n【已审核材料】绿豆、培养皿、红蓝白LED灯、滴管\n【已审核步骤】将等量绿豆分入培养皿；分别置于三种颜色灯光下；每天同一时间补充等量清水；第4天统计发芽数",
+        "approvedPlan": {
+          "researchQuestion": "光的颜色如何影响第4天发芽数？",
+          "hypothesis": "不同光的颜色水平会使第4天发芽数出现可测差异。",
+          "independentVariable": {
+            "name": "光的颜色",
+            "levels": [
+              "红光",
+              "蓝光",
+              "白光"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第4天发芽数",
+            "measurement": "以胚根突破种皮为已发芽；第4天统计每皿已发芽绿豆数量",
+            "unit": "粒",
+            "reasonableRange": [
+              0,
+              20
+            ]
+          },
+          "controlledVariables": [
+            "每皿绿豆数量",
+            "光照时长",
+            "灯距",
+            "浇水量"
+          ],
+          "materials": [
+            "绿豆",
+            "培养皿",
+            "红蓝白LED灯",
+            "滴管"
+          ],
+          "procedure": [
+            "将等量绿豆分入培养皿",
+            "分别置于三种颜色灯光下",
+            "每天同一时间补充等量清水",
+            "第4天统计发芽数"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "避免直视LED灯",
+            "电源和滴水区域保持分离"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "光照对植物的影响",
+          "retainedFeature": "光的不同属性会影响植物",
+          "classroomProxy": "不同颜色的光（红蓝绿白）",
+          "researchQuestion": "不同颜色的光是否影响绿豆发芽速度？",
+          "independentVariable": "光的颜色",
+          "dependentDirection": "发芽速度/发芽数",
+          "safetyNotes": [
+            "避免使用220V强光灯具，用LED或手电筒"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "光的颜色如何影响第4天发芽数？",
+          "hypothesis": "不同光的颜色水平会使第4天发芽数出现可测差异。",
+          "independentVariable": {
+            "name": "光的颜色",
+            "levels": [
+              "红光",
+              "蓝光",
+              "白光"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第4天发芽数",
+            "measurement": "以胚根突破种皮为已发芽；第4天统计每皿已发芽绿豆数量",
+            "unit": "粒",
+            "reasonableRange": [
+              0,
+              20
+            ]
+          },
+          "controlledVariables": [
+            "每皿绿豆数量",
+            "光照时长",
+            "灯距",
+            "浇水量"
+          ],
+          "materials": [
+            "绿豆",
+            "培养皿",
+            "红蓝白LED灯",
+            "滴管"
+          ],
+          "procedure": [
+            "将等量绿豆分入培养皿",
+            "分别置于三种颜色灯光下",
+            "每天同一时间补充等量清水",
+            "第4天统计发芽数"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "避免直视LED灯",
+            "电源和滴水区域保持分离"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-fuzzy-water-amount-v1-09ff09dfc8-v1",
+      "cellKey": "P4:socratic_concise",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-fuzzy-water-amount-v1-09ff09dfc8-v1",
+      "familyKey": "fuzzy-water-amount",
+      "phase": 4,
+      "scenario": "模糊型-浇水多少",
+      "styleFamily": "socratic_concise",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "每日浇水量如何影响第5天发芽率？",
+        "hypothesis": "不同每日浇水量水平会使第5天发芽率出现可测差异。",
+        "independentVariable": {
+          "name": "每日浇水量",
+          "levels": [
+            "2 mL",
+            "5 mL",
+            "8 mL"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第5天发芽率",
+          "measurement": "以胚根突破种皮为已发芽；第5天统计发芽数并计算百分比",
+          "unit": "%",
+          "reasonableRange": [
+            0,
+            100
+          ]
+        },
+        "controlledVariables": [
+          "绿豆数量",
+          "土壤质量",
+          "光照时长",
+          "环境温度"
+        ],
+        "materials": [
+          "绿豆",
+          "相同花盆",
+          "土壤",
+          "量筒"
+        ],
+        "procedure": [
+          "每盆装入相同质量土壤并播种等量绿豆",
+          "每天加入对应体积清水",
+          "保持摆放位置一致",
+          "第5天统计发芽数"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "及时擦干洒出的水，防止滑倒"
+        ],
+        "dataPattern": "plateau",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“模糊型-浇水多少”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择每日浇水量，具体水平为2 mL、5 mL、8 mL。",
+          "我提出的假设是：不同每日浇水量水平会使第5天发芽率出现可测差异。",
+          "我要测量第5天发芽率：以胚根突破种皮为已发芽；第5天统计发芽数并计算百分比，单位%。",
+          "我会控制绿豆数量、土壤质量、光照时长、环境温度。",
+          "我选择的材料是绿豆、相同花盆、土壤、量筒。",
+          "我确认的步骤是每盆装入相同质量土壤并播种等量绿豆；每天加入对应体积清水；保持摆放位置一致；第5天统计发芽数。",
+          "每个水平重复3次；安全要求是及时擦干洒出的水，防止滑倒。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 25,
+            "result_b": 71,
+            "result_c": 67,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 25,
+            "result_b": 71,
+            "result_c": 67,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 25,
+            "result_b": 71,
+            "result_c": 67,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】每日浇水量如何影响第5天发芽率？\n【已确认假设】不同每日浇水量水平会使第5天发芽率出现可测差异。\n【已审核变量】自变量：每日浇水量；水平：2 mL、5 mL、8 mL；因变量：第5天发芽率；测量：以胚根突破种皮为已发芽；第5天统计发芽数并计算百分比；单位：%\n【已审核控制变量】绿豆数量、土壤质量、光照时长、环境温度\n【已审核重复次数】每个水平3次\n【已审核安全】及时擦干洒出的水，防止滑倒\n【已审核材料】绿豆、相同花盆、土壤、量筒\n【已审核步骤】每盆装入相同质量土壤并播种等量绿豆；每天加入对应体积清水；保持摆放位置一致；第5天统计发芽数\n【学生真实数据】\n第1次：2 mL=25%；5 mL=71%；8 mL=67%；备注=\n第2次：2 mL=25%；5 mL=71%；8 mL=67%；备注=\n第3次：2 mL=25%；5 mL=71%；8 mL=67%；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 25,
+            "result_b": 71,
+            "result_c": 67,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 25,
+            "result_b": 71,
+            "result_c": 67,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 25,
+            "result_b": 71,
+            "result_c": 67,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "2 mL：第5天发芽率（%）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "5 mL：第5天发芽率（%）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "8 mL：第5天发芽率（%）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "每日浇水量如何影响第5天发芽率？",
+          "hypothesis": "不同每日浇水量水平会使第5天发芽率出现可测差异。",
+          "independentVariable": {
+            "name": "每日浇水量",
+            "levels": [
+              "2 mL",
+              "5 mL",
+              "8 mL"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第5天发芽率",
+            "measurement": "以胚根突破种皮为已发芽；第5天统计发芽数并计算百分比",
+            "unit": "%",
+            "reasonableRange": [
+              0,
+              100
+            ]
+          },
+          "controlledVariables": [
+            "绿豆数量",
+            "土壤质量",
+            "光照时长",
+            "环境温度"
+          ],
+          "materials": [
+            "绿豆",
+            "相同花盆",
+            "土壤",
+            "量筒"
+          ],
+          "procedure": [
+            "每盆装入相同质量土壤并播种等量绿豆",
+            "每天加入对应体积清水",
+            "保持摆放位置一致",
+            "第5天统计发芽数"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "及时擦干洒出的水，防止滑倒"
+          ],
+          "dataPattern": "plateau",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "种子发芽",
+          "retainedFeature": "水分多少影响发芽",
+          "classroomProxy": "不同浇水量",
+          "researchQuestion": "每天浇水量不同是否影响绿豆发芽率？",
+          "independentVariable": "每天浇水量",
+          "dependentDirection": "发芽率"
+        },
+        "domainSpec": {
+          "researchQuestion": "每日浇水量如何影响第5天发芽率？",
+          "hypothesis": "不同每日浇水量水平会使第5天发芽率出现可测差异。",
+          "independentVariable": {
+            "name": "每日浇水量",
+            "levels": [
+              "2 mL",
+              "5 mL",
+              "8 mL"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第5天发芽率",
+            "measurement": "以胚根突破种皮为已发芽；第5天统计发芽数并计算百分比",
+            "unit": "%",
+            "reasonableRange": [
+              0,
+              100
+            ]
+          },
+          "controlledVariables": [
+            "绿豆数量",
+            "土壤质量",
+            "光照时长",
+            "环境温度"
+          ],
+          "materials": [
+            "绿豆",
+            "相同花盆",
+            "土壤",
+            "量筒"
+          ],
+          "procedure": [
+            "每盆装入相同质量土壤并播种等量绿豆",
+            "每天加入对应体积清水",
+            "保持摆放位置一致",
+            "第5天统计发芽数"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "及时擦干洒出的水，防止滑倒"
+          ],
+          "dataPattern": "plateau",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "over_questioning",
+          "weak_confirmation_doc"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "structure_compliance",
+          "student_agency",
+          "teaching_guidance",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-smartedu-0009-v1-ed79fea655-v1",
+      "cellKey": "P5:socratic_concise",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-smartedu-0009-v1-ed79fea655-v1",
+      "familyKey": "smartedu-0009",
+      "phase": 5,
+      "scenario": "化学实验探究",
+      "styleFamily": "socratic_concise",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "reportPath": "complete",
+      "domainSpec": {
+        "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+        "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+        "independentVariable": {
+          "name": "泡腾片颗粒大小",
+          "levels": [
+            "整片",
+            "分成4块",
+            "研成粗粉"
+          ]
+        },
+        "dependentVariable": {
+          "name": "完全溶解时间",
+          "measurement": "投入水中后用秒表记录到无固体可见的时间",
+          "unit": "s",
+          "reasonableRange": [
+            5,
+            240
+          ]
+        },
+        "controlledVariables": [
+          "泡腾片质量",
+          "水体积",
+          "水温",
+          "容器规格"
+        ],
+        "materials": [
+          "同批次泡腾片",
+          "清水",
+          "烧杯",
+          "量筒",
+          "秒表"
+        ],
+        "procedure": [
+          "准备三种颗粒大小的等质量泡腾片",
+          "量取等体积同温清水",
+          "投入后立即计时",
+          "记录固体完全消失时间"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "实验溶液不得饮用",
+          "研碎操作由教师指导并避免粉末进入眼睛"
+        ],
+        "dataPattern": "non_monotonic",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“化学实验探究”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择泡腾片颗粒大小，具体水平为整片、分成4块、研成粗粉。",
+          "我提出的假设是：不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "我要测量完全溶解时间：投入水中后用秒表记录到无固体可见的时间，单位s。",
+          "我会控制泡腾片质量、水体积、水温、容器规格。",
+          "我选择的材料是同批次泡腾片、清水、烧杯、量筒、秒表。",
+          "我确认的步骤是准备三种颗粒大小的等质量泡腾片；量取等体积同温清水；投入后立即计时；记录固体完全消失时间。",
+          "每个水平重复3次；安全要求是实验溶液不得饮用、研碎操作由教师指导并避免粉末进入眼睛。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 92,
+            "result_b": 188,
+            "result_c": 108,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 92,
+            "result_b": 188,
+            "result_c": 108,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 92,
+            "result_b": 188,
+            "result_c": 108,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】泡腾片颗粒大小如何影响完全溶解时间？\n【已确认假设】不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。\n【已审核变量】自变量：泡腾片颗粒大小；水平：整片、分成4块、研成粗粉；因变量：完全溶解时间；测量：投入水中后用秒表记录到无固体可见的时间；单位：s\n【已审核控制变量】泡腾片质量、水体积、水温、容器规格\n【已审核重复次数】每个水平3次\n【已审核安全】实验溶液不得饮用、研碎操作由教师指导并避免粉末进入眼睛\n【已审核材料】同批次泡腾片、清水、烧杯、量筒、秒表\n【已审核步骤】准备三种颗粒大小的等质量泡腾片；量取等体积同温清水；投入后立即计时；记录固体完全消失时间\n【学生真实数据】\n第1次：整片=92s；分成4块=188s；研成粗粉=108s；备注=\n第2次：整片=92s；分成4块=188s；研成粗粉=108s；备注=\n第3次：整片=92s；分成4块=188s；研成粗粉=108s；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的整片=92s和分成4块=188s进行比较。\n学生又引用第2次的研成粗粉=108s，并把观察到的差异表述为相关现象而非确定因果。",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 92,
+            "result_b": 188,
+            "result_c": 108,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 92,
+            "result_b": 188,
+            "result_c": 108,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 92,
+            "result_b": 188,
+            "result_c": 108,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "整片：完全溶解时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "分成4块：完全溶解时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "研成粗粉：完全溶解时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+          "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "independentVariable": {
+            "name": "泡腾片颗粒大小",
+            "levels": [
+              "整片",
+              "分成4块",
+              "研成粗粉"
+            ]
+          },
+          "dependentVariable": {
+            "name": "完全溶解时间",
+            "measurement": "投入水中后用秒表记录到无固体可见的时间",
+            "unit": "s",
+            "reasonableRange": [
+              5,
+              240
+            ]
+          },
+          "controlledVariables": [
+            "泡腾片质量",
+            "水体积",
+            "水温",
+            "容器规格"
+          ],
+          "materials": [
+            "同批次泡腾片",
+            "清水",
+            "烧杯",
+            "量筒",
+            "秒表"
+          ],
+          "procedure": [
+            "准备三种颗粒大小的等质量泡腾片",
+            "量取等体积同温清水",
+            "投入后立即计时",
+            "记录固体完全消失时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验溶液不得饮用",
+            "研碎操作由教师指导并避免粉末进入眼睛"
+          ],
+          "dataPattern": "non_monotonic",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的整片=92s和分成4块=188s进行比较。",
+          "学生又引用第2次的研成粗粉=108s，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "化学实验探究",
+          "retainedFeature": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「化学实验探究」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+          "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "independentVariable": {
+            "name": "泡腾片颗粒大小",
+            "levels": [
+              "整片",
+              "分成4块",
+              "研成粗粉"
+            ]
+          },
+          "dependentVariable": {
+            "name": "完全溶解时间",
+            "measurement": "投入水中后用秒表记录到无固体可见的时间",
+            "unit": "s",
+            "reasonableRange": [
+              5,
+              240
+            ]
+          },
+          "controlledVariables": [
+            "泡腾片质量",
+            "水体积",
+            "水温",
+            "容器规格"
+          ],
+          "materials": [
+            "同批次泡腾片",
+            "清水",
+            "烧杯",
+            "量筒",
+            "秒表"
+          ],
+          "procedure": [
+            "准备三种颗粒大小的等质量泡腾片",
+            "量取等体积同温清水",
+            "投入后立即计时",
+            "记录固体完全消失时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验溶液不得饮用",
+            "研碎操作由教师指导并避免粉末进入眼睛"
+          ],
+          "dataPattern": "non_monotonic",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-smartedu-0012-v1-2fdae34c53-v1",
+      "cellKey": "P6:socratic_concise",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-smartedu-0012-v1-2fdae34c53-v1",
+      "familyKey": "smartedu-0012",
+      "phase": 6,
+      "scenario": "《控制变量法在初中化学实验探究中的应用》",
+      "styleFamily": "socratic_concise",
+      "triggerType": "OPTIONAL_COACHING",
+      "domainSpec": {
+        "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+        "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+        "independentVariable": {
+          "name": "泡腾片颗粒大小",
+          "levels": [
+            "整片",
+            "分成4块",
+            "研成粗粉"
+          ]
+        },
+        "dependentVariable": {
+          "name": "完全溶解时间",
+          "measurement": "投入水中后用秒表记录到无固体可见的时间",
+          "unit": "s",
+          "reasonableRange": [
+            5,
+            240
+          ]
+        },
+        "controlledVariables": [
+          "泡腾片质量",
+          "水体积",
+          "水温",
+          "容器规格"
+        ],
+        "materials": [
+          "同批次泡腾片",
+          "清水",
+          "烧杯",
+          "量筒",
+          "秒表"
+        ],
+        "procedure": [
+          "准备三种颗粒大小的等质量泡腾片",
+          "量取等体积同温清水",
+          "投入后立即计时",
+          "记录固体完全消失时间"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "实验溶液不得饮用",
+          "研碎操作由教师指导并避免粉末进入眼睛"
+        ],
+        "dataPattern": "overlap",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "我想反思“泡腾片颗粒大小如何影响完全溶解时间？”这次实验，但不希望你直接替我写答案。",
+        "brief": [
+          "我正在做“《控制变量法在初中化学实验探究中的应用》”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择泡腾片颗粒大小，具体水平为整片、分成4块、研成粗粉。",
+          "我提出的假设是：不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "我要测量完全溶解时间：投入水中后用秒表记录到无固体可见的时间，单位s。",
+          "我会控制泡腾片质量、水体积、水温、容器规格。",
+          "我选择的材料是同批次泡腾片、清水、烧杯、量筒、秒表。",
+          "我确认的步骤是准备三种颗粒大小的等质量泡腾片；量取等体积同温清水；投入后立即计时；记录固体完全消失时间。",
+          "每个水平重复3次；安全要求是实验溶液不得饮用、研碎操作由教师指导并避免粉末进入眼睛。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 118,
+            "result_b": 120,
+            "result_c": 127,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 118,
+            "result_b": 120,
+            "result_c": 127,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 118,
+            "result_b": 120,
+            "result_c": 127,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】泡腾片颗粒大小如何影响完全溶解时间？\n【已确认假设】不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。\n【已审核变量】自变量：泡腾片颗粒大小；水平：整片、分成4块、研成粗粉；因变量：完全溶解时间；测量：投入水中后用秒表记录到无固体可见的时间；单位：s\n【已审核控制变量】泡腾片质量、水体积、水温、容器规格\n【已审核重复次数】每个水平3次\n【已审核安全】实验溶液不得饮用、研碎操作由教师指导并避免粉末进入眼睛\n【已审核材料】同批次泡腾片、清水、烧杯、量筒、秒表\n【已审核步骤】准备三种颗粒大小的等质量泡腾片；量取等体积同温清水；投入后立即计时；记录固体完全消失时间\n【学生真实数据】\n第1次：整片=118s；分成4块=120s；研成粗粉=127s；备注=\n第2次：整片=118s；分成4块=120s；研成粗粉=127s；备注=\n第3次：整片=118s；分成4块=120s；研成粗粉=127s；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的整片=118s和分成4块=120s进行比较。\n学生又引用第2次的研成粗粉=127s，并把观察到的差异表述为相关现象而非确定因果。\n【已提交报告】报告正文已提交；最终局限与改进由学生本人在反思表单填写。",
+        "approvedPlan": {
+          "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+          "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "independentVariable": {
+            "name": "泡腾片颗粒大小",
+            "levels": [
+              "整片",
+              "分成4块",
+              "研成粗粉"
+            ]
+          },
+          "dependentVariable": {
+            "name": "完全溶解时间",
+            "measurement": "投入水中后用秒表记录到无固体可见的时间",
+            "unit": "s",
+            "reasonableRange": [
+              5,
+              240
+            ]
+          },
+          "controlledVariables": [
+            "泡腾片质量",
+            "水体积",
+            "水温",
+            "容器规格"
+          ],
+          "materials": [
+            "同批次泡腾片",
+            "清水",
+            "烧杯",
+            "量筒",
+            "秒表"
+          ],
+          "procedure": [
+            "准备三种颗粒大小的等质量泡腾片",
+            "量取等体积同温清水",
+            "投入后立即计时",
+            "记录固体完全消失时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验溶液不得饮用",
+            "研碎操作由教师指导并避免粉末进入眼睛"
+          ],
+          "dataPattern": "overlap",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的整片=118s和分成4块=120s进行比较。",
+          "学生又引用第2次的研成粗粉=127s，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "《控制变量法在初中化学实验探究中的应用》",
+          "retainedFeature": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「《控制变量法在初中化学实验探究中的应用》」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+          "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "independentVariable": {
+            "name": "泡腾片颗粒大小",
+            "levels": [
+              "整片",
+              "分成4块",
+              "研成粗粉"
+            ]
+          },
+          "dependentVariable": {
+            "name": "完全溶解时间",
+            "measurement": "投入水中后用秒表记录到无固体可见的时间",
+            "unit": "s",
+            "reasonableRange": [
+              5,
+              240
+            ]
+          },
+          "controlledVariables": [
+            "泡腾片质量",
+            "水体积",
+            "水温",
+            "容器规格"
+          ],
+          "materials": [
+            "同批次泡腾片",
+            "清水",
+            "烧杯",
+            "量筒",
+            "秒表"
+          ],
+          "procedure": [
+            "准备三种颗粒大小的等质量泡腾片",
+            "量取等体积同温清水",
+            "投入后立即计时",
+            "记录固体完全消失时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验溶液不得饮用",
+            "研碎操作由教师指导并避免粉末进入眼睛"
+          ],
+          "dataPattern": "overlap",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-ecology-bottle-balance-v1-647ce28752-v1",
+      "cellKey": "P1:warm_companion",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-ecology-bottle-balance-v1-647ce28752-v1",
+      "familyKey": "ecology-bottle-balance",
+      "phase": 1,
+      "scenario": "过度宏大型-生态瓶平衡",
+      "styleFamily": "warm_companion",
+      "triggerType": "USER_MESSAGE",
+      "domainSpec": {
+        "researchQuestion": "水草与小鱼数量组合如何影响第7天溶解氧？",
+        "hypothesis": "不同水草与小鱼数量组合水平会使第7天溶解氧出现可测差异。",
+        "independentVariable": {
+          "name": "水草与小鱼数量组合",
+          "levels": [
+            "2株水草+1条小鱼",
+            "4株水草+1条小鱼",
+            "4株水草+2条小鱼"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第7天溶解氧",
+          "measurement": "第7天用溶解氧传感器测量",
+          "unit": "mg/L",
+          "reasonableRange": [
+            0,
+            14
+          ]
+        },
+        "controlledVariables": [
+          "瓶体积",
+          "水体积",
+          "光照时长",
+          "投喂量"
+        ],
+        "materials": [
+          "透明生态瓶",
+          "水草",
+          "小鱼",
+          "溶解氧传感器"
+        ],
+        "procedure": [
+          "按组合放入水草和小鱼",
+          "加入相同体积水",
+          "保持光照和投喂一致",
+          "第7天测量溶解氧"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "轻拿生态瓶，避免玻璃破裂",
+          "实验结束后按教师要求妥善安置小鱼"
+        ],
+        "dataPattern": "single_outlier",
+        "anomalyPattern": "single_outlier"
+      },
+      "studentVisible": {
+        "profile": "over_broad",
+        "openingMessage": "我对“过度宏大型-生态瓶平衡”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“过度宏大型-生态瓶平衡”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "decisionFacts": [
+          "我真正感兴趣的是水草与小鱼数量组合与观察现象之间的关系，但尚未决定水平、测量或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "生态瓶/微型生态系统",
+          "retainedFeature": "生物数量比例影响系统稳定性",
+          "classroomProxy": "不同水草与小鱼数量比例",
+          "researchQuestion": "水草与小鱼数量比例是否影响生态瓶存活天数？",
+          "independentVariable": "水草与小鱼数量比例",
+          "dependentDirection": "生态瓶存活天数"
+        },
+        "domainSpec": {
+          "researchQuestion": "水草与小鱼数量组合如何影响第7天溶解氧？",
+          "hypothesis": "不同水草与小鱼数量组合水平会使第7天溶解氧出现可测差异。",
+          "independentVariable": {
+            "name": "水草与小鱼数量组合",
+            "levels": [
+              "2株水草+1条小鱼",
+              "4株水草+1条小鱼",
+              "4株水草+2条小鱼"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第7天溶解氧",
+            "measurement": "第7天用溶解氧传感器测量",
+            "unit": "mg/L",
+            "reasonableRange": [
+              0,
+              14
+            ]
+          },
+          "controlledVariables": [
+            "瓶体积",
+            "水体积",
+            "光照时长",
+            "投喂量"
+          ],
+          "materials": [
+            "透明生态瓶",
+            "水草",
+            "小鱼",
+            "溶解氧传感器"
+          ],
+          "procedure": [
+            "按组合放入水草和小鱼",
+            "加入相同体积水",
+            "保持光照和投喂一致",
+            "第7天测量溶解氧"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "轻拿生态瓶，避免玻璃破裂",
+            "实验结束后按教师要求妥善安置小鱼"
+          ],
+          "dataPattern": "single_outlier",
+          "anomalyPattern": "single_outlier"
+        },
+        "failureModes": [
+          "theme_loss",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-safety-bread-mold-preservative-v1-f6c9fddb4b-v1",
+      "cellKey": "P2:warm_companion",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-safety-bread-mold-preservative-v1-f6c9fddb4b-v1",
+      "familyKey": "safety-bread-mold-preservative",
+      "phase": 2,
+      "scenario": "安全风险型-面包防腐",
+      "styleFamily": "warm_companion",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "保存方式如何影响第7天霉斑覆盖率？",
+        "hypothesis": "不同保存方式水平会使第7天霉斑覆盖率出现可测差异。",
+        "independentVariable": {
+          "name": "保存方式",
+          "levels": [
+            "室温密封",
+            "冷藏密封",
+            "室温干燥"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第7天霉斑覆盖率",
+          "measurement": "隔着密封袋用方格纸估算霉斑面积百分比",
+          "unit": "%",
+          "reasonableRange": [
+            0,
+            100
+          ]
+        },
+        "controlledVariables": [
+          "面包大小",
+          "面包批次",
+          "观察时间",
+          "包装袋大小"
+        ],
+        "materials": [
+          "同批次面包片",
+          "密封袋",
+          "方格纸"
+        ],
+        "procedure": [
+          "将等大面包片分别密封",
+          "按三种方式保存",
+          "全程不打开袋子",
+          "第7天隔袋估算霉斑覆盖率"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "发霉样品全程密封且不得闻或触摸",
+          "实验结束后由教师统一处置"
+        ],
+        "dataPattern": "missing_measurement",
+        "anomalyPattern": "missing_measurement"
+      },
+      "studentVisible": {
+        "profile": "safety_risk",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“安全风险型-面包防腐”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择保存方式，具体水平为室温密封、冷藏密封、室温干燥。",
+          "我提出的假设是：不同保存方式水平会使第7天霉斑覆盖率出现可测差异。",
+          "我要测量第7天霉斑覆盖率：隔着密封袋用方格纸估算霉斑面积百分比，单位%。",
+          "我会控制面包大小、面包批次、观察时间、包装袋大小。",
+          "我选择的材料是同批次面包片、密封袋、方格纸。",
+          "我确认的步骤是将等大面包片分别密封；按三种方式保存；全程不打开袋子；第7天隔袋估算霉斑覆盖率。",
+          "每个水平重复3次；安全要求是发霉样品全程密封且不得闻或触摸、实验结束后由教师统一处置。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】保存方式如何影响第7天霉斑覆盖率？\n【因素与现象方向】拟改变：保存方式；关注：第7天霉斑覆盖率"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "食物怎么防腐",
+          "retainedFeature": "防腐方式抑制微生物",
+          "classroomProxy": "不同防腐处理（冷藏/干燥/真空密封）",
+          "researchQuestion": "不同防腐处理是否影响面包发霉速度？",
+          "independentVariable": "防腐处理方式",
+          "dependentDirection": "发霉速度",
+          "safetyNotes": [
+            "发霉食物只观察不食用，可能产生毒素",
+            "避免吸入霉菌孢子"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "保存方式如何影响第7天霉斑覆盖率？",
+          "hypothesis": "不同保存方式水平会使第7天霉斑覆盖率出现可测差异。",
+          "independentVariable": {
+            "name": "保存方式",
+            "levels": [
+              "室温密封",
+              "冷藏密封",
+              "室温干燥"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第7天霉斑覆盖率",
+            "measurement": "隔着密封袋用方格纸估算霉斑面积百分比",
+            "unit": "%",
+            "reasonableRange": [
+              0,
+              100
+            ]
+          },
+          "controlledVariables": [
+            "面包大小",
+            "面包批次",
+            "观察时间",
+            "包装袋大小"
+          ],
+          "materials": [
+            "同批次面包片",
+            "密封袋",
+            "方格纸"
+          ],
+          "procedure": [
+            "将等大面包片分别密封",
+            "按三种方式保存",
+            "全程不打开袋子",
+            "第7天隔袋估算霉斑覆盖率"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "发霉样品全程密封且不得闻或触摸",
+            "实验结束后由教师统一处置"
+          ],
+          "dataPattern": "missing_measurement",
+          "anomalyPattern": "missing_measurement"
+        },
+        "failureModes": [
+          "safety_softness"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-premature-shade-plant-height-v1-59aae2fa50-v1",
+      "cellKey": "P3:warm_companion",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-premature-shade-plant-height-v1-59aae2fa50-v1",
+      "familyKey": "premature-shade-plant-height",
+      "phase": 3,
+      "scenario": "细节过早型-遮阴与株高",
+      "styleFamily": "warm_companion",
+      "triggerType": "STAGE_ENTER",
+      "domainSpec": {
+        "researchQuestion": "每日人工光照时长如何影响第7天幼苗株高？",
+        "hypothesis": "不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。",
+        "independentVariable": {
+          "name": "每日人工光照时长",
+          "levels": [
+            "4 h",
+            "8 h",
+            "12 h"
+          ]
+        },
+        "dependentVariable": {
+          "name": "第7天幼苗株高",
+          "measurement": "第7天从土面到幼苗顶端测量高度",
+          "unit": "mm",
+          "reasonableRange": [
+            0,
+            160
+          ]
+        },
+        "controlledVariables": [
+          "绿豆数量",
+          "土壤质量",
+          "每日浇水量",
+          "灯距"
+        ],
+        "materials": [
+          "绿豆",
+          "相同花盆",
+          "土壤",
+          "LED灯",
+          "刻度尺"
+        ],
+        "procedure": [
+          "播种等量绿豆",
+          "分别设置三种每日光照时长",
+          "每天同一时间浇等量水",
+          "第7天测量株高"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "避免直视LED灯",
+          "浇水时先切断灯具电源"
+        ],
+        "dataPattern": "replicate_variation",
+        "anomalyPattern": "replicate_variation"
+      },
+      "studentVisible": {
+        "profile": "premature_details",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与已审核风险相关的安全问答。",
+        "brief": [
+          "我正在做“细节过早型-遮阴与株高”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择每日人工光照时长，具体水平为4 h、8 h、12 h。",
+          "我提出的假设是：不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。",
+          "我要测量第7天幼苗株高：第7天从土面到幼苗顶端测量高度，单位mm。",
+          "我会控制绿豆数量、土壤质量、每日浇水量、灯距。",
+          "我选择的材料是绿豆、相同花盆、土壤、LED灯、刻度尺。",
+          "我确认的步骤是播种等量绿豆；分别设置三种每日光照时长；每天同一时间浇等量水；第7天测量株高。",
+          "每个水平重复3次；安全要求是避免直视LED灯、浇水时先切断灯具电源。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】每日人工光照时长如何影响第7天幼苗株高？\n【已确认假设】不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。\n【已审核变量】自变量：每日人工光照时长；水平：4 h、8 h、12 h；因变量：第7天幼苗株高；测量：第7天从土面到幼苗顶端测量高度；单位：mm\n【已审核控制变量】绿豆数量、土壤质量、每日浇水量、灯距\n【已审核重复次数】每个水平3次\n【已审核安全】避免直视LED灯、浇水时先切断灯具电源\n【已审核材料】绿豆、相同花盆、土壤、LED灯、刻度尺\n【已审核步骤】播种等量绿豆；分别设置三种每日光照时长；每天同一时间浇等量水；第7天测量株高",
+        "approvedPlan": {
+          "researchQuestion": "每日人工光照时长如何影响第7天幼苗株高？",
+          "hypothesis": "不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。",
+          "independentVariable": {
+            "name": "每日人工光照时长",
+            "levels": [
+              "4 h",
+              "8 h",
+              "12 h"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第7天幼苗株高",
+            "measurement": "第7天从土面到幼苗顶端测量高度",
+            "unit": "mm",
+            "reasonableRange": [
+              0,
+              160
+            ]
+          },
+          "controlledVariables": [
+            "绿豆数量",
+            "土壤质量",
+            "每日浇水量",
+            "灯距"
+          ],
+          "materials": [
+            "绿豆",
+            "相同花盆",
+            "土壤",
+            "LED灯",
+            "刻度尺"
+          ],
+          "procedure": [
+            "播种等量绿豆",
+            "分别设置三种每日光照时长",
+            "每天同一时间浇等量水",
+            "第7天测量株高"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "避免直视LED灯",
+            "浇水时先切断灯具电源"
+          ],
+          "dataPattern": "replicate_variation",
+          "anomalyPattern": "replicate_variation"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "植物长不高",
+          "retainedFeature": "光照强弱影响株高",
+          "classroomProxy": "不同遮阴程度",
+          "researchQuestion": "遮阴程度是否影响绿豆幼苗株高？",
+          "independentVariable": "遮阴程度",
+          "dependentDirection": "幼苗株高"
+        },
+        "domainSpec": {
+          "researchQuestion": "每日人工光照时长如何影响第7天幼苗株高？",
+          "hypothesis": "不同每日人工光照时长水平会使第7天幼苗株高出现可测差异。",
+          "independentVariable": {
+            "name": "每日人工光照时长",
+            "levels": [
+              "4 h",
+              "8 h",
+              "12 h"
+            ]
+          },
+          "dependentVariable": {
+            "name": "第7天幼苗株高",
+            "measurement": "第7天从土面到幼苗顶端测量高度",
+            "unit": "mm",
+            "reasonableRange": [
+              0,
+              160
+            ]
+          },
+          "controlledVariables": [
+            "绿豆数量",
+            "土壤质量",
+            "每日浇水量",
+            "灯距"
+          ],
+          "materials": [
+            "绿豆",
+            "相同花盆",
+            "土壤",
+            "LED灯",
+            "刻度尺"
+          ],
+          "procedure": [
+            "播种等量绿豆",
+            "分别设置三种每日光照时长",
+            "每天同一时间浇等量水",
+            "第7天测量株高"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "避免直视LED灯",
+            "浇水时先切断灯具电源"
+          ],
+          "dataPattern": "replicate_variation",
+          "anomalyPattern": "replicate_variation"
+        },
+        "failureModes": [
+          "premature_stage2"
+        ],
+        "rubricTargets": [
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v1-a7c0549057-v1",
+      "cellKey": "P4:warm_companion",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-fuzzy-yogurt-temperature-v1-a7c0549057-v1",
+      "familyKey": "fuzzy-yogurt-temperature",
+      "phase": 4,
+      "scenario": "模糊型-酸奶与温度",
+      "styleFamily": "warm_companion",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "存放温度如何影响pH变化量？",
+        "hypothesis": "不同存放温度水平会使pH变化量出现可测差异。",
+        "independentVariable": {
+          "name": "存放温度",
+          "levels": [
+            "4 ℃",
+            "20 ℃",
+            "30 ℃"
+          ]
+        },
+        "dependentVariable": {
+          "name": "pH变化量",
+          "measurement": "在0小时和24小时各测一次pH并计算变化量",
+          "unit": "pH",
+          "reasonableRange": [
+            0,
+            3
+          ]
+        },
+        "controlledVariables": [
+          "酸奶批次",
+          "样品体积",
+          "容器大小",
+          "存放时长"
+        ],
+        "materials": [
+          "同批次酸奶",
+          "带盖样品杯",
+          "pH试纸",
+          "温度计"
+        ],
+        "procedure": [
+          "分装等体积酸奶",
+          "记录初始pH",
+          "分别存放24小时",
+          "测量末次pH并计算变化量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "实验样品不得食用",
+          "样品保持封闭并由教师统一处置"
+        ],
+        "dataPattern": "rising",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“模糊型-酸奶与温度”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择存放温度，具体水平为4 ℃、20 ℃、30 ℃。",
+          "我提出的假设是：不同存放温度水平会使pH变化量出现可测差异。",
+          "我要测量pH变化量：在0小时和24小时各测一次pH并计算变化量，单位pH。",
+          "我会控制酸奶批次、样品体积、容器大小、存放时长。",
+          "我选择的材料是同批次酸奶、带盖样品杯、pH试纸、温度计。",
+          "我确认的步骤是分装等体积酸奶；记录初始pH；分别存放24小时；测量末次pH并计算变化量。",
+          "每个水平重复3次；安全要求是实验样品不得食用、样品保持封闭并由教师统一处置。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 0.42,
+            "result_b": 1.29,
+            "result_c": 2.1,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 0.42,
+            "result_b": 1.29,
+            "result_c": 2.1,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 0.42,
+            "result_b": 1.29,
+            "result_c": 2.1,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】存放温度如何影响pH变化量？\n【已确认假设】不同存放温度水平会使pH变化量出现可测差异。\n【已审核变量】自变量：存放温度；水平：4 ℃、20 ℃、30 ℃；因变量：pH变化量；测量：在0小时和24小时各测一次pH并计算变化量；单位：pH\n【已审核控制变量】酸奶批次、样品体积、容器大小、存放时长\n【已审核重复次数】每个水平3次\n【已审核安全】实验样品不得食用、样品保持封闭并由教师统一处置\n【已审核材料】同批次酸奶、带盖样品杯、pH试纸、温度计\n【已审核步骤】分装等体积酸奶；记录初始pH；分别存放24小时；测量末次pH并计算变化量\n【学生真实数据】\n第1次：4 ℃=0.42pH；20 ℃=1.29pH；30 ℃=2.1pH；备注=\n第2次：4 ℃=0.42pH；20 ℃=1.29pH；30 ℃=2.1pH；备注=\n第3次：4 ℃=0.42pH；20 ℃=1.29pH；30 ℃=2.1pH；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 0.42,
+            "result_b": 1.29,
+            "result_c": 2.1,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 0.42,
+            "result_b": 1.29,
+            "result_c": 2.1,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 0.42,
+            "result_b": 1.29,
+            "result_c": 2.1,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "4 ℃：pH变化量（pH）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "20 ℃：pH变化量（pH）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "30 ℃：pH变化量（pH）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "存放温度如何影响pH变化量？",
+          "hypothesis": "不同存放温度水平会使pH变化量出现可测差异。",
+          "independentVariable": {
+            "name": "存放温度",
+            "levels": [
+              "4 ℃",
+              "20 ℃",
+              "30 ℃"
+            ]
+          },
+          "dependentVariable": {
+            "name": "pH变化量",
+            "measurement": "在0小时和24小时各测一次pH并计算变化量",
+            "unit": "pH",
+            "reasonableRange": [
+              0,
+              3
+            ]
+          },
+          "controlledVariables": [
+            "酸奶批次",
+            "样品体积",
+            "容器大小",
+            "存放时长"
+          ],
+          "materials": [
+            "同批次酸奶",
+            "带盖样品杯",
+            "pH试纸",
+            "温度计"
+          ],
+          "procedure": [
+            "分装等体积酸奶",
+            "记录初始pH",
+            "分别存放24小时",
+            "测量末次pH并计算变化量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验样品不得食用",
+            "样品保持封闭并由教师统一处置"
+          ],
+          "dataPattern": "rising",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "食物保存",
+          "retainedFeature": "温度影响微生物活动",
+          "classroomProxy": "不同存放温度",
+          "researchQuestion": "存放温度是否影响酸奶变质快慢？",
+          "independentVariable": "存放温度",
+          "dependentDirection": "变质快慢",
+          "safetyNotes": [
+            "变质食物只观察不食用",
+            "闻气味用手扇，不直接凑近"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "存放温度如何影响pH变化量？",
+          "hypothesis": "不同存放温度水平会使pH变化量出现可测差异。",
+          "independentVariable": {
+            "name": "存放温度",
+            "levels": [
+              "4 ℃",
+              "20 ℃",
+              "30 ℃"
+            ]
+          },
+          "dependentVariable": {
+            "name": "pH变化量",
+            "measurement": "在0小时和24小时各测一次pH并计算变化量",
+            "unit": "pH",
+            "reasonableRange": [
+              0,
+              3
+            ]
+          },
+          "controlledVariables": [
+            "酸奶批次",
+            "样品体积",
+            "容器大小",
+            "存放时长"
+          ],
+          "materials": [
+            "同批次酸奶",
+            "带盖样品杯",
+            "pH试纸",
+            "温度计"
+          ],
+          "procedure": [
+            "分装等体积酸奶",
+            "记录初始pH",
+            "分别存放24小时",
+            "测量末次pH并计算变化量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验样品不得食用",
+            "样品保持封闭并由教师统一处置"
+          ],
+          "dataPattern": "rising",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-smartedu-0016-v1-0ae26e6f35-v1",
+      "cellKey": "P5:warm_companion",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-smartedu-0016-v1-0ae26e6f35-v1",
+      "familyKey": "smartedu-0016",
+      "phase": 5,
+      "scenario": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+      "styleFamily": "warm_companion",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "reportPath": "complete",
+      "domainSpec": {
+        "researchQuestion": "过滤材料如何影响过滤后浊度？",
+        "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+        "independentVariable": {
+          "name": "过滤材料",
+          "levels": [
+            "棉布",
+            "滤纸",
+            "活性炭+滤纸"
+          ]
+        },
+        "dependentVariable": {
+          "name": "过滤后浊度",
+          "measurement": "用浊度传感器测量过滤后水样",
+          "unit": "NTU",
+          "reasonableRange": [
+            0,
+            300
+          ]
+        },
+        "controlledVariables": [
+          "原水体积",
+          "原水批次",
+          "过滤材料面积",
+          "静置时间"
+        ],
+        "materials": [
+          "模拟浑水",
+          "棉布",
+          "滤纸",
+          "活性炭",
+          "漏斗",
+          "浊度传感器"
+        ],
+        "procedure": [
+          "混匀同一批模拟浑水",
+          "装配三种过滤材料",
+          "分别过滤相同体积水样",
+          "测量过滤后浊度"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "模拟浑水不得饮用",
+          "活性炭粉末避免吸入并及时清理"
+        ],
+        "dataPattern": "falling",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择过滤材料，具体水平为棉布、滤纸、活性炭+滤纸。",
+          "我提出的假设是：不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "我要测量过滤后浊度：用浊度传感器测量过滤后水样，单位NTU。",
+          "我会控制原水体积、原水批次、过滤材料面积、静置时间。",
+          "我选择的材料是模拟浑水、棉布、滤纸、活性炭、漏斗、浊度传感器。",
+          "我确认的步骤是混匀同一批模拟浑水；装配三种过滤材料；分别过滤相同体积水样；测量过滤后浊度。",
+          "每个水平重复3次；安全要求是模拟浑水不得饮用、活性炭粉末避免吸入并及时清理。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 207,
+            "result_b": 132,
+            "result_c": 54,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 207,
+            "result_b": 132,
+            "result_c": 54,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 207,
+            "result_b": 132,
+            "result_c": 54,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】过滤材料如何影响过滤后浊度？\n【已确认假设】不同过滤材料水平会使过滤后浊度出现可测差异。\n【已审核变量】自变量：过滤材料；水平：棉布、滤纸、活性炭+滤纸；因变量：过滤后浊度；测量：用浊度传感器测量过滤后水样；单位：NTU\n【已审核控制变量】原水体积、原水批次、过滤材料面积、静置时间\n【已审核重复次数】每个水平3次\n【已审核安全】模拟浑水不得饮用、活性炭粉末避免吸入并及时清理\n【已审核材料】模拟浑水、棉布、滤纸、活性炭、漏斗、浊度传感器\n【已审核步骤】混匀同一批模拟浑水；装配三种过滤材料；分别过滤相同体积水样；测量过滤后浊度\n【学生真实数据】\n第1次：棉布=207NTU；滤纸=132NTU；活性炭+滤纸=54NTU；备注=\n第2次：棉布=207NTU；滤纸=132NTU；活性炭+滤纸=54NTU；备注=\n第3次：棉布=207NTU；滤纸=132NTU；活性炭+滤纸=54NTU；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的棉布=207NTU和滤纸=132NTU进行比较。\n学生又引用第2次的活性炭+滤纸=54NTU，并把观察到的差异表述为相关现象而非确定因果。",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 207,
+            "result_b": 132,
+            "result_c": 54,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 207,
+            "result_b": 132,
+            "result_c": 54,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 207,
+            "result_b": 132,
+            "result_c": 54,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "棉布：过滤后浊度（NTU）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "滤纸：过滤后浊度（NTU）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "活性炭+滤纸：过滤后浊度（NTU）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "falling",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的棉布=207NTU和滤纸=132NTU进行比较。",
+          "学生又引用第2次的活性炭+滤纸=54NTU，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "控制变量巧对比—活性炭和明矾的净水作用及影响因素之探究",
+          "retainedFeature": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+          "classroomProxy": "把“做一个净水器”转化为“改变过滤材料/层数，比较过滤效果”的探究问题。",
+          "researchQuestion": "不同过滤材料或过滤层数会怎样影响自制净水器的过滤效果？",
+          "independentVariable": "过滤材料种类或过滤层数",
+          "dependentDirection": "过滤后水的浑浊程度/颜色变化",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "falling",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-variable-confusion-apple-browning-v1-60684033e1-v1",
+      "cellKey": "P6:warm_companion",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-variable-confusion-apple-browning-v1-60684033e1-v1",
+      "familyKey": "variable-confusion-apple-browning",
+      "phase": 6,
+      "scenario": "变量混乱型-苹果褐变",
+      "styleFamily": "warm_companion",
+      "triggerType": "OPTIONAL_COACHING",
+      "domainSpec": {
+        "researchQuestion": "抗褐变处理如何影响30分钟褐变面积率？",
+        "hypothesis": "不同抗褐变处理水平会使30分钟褐变面积率出现可测差异。",
+        "independentVariable": {
+          "name": "抗褐变处理",
+          "levels": [
+            "不处理",
+            "5%盐水浸泡",
+            "柠檬汁浸泡"
+          ]
+        },
+        "dependentVariable": {
+          "name": "30分钟褐变面积率",
+          "measurement": "30分钟后用方格纸估算褐变面积百分比",
+          "unit": "%",
+          "reasonableRange": [
+            0,
+            100
+          ]
+        },
+        "controlledVariables": [
+          "苹果批次",
+          "切片厚度",
+          "浸泡时长",
+          "观察时间"
+        ],
+        "materials": [
+          "同一苹果",
+          "5%盐水",
+          "柠檬汁",
+          "方格纸"
+        ],
+        "procedure": [
+          "由教师切取等厚苹果片",
+          "按三种方式处理相同时长",
+          "平放30分钟",
+          "估算褐变面积率"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "刀具只由教师使用",
+          "实验样品不得食用"
+        ],
+        "dataPattern": "weak_trend",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "variable_confusion",
+        "openingMessage": "我想反思“抗褐变处理如何影响30分钟褐变面积率？”这次实验，但不希望你直接替我写答案。",
+        "brief": [
+          "我正在做“变量混乱型-苹果褐变”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择抗褐变处理，具体水平为不处理、5%盐水浸泡、柠檬汁浸泡。",
+          "我提出的假设是：不同抗褐变处理水平会使30分钟褐变面积率出现可测差异。",
+          "我要测量30分钟褐变面积率：30分钟后用方格纸估算褐变面积百分比，单位%。",
+          "我会控制苹果批次、切片厚度、浸泡时长、观察时间。",
+          "我选择的材料是同一苹果、5%盐水、柠檬汁、方格纸。",
+          "我确认的步骤是由教师切取等厚苹果片；按三种方式处理相同时长；平放30分钟；估算褐变面积率。",
+          "每个水平重复3次；安全要求是刀具只由教师使用、实验样品不得食用。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 49,
+            "result_b": 53,
+            "result_c": 57,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 49,
+            "result_b": 53,
+            "result_c": 57,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 49,
+            "result_b": 53,
+            "result_c": 57,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】抗褐变处理如何影响30分钟褐变面积率？\n【已确认假设】不同抗褐变处理水平会使30分钟褐变面积率出现可测差异。\n【已审核变量】自变量：抗褐变处理；水平：不处理、5%盐水浸泡、柠檬汁浸泡；因变量：30分钟褐变面积率；测量：30分钟后用方格纸估算褐变面积百分比；单位：%\n【已审核控制变量】苹果批次、切片厚度、浸泡时长、观察时间\n【已审核重复次数】每个水平3次\n【已审核安全】刀具只由教师使用、实验样品不得食用\n【已审核材料】同一苹果、5%盐水、柠檬汁、方格纸\n【已审核步骤】由教师切取等厚苹果片；按三种方式处理相同时长；平放30分钟；估算褐变面积率\n【学生真实数据】\n第1次：不处理=49%；5%盐水浸泡=53%；柠檬汁浸泡=57%；备注=\n第2次：不处理=49%；5%盐水浸泡=53%；柠檬汁浸泡=57%；备注=\n第3次：不处理=49%；5%盐水浸泡=53%；柠檬汁浸泡=57%；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的不处理=49%和5%盐水浸泡=53%进行比较。\n学生又引用第2次的柠檬汁浸泡=57%，并把观察到的差异表述为相关现象而非确定因果。\n【已提交报告】报告正文已提交；最终局限与改进由学生本人在反思表单填写。",
+        "approvedPlan": {
+          "researchQuestion": "抗褐变处理如何影响30分钟褐变面积率？",
+          "hypothesis": "不同抗褐变处理水平会使30分钟褐变面积率出现可测差异。",
+          "independentVariable": {
+            "name": "抗褐变处理",
+            "levels": [
+              "不处理",
+              "5%盐水浸泡",
+              "柠檬汁浸泡"
+            ]
+          },
+          "dependentVariable": {
+            "name": "30分钟褐变面积率",
+            "measurement": "30分钟后用方格纸估算褐变面积百分比",
+            "unit": "%",
+            "reasonableRange": [
+              0,
+              100
+            ]
+          },
+          "controlledVariables": [
+            "苹果批次",
+            "切片厚度",
+            "浸泡时长",
+            "观察时间"
+          ],
+          "materials": [
+            "同一苹果",
+            "5%盐水",
+            "柠檬汁",
+            "方格纸"
+          ],
+          "procedure": [
+            "由教师切取等厚苹果片",
+            "按三种方式处理相同时长",
+            "平放30分钟",
+            "估算褐变面积率"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "刀具只由教师使用",
+            "实验样品不得食用"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的不处理=49%和5%盐水浸泡=53%进行比较。",
+          "学生又引用第2次的柠檬汁浸泡=57%，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "苹果切开变色",
+          "retainedFeature": "隔绝氧气可延缓褐变",
+          "classroomProxy": "不同抗褐变处理（盐水浸泡/柠檬汁/不处理）",
+          "researchQuestion": "不同处理是否影响苹果切面褐变速度？",
+          "independentVariable": "抗褐变处理方式",
+          "dependentDirection": "褐变速度"
+        },
+        "domainSpec": {
+          "researchQuestion": "抗褐变处理如何影响30分钟褐变面积率？",
+          "hypothesis": "不同抗褐变处理水平会使30分钟褐变面积率出现可测差异。",
+          "independentVariable": {
+            "name": "抗褐变处理",
+            "levels": [
+              "不处理",
+              "5%盐水浸泡",
+              "柠檬汁浸泡"
+            ]
+          },
+          "dependentVariable": {
+            "name": "30分钟褐变面积率",
+            "measurement": "30分钟后用方格纸估算褐变面积百分比",
+            "unit": "%",
+            "reasonableRange": [
+              0,
+              100
+            ]
+          },
+          "controlledVariables": [
+            "苹果批次",
+            "切片厚度",
+            "浸泡时长",
+            "观察时间"
+          ],
+          "materials": [
+            "同一苹果",
+            "5%盐水",
+            "柠檬汁",
+            "方格纸"
+          ],
+          "procedure": [
+            "由教师切取等厚苹果片",
+            "按三种方式处理相同时长",
+            "平放30分钟",
+            "估算褐变面积率"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "刀具只由教师使用",
+            "实验样品不得食用"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "variable_confusion",
+          "premature_stage2"
+        ],
+        "rubricTargets": [
+          "expression",
+          "stage_discipline",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-smartedu-0011-v1-b9379d19db-v1",
+      "cellKey": "P1:engineering_mentor",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-smartedu-0011-v1-b9379d19db-v1",
+      "familyKey": "smartedu-0011",
+      "phase": 1,
+      "scenario": "控制变量法在初中化学实验探究中的应用",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "USER_MESSAGE",
+      "domainSpec": {
+        "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+        "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+        "independentVariable": {
+          "name": "泡腾片颗粒大小",
+          "levels": [
+            "整片",
+            "分成4块",
+            "研成粗粉"
+          ]
+        },
+        "dependentVariable": {
+          "name": "完全溶解时间",
+          "measurement": "投入水中后用秒表记录到无固体可见的时间",
+          "unit": "s",
+          "reasonableRange": [
+            5,
+            240
+          ]
+        },
+        "controlledVariables": [
+          "泡腾片质量",
+          "水体积",
+          "水温",
+          "容器规格"
+        ],
+        "materials": [
+          "同批次泡腾片",
+          "清水",
+          "烧杯",
+          "量筒",
+          "秒表"
+        ],
+        "procedure": [
+          "准备三种颗粒大小的等质量泡腾片",
+          "量取等体积同温清水",
+          "投入后立即计时",
+          "记录固体完全消失时间"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "实验溶液不得饮用",
+          "研碎操作由教师指导并避免粉末进入眼睛"
+        ],
+        "dataPattern": "plateau",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "我对“控制变量法在初中化学实验探究中的应用”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“控制变量法在初中化学实验探究中的应用”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "decisionFacts": [
+          "我真正感兴趣的是泡腾片颗粒大小与观察现象之间的关系，但尚未决定水平、测量或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "控制变量法在初中化学实验探究中的应用",
+          "retainedFeature": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「控制变量法在初中化学实验探究中的应用」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+          "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "independentVariable": {
+            "name": "泡腾片颗粒大小",
+            "levels": [
+              "整片",
+              "分成4块",
+              "研成粗粉"
+            ]
+          },
+          "dependentVariable": {
+            "name": "完全溶解时间",
+            "measurement": "投入水中后用秒表记录到无固体可见的时间",
+            "unit": "s",
+            "reasonableRange": [
+              5,
+              240
+            ]
+          },
+          "controlledVariables": [
+            "泡腾片质量",
+            "水体积",
+            "水温",
+            "容器规格"
+          ],
+          "materials": [
+            "同批次泡腾片",
+            "清水",
+            "烧杯",
+            "量筒",
+            "秒表"
+          ],
+          "procedure": [
+            "准备三种颗粒大小的等质量泡腾片",
+            "量取等体积同温清水",
+            "投入后立即计时",
+            "记录固体完全消失时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验溶液不得饮用",
+            "研碎操作由教师指导并避免粉末进入眼睛"
+          ],
+          "dataPattern": "plateau",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-engineering-bridge-load-v1-b762ca3ae6-v1",
+      "cellKey": "P2:engineering_mentor",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-engineering-bridge-load-v1-b762ca3ae6-v1",
+      "familyKey": "engineering-bridge-load",
+      "phase": 2,
+      "scenario": "工程项目型-纸桥承重",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "纸桥结构如何影响最大承重质量？",
+        "hypothesis": "不同纸桥结构水平会使最大承重质量出现可测差异。",
+        "independentVariable": {
+          "name": "纸桥结构",
+          "levels": [
+            "平板形",
+            "拱形",
+            "三角桁架形"
+          ]
+        },
+        "dependentVariable": {
+          "name": "最大承重质量",
+          "measurement": "逐次增加砝码，记录桥面明显变形前的总质量",
+          "unit": "g",
+          "reasonableRange": [
+            0,
+            1500
+          ]
+        },
+        "controlledVariables": [
+          "纸张规格",
+          "桥跨长度",
+          "胶带用量",
+          "加载位置"
+        ],
+        "materials": [
+          "A4纸",
+          "胶带",
+          "砝码",
+          "电子秤",
+          "支撑块"
+        ],
+        "procedure": [
+          "用相同纸张制作三种结构",
+          "设置相同桥跨",
+          "在桥中央逐次增加砝码",
+          "记录明显变形前总质量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "砝码从低处轻放，脚部不得位于桥下"
+        ],
+        "dataPattern": "non_monotonic",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "engineering_project",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“工程项目型-纸桥承重”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择纸桥结构，具体水平为平板形、拱形、三角桁架形。",
+          "我提出的假设是：不同纸桥结构水平会使最大承重质量出现可测差异。",
+          "我要测量最大承重质量：逐次增加砝码，记录桥面明显变形前的总质量，单位g。",
+          "我会控制纸张规格、桥跨长度、胶带用量、加载位置。",
+          "我选择的材料是A4纸、胶带、砝码、电子秤、支撑块。",
+          "我确认的步骤是用相同纸张制作三种结构；设置相同桥跨；在桥中央逐次增加砝码；记录明显变形前总质量。",
+          "每个水平重复3次；安全要求是砝码从低处轻放，脚部不得位于桥下。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】纸桥结构如何影响最大承重质量？\n【因素与现象方向】拟改变：纸桥结构；关注：最大承重质量"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "纸桥承重",
+          "retainedFeature": "结构形式影响承重能力",
+          "classroomProxy": "不同桥身结构形式",
+          "researchQuestion": "桥身结构形式是否影响纸桥承重？",
+          "independentVariable": "桥身结构形式",
+          "dependentDirection": "承重能力"
+        },
+        "domainSpec": {
+          "researchQuestion": "纸桥结构如何影响最大承重质量？",
+          "hypothesis": "不同纸桥结构水平会使最大承重质量出现可测差异。",
+          "independentVariable": {
+            "name": "纸桥结构",
+            "levels": [
+              "平板形",
+              "拱形",
+              "三角桁架形"
+            ]
+          },
+          "dependentVariable": {
+            "name": "最大承重质量",
+            "measurement": "逐次增加砝码，记录桥面明显变形前的总质量",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              1500
+            ]
+          },
+          "controlledVariables": [
+            "纸张规格",
+            "桥跨长度",
+            "胶带用量",
+            "加载位置"
+          ],
+          "materials": [
+            "A4纸",
+            "胶带",
+            "砝码",
+            "电子秤",
+            "支撑块"
+          ],
+          "procedure": [
+            "用相同纸张制作三种结构",
+            "设置相同桥跨",
+            "在桥中央逐次增加砝码",
+            "记录明显变形前总质量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "砝码从低处轻放，脚部不得位于桥下"
+          ],
+          "dataPattern": "non_monotonic",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "engineering_flattening",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "interdisciplinary_integration",
+          "proxy_quality",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance",
+          "theme_fidelity"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-smartedu-0020-v1-a4f200a1d9-v1",
+      "cellKey": "P3:engineering_mentor",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-smartedu-0020-v1-a4f200a1d9-v1",
+      "familyKey": "smartedu-0020",
+      "phase": 3,
+      "scenario": "探究影响光合作用的因素（实验）",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "STAGE_ENTER",
+      "domainSpec": {
+        "researchQuestion": "灯与水草距离如何影响每分钟气泡数？",
+        "hypothesis": "不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+        "independentVariable": {
+          "name": "灯与水草距离",
+          "levels": [
+            "10 cm",
+            "20 cm",
+            "30 cm"
+          ]
+        },
+        "dependentVariable": {
+          "name": "每分钟气泡数",
+          "measurement": "稳定2分钟后计数1分钟内释放的气泡",
+          "unit": "个/min",
+          "reasonableRange": [
+            0,
+            60
+          ]
+        },
+        "controlledVariables": [
+          "水草长度",
+          "水温",
+          "计数时间",
+          "碳酸氢钠溶液体积"
+        ],
+        "materials": [
+          "金鱼藻",
+          "烧杯",
+          "LED灯",
+          "刻度尺",
+          "秒表"
+        ],
+        "procedure": [
+          "将等长金鱼藻放入等量溶液",
+          "按刻度尺设置灯距",
+          "稳定2分钟",
+          "计数1分钟气泡并重复测量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "LED灯与水保持安全距离",
+          "移动烧杯时防止液体泼洒"
+        ],
+        "dataPattern": "overlap",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与已审核风险相关的安全问答。",
+        "brief": [
+          "我正在做“探究影响光合作用的因素（实验）”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择灯与水草距离，具体水平为10 cm、20 cm、30 cm。",
+          "我提出的假设是：不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+          "我要测量每分钟气泡数：稳定2分钟后计数1分钟内释放的气泡，单位个/min。",
+          "我会控制水草长度、水温、计数时间、碳酸氢钠溶液体积。",
+          "我选择的材料是金鱼藻、烧杯、LED灯、刻度尺、秒表。",
+          "我确认的步骤是将等长金鱼藻放入等量溶液；按刻度尺设置灯距；稳定2分钟；计数1分钟气泡并重复测量。",
+          "每个水平重复3次；安全要求是LED灯与水保持安全距离、移动烧杯时防止液体泼洒。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】灯与水草距离如何影响每分钟气泡数？\n【已确认假设】不同灯与水草距离水平会使每分钟气泡数出现可测差异。\n【已审核变量】自变量：灯与水草距离；水平：10 cm、20 cm、30 cm；因变量：每分钟气泡数；测量：稳定2分钟后计数1分钟内释放的气泡；单位：个/min\n【已审核控制变量】水草长度、水温、计数时间、碳酸氢钠溶液体积\n【已审核重复次数】每个水平3次\n【已审核安全】LED灯与水保持安全距离、移动烧杯时防止液体泼洒\n【已审核材料】金鱼藻、烧杯、LED灯、刻度尺、秒表\n【已审核步骤】将等长金鱼藻放入等量溶液；按刻度尺设置灯距；稳定2分钟；计数1分钟气泡并重复测量",
+        "approvedPlan": {
+          "researchQuestion": "灯与水草距离如何影响每分钟气泡数？",
+          "hypothesis": "不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+          "independentVariable": {
+            "name": "灯与水草距离",
+            "levels": [
+              "10 cm",
+              "20 cm",
+              "30 cm"
+            ]
+          },
+          "dependentVariable": {
+            "name": "每分钟气泡数",
+            "measurement": "稳定2分钟后计数1分钟内释放的气泡",
+            "unit": "个/min",
+            "reasonableRange": [
+              0,
+              60
+            ]
+          },
+          "controlledVariables": [
+            "水草长度",
+            "水温",
+            "计数时间",
+            "碳酸氢钠溶液体积"
+          ],
+          "materials": [
+            "金鱼藻",
+            "烧杯",
+            "LED灯",
+            "刻度尺",
+            "秒表"
+          ],
+          "procedure": [
+            "将等长金鱼藻放入等量溶液",
+            "按刻度尺设置灯距",
+            "稳定2分钟",
+            "计数1分钟气泡并重复测量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "LED灯与水保持安全距离",
+            "移动烧杯时防止液体泼洒"
+          ],
+          "dataPattern": "overlap",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究影响光合作用的因素（实验）",
+          "retainedFeature": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究影响光合作用的因素（实验）」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "灯与水草距离如何影响每分钟气泡数？",
+          "hypothesis": "不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+          "independentVariable": {
+            "name": "灯与水草距离",
+            "levels": [
+              "10 cm",
+              "20 cm",
+              "30 cm"
+            ]
+          },
+          "dependentVariable": {
+            "name": "每分钟气泡数",
+            "measurement": "稳定2分钟后计数1分钟内释放的气泡",
+            "unit": "个/min",
+            "reasonableRange": [
+              0,
+              60
+            ]
+          },
+          "controlledVariables": [
+            "水草长度",
+            "水温",
+            "计数时间",
+            "碳酸氢钠溶液体积"
+          ],
+          "materials": [
+            "金鱼藻",
+            "烧杯",
+            "LED灯",
+            "刻度尺",
+            "秒表"
+          ],
+          "procedure": [
+            "将等长金鱼藻放入等量溶液",
+            "按刻度尺设置灯距",
+            "稳定2分钟",
+            "计数1分钟气泡并重复测量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "LED灯与水保持安全距离",
+            "移动烧杯时防止液体泼洒"
+          ],
+          "dataPattern": "overlap",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5-v1",
+      "cellKey": "P4:engineering_mentor",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-fuzzy-vehicle-ramp-angle-v1-7bf47a13b5-v1",
+      "familyKey": "fuzzy-vehicle-ramp-angle",
+      "phase": 4,
+      "scenario": "模糊型-小车与斜面",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "斜面角度如何影响离开斜面后的滑行距离？",
+        "hypothesis": "不同斜面角度水平会使离开斜面后的滑行距离出现可测差异。",
+        "independentVariable": {
+          "name": "斜面角度",
+          "levels": [
+            "10°",
+            "20°",
+            "30°"
+          ]
+        },
+        "dependentVariable": {
+          "name": "离开斜面后的滑行距离",
+          "measurement": "从斜面末端到小车停止位置测量距离",
+          "unit": "cm",
+          "reasonableRange": [
+            0,
+            400
+          ]
+        },
+        "controlledVariables": [
+          "小车型号",
+          "释放位置",
+          "斜面表面",
+          "地面材质"
+        ],
+        "materials": [
+          "实验小车",
+          "斜面板",
+          "量角器",
+          "卷尺"
+        ],
+        "procedure": [
+          "调节并核对斜面角度",
+          "从同一位置无推力释放小车",
+          "测量滑行距离",
+          "每个角度重复测量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "在轨道末端设置软挡板，避免小车撞人"
+        ],
+        "dataPattern": "single_outlier",
+        "anomalyPattern": "single_outlier"
+      },
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“模糊型-小车与斜面”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择斜面角度，具体水平为10°、20°、30°。",
+          "我提出的假设是：不同斜面角度水平会使离开斜面后的滑行距离出现可测差异。",
+          "我要测量离开斜面后的滑行距离：从斜面末端到小车停止位置测量距离，单位cm。",
+          "我会控制小车型号、释放位置、斜面表面、地面材质。",
+          "我选择的材料是实验小车、斜面板、量角器、卷尺。",
+          "我确认的步骤是调节并核对斜面角度；从同一位置无推力释放小车；测量滑行距离；每个角度重复测量。",
+          "每个水平重复3次；安全要求是在轨道末端设置软挡板，避免小车撞人。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 92,
+            "result_b": 184,
+            "result_c": 272,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 92,
+            "result_b": 184,
+            "result_c": 272,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 92,
+            "result_b": 184,
+            "result_c": 352,
+            "notes": "第3次30°的读数与同组其余记录差异较大"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】斜面角度如何影响离开斜面后的滑行距离？\n【已确认假设】不同斜面角度水平会使离开斜面后的滑行距离出现可测差异。\n【已审核变量】自变量：斜面角度；水平：10°、20°、30°；因变量：离开斜面后的滑行距离；测量：从斜面末端到小车停止位置测量距离；单位：cm\n【已审核控制变量】小车型号、释放位置、斜面表面、地面材质\n【已审核重复次数】每个水平3次\n【已审核安全】在轨道末端设置软挡板，避免小车撞人\n【已审核材料】实验小车、斜面板、量角器、卷尺\n【已审核步骤】调节并核对斜面角度；从同一位置无推力释放小车；测量滑行距离；每个角度重复测量\n【学生真实数据】\n第1次：10°=92cm；20°=184cm；30°=272cm；备注=\n第2次：10°=92cm；20°=184cm；30°=272cm；备注=\n第3次：10°=92cm；20°=184cm；30°=352cm；备注=第3次30°的读数与同组其余记录差异较大",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 92,
+            "result_b": 184,
+            "result_c": 272,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 92,
+            "result_b": 184,
+            "result_c": 272,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 92,
+            "result_b": 184,
+            "result_c": 352,
+            "notes": "第3次30°的读数与同组其余记录差异较大"
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "10°：离开斜面后的滑行距离（cm）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "20°：离开斜面后的滑行距离（cm）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "30°：离开斜面后的滑行距离（cm）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "斜面角度如何影响离开斜面后的滑行距离？",
+          "hypothesis": "不同斜面角度水平会使离开斜面后的滑行距离出现可测差异。",
+          "independentVariable": {
+            "name": "斜面角度",
+            "levels": [
+              "10°",
+              "20°",
+              "30°"
+            ]
+          },
+          "dependentVariable": {
+            "name": "离开斜面后的滑行距离",
+            "measurement": "从斜面末端到小车停止位置测量距离",
+            "unit": "cm",
+            "reasonableRange": [
+              0,
+              400
+            ]
+          },
+          "controlledVariables": [
+            "小车型号",
+            "释放位置",
+            "斜面表面",
+            "地面材质"
+          ],
+          "materials": [
+            "实验小车",
+            "斜面板",
+            "量角器",
+            "卷尺"
+          ],
+          "procedure": [
+            "调节并核对斜面角度",
+            "从同一位置无推力释放小车",
+            "测量滑行距离",
+            "每个角度重复测量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "在轨道末端设置软挡板，避免小车撞人"
+          ],
+          "dataPattern": "single_outlier",
+          "anomalyPattern": "single_outlier"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "小车下坡",
+          "retainedFeature": "坡度影响下滑加速度",
+          "classroomProxy": "不同斜面角度",
+          "researchQuestion": "斜面角度是否影响小车下滑距离？",
+          "independentVariable": "斜面角度",
+          "dependentDirection": "下滑距离"
+        },
+        "domainSpec": {
+          "researchQuestion": "斜面角度如何影响离开斜面后的滑行距离？",
+          "hypothesis": "不同斜面角度水平会使离开斜面后的滑行距离出现可测差异。",
+          "independentVariable": {
+            "name": "斜面角度",
+            "levels": [
+              "10°",
+              "20°",
+              "30°"
+            ]
+          },
+          "dependentVariable": {
+            "name": "离开斜面后的滑行距离",
+            "measurement": "从斜面末端到小车停止位置测量距离",
+            "unit": "cm",
+            "reasonableRange": [
+              0,
+              400
+            ]
+          },
+          "controlledVariables": [
+            "小车型号",
+            "释放位置",
+            "斜面表面",
+            "地面材质"
+          ],
+          "materials": [
+            "实验小车",
+            "斜面板",
+            "量角器",
+            "卷尺"
+          ],
+          "procedure": [
+            "调节并核对斜面角度",
+            "从同一位置无推力释放小车",
+            "测量滑行距离",
+            "每个角度重复测量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "在轨道末端设置软挡板，避免小车撞人"
+          ],
+          "dataPattern": "single_outlier",
+          "anomalyPattern": "single_outlier"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-all-at-once-parachute-area-v1-7a494d653d-v1",
+      "cellKey": "P5:engineering_mentor",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-all-at-once-parachute-area-v1-7a494d653d-v1",
+      "familyKey": "all-at-once-parachute-area",
+      "phase": 5,
+      "scenario": "一次给全型-降落伞面积",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "reportPath": "complete",
+      "domainSpec": {
+        "researchQuestion": "伞面面积如何影响下落时间？",
+        "hypothesis": "不同伞面面积水平会使下落时间出现可测差异。",
+        "independentVariable": {
+          "name": "伞面面积",
+          "levels": [
+            "400 cm²",
+            "625 cm²",
+            "900 cm²"
+          ]
+        },
+        "dependentVariable": {
+          "name": "下落时间",
+          "measurement": "从2 m高度释放后用秒表记录落地时间",
+          "unit": "s",
+          "reasonableRange": [
+            0.5,
+            8
+          ]
+        },
+        "controlledVariables": [
+          "载荷质量",
+          "伞绳长度",
+          "释放高度",
+          "释放姿态"
+        ],
+        "materials": [
+          "塑料伞面",
+          "细绳",
+          "相同载荷",
+          "卷尺",
+          "秒表"
+        ],
+        "procedure": [
+          "制作三种面积伞面",
+          "连接相同载荷和等长伞绳",
+          "从2 m高度释放",
+          "记录下落时间"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "释放区下方保持无人",
+          "只在教师指定高度操作，不攀爬桌椅"
+        ],
+        "dataPattern": "missing_measurement",
+        "anomalyPattern": "missing_measurement"
+      },
+      "studentVisible": {
+        "profile": "all_at_once",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“一次给全型-降落伞面积”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择伞面面积，具体水平为400 cm²、625 cm²、900 cm²。",
+          "我提出的假设是：不同伞面面积水平会使下落时间出现可测差异。",
+          "我要测量下落时间：从2 m高度释放后用秒表记录落地时间，单位s。",
+          "我会控制载荷质量、伞绳长度、释放高度、释放姿态。",
+          "我选择的材料是塑料伞面、细绳、相同载荷、卷尺、秒表。",
+          "我确认的步骤是制作三种面积伞面；连接相同载荷和等长伞绳；从2 m高度释放；记录下落时间。",
+          "每个水平重复3次；安全要求是释放区下方保持无人、只在教师指定高度操作，不攀爬桌椅。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 2.53,
+            "result_b": 4.47,
+            "result_c": 6.2,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 2.53,
+            "result_b": 4.47,
+            "result_c": 6.2,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 2.53,
+            "result_b": 4.47,
+            "result_c": "",
+            "notes": "第3次的900 cm²未记录到读数"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】伞面面积如何影响下落时间？\n【已确认假设】不同伞面面积水平会使下落时间出现可测差异。\n【已审核变量】自变量：伞面面积；水平：400 cm²、625 cm²、900 cm²；因变量：下落时间；测量：从2 m高度释放后用秒表记录落地时间；单位：s\n【已审核控制变量】载荷质量、伞绳长度、释放高度、释放姿态\n【已审核重复次数】每个水平3次\n【已审核安全】释放区下方保持无人、只在教师指定高度操作，不攀爬桌椅\n【已审核材料】塑料伞面、细绳、相同载荷、卷尺、秒表\n【已审核步骤】制作三种面积伞面；连接相同载荷和等长伞绳；从2 m高度释放；记录下落时间\n【学生真实数据】\n第1次：400 cm²=2.53s；625 cm²=4.47s；900 cm²=6.2s；备注=\n第2次：400 cm²=2.53s；625 cm²=4.47s；900 cm²=6.2s；备注=\n第3次：400 cm²=2.53s；625 cm²=4.47s；900 cm²=s；备注=第3次的900 cm²未记录到读数\n【已接受的两轮数据分析】\n学生已引用第1次的400 cm²=2.53s和625 cm²=4.47s进行比较。\n学生又引用第2次的900 cm²=6.2s，并把观察到的差异表述为相关现象而非确定因果。学生客观指出：第3次的900 cm²未记录到读数。",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 2.53,
+            "result_b": 4.47,
+            "result_c": 6.2,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 2.53,
+            "result_b": 4.47,
+            "result_c": 6.2,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 2.53,
+            "result_b": 4.47,
+            "result_c": "",
+            "notes": "第3次的900 cm²未记录到读数"
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "400 cm²：下落时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "625 cm²：下落时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "900 cm²：下落时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "伞面面积如何影响下落时间？",
+          "hypothesis": "不同伞面面积水平会使下落时间出现可测差异。",
+          "independentVariable": {
+            "name": "伞面面积",
+            "levels": [
+              "400 cm²",
+              "625 cm²",
+              "900 cm²"
+            ]
+          },
+          "dependentVariable": {
+            "name": "下落时间",
+            "measurement": "从2 m高度释放后用秒表记录落地时间",
+            "unit": "s",
+            "reasonableRange": [
+              0.5,
+              8
+            ]
+          },
+          "controlledVariables": [
+            "载荷质量",
+            "伞绳长度",
+            "释放高度",
+            "释放姿态"
+          ],
+          "materials": [
+            "塑料伞面",
+            "细绳",
+            "相同载荷",
+            "卷尺",
+            "秒表"
+          ],
+          "procedure": [
+            "制作三种面积伞面",
+            "连接相同载荷和等长伞绳",
+            "从2 m高度释放",
+            "记录下落时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "释放区下方保持无人",
+            "只在教师指定高度操作，不攀爬桌椅"
+          ],
+          "dataPattern": "missing_measurement",
+          "anomalyPattern": "missing_measurement"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的400 cm²=2.53s和625 cm²=4.47s进行比较。",
+          "学生又引用第2次的900 cm²=6.2s，并把观察到的差异表述为相关现象而非确定因果。学生客观指出：第3次的900 cm²未记录到读数。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "降落伞下落快慢",
+          "retainedFeature": "伞面面积影响空气阻力",
+          "classroomProxy": "不同伞面面积",
+          "researchQuestion": "降落伞伞面面积是否影响下落时间？",
+          "independentVariable": "伞面面积",
+          "dependentDirection": "下落时间"
+        },
+        "domainSpec": {
+          "researchQuestion": "伞面面积如何影响下落时间？",
+          "hypothesis": "不同伞面面积水平会使下落时间出现可测差异。",
+          "independentVariable": {
+            "name": "伞面面积",
+            "levels": [
+              "400 cm²",
+              "625 cm²",
+              "900 cm²"
+            ]
+          },
+          "dependentVariable": {
+            "name": "下落时间",
+            "measurement": "从2 m高度释放后用秒表记录落地时间",
+            "unit": "s",
+            "reasonableRange": [
+              0.5,
+              8
+            ]
+          },
+          "controlledVariables": [
+            "载荷质量",
+            "伞绳长度",
+            "释放高度",
+            "释放姿态"
+          ],
+          "materials": [
+            "塑料伞面",
+            "细绳",
+            "相同载荷",
+            "卷尺",
+            "秒表"
+          ],
+          "procedure": [
+            "制作三种面积伞面",
+            "连接相同载荷和等长伞绳",
+            "从2 m高度释放",
+            "记录下落时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "释放区下方保持无人",
+            "只在教师指定高度操作，不攀爬桌椅"
+          ],
+          "dataPattern": "missing_measurement",
+          "anomalyPattern": "missing_measurement"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-smartedu-0023-v1-1797ee48c0-v1",
+      "cellKey": "P6:engineering_mentor",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-smartedu-0023-v1-1797ee48c0-v1",
+      "familyKey": "smartedu-0023",
+      "phase": 6,
+      "scenario": "探究弹性势能的影响因素",
+      "styleFamily": "engineering_mentor",
+      "triggerType": "OPTIONAL_COACHING",
+      "domainSpec": {
+        "researchQuestion": "橡皮筋数量如何影响小车行驶距离？",
+        "hypothesis": "不同橡皮筋数量水平会使小车行驶距离出现可测差异。",
+        "independentVariable": {
+          "name": "橡皮筋数量",
+          "levels": [
+            "1根",
+            "2根",
+            "3根"
+          ]
+        },
+        "dependentVariable": {
+          "name": "小车行驶距离",
+          "measurement": "从起点到小车停止位置测量距离",
+          "unit": "cm",
+          "reasonableRange": [
+            0,
+            800
+          ]
+        },
+        "controlledVariables": [
+          "橡皮筋规格",
+          "小车质量",
+          "缠绕圈数",
+          "地面材质"
+        ],
+        "materials": [
+          "橡皮筋动力小车",
+          "同规格橡皮筋",
+          "卷尺"
+        ],
+        "procedure": [
+          "安装对应数量橡皮筋",
+          "保持缠绕圈数一致",
+          "从同一起点释放小车",
+          "测量停止距离"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "检查橡皮筋无裂纹并远离面部",
+          "行驶区域保持无人"
+        ],
+        "dataPattern": "replicate_variation",
+        "anomalyPattern": "replicate_variation"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "我想反思“橡皮筋数量如何影响小车行驶距离？”这次实验，但不希望你直接替我写答案。",
+        "brief": [
+          "我正在做“探究弹性势能的影响因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择橡皮筋数量，具体水平为1根、2根、3根。",
+          "我提出的假设是：不同橡皮筋数量水平会使小车行驶距离出现可测差异。",
+          "我要测量小车行驶距离：从起点到小车停止位置测量距离，单位cm。",
+          "我会控制橡皮筋规格、小车质量、缠绕圈数、地面材质。",
+          "我选择的材料是橡皮筋动力小车、同规格橡皮筋、卷尺。",
+          "我确认的步骤是安装对应数量橡皮筋；保持缠绕圈数一致；从同一起点释放小车；测量停止距离。",
+          "每个水平重复3次；安全要求是检查橡皮筋无裂纹并远离面部、行驶区域保持无人。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 152,
+            "result_b": 456,
+            "result_c": 464,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 224,
+            "result_b": 384,
+            "result_c": 536,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 296,
+            "result_b": 312,
+            "result_c": 608,
+            "notes": "第3次测量与前两次的差值较大，保留原始记录"
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】橡皮筋数量如何影响小车行驶距离？\n【已确认假设】不同橡皮筋数量水平会使小车行驶距离出现可测差异。\n【已审核变量】自变量：橡皮筋数量；水平：1根、2根、3根；因变量：小车行驶距离；测量：从起点到小车停止位置测量距离；单位：cm\n【已审核控制变量】橡皮筋规格、小车质量、缠绕圈数、地面材质\n【已审核重复次数】每个水平3次\n【已审核安全】检查橡皮筋无裂纹并远离面部、行驶区域保持无人\n【已审核材料】橡皮筋动力小车、同规格橡皮筋、卷尺\n【已审核步骤】安装对应数量橡皮筋；保持缠绕圈数一致；从同一起点释放小车；测量停止距离\n【学生真实数据】\n第1次：1根=152cm；2根=456cm；3根=464cm；备注=\n第2次：1根=224cm；2根=384cm；3根=536cm；备注=\n第3次：1根=296cm；2根=312cm；3根=608cm；备注=第3次测量与前两次的差值较大，保留原始记录\n【已接受的两轮数据分析】\n学生已引用第1次的1根=152cm和2根=456cm进行比较。\n学生又引用第2次的3根=536cm，并把观察到的差异表述为相关现象而非确定因果。学生客观指出：第3次测量与前两次的差值较大，保留原始记录。\n【已提交报告】报告正文已提交；最终局限与改进由学生本人在反思表单填写。",
+        "approvedPlan": {
+          "researchQuestion": "橡皮筋数量如何影响小车行驶距离？",
+          "hypothesis": "不同橡皮筋数量水平会使小车行驶距离出现可测差异。",
+          "independentVariable": {
+            "name": "橡皮筋数量",
+            "levels": [
+              "1根",
+              "2根",
+              "3根"
+            ]
+          },
+          "dependentVariable": {
+            "name": "小车行驶距离",
+            "measurement": "从起点到小车停止位置测量距离",
+            "unit": "cm",
+            "reasonableRange": [
+              0,
+              800
+            ]
+          },
+          "controlledVariables": [
+            "橡皮筋规格",
+            "小车质量",
+            "缠绕圈数",
+            "地面材质"
+          ],
+          "materials": [
+            "橡皮筋动力小车",
+            "同规格橡皮筋",
+            "卷尺"
+          ],
+          "procedure": [
+            "安装对应数量橡皮筋",
+            "保持缠绕圈数一致",
+            "从同一起点释放小车",
+            "测量停止距离"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "检查橡皮筋无裂纹并远离面部",
+            "行驶区域保持无人"
+          ],
+          "dataPattern": "replicate_variation",
+          "anomalyPattern": "replicate_variation"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的1根=152cm和2根=456cm进行比较。",
+          "学生又引用第2次的3根=536cm，并把观察到的差异表述为相关现象而非确定因果。学生客观指出：第3次测量与前两次的差值较大，保留原始记录。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究弹性势能的影响因素",
+          "retainedFeature": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究弹性势能的影响因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "橡皮筋数量如何影响小车行驶距离？",
+          "hypothesis": "不同橡皮筋数量水平会使小车行驶距离出现可测差异。",
+          "independentVariable": {
+            "name": "橡皮筋数量",
+            "levels": [
+              "1根",
+              "2根",
+              "3根"
+            ]
+          },
+          "dependentVariable": {
+            "name": "小车行驶距离",
+            "measurement": "从起点到小车停止位置测量距离",
+            "unit": "cm",
+            "reasonableRange": [
+              0,
+              800
+            ]
+          },
+          "controlledVariables": [
+            "橡皮筋规格",
+            "小车质量",
+            "缠绕圈数",
+            "地面材质"
+          ],
+          "materials": [
+            "橡皮筋动力小车",
+            "同规格橡皮筋",
+            "卷尺"
+          ],
+          "procedure": [
+            "安装对应数量橡皮筋",
+            "保持缠绕圈数一致",
+            "从同一起点释放小车",
+            "测量停止距离"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "检查橡皮筋无裂纹并远离面部",
+            "行驶区域保持无人"
+          ],
+          "dataPattern": "replicate_variation",
+          "anomalyPattern": "replicate_variation"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-over-broad-vehicle-fuel-v1-6ee3ea8739-v1",
+      "cellKey": "P1:evidence_analyst",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-over-broad-vehicle-fuel-v1-6ee3ea8739-v1",
+      "familyKey": "over-broad-vehicle-fuel",
+      "phase": 1,
+      "scenario": "过度宏大型-新能源车续航",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "USER_MESSAGE",
+      "domainSpec": {
+        "researchQuestion": "橡皮筋数量如何影响小车行驶距离？",
+        "hypothesis": "不同橡皮筋数量水平会使小车行驶距离出现可测差异。",
+        "independentVariable": {
+          "name": "橡皮筋数量",
+          "levels": [
+            "1根",
+            "2根",
+            "3根"
+          ]
+        },
+        "dependentVariable": {
+          "name": "小车行驶距离",
+          "measurement": "从起点到小车停止位置测量距离",
+          "unit": "cm",
+          "reasonableRange": [
+            0,
+            800
+          ]
+        },
+        "controlledVariables": [
+          "橡皮筋规格",
+          "小车质量",
+          "缠绕圈数",
+          "地面材质"
+        ],
+        "materials": [
+          "橡皮筋动力小车",
+          "同规格橡皮筋",
+          "卷尺"
+        ],
+        "procedure": [
+          "安装对应数量橡皮筋",
+          "保持缠绕圈数一致",
+          "从同一起点释放小车",
+          "测量停止距离"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "检查橡皮筋无裂纹并远离面部",
+          "行驶区域保持无人"
+        ],
+        "dataPattern": "rising",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "over_broad",
+        "openingMessage": "我对“过度宏大型-新能源车续航”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“过度宏大型-新能源车续航”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "decisionFacts": [
+          "我真正感兴趣的是橡皮筋数量与观察现象之间的关系，但尚未决定水平、测量或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "新能源汽车续航",
+          "retainedFeature": "能量来源影响续航",
+          "classroomProxy": "不同橡皮筋数量（模拟能量储备）",
+          "researchQuestion": "橡皮筋数量是否影响动力小车行驶距离？",
+          "independentVariable": "橡皮筋数量",
+          "dependentDirection": "行驶距离"
+        },
+        "domainSpec": {
+          "researchQuestion": "橡皮筋数量如何影响小车行驶距离？",
+          "hypothesis": "不同橡皮筋数量水平会使小车行驶距离出现可测差异。",
+          "independentVariable": {
+            "name": "橡皮筋数量",
+            "levels": [
+              "1根",
+              "2根",
+              "3根"
+            ]
+          },
+          "dependentVariable": {
+            "name": "小车行驶距离",
+            "measurement": "从起点到小车停止位置测量距离",
+            "unit": "cm",
+            "reasonableRange": [
+              0,
+              800
+            ]
+          },
+          "controlledVariables": [
+            "橡皮筋规格",
+            "小车质量",
+            "缠绕圈数",
+            "地面材质"
+          ],
+          "materials": [
+            "橡皮筋动力小车",
+            "同规格橡皮筋",
+            "卷尺"
+          ],
+          "procedure": [
+            "安装对应数量橡皮筋",
+            "保持缠绕圈数一致",
+            "从同一起点释放小车",
+            "测量停止距离"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "检查橡皮筋无裂纹并远离面部",
+            "行驶区域保持无人"
+          ],
+          "dataPattern": "rising",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "theme_loss",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "proxy_quality",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-real-world-classroom-shade-heat-v1-51bf2d8516-v1",
+      "cellKey": "P2:evidence_analyst",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-real-world-classroom-shade-heat-v1-51bf2d8516-v1",
+      "familyKey": "real-world-classroom-shade-heat",
+      "phase": 2,
+      "scenario": "现实问题抽象型-教室遮光降温",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "包覆材料如何影响20分钟温度下降值？",
+        "hypothesis": "不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+        "independentVariable": {
+          "name": "包覆材料",
+          "levels": [
+            "无包覆",
+            "棉布",
+            "铝箔气泡膜"
+          ]
+        },
+        "dependentVariable": {
+          "name": "20分钟温度下降值",
+          "measurement": "记录初温和20分钟温度并计算差值",
+          "unit": "℃",
+          "reasonableRange": [
+            0,
+            35
+          ]
+        },
+        "controlledVariables": [
+          "水体积",
+          "初始温度",
+          "容器规格",
+          "室温"
+        ],
+        "materials": [
+          "相同烧杯",
+          "温水",
+          "棉布",
+          "铝箔气泡膜",
+          "温度计"
+        ],
+        "procedure": [
+          "向烧杯加入等体积同温温水",
+          "按三种方式包覆",
+          "同时开始计时",
+          "20分钟后记录温度并计算下降值"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "使用不超过50 ℃的温水",
+          "擦干洒出的水并轻拿玻璃器皿"
+        ],
+        "dataPattern": "falling",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“现实问题抽象型-教室遮光降温”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择包覆材料，具体水平为无包覆、棉布、铝箔气泡膜。",
+          "我提出的假设是：不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+          "我要测量20分钟温度下降值：记录初温和20分钟温度并计算差值，单位℃。",
+          "我会控制水体积、初始温度、容器规格、室温。",
+          "我选择的材料是相同烧杯、温水、棉布、铝箔气泡膜、温度计。",
+          "我确认的步骤是向烧杯加入等体积同温温水；按三种方式包覆；同时开始计时；20分钟后记录温度并计算下降值。",
+          "每个水平重复3次；安全要求是使用不超过50 ℃的温水、擦干洒出的水并轻拿玻璃器皿。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】包覆材料如何影响20分钟温度下降值？\n【因素与现象方向】拟改变：包覆材料；关注：20分钟温度下降值"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "教室夏天太热",
+          "retainedFeature": "遮挡阳光可降温",
+          "classroomProxy": "不同遮光材料盖纸盒",
+          "researchQuestion": "遮光材料是否影响纸盒内温度变化？",
+          "independentVariable": "遮光材料",
+          "dependentDirection": "纸盒内温度变化"
+        },
+        "domainSpec": {
+          "researchQuestion": "包覆材料如何影响20分钟温度下降值？",
+          "hypothesis": "不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+          "independentVariable": {
+            "name": "包覆材料",
+            "levels": [
+              "无包覆",
+              "棉布",
+              "铝箔气泡膜"
+            ]
+          },
+          "dependentVariable": {
+            "name": "20分钟温度下降值",
+            "measurement": "记录初温和20分钟温度并计算差值",
+            "unit": "℃",
+            "reasonableRange": [
+              0,
+              35
+            ]
+          },
+          "controlledVariables": [
+            "水体积",
+            "初始温度",
+            "容器规格",
+            "室温"
+          ],
+          "materials": [
+            "相同烧杯",
+            "温水",
+            "棉布",
+            "铝箔气泡膜",
+            "温度计"
+          ],
+          "procedure": [
+            "向烧杯加入等体积同温温水",
+            "按三种方式包覆",
+            "同时开始计时",
+            "20分钟后记录温度并计算下降值"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "使用不超过50 ℃的温水",
+            "擦干洒出的水并轻拿玻璃器皿"
+          ],
+          "dataPattern": "falling",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "theme_loss"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance",
+          "theme_fidelity"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-cooperative-thermal-insulation-v1-b9a7d9d183-v1",
+      "cellKey": "P3:evidence_analyst",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-cooperative-thermal-insulation-v1-b9a7d9d183-v1",
+      "familyKey": "cooperative-thermal-insulation",
+      "phase": 3,
+      "scenario": "配合型-保温材料",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "STAGE_ENTER",
+      "domainSpec": {
+        "researchQuestion": "包覆材料如何影响20分钟温度下降值？",
+        "hypothesis": "不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+        "independentVariable": {
+          "name": "包覆材料",
+          "levels": [
+            "无包覆",
+            "棉布",
+            "铝箔气泡膜"
+          ]
+        },
+        "dependentVariable": {
+          "name": "20分钟温度下降值",
+          "measurement": "记录初温和20分钟温度并计算差值",
+          "unit": "℃",
+          "reasonableRange": [
+            0,
+            35
+          ]
+        },
+        "controlledVariables": [
+          "水体积",
+          "初始温度",
+          "容器规格",
+          "室温"
+        ],
+        "materials": [
+          "相同烧杯",
+          "温水",
+          "棉布",
+          "铝箔气泡膜",
+          "温度计"
+        ],
+        "procedure": [
+          "向烧杯加入等体积同温温水",
+          "按三种方式包覆",
+          "同时开始计时",
+          "20分钟后记录温度并计算下降值"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "使用不超过50 ℃的温水",
+          "擦干洒出的水并轻拿玻璃器皿"
+        ],
+        "dataPattern": "weak_trend",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与已审核风险相关的安全问答。",
+        "brief": [
+          "我正在做“配合型-保温材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择包覆材料，具体水平为无包覆、棉布、铝箔气泡膜。",
+          "我提出的假设是：不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+          "我要测量20分钟温度下降值：记录初温和20分钟温度并计算差值，单位℃。",
+          "我会控制水体积、初始温度、容器规格、室温。",
+          "我选择的材料是相同烧杯、温水、棉布、铝箔气泡膜、温度计。",
+          "我确认的步骤是向烧杯加入等体积同温温水；按三种方式包覆；同时开始计时；20分钟后记录温度并计算下降值。",
+          "每个水平重复3次；安全要求是使用不超过50 ℃的温水、擦干洒出的水并轻拿玻璃器皿。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】包覆材料如何影响20分钟温度下降值？\n【已确认假设】不同包覆材料水平会使20分钟温度下降值出现可测差异。\n【已审核变量】自变量：包覆材料；水平：无包覆、棉布、铝箔气泡膜；因变量：20分钟温度下降值；测量：记录初温和20分钟温度并计算差值；单位：℃\n【已审核控制变量】水体积、初始温度、容器规格、室温\n【已审核重复次数】每个水平3次\n【已审核安全】使用不超过50 ℃的温水、擦干洒出的水并轻拿玻璃器皿\n【已审核材料】相同烧杯、温水、棉布、铝箔气泡膜、温度计\n【已审核步骤】向烧杯加入等体积同温温水；按三种方式包覆；同时开始计时；20分钟后记录温度并计算下降值",
+        "approvedPlan": {
+          "researchQuestion": "包覆材料如何影响20分钟温度下降值？",
+          "hypothesis": "不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+          "independentVariable": {
+            "name": "包覆材料",
+            "levels": [
+              "无包覆",
+              "棉布",
+              "铝箔气泡膜"
+            ]
+          },
+          "dependentVariable": {
+            "name": "20分钟温度下降值",
+            "measurement": "记录初温和20分钟温度并计算差值",
+            "unit": "℃",
+            "reasonableRange": [
+              0,
+              35
+            ]
+          },
+          "controlledVariables": [
+            "水体积",
+            "初始温度",
+            "容器规格",
+            "室温"
+          ],
+          "materials": [
+            "相同烧杯",
+            "温水",
+            "棉布",
+            "铝箔气泡膜",
+            "温度计"
+          ],
+          "procedure": [
+            "向烧杯加入等体积同温温水",
+            "按三种方式包覆",
+            "同时开始计时",
+            "20分钟后记录温度并计算下降值"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "使用不超过50 ℃的温水",
+            "擦干洒出的水并轻拿玻璃器皿"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "保温杯保温",
+          "retainedFeature": "材料隔热性能差异",
+          "classroomProxy": "不同包覆材料",
+          "researchQuestion": "包覆材料是否影响热水降温速度？",
+          "independentVariable": "包覆材料",
+          "dependentDirection": "降温速度",
+          "safetyNotes": [
+            "热水温度控制在60-70℃，避免烫伤"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "包覆材料如何影响20分钟温度下降值？",
+          "hypothesis": "不同包覆材料水平会使20分钟温度下降值出现可测差异。",
+          "independentVariable": {
+            "name": "包覆材料",
+            "levels": [
+              "无包覆",
+              "棉布",
+              "铝箔气泡膜"
+            ]
+          },
+          "dependentVariable": {
+            "name": "20分钟温度下降值",
+            "measurement": "记录初温和20分钟温度并计算差值",
+            "unit": "℃",
+            "reasonableRange": [
+              0,
+              35
+            ]
+          },
+          "controlledVariables": [
+            "水体积",
+            "初始温度",
+            "容器规格",
+            "室温"
+          ],
+          "materials": [
+            "相同烧杯",
+            "温水",
+            "棉布",
+            "铝箔气泡膜",
+            "温度计"
+          ],
+          "procedure": [
+            "向烧杯加入等体积同温温水",
+            "按三种方式包覆",
+            "同时开始计时",
+            "20分钟后记录温度并计算下降值"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "使用不超过50 ℃的温水",
+            "擦干洒出的水并轻拿玻璃器皿"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "format_discipline"
+        ],
+        "rubricTargets": [
+          "expression",
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-smartedu-0026-v1-35e497f896-v1",
+      "cellKey": "P4:evidence_analyst",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-smartedu-0026-v1-35e497f896-v1",
+      "familyKey": "smartedu-0026",
+      "phase": 4,
+      "scenario": "探究影响电磁铁磁性强弱的因素",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "线圈匝数如何影响吸起回形针数量？",
+        "hypothesis": "不同线圈匝数水平会使吸起回形针数量出现可测差异。",
+        "independentVariable": {
+          "name": "线圈匝数",
+          "levels": [
+            "20匝",
+            "40匝",
+            "60匝"
+          ]
+        },
+        "dependentVariable": {
+          "name": "吸起回形针数量",
+          "measurement": "通电3秒后统计一次吸起的回形针数",
+          "unit": "枚",
+          "reasonableRange": [
+            0,
+            50
+          ]
+        },
+        "controlledVariables": [
+          "铁钉规格",
+          "电池电压",
+          "通电时间",
+          "回形针规格"
+        ],
+        "materials": [
+          "铁钉",
+          "绝缘导线",
+          "低压电池盒",
+          "开关",
+          "回形针"
+        ],
+        "procedure": [
+          "绕制三种匝数线圈",
+          "接入相同低压电源",
+          "每次通电3秒吸取回形针",
+          "断电后统计数量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "每次通电不超过3秒并在测量间隔断电",
+          "导线发热时立即停止"
+        ],
+        "dataPattern": "plateau",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“探究影响电磁铁磁性强弱的因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择线圈匝数，具体水平为20匝、40匝、60匝。",
+          "我提出的假设是：不同线圈匝数水平会使吸起回形针数量出现可测差异。",
+          "我要测量吸起回形针数量：通电3秒后统计一次吸起的回形针数，单位枚。",
+          "我会控制铁钉规格、电池电压、通电时间、回形针规格。",
+          "我选择的材料是铁钉、绝缘导线、低压电池盒、开关、回形针。",
+          "我确认的步骤是绕制三种匝数线圈；接入相同低压电源；每次通电3秒吸取回形针；断电后统计数量。",
+          "每个水平重复3次；安全要求是每次通电不超过3秒并在测量间隔断电、导线发热时立即停止。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 13.5,
+            "result_b": 34,
+            "result_c": 35.5,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 13.5,
+            "result_b": 34,
+            "result_c": 35.5,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 13.5,
+            "result_b": 34,
+            "result_c": 35.5,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】线圈匝数如何影响吸起回形针数量？\n【已确认假设】不同线圈匝数水平会使吸起回形针数量出现可测差异。\n【已审核变量】自变量：线圈匝数；水平：20匝、40匝、60匝；因变量：吸起回形针数量；测量：通电3秒后统计一次吸起的回形针数；单位：枚\n【已审核控制变量】铁钉规格、电池电压、通电时间、回形针规格\n【已审核重复次数】每个水平3次\n【已审核安全】每次通电不超过3秒并在测量间隔断电、导线发热时立即停止\n【已审核材料】铁钉、绝缘导线、低压电池盒、开关、回形针\n【已审核步骤】绕制三种匝数线圈；接入相同低压电源；每次通电3秒吸取回形针；断电后统计数量\n【学生真实数据】\n第1次：20匝=13.5枚；40匝=34枚；60匝=35.5枚；备注=\n第2次：20匝=13.5枚；40匝=34枚；60匝=35.5枚；备注=\n第3次：20匝=13.5枚；40匝=34枚；60匝=35.5枚；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 13.5,
+            "result_b": 34,
+            "result_c": 35.5,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 13.5,
+            "result_b": 34,
+            "result_c": 35.5,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 13.5,
+            "result_b": 34,
+            "result_c": 35.5,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "20匝：吸起回形针数量（枚）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "40匝：吸起回形针数量（枚）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "60匝：吸起回形针数量（枚）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "线圈匝数如何影响吸起回形针数量？",
+          "hypothesis": "不同线圈匝数水平会使吸起回形针数量出现可测差异。",
+          "independentVariable": {
+            "name": "线圈匝数",
+            "levels": [
+              "20匝",
+              "40匝",
+              "60匝"
+            ]
+          },
+          "dependentVariable": {
+            "name": "吸起回形针数量",
+            "measurement": "通电3秒后统计一次吸起的回形针数",
+            "unit": "枚",
+            "reasonableRange": [
+              0,
+              50
+            ]
+          },
+          "controlledVariables": [
+            "铁钉规格",
+            "电池电压",
+            "通电时间",
+            "回形针规格"
+          ],
+          "materials": [
+            "铁钉",
+            "绝缘导线",
+            "低压电池盒",
+            "开关",
+            "回形针"
+          ],
+          "procedure": [
+            "绕制三种匝数线圈",
+            "接入相同低压电源",
+            "每次通电3秒吸取回形针",
+            "断电后统计数量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "每次通电不超过3秒并在测量间隔断电",
+            "导线发热时立即停止"
+          ],
+          "dataPattern": "plateau",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究影响电磁铁磁性强弱的因素",
+          "retainedFeature": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究影响电磁铁磁性强弱的因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "线圈匝数如何影响吸起回形针数量？",
+          "hypothesis": "不同线圈匝数水平会使吸起回形针数量出现可测差异。",
+          "independentVariable": {
+            "name": "线圈匝数",
+            "levels": [
+              "20匝",
+              "40匝",
+              "60匝"
+            ]
+          },
+          "dependentVariable": {
+            "name": "吸起回形针数量",
+            "measurement": "通电3秒后统计一次吸起的回形针数",
+            "unit": "枚",
+            "reasonableRange": [
+              0,
+              50
+            ]
+          },
+          "controlledVariables": [
+            "铁钉规格",
+            "电池电压",
+            "通电时间",
+            "回形针规格"
+          ],
+          "materials": [
+            "铁钉",
+            "绝缘导线",
+            "低压电池盒",
+            "开关",
+            "回形针"
+          ],
+          "procedure": [
+            "绕制三种匝数线圈",
+            "接入相同低压电源",
+            "每次通电3秒吸取回形针",
+            "断电后统计数量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "每次通电不超过3秒并在测量间隔断电",
+            "导线发热时立即停止"
+          ],
+          "dataPattern": "plateau",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-engineering-waterproof-material-v1-f8addcf76c-v1",
+      "cellKey": "P5:evidence_analyst",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-engineering-waterproof-material-v1-f8addcf76c-v1",
+      "familyKey": "engineering-waterproof-material",
+      "phase": 5,
+      "scenario": "工程项目型-防水材料",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "reportPath": "complete",
+      "domainSpec": {
+        "researchQuestion": "表面处理材料如何影响3分钟吸水质量？",
+        "hypothesis": "不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+        "independentVariable": {
+          "name": "表面处理材料",
+          "levels": [
+            "不处理",
+            "蜡笔涂层",
+            "透明胶带覆盖"
+          ]
+        },
+        "dependentVariable": {
+          "name": "3分钟吸水质量",
+          "measurement": "接触水前后称量并计算质量增加值",
+          "unit": "g",
+          "reasonableRange": [
+            0,
+            30
+          ]
+        },
+        "controlledVariables": [
+          "纸片面积",
+          "接触水深",
+          "接触时间",
+          "水温"
+        ],
+        "materials": [
+          "同规格纸片",
+          "蜡笔",
+          "透明胶带",
+          "清水",
+          "电子秤"
+        ],
+        "procedure": [
+          "制作三种表面处理纸片",
+          "称量初始质量",
+          "接触相同深度清水3分钟",
+          "擦去表面水后再次称量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "及时擦干电子秤附近的水",
+          "电子秤不得直接接触水"
+        ],
+        "dataPattern": "non_monotonic",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "engineering_project",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“工程项目型-防水材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择表面处理材料，具体水平为不处理、蜡笔涂层、透明胶带覆盖。",
+          "我提出的假设是：不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+          "我要测量3分钟吸水质量：接触水前后称量并计算质量增加值，单位g。",
+          "我会控制纸片面积、接触水深、接触时间、水温。",
+          "我选择的材料是同规格纸片、蜡笔、透明胶带、清水、电子秤。",
+          "我确认的步骤是制作三种表面处理纸片；称量初始质量；接触相同深度清水3分钟；擦去表面水后再次称量。",
+          "每个水平重复3次；安全要求是及时擦干电子秤附近的水、电子秤不得直接接触水。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 10.8,
+            "result_b": 22.2,
+            "result_c": 13.5,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 10.8,
+            "result_b": 22.2,
+            "result_c": 13.5,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 10.8,
+            "result_b": 22.2,
+            "result_c": 13.5,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】表面处理材料如何影响3分钟吸水质量？\n【已确认假设】不同表面处理材料水平会使3分钟吸水质量出现可测差异。\n【已审核变量】自变量：表面处理材料；水平：不处理、蜡笔涂层、透明胶带覆盖；因变量：3分钟吸水质量；测量：接触水前后称量并计算质量增加值；单位：g\n【已审核控制变量】纸片面积、接触水深、接触时间、水温\n【已审核重复次数】每个水平3次\n【已审核安全】及时擦干电子秤附近的水、电子秤不得直接接触水\n【已审核材料】同规格纸片、蜡笔、透明胶带、清水、电子秤\n【已审核步骤】制作三种表面处理纸片；称量初始质量；接触相同深度清水3分钟；擦去表面水后再次称量\n【学生真实数据】\n第1次：不处理=10.8g；蜡笔涂层=22.2g；透明胶带覆盖=13.5g；备注=\n第2次：不处理=10.8g；蜡笔涂层=22.2g；透明胶带覆盖=13.5g；备注=\n第3次：不处理=10.8g；蜡笔涂层=22.2g；透明胶带覆盖=13.5g；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的不处理=10.8g和蜡笔涂层=22.2g进行比较。\n学生又引用第2次的透明胶带覆盖=13.5g，并把观察到的差异表述为相关现象而非确定因果。",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 10.8,
+            "result_b": 22.2,
+            "result_c": 13.5,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 10.8,
+            "result_b": 22.2,
+            "result_c": 13.5,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 10.8,
+            "result_b": 22.2,
+            "result_c": 13.5,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "不处理：3分钟吸水质量（g）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "蜡笔涂层：3分钟吸水质量（g）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "透明胶带覆盖：3分钟吸水质量（g）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "表面处理材料如何影响3分钟吸水质量？",
+          "hypothesis": "不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+          "independentVariable": {
+            "name": "表面处理材料",
+            "levels": [
+              "不处理",
+              "蜡笔涂层",
+              "透明胶带覆盖"
+            ]
+          },
+          "dependentVariable": {
+            "name": "3分钟吸水质量",
+            "measurement": "接触水前后称量并计算质量增加值",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              30
+            ]
+          },
+          "controlledVariables": [
+            "纸片面积",
+            "接触水深",
+            "接触时间",
+            "水温"
+          ],
+          "materials": [
+            "同规格纸片",
+            "蜡笔",
+            "透明胶带",
+            "清水",
+            "电子秤"
+          ],
+          "procedure": [
+            "制作三种表面处理纸片",
+            "称量初始质量",
+            "接触相同深度清水3分钟",
+            "擦去表面水后再次称量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "及时擦干电子秤附近的水",
+            "电子秤不得直接接触水"
+          ],
+          "dataPattern": "non_monotonic",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的不处理=10.8g和蜡笔涂层=22.2g进行比较。",
+          "学生又引用第2次的透明胶带覆盖=13.5g，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "做防水的东西",
+          "retainedFeature": "材料表面影响渗水",
+          "classroomProxy": "不同涂层材料",
+          "researchQuestion": "涂层材料是否影响纸板渗水时间？",
+          "independentVariable": "涂层材料",
+          "dependentDirection": "渗水时间"
+        },
+        "domainSpec": {
+          "researchQuestion": "表面处理材料如何影响3分钟吸水质量？",
+          "hypothesis": "不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+          "independentVariable": {
+            "name": "表面处理材料",
+            "levels": [
+              "不处理",
+              "蜡笔涂层",
+              "透明胶带覆盖"
+            ]
+          },
+          "dependentVariable": {
+            "name": "3分钟吸水质量",
+            "measurement": "接触水前后称量并计算质量增加值",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              30
+            ]
+          },
+          "controlledVariables": [
+            "纸片面积",
+            "接触水深",
+            "接触时间",
+            "水温"
+          ],
+          "materials": [
+            "同规格纸片",
+            "蜡笔",
+            "透明胶带",
+            "清水",
+            "电子秤"
+          ],
+          "procedure": [
+            "制作三种表面处理纸片",
+            "称量初始质量",
+            "接触相同深度清水3分钟",
+            "擦去表面水后再次称量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "及时擦干电子秤附近的水",
+            "电子秤不得直接接触水"
+          ],
+          "dataPattern": "non_monotonic",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "engineering_flattening"
+        ],
+        "rubricTargets": [
+          "expression",
+          "interdisciplinary_integration",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-fuzzy-absorbent-paper-v1-fbdc9240ca-v1",
+      "cellKey": "P6:evidence_analyst",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-fuzzy-absorbent-paper-v1-fbdc9240ca-v1",
+      "familyKey": "fuzzy-absorbent-paper",
+      "phase": 6,
+      "scenario": "模糊型-吸水材料",
+      "styleFamily": "evidence_analyst",
+      "triggerType": "OPTIONAL_COACHING",
+      "domainSpec": {
+        "researchQuestion": "表面处理材料如何影响3分钟吸水质量？",
+        "hypothesis": "不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+        "independentVariable": {
+          "name": "表面处理材料",
+          "levels": [
+            "不处理",
+            "蜡笔涂层",
+            "透明胶带覆盖"
+          ]
+        },
+        "dependentVariable": {
+          "name": "3分钟吸水质量",
+          "measurement": "接触水前后称量并计算质量增加值",
+          "unit": "g",
+          "reasonableRange": [
+            0,
+            30
+          ]
+        },
+        "controlledVariables": [
+          "纸片面积",
+          "接触水深",
+          "接触时间",
+          "水温"
+        ],
+        "materials": [
+          "同规格纸片",
+          "蜡笔",
+          "透明胶带",
+          "清水",
+          "电子秤"
+        ],
+        "procedure": [
+          "制作三种表面处理纸片",
+          "称量初始质量",
+          "接触相同深度清水3分钟",
+          "擦去表面水后再次称量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "及时擦干电子秤附近的水",
+          "电子秤不得直接接触水"
+        ],
+        "dataPattern": "overlap",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "fuzzy_interest",
+        "openingMessage": "我想反思“表面处理材料如何影响3分钟吸水质量？”这次实验，但不希望你直接替我写答案。",
+        "brief": [
+          "我正在做“模糊型-吸水材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择表面处理材料，具体水平为不处理、蜡笔涂层、透明胶带覆盖。",
+          "我提出的假设是：不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+          "我要测量3分钟吸水质量：接触水前后称量并计算质量增加值，单位g。",
+          "我会控制纸片面积、接触水深、接触时间、水温。",
+          "我选择的材料是同规格纸片、蜡笔、透明胶带、清水、电子秤。",
+          "我确认的步骤是制作三种表面处理纸片；称量初始质量；接触相同深度清水3分钟；擦去表面水后再次称量。",
+          "每个水平重复3次；安全要求是及时擦干电子秤附近的水、电子秤不得直接接触水。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 14.4,
+            "result_b": 14.7,
+            "result_c": 15.6,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 14.4,
+            "result_b": 14.7,
+            "result_c": 15.6,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 14.4,
+            "result_b": 14.7,
+            "result_c": 15.6,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】表面处理材料如何影响3分钟吸水质量？\n【已确认假设】不同表面处理材料水平会使3分钟吸水质量出现可测差异。\n【已审核变量】自变量：表面处理材料；水平：不处理、蜡笔涂层、透明胶带覆盖；因变量：3分钟吸水质量；测量：接触水前后称量并计算质量增加值；单位：g\n【已审核控制变量】纸片面积、接触水深、接触时间、水温\n【已审核重复次数】每个水平3次\n【已审核安全】及时擦干电子秤附近的水、电子秤不得直接接触水\n【已审核材料】同规格纸片、蜡笔、透明胶带、清水、电子秤\n【已审核步骤】制作三种表面处理纸片；称量初始质量；接触相同深度清水3分钟；擦去表面水后再次称量\n【学生真实数据】\n第1次：不处理=14.4g；蜡笔涂层=14.7g；透明胶带覆盖=15.6g；备注=\n第2次：不处理=14.4g；蜡笔涂层=14.7g；透明胶带覆盖=15.6g；备注=\n第3次：不处理=14.4g；蜡笔涂层=14.7g；透明胶带覆盖=15.6g；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的不处理=14.4g和蜡笔涂层=14.7g进行比较。\n学生又引用第2次的透明胶带覆盖=15.6g，并把观察到的差异表述为相关现象而非确定因果。\n【已提交报告】报告正文已提交；最终局限与改进由学生本人在反思表单填写。",
+        "approvedPlan": {
+          "researchQuestion": "表面处理材料如何影响3分钟吸水质量？",
+          "hypothesis": "不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+          "independentVariable": {
+            "name": "表面处理材料",
+            "levels": [
+              "不处理",
+              "蜡笔涂层",
+              "透明胶带覆盖"
+            ]
+          },
+          "dependentVariable": {
+            "name": "3分钟吸水质量",
+            "measurement": "接触水前后称量并计算质量增加值",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              30
+            ]
+          },
+          "controlledVariables": [
+            "纸片面积",
+            "接触水深",
+            "接触时间",
+            "水温"
+          ],
+          "materials": [
+            "同规格纸片",
+            "蜡笔",
+            "透明胶带",
+            "清水",
+            "电子秤"
+          ],
+          "procedure": [
+            "制作三种表面处理纸片",
+            "称量初始质量",
+            "接触相同深度清水3分钟",
+            "擦去表面水后再次称量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "及时擦干电子秤附近的水",
+            "电子秤不得直接接触水"
+          ],
+          "dataPattern": "overlap",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的不处理=14.4g和蜡笔涂层=14.7g进行比较。",
+          "学生又引用第2次的透明胶带覆盖=15.6g，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "纸吸水",
+          "retainedFeature": "材质影响吸水高度",
+          "classroomProxy": "不同纸条材质",
+          "researchQuestion": "纸条材质是否影响吸水高度？",
+          "independentVariable": "纸条材质",
+          "dependentDirection": "吸水高度"
+        },
+        "domainSpec": {
+          "researchQuestion": "表面处理材料如何影响3分钟吸水质量？",
+          "hypothesis": "不同表面处理材料水平会使3分钟吸水质量出现可测差异。",
+          "independentVariable": {
+            "name": "表面处理材料",
+            "levels": [
+              "不处理",
+              "蜡笔涂层",
+              "透明胶带覆盖"
+            ]
+          },
+          "dependentVariable": {
+            "name": "3分钟吸水质量",
+            "measurement": "接触水前后称量并计算质量增加值",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              30
+            ]
+          },
+          "controlledVariables": [
+            "纸片面积",
+            "接触水深",
+            "接触时间",
+            "水温"
+          ],
+          "materials": [
+            "同规格纸片",
+            "蜡笔",
+            "透明胶带",
+            "清水",
+            "电子秤"
+          ],
+          "procedure": [
+            "制作三种表面处理纸片",
+            "称量初始质量",
+            "接触相同深度清水3分钟",
+            "擦去表面水后再次称量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "及时擦干电子秤附近的水",
+            "电子秤不得直接接触水"
+          ],
+          "dataPattern": "overlap",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "over_questioning"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "expression",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p1-engineering-oil-separation-v1-00dcecb636-v1",
+      "cellKey": "P1:classroom_coach",
+      "parentLegacyRecordId": "stem-distill-dsv4-p1-engineering-oil-separation-v1-00dcecb636-v1",
+      "familyKey": "engineering-oil-separation",
+      "phase": 1,
+      "scenario": "工程项目型-油污分离装置",
+      "styleFamily": "classroom_coach",
+      "triggerType": "USER_MESSAGE",
+      "domainSpec": {
+        "researchQuestion": "过滤材料如何影响过滤后浊度？",
+        "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+        "independentVariable": {
+          "name": "过滤材料",
+          "levels": [
+            "棉布",
+            "滤纸",
+            "活性炭+滤纸"
+          ]
+        },
+        "dependentVariable": {
+          "name": "过滤后浊度",
+          "measurement": "用浊度传感器测量过滤后水样",
+          "unit": "NTU",
+          "reasonableRange": [
+            0,
+            300
+          ]
+        },
+        "controlledVariables": [
+          "原水体积",
+          "原水批次",
+          "过滤材料面积",
+          "静置时间"
+        ],
+        "materials": [
+          "模拟浑水",
+          "棉布",
+          "滤纸",
+          "活性炭",
+          "漏斗",
+          "浊度传感器"
+        ],
+        "procedure": [
+          "混匀同一批模拟浑水",
+          "装配三种过滤材料",
+          "分别过滤相同体积水样",
+          "测量过滤后浊度"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "模拟浑水不得饮用",
+          "活性炭粉末避免吸入并及时清理"
+        ],
+        "dataPattern": "single_outlier",
+        "anomalyPattern": "single_outlier"
+      },
+      "studentVisible": {
+        "profile": "engineering_project",
+        "openingMessage": "我对“工程项目型-油污分离装置”感兴趣，但还不知道怎样变成课堂里能研究的问题。",
+        "brief": [
+          "我正在做“工程项目型-油污分离装置”主题的探究。",
+          "我还没有确定具体变量、组别、测量方法或步骤。"
+        ],
+        "decisionFacts": [
+          "我真正感兴趣的是过滤材料与观察现象之间的关系，但尚未决定水平、测量或步骤。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {},
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "油污处理装置",
+          "retainedFeature": "材料亲水/疏油差异影响分离",
+          "classroomProxy": "不同吸附材料",
+          "researchQuestion": "吸附材料是否影响从水面除油效率？",
+          "independentVariable": "吸附材料",
+          "dependentDirection": "除油效率"
+        },
+        "domainSpec": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "single_outlier",
+          "anomalyPattern": "single_outlier"
+        },
+        "failureModes": [
+          "engineering_flattening",
+          "proxy_drift"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "interdisciplinary_integration",
+          "proxy_quality",
+          "stem_fit",
+          "student_agency",
+          "theme_fidelity",
+          "transformation_reasoning"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p2-smartedu-0018-v1-f69464bf80-v1",
+      "cellKey": "P2:classroom_coach",
+      "parentLegacyRecordId": "stem-distill-dsv4-p2-smartedu-0018-v1-f69464bf80-v1",
+      "familyKey": "smartedu-0018",
+      "phase": 2,
+      "scenario": "探究光合作用的影响因素",
+      "styleFamily": "classroom_coach",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "灯与水草距离如何影响每分钟气泡数？",
+        "hypothesis": "不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+        "independentVariable": {
+          "name": "灯与水草距离",
+          "levels": [
+            "10 cm",
+            "20 cm",
+            "30 cm"
+          ]
+        },
+        "dependentVariable": {
+          "name": "每分钟气泡数",
+          "measurement": "稳定2分钟后计数1分钟内释放的气泡",
+          "unit": "个/min",
+          "reasonableRange": [
+            0,
+            60
+          ]
+        },
+        "controlledVariables": [
+          "水草长度",
+          "水温",
+          "计数时间",
+          "碳酸氢钠溶液体积"
+        ],
+        "materials": [
+          "金鱼藻",
+          "烧杯",
+          "LED灯",
+          "刻度尺",
+          "秒表"
+        ],
+        "procedure": [
+          "将等长金鱼藻放入等量溶液",
+          "按刻度尺设置灯距",
+          "稳定2分钟",
+          "计数1分钟气泡并重复测量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "LED灯与水保持安全距离",
+          "移动烧杯时防止液体泼洒"
+        ],
+        "dataPattern": "missing_measurement",
+        "anomalyPattern": "missing_measurement"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。",
+        "brief": [
+          "我正在做“探究光合作用的影响因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择灯与水草距离，具体水平为10 cm、20 cm、30 cm。",
+          "我提出的假设是：不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+          "我要测量每分钟气泡数：稳定2分钟后计数1分钟内释放的气泡，单位个/min。",
+          "我会控制水草长度、水温、计数时间、碳酸氢钠溶液体积。",
+          "我选择的材料是金鱼藻、烧杯、LED灯、刻度尺、秒表。",
+          "我确认的步骤是将等长金鱼藻放入等量溶液；按刻度尺设置灯距；稳定2分钟；计数1分钟气泡并重复测量。",
+          "每个水平重复3次；安全要求是LED灯与水保持安全距离、移动烧杯时防止液体泼洒。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】灯与水草距离如何影响每分钟气泡数？\n【因素与现象方向】拟改变：灯与水草距离；关注：每分钟气泡数"
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究光合作用的影响因素",
+          "retainedFeature": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究光合作用的影响因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "灯与水草距离如何影响每分钟气泡数？",
+          "hypothesis": "不同灯与水草距离水平会使每分钟气泡数出现可测差异。",
+          "independentVariable": {
+            "name": "灯与水草距离",
+            "levels": [
+              "10 cm",
+              "20 cm",
+              "30 cm"
+            ]
+          },
+          "dependentVariable": {
+            "name": "每分钟气泡数",
+            "measurement": "稳定2分钟后计数1分钟内释放的气泡",
+            "unit": "个/min",
+            "reasonableRange": [
+              0,
+              60
+            ]
+          },
+          "controlledVariables": [
+            "水草长度",
+            "水温",
+            "计数时间",
+            "碳酸氢钠溶液体积"
+          ],
+          "materials": [
+            "金鱼藻",
+            "烧杯",
+            "LED灯",
+            "刻度尺",
+            "秒表"
+          ],
+          "procedure": [
+            "将等长金鱼藻放入等量溶液",
+            "按刻度尺设置灯距",
+            "稳定2分钟",
+            "计数1分钟气泡并重复测量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "LED灯与水保持安全距离",
+            "移动烧杯时防止液体泼洒"
+          ],
+          "dataPattern": "missing_measurement",
+          "anomalyPattern": "missing_measurement"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "safety",
+          "stage_discipline",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p3-smartedu-0030-v1-ba5f5f52c9-v1",
+      "cellKey": "P3:classroom_coach",
+      "parentLegacyRecordId": "stem-distill-dsv4-p3-smartedu-0030-v1-ba5f5f52c9-v1",
+      "familyKey": "smartedu-0030",
+      "phase": 3,
+      "scenario": "探究影响结构稳定性的主要因素",
+      "styleFamily": "classroom_coach",
+      "triggerType": "STAGE_ENTER",
+      "domainSpec": {
+        "researchQuestion": "纸桥结构如何影响最大承重质量？",
+        "hypothesis": "不同纸桥结构水平会使最大承重质量出现可测差异。",
+        "independentVariable": {
+          "name": "纸桥结构",
+          "levels": [
+            "平板形",
+            "拱形",
+            "三角桁架形"
+          ]
+        },
+        "dependentVariable": {
+          "name": "最大承重质量",
+          "measurement": "逐次增加砝码，记录桥面明显变形前的总质量",
+          "unit": "g",
+          "reasonableRange": [
+            0,
+            1500
+          ]
+        },
+        "controlledVariables": [
+          "纸张规格",
+          "桥跨长度",
+          "胶带用量",
+          "加载位置"
+        ],
+        "materials": [
+          "A4纸",
+          "胶带",
+          "砝码",
+          "电子秤",
+          "支撑块"
+        ],
+        "procedure": [
+          "用相同纸张制作三种结构",
+          "设置相同桥跨",
+          "在桥中央逐次增加砝码",
+          "记录明显变形前总质量"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "砝码从低处轻放，脚部不得位于桥下"
+        ],
+        "dataPattern": "replicate_variation",
+        "anomalyPattern": "replicate_variation"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生首次进入过程执行阶段，请先进行与已审核风险相关的安全问答。",
+        "brief": [
+          "我正在做“探究影响结构稳定性的主要因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择纸桥结构，具体水平为平板形、拱形、三角桁架形。",
+          "我提出的假设是：不同纸桥结构水平会使最大承重质量出现可测差异。",
+          "我要测量最大承重质量：逐次增加砝码，记录桥面明显变形前的总质量，单位g。",
+          "我会控制纸张规格、桥跨长度、胶带用量、加载位置。",
+          "我选择的材料是A4纸、胶带、砝码、电子秤、支撑块。",
+          "我确认的步骤是用相同纸张制作三种结构；设置相同桥跨；在桥中央逐次增加砝码；记录明显变形前总质量。",
+          "每个水平重复3次；安全要求是砝码从低处轻放，脚部不得位于桥下。"
+        ],
+        "realRows": []
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】纸桥结构如何影响最大承重质量？\n【已确认假设】不同纸桥结构水平会使最大承重质量出现可测差异。\n【已审核变量】自变量：纸桥结构；水平：平板形、拱形、三角桁架形；因变量：最大承重质量；测量：逐次增加砝码，记录桥面明显变形前的总质量；单位：g\n【已审核控制变量】纸张规格、桥跨长度、胶带用量、加载位置\n【已审核重复次数】每个水平3次\n【已审核安全】砝码从低处轻放，脚部不得位于桥下\n【已审核材料】A4纸、胶带、砝码、电子秤、支撑块\n【已审核步骤】用相同纸张制作三种结构；设置相同桥跨；在桥中央逐次增加砝码；记录明显变形前总质量",
+        "approvedPlan": {
+          "researchQuestion": "纸桥结构如何影响最大承重质量？",
+          "hypothesis": "不同纸桥结构水平会使最大承重质量出现可测差异。",
+          "independentVariable": {
+            "name": "纸桥结构",
+            "levels": [
+              "平板形",
+              "拱形",
+              "三角桁架形"
+            ]
+          },
+          "dependentVariable": {
+            "name": "最大承重质量",
+            "measurement": "逐次增加砝码，记录桥面明显变形前的总质量",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              1500
+            ]
+          },
+          "controlledVariables": [
+            "纸张规格",
+            "桥跨长度",
+            "胶带用量",
+            "加载位置"
+          ],
+          "materials": [
+            "A4纸",
+            "胶带",
+            "砝码",
+            "电子秤",
+            "支撑块"
+          ],
+          "procedure": [
+            "用相同纸张制作三种结构",
+            "设置相同桥跨",
+            "在桥中央逐次增加砝码",
+            "记录明显变形前总质量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "砝码从低处轻放，脚部不得位于桥下"
+          ],
+          "dataPattern": "replicate_variation",
+          "anomalyPattern": "replicate_variation"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究影响结构稳定性的主要因素",
+          "retainedFeature": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+          "classroomProxy": "把“搭一个更结实的结构”转化为“改变结构形状，测量承重能力”。",
+          "researchQuestion": "不同结构形状会怎样影响模型的承重能力？",
+          "independentVariable": "结构形状或支撑方式",
+          "dependentDirection": "最大承重质量",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "纸桥结构如何影响最大承重质量？",
+          "hypothesis": "不同纸桥结构水平会使最大承重质量出现可测差异。",
+          "independentVariable": {
+            "name": "纸桥结构",
+            "levels": [
+              "平板形",
+              "拱形",
+              "三角桁架形"
+            ]
+          },
+          "dependentVariable": {
+            "name": "最大承重质量",
+            "measurement": "逐次增加砝码，记录桥面明显变形前的总质量",
+            "unit": "g",
+            "reasonableRange": [
+              0,
+              1500
+            ]
+          },
+          "controlledVariables": [
+            "纸张规格",
+            "桥跨长度",
+            "胶带用量",
+            "加载位置"
+          ],
+          "materials": [
+            "A4纸",
+            "胶带",
+            "砝码",
+            "电子秤",
+            "支撑块"
+          ],
+          "procedure": [
+            "用相同纸张制作三种结构",
+            "设置相同桥跨",
+            "在桥中央逐次增加砝码",
+            "记录明显变形前总质量"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "砝码从低处轻放，脚部不得位于桥下"
+          ],
+          "dataPattern": "replicate_variation",
+          "anomalyPattern": "replicate_variation"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "safety",
+          "stage_discipline",
+          "structure_compliance",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p4-cooperative-water-filter-v1-afbf673716-v1",
+      "cellKey": "P4:classroom_coach",
+      "parentLegacyRecordId": "stem-distill-dsv4-p4-cooperative-water-filter-v1-afbf673716-v1",
+      "familyKey": "cooperative-water-filter",
+      "phase": 4,
+      "scenario": "配合型-净水过滤材料",
+      "styleFamily": "classroom_coach",
+      "triggerType": "STAGE_TRANSITION",
+      "domainSpec": {
+        "researchQuestion": "过滤材料如何影响过滤后浊度？",
+        "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+        "independentVariable": {
+          "name": "过滤材料",
+          "levels": [
+            "棉布",
+            "滤纸",
+            "活性炭+滤纸"
+          ]
+        },
+        "dependentVariable": {
+          "name": "过滤后浊度",
+          "measurement": "用浊度传感器测量过滤后水样",
+          "unit": "NTU",
+          "reasonableRange": [
+            0,
+            300
+          ]
+        },
+        "controlledVariables": [
+          "原水体积",
+          "原水批次",
+          "过滤材料面积",
+          "静置时间"
+        ],
+        "materials": [
+          "模拟浑水",
+          "棉布",
+          "滤纸",
+          "活性炭",
+          "漏斗",
+          "浊度传感器"
+        ],
+        "procedure": [
+          "混匀同一批模拟浑水",
+          "装配三种过滤材料",
+          "分别过滤相同体积水样",
+          "测量过滤后浊度"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "模拟浑水不得饮用",
+          "活性炭粉末避免吸入并及时清理"
+        ],
+        "dataPattern": "rising",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "cooperative",
+        "openingMessage": "系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。",
+        "brief": [
+          "我正在做“配合型-净水过滤材料”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择过滤材料，具体水平为棉布、滤纸、活性炭+滤纸。",
+          "我提出的假设是：不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "我要测量过滤后浊度：用浊度传感器测量过滤后水样，单位NTU。",
+          "我会控制原水体积、原水批次、过滤材料面积、静置时间。",
+          "我选择的材料是模拟浑水、棉布、滤纸、活性炭、漏斗、浊度传感器。",
+          "我确认的步骤是混匀同一批模拟浑水；装配三种过滤材料；分别过滤相同体积水样；测量过滤后浊度。",
+          "每个水平重复3次；安全要求是模拟浑水不得饮用、活性炭粉末避免吸入并及时清理。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 75,
+            "result_b": 147,
+            "result_c": 228,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 75,
+            "result_b": 147,
+            "result_c": 228,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 75,
+            "result_b": 147,
+            "result_c": 228,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】过滤材料如何影响过滤后浊度？\n【已确认假设】不同过滤材料水平会使过滤后浊度出现可测差异。\n【已审核变量】自变量：过滤材料；水平：棉布、滤纸、活性炭+滤纸；因变量：过滤后浊度；测量：用浊度传感器测量过滤后水样；单位：NTU\n【已审核控制变量】原水体积、原水批次、过滤材料面积、静置时间\n【已审核重复次数】每个水平3次\n【已审核安全】模拟浑水不得饮用、活性炭粉末避免吸入并及时清理\n【已审核材料】模拟浑水、棉布、滤纸、活性炭、漏斗、浊度传感器\n【已审核步骤】混匀同一批模拟浑水；装配三种过滤材料；分别过滤相同体积水样；测量过滤后浊度\n【学生真实数据】\n第1次：棉布=75NTU；滤纸=147NTU；活性炭+滤纸=228NTU；备注=\n第2次：棉布=75NTU；滤纸=147NTU；活性炭+滤纸=228NTU；备注=\n第3次：棉布=75NTU；滤纸=147NTU；活性炭+滤纸=228NTU；备注=",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 75,
+            "result_b": 147,
+            "result_c": 228,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 75,
+            "result_b": 147,
+            "result_c": 228,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 75,
+            "result_b": 147,
+            "result_c": 228,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "棉布：过滤后浊度（NTU）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "滤纸：过滤后浊度（NTU）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "活性炭+滤纸：过滤后浊度（NTU）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "approvedPlan": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "rising",
+          "anomalyPattern": "none"
+        }
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "把脏水变清",
+          "retainedFeature": "过滤材料拦截杂质",
+          "classroomProxy": "不同过滤材料",
+          "researchQuestion": "过滤材料是否影响浑水澄清程度？",
+          "independentVariable": "过滤材料",
+          "dependentDirection": "澄清程度",
+          "safetyNotes": [
+            "净化后的水不可饮用，仅观察"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "rising",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "format_discipline"
+        ],
+        "rubricTargets": [
+          "cognitive_load_control",
+          "expression",
+          "stem_fit",
+          "structure_compliance",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p5-smartedu-0047-v1-7d6deea38b-v1",
+      "cellKey": "P5:classroom_coach",
+      "parentLegacyRecordId": "stem-distill-dsv4-p5-smartedu-0047-v1-7d6deea38b-v1",
+      "familyKey": "smartedu-0047",
+      "phase": 5,
+      "scenario": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素",
+      "styleFamily": "classroom_coach",
+      "triggerType": "REPORT_BOOTSTRAP",
+      "reportPath": "fallback",
+      "domainSpec": {
+        "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+        "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+        "independentVariable": {
+          "name": "泡腾片颗粒大小",
+          "levels": [
+            "整片",
+            "分成4块",
+            "研成粗粉"
+          ]
+        },
+        "dependentVariable": {
+          "name": "完全溶解时间",
+          "measurement": "投入水中后用秒表记录到无固体可见的时间",
+          "unit": "s",
+          "reasonableRange": [
+            5,
+            240
+          ]
+        },
+        "controlledVariables": [
+          "泡腾片质量",
+          "水体积",
+          "水温",
+          "容器规格"
+        ],
+        "materials": [
+          "同批次泡腾片",
+          "清水",
+          "烧杯",
+          "量筒",
+          "秒表"
+        ],
+        "procedure": [
+          "准备三种颗粒大小的等质量泡腾片",
+          "量取等体积同温清水",
+          "投入后立即计时",
+          "记录固体完全消失时间"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "实验溶液不得饮用",
+          "研碎操作由教师指导并避免粉末进入眼睛"
+        ],
+        "dataPattern": "falling",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "普通初中生",
+        "openingMessage": "系统触发：学生已完成数据分析，请基于前序结构化状态生成报告框架。",
+        "brief": [
+          "我正在做“探究「初中化学实验设计与评价（中考专题复习）」中的影响因素”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择泡腾片颗粒大小，具体水平为整片、分成4块、研成粗粉。",
+          "我提出的假设是：不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "我要测量完全溶解时间：投入水中后用秒表记录到无固体可见的时间，单位s。",
+          "我会控制泡腾片质量、水体积、水温、容器规格。",
+          "我选择的材料是同批次泡腾片、清水、烧杯、量筒、秒表。",
+          "我确认的步骤是准备三种颗粒大小的等质量泡腾片；量取等体积同温清水；投入后立即计时；记录固体完全消失时间。",
+          "每个水平重复3次；安全要求是实验溶液不得饮用、研碎操作由教师指导并避免粉末进入眼睛。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 184,
+            "result_b": 123,
+            "result_c": 52,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 184,
+            "result_b": 123,
+            "result_c": 52,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 184,
+            "result_b": 123,
+            "result_c": 52,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】泡腾片颗粒大小如何影响完全溶解时间？\n【缺失信息】研究假设尚未由学生提供。\n【已审核变量】自变量：泡腾片颗粒大小；水平：整片、分成4块、研成粗粉；因变量：完全溶解时间；测量：投入水中后用秒表记录到无固体可见的时间；单位：s\n【已审核控制变量】泡腾片质量、水体积、水温、容器规格\n【已审核重复次数】每个水平3次\n【已审核安全】实验溶液不得饮用、研碎操作由教师指导并避免粉末进入眼睛\n【缺失信息】材料和步骤尚未由学生提供。\n【学生真实数据】\n第1次：整片=184s；分成4块=123s；研成粗粉=52s；备注=\n第2次：整片=184s；分成4块=123s；研成粗粉=52s；备注=\n第3次：整片=184s；分成4块=123s；研成粗粉=52s；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的整片=184s和分成4块=123s进行比较。\n学生又引用第2次的研成粗粉=52s，并把观察到的差异表述为相关现象而非确定因果。",
+        "dataRows": [
+          {
+            "trial": 1,
+            "result_a": 184,
+            "result_b": 123,
+            "result_c": 52,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 184,
+            "result_b": 123,
+            "result_c": 52,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 184,
+            "result_b": 123,
+            "result_c": 52,
+            "notes": ""
+          }
+        ],
+        "dataSchema": {
+          "columns": [
+            {
+              "key": "trial",
+              "title": "重复序号",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_a",
+              "title": "整片：完全溶解时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_b",
+              "title": "分成4块：完全溶解时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "result_c",
+              "title": "研成粗粉：完全溶解时间（s）",
+              "type": "number",
+              "required": true
+            },
+            {
+              "key": "notes",
+              "title": "客观异常备注",
+              "type": "text",
+              "required": false
+            }
+          ],
+          "minRows": 3,
+          "maxRows": 200
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的整片=184s和分成4块=123s进行比较。",
+          "学生又引用第2次的研成粗粉=52s，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "探究「初中化学实验设计与评价（中考专题复习）」中的影响因素",
+          "retainedFeature": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+          "classroomProxy": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+          "researchQuestion": "围绕「探究「初中化学实验设计与评价（中考专题复习）」中的影响因素」，改变一个条件会怎样影响观察结果？",
+          "independentVariable": "一个可人为改变的条件",
+          "dependentDirection": "可观察或可测量的结果",
+          "safetyNotes": [
+            "优先选择低风险、材料易得、可在教师指导下完成的方案。"
+          ]
+        },
+        "domainSpec": {
+          "researchQuestion": "泡腾片颗粒大小如何影响完全溶解时间？",
+          "hypothesis": "不同泡腾片颗粒大小水平会使完全溶解时间出现可测差异。",
+          "independentVariable": {
+            "name": "泡腾片颗粒大小",
+            "levels": [
+              "整片",
+              "分成4块",
+              "研成粗粉"
+            ]
+          },
+          "dependentVariable": {
+            "name": "完全溶解时间",
+            "measurement": "投入水中后用秒表记录到无固体可见的时间",
+            "unit": "s",
+            "reasonableRange": [
+              5,
+              240
+            ]
+          },
+          "controlledVariables": [
+            "泡腾片质量",
+            "水体积",
+            "水温",
+            "容器规格"
+          ],
+          "materials": [
+            "同批次泡腾片",
+            "清水",
+            "烧杯",
+            "量筒",
+            "秒表"
+          ],
+          "procedure": [
+            "准备三种颗粒大小的等质量泡腾片",
+            "量取等体积同温清水",
+            "投入后立即计时",
+            "记录固体完全消失时间"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "实验溶液不得饮用",
+            "研碎操作由教师指导并避免粉末进入眼睛"
+          ],
+          "dataPattern": "falling",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "structure_compliance"
+        ]
+      }
+    },
+    {
+      "id": "dataset-v3-stem-distill-dsv4-p6-variable-confusion-turbidity-settle-v1-fd37e1f659-v1",
+      "cellKey": "P6:classroom_coach",
+      "parentLegacyRecordId": "stem-distill-dsv4-p6-variable-confusion-turbidity-settle-v1-fd37e1f659-v1",
+      "familyKey": "variable-confusion-turbidity-settle",
+      "phase": 6,
+      "scenario": "变量混乱型-泥沙沉降",
+      "styleFamily": "classroom_coach",
+      "triggerType": "OPTIONAL_COACHING",
+      "domainSpec": {
+        "researchQuestion": "过滤材料如何影响过滤后浊度？",
+        "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+        "independentVariable": {
+          "name": "过滤材料",
+          "levels": [
+            "棉布",
+            "滤纸",
+            "活性炭+滤纸"
+          ]
+        },
+        "dependentVariable": {
+          "name": "过滤后浊度",
+          "measurement": "用浊度传感器测量过滤后水样",
+          "unit": "NTU",
+          "reasonableRange": [
+            0,
+            300
+          ]
+        },
+        "controlledVariables": [
+          "原水体积",
+          "原水批次",
+          "过滤材料面积",
+          "静置时间"
+        ],
+        "materials": [
+          "模拟浑水",
+          "棉布",
+          "滤纸",
+          "活性炭",
+          "漏斗",
+          "浊度传感器"
+        ],
+        "procedure": [
+          "混匀同一批模拟浑水",
+          "装配三种过滤材料",
+          "分别过滤相同体积水样",
+          "测量过滤后浊度"
+        ],
+        "repeatCount": 3,
+        "safetyRisks": [
+          "模拟浑水不得饮用",
+          "活性炭粉末避免吸入并及时清理"
+        ],
+        "dataPattern": "weak_trend",
+        "anomalyPattern": "none"
+      },
+      "studentVisible": {
+        "profile": "variable_confusion",
+        "openingMessage": "我想反思“过滤材料如何影响过滤后浊度？”这次实验，但不希望你直接替我写答案。",
+        "brief": [
+          "我正在做“变量混乱型-泥沙沉降”主题的探究。",
+          "我只会依据已确认的前序状态回答导师。"
+        ],
+        "decisionFacts": [
+          "我选择过滤材料，具体水平为棉布、滤纸、活性炭+滤纸。",
+          "我提出的假设是：不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "我要测量过滤后浊度：用浊度传感器测量过滤后水样，单位NTU。",
+          "我会控制原水体积、原水批次、过滤材料面积、静置时间。",
+          "我选择的材料是模拟浑水、棉布、滤纸、活性炭、漏斗、浊度传感器。",
+          "我确认的步骤是混匀同一批模拟浑水；装配三种过滤材料；分别过滤相同体积水样；测量过滤后浊度。",
+          "每个水平重复3次；安全要求是模拟浑水不得饮用、活性炭粉末避免吸入并及时清理。"
+        ],
+        "realRows": [
+          {
+            "trial": 1,
+            "result_a": 141,
+            "result_b": 141,
+            "result_c": 168,
+            "notes": ""
+          },
+          {
+            "trial": 2,
+            "result_a": 141,
+            "result_b": 141,
+            "result_c": 168,
+            "notes": ""
+          },
+          {
+            "trial": 3,
+            "result_a": 141,
+            "result_b": 141,
+            "result_c": 168,
+            "notes": ""
+          }
+        ]
+      },
+      "tutorVisible": {
+        "priorSummary": "【已确认研究问题】过滤材料如何影响过滤后浊度？\n【已确认假设】不同过滤材料水平会使过滤后浊度出现可测差异。\n【已审核变量】自变量：过滤材料；水平：棉布、滤纸、活性炭+滤纸；因变量：过滤后浊度；测量：用浊度传感器测量过滤后水样；单位：NTU\n【已审核控制变量】原水体积、原水批次、过滤材料面积、静置时间\n【已审核重复次数】每个水平3次\n【已审核安全】模拟浑水不得饮用、活性炭粉末避免吸入并及时清理\n【已审核材料】模拟浑水、棉布、滤纸、活性炭、漏斗、浊度传感器\n【已审核步骤】混匀同一批模拟浑水；装配三种过滤材料；分别过滤相同体积水样；测量过滤后浊度\n【学生真实数据】\n第1次：棉布=141NTU；滤纸=141NTU；活性炭+滤纸=168NTU；备注=\n第2次：棉布=141NTU；滤纸=141NTU；活性炭+滤纸=168NTU；备注=\n第3次：棉布=141NTU；滤纸=141NTU；活性炭+滤纸=168NTU；备注=\n【已接受的两轮数据分析】\n学生已引用第1次的棉布=141NTU和滤纸=141NTU进行比较。\n学生又引用第2次的活性炭+滤纸=168NTU，并把观察到的差异表述为相关现象而非确定因果。\n【已提交报告】报告正文已提交；最终局限与改进由学生本人在反思表单填写。",
+        "approvedPlan": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        },
+        "acceptedAnalysis": [
+          "学生已引用第1次的棉布=141NTU和滤纸=141NTU进行比较。",
+          "学生又引用第2次的活性炭+滤纸=168NTU，并把观察到的差异表述为相关现象而非确定因果。"
+        ]
+      },
+      "evaluatorOnly": {
+        "expectedTransformation": {
+          "originalInterest": "泥水变清",
+          "retainedFeature": "静置时间影响沉降程度",
+          "classroomProxy": "不同静置时间",
+          "researchQuestion": "静置时间是否影响泥水浊度？",
+          "independentVariable": "静置时间",
+          "dependentDirection": "浊度"
+        },
+        "domainSpec": {
+          "researchQuestion": "过滤材料如何影响过滤后浊度？",
+          "hypothesis": "不同过滤材料水平会使过滤后浊度出现可测差异。",
+          "independentVariable": {
+            "name": "过滤材料",
+            "levels": [
+              "棉布",
+              "滤纸",
+              "活性炭+滤纸"
+            ]
+          },
+          "dependentVariable": {
+            "name": "过滤后浊度",
+            "measurement": "用浊度传感器测量过滤后水样",
+            "unit": "NTU",
+            "reasonableRange": [
+              0,
+              300
+            ]
+          },
+          "controlledVariables": [
+            "原水体积",
+            "原水批次",
+            "过滤材料面积",
+            "静置时间"
+          ],
+          "materials": [
+            "模拟浑水",
+            "棉布",
+            "滤纸",
+            "活性炭",
+            "漏斗",
+            "浊度传感器"
+          ],
+          "procedure": [
+            "混匀同一批模拟浑水",
+            "装配三种过滤材料",
+            "分别过滤相同体积水样",
+            "测量过滤后浊度"
+          ],
+          "repeatCount": 3,
+          "safetyRisks": [
+            "模拟浑水不得饮用",
+            "活性炭粉末避免吸入并及时清理"
+          ],
+          "dataPattern": "weak_trend",
+          "anomalyPattern": "none"
+        },
+        "failureModes": [
+          "variable_confusion"
+        ],
+        "rubricTargets": [
+          "expression",
+          "stem_fit",
+          "student_agency",
+          "teaching_guidance"
+        ]
+      }
+    }
+  ]
+}

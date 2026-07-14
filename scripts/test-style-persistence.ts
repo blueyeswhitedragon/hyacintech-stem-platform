@@ -10,6 +10,10 @@ import {
   submitAnnotationTask,
 } from '../app/lib/dataLab/service';
 import { DEFAULT_STYLE_POLICY_VERSION, resolveStyleFamily } from '../app/lib/stylePolicy';
+import { STAGE_CONTRACT_VERSION } from '../app/lib/stageContract';
+import { ACTIVE_DATASET_BATCH_STATUS } from '../app/lib/dataLab/datasetPolicy';
+import { getPromptForPhase } from '../app/prompts';
+import { PhaseEnum } from '../app/models/types';
 import type { SessionUser } from '../app/lib/session';
 import { parseAssistantResponse, parseJson } from '../app/lib/dataLab/validation';
 import type { RevisionInput, ShareGPTRecord } from '../app/lib/dataLab/types';
@@ -34,9 +38,64 @@ function sessionUser(user: { id: string; username: string; displayName: string; 
 async function main() {
   const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const membership = await db.classMember.findFirst({ include: { class: true, student: true } });
-  const adminRow = await db.user.findFirstOrThrow({ where: { role: 'admin', isActive: true } });
-  const batch = await db.datasetBatch.findFirstOrThrow({ where: { samples: { some: {} } } });
   if (!membership) throw new Error('需要至少一条班级成员关系才能测试会话风格持久化');
+  const [adminRow, annotatorRow] = await Promise.all([
+    db.user.create({ data: { username: `style-admin-${suffix}`, displayName: '测试管理员', passwordHash: 'test-only', role: 'admin' } }),
+    db.user.create({ data: { username: `style-annotator-${suffix}`, displayName: '测试标注员', passwordHash: 'test-only', role: 'annotator' } }),
+  ]);
+
+  const fixtureRecord: ShareGPTRecord = {
+    id: `style-fixture-${suffix}`,
+    source: 'test',
+    scenario: '风格持久化测试',
+    phase: 4,
+    conversations: [
+      { from: 'human', value: '第1次短光照2粒、长光照5粒；第2次短光照3粒、长光照7粒。' },
+      { from: 'gpt', value: JSON.stringify({
+        dialogue: '你引用了2、5、3、7。先比较两组从第一次到第二次的变化幅度，这些证据支持怎样的观察？',
+        next_action_type: 'text_input',
+        phase_complete: false,
+        analysis_progress: {
+          observation: '第1次短光照2粒、长光照5粒；第2次短光照3粒、长光照7粒。',
+          evidenceCitations: ['第1次：2和5', '第2次：3和7'],
+          studentEvidenceAccepted: true,
+        },
+      }) },
+    ],
+    meta: {
+      sourceKind: 'stage_contract_rollout',
+      stageContractVersion: STAGE_CONTRACT_VERSION,
+      systemPrompt: getPromptForPhase(PhaseEnum.DataAnalysis, { styleFamily: 'evidence_analyst', stylePolicyVersion: DEFAULT_STYLE_POLICY_VERSION }),
+      stageTriggerType: 'USER_MESSAGE',
+      visibleContext: JSON.stringify({
+        tutorVisible: { dataRows: [{ short: 2, long: 5 }, { short: 3, long: 7 }] },
+        studentMessages: ['第1次短光照2粒、长光照5粒；第2次短光照3粒、长光照7粒。'],
+      }),
+      generationContext: { turnSystemPrompts: [getPromptForPhase(PhaseEnum.DataAnalysis, { styleFamily: 'evidence_analyst', stylePolicyVersion: DEFAULT_STYLE_POLICY_VERSION })], turnTriggerTypes: ['USER_MESSAGE'] },
+    },
+  };
+  const batch = await db.datasetBatch.create({
+    data: {
+      name: `style-active-${suffix}`,
+      sourceType: 'TEST',
+      sourceFileName: 'style-fixture.json',
+      sourceSha256: `style-${suffix}`,
+      status: ACTIVE_DATASET_BATCH_STATUS,
+      importedById: adminRow.id,
+      samples: {
+        create: [0, 1].map((index) => ({
+          sourceRecordId: `${fixtureRecord.id}-${index}`,
+          familyKey: `${fixtureRecord.id}-${index}`,
+          phase: fixtureRecord.phase,
+          scenario: fixtureRecord.scenario,
+          sourceKind: 'stage_contract_rollout',
+          candidateTier: 'silver',
+          originalRecordJson: JSON.stringify({ ...fixtureRecord, id: `${fixtureRecord.id}-${index}` }),
+          autoCheckJson: '{}',
+        })),
+      },
+    },
+  });
 
   let assignmentId: string | null = null;
   let conversationId: string | null = null;
@@ -99,7 +158,7 @@ async function main() {
     check('每个样本的所有槽位共享目标风格', [...stylesBySample.values()].every((styles) => styles.size === 1));
     check('任务保存创建时的风格规范版本', tasks.every((task) => task.stylePolicyVersion === DEFAULT_STYLE_POLICY_VERSION));
 
-    const annotator = await db.user.findFirstOrThrow({ where: { role: 'annotator', isActive: true } });
+    const annotator = annotatorRow;
     const releaseCampaign = await createCampaign({
       name: `style-release-${suffix}`,
       selection: { batchIds: [batch.id], candidateTiers: ['silver'], limit: 1 },
@@ -154,6 +213,9 @@ async function main() {
     if (studentAssignmentId) await db.studentAssignment.delete({ where: { id: studentAssignmentId } }).catch(() => undefined);
     if (conversationId) await db.conversation.delete({ where: { id: conversationId } }).catch(() => undefined);
     if (assignmentId) await db.assignment.delete({ where: { id: assignmentId } }).catch(() => undefined);
+    await db.datasetBatch.delete({ where: { id: batch.id } }).catch(() => undefined);
+    await db.dataLabAuditLog.deleteMany({ where: { actorId: { in: [adminRow.id, annotatorRow.id] } } });
+    await db.user.deleteMany({ where: { id: { in: [adminRow.id, annotatorRow.id] } } });
   }
 
   console.log(`\nStyle persistence tests: ${passed} passed, ${failed} failed`);

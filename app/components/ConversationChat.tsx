@@ -7,6 +7,7 @@ import type { StageData } from '../models/stageData';
 import MessageItem from './MessageItem';
 import StageProgress from './StageProgress';
 import { shouldShowEscapeHatch } from '../lib/pacing';
+import { injectMessageOnce } from '../lib/messageInjection';
 
 /** 逃生按钮发送的强制收敛消息：促使模型立即输出确认书（仍由模型产出结构化信号，不绕过 gating）。 */
 const FORCE_CONVERGE_TEXT = '我觉得讨论得差不多了，请你直接给出《探究问题确认书》，让我进入下一阶段。';
@@ -26,13 +27,13 @@ interface Props {
   /** 每次 chat 响应后回调，供 workspace 更新 stage / stageData。 */
   onResult?: (data: ChatApiResponse) => void;
   /** 安全问答答对后的回调（正式模式 POST safety-quiz；体验模式本地无操作）。 */
-  onSafetyPassed?: () => void | Promise<void>;
+  onSafetyPassed?: (selected: number) => void | Promise<void>;
   /** 当阶段完成且用户点击"确认"时，直接推进阶段（不再发 LLM 请求）。 */
   onPhaseConfirm?: () => Promise<string | null>;
   /** 本阶段累计对话轮次，用于判断是否显示「我已准备好，进入下一步」逃生按钮。 */
   roundCount?: number;
-  /** 向父组件注册"程序化发送"函数（用于阶段推进后的自动触发消息，消息正常进入聊天流）。 */
-  registerAutoSend?: (fn: (text: string) => Promise<void>) => void;
+  /** 服务端或父级生成的助手主动消息；按稳定 id 去重注入，不产生用户消息。 */
+  injectedMessage?: Message | null;
 }
 
 const noop = () => {};
@@ -49,7 +50,7 @@ function structuredNotice(data: ChatApiResponse): string | null {
   return null;
 }
 
-export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, roundCount = 0, registerAutoSend }: Props) {
+export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, roundCount = 0, injectedMessage }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -61,17 +62,19 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // 并发发送守卫：用 ref 而非 isLoading，确保确认按钮流程中（isLoading=true）仍可执行自动触发消息
   const sendingRef = useRef(false);
+  const displayedMessages = injectMessageOnce(messages, injectedMessage);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+  }, [messages, injectedMessage, isLoading]);
 
   const doSend = async (text: string) => {
     if (text.trim() === '' || sendingRef.current) return;
     sendingRef.current = true;
 
     const userMessage: Message = { id: uuidv4(), role: 'user', content: text, status: 'sent' };
-    setMessages((prev) => [...prev, userMessage]);
+    const historyForSend = displayedMessages;
+    setMessages([...historyForSend, userMessage]);
     setInputValue('');
     setIsLoading(true);
     setError(null);
@@ -79,7 +82,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
     try {
       let data: ChatApiResponse;
       try {
-        data = await send(text, messages);
+        data = await send(text, historyForSend);
       } catch (e) {
         setError(e instanceof Error ? e.message : '请求失败，请重试。');
         setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
@@ -134,12 +137,6 @@ export default function ConversationChat({ initialMessages, stage, completed, se
 
   const sendMessage = () => doSend(inputValue);
 
-  // 向父组件暴露程序化发送（自动触发消息也会正常进入聊天流与历史）。
-  // 每次渲染都重注册，保证闭包里的 send/stage/messages 始终最新（guest 模式 send 捕获 stage）。
-  useEffect(() => {
-    registerAutoSend?.(doSend);
-  });
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -168,9 +165,10 @@ export default function ConversationChat({ initialMessages, stage, completed, se
     }
     // 答对 → 通知调用方（正式模式 POST safety-quiz；体验模式无操作）
     try {
-      await onSafetyPassed?.();
-    } catch {
-      // 标记失败不阻断；下次进入会重新出题
+      await onSafetyPassed?.(quizChoice);
+    } catch (error) {
+      setQuizError(error instanceof Error ? error.message : '安全问答提交失败，请重试。');
+      return;
     }
     setQuiz(null);
     setMessages((prev) => [
@@ -181,7 +179,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
 
   // 最后一条助手消息的交互类型/选项/提示
   // 注意：confirmation_doc 等特殊消息可能没有 actionType，需要向前查找
-  const assistantMessages = messages.filter((m) => m.role === 'assistant');
+  const assistantMessages = displayedMessages.filter((m) => m.role === 'assistant');
   const lastWithAction = [...assistantMessages].reverse().find(m => m.actionType);
   const lastActionType = lastWithAction?.actionType ?? null;
   const options =
@@ -191,9 +189,9 @@ export default function ConversationChat({ initialMessages, stage, completed, se
 
   // 确认按钮与确认书卡片绑定：若最近一条 confirmation_doc 在 confirmation 动作之后出现，
   // 则按钮直接渲染在该卡片下方（同一视觉块）；否则退回底部固定条（阶段3/4等无卡片场景）。
-  const lastDocIndex = messages.reduce(
+  const lastDocIndex = displayedMessages.reduce(
     (acc, m, i) => (m.messageType === 'confirmation_doc' ? i : acc), -1);
-  const confirmAttachedToDoc = lastActionType === 'confirmation' && lastDocIndex === messages.length - 1;
+  const confirmAttachedToDoc = lastActionType === 'confirmation' && lastDocIndex === displayedMessages.length - 1;
 
   const confirmButton = (
     <button
@@ -212,7 +210,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
-        {messages.map((message) => (
+        {displayedMessages.map((message) => (
           <MessageItem
             key={message.id}
             message={message}

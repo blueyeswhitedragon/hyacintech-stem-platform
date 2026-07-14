@@ -1,4 +1,12 @@
-import { LLMMessage, LLMProvider, LLMProviderConfig, ConfigValidation } from './types';
+import {
+  type ChatOptions,
+  type ConfigValidation,
+  type LLMCompletion,
+  type LLMMessage,
+  type LLMProvider,
+  type LLMProviderConfig,
+  type LLMRuntimeOverride,
+} from './types';
 import { LLMError } from './errors';
 
 class OpenAICompatibleProvider implements LLMProvider {
@@ -8,11 +16,19 @@ class OpenAICompatibleProvider implements LLMProvider {
     this.config = config;
   }
 
-  async chat(messages: LLMMessage[], options?: { useJsonFormat?: boolean }): Promise<string> {
+  async complete(messages: LLMMessage[], options?: ChatOptions): Promise<LLMCompletion> {
     const useJsonFormat = options?.useJsonFormat !== false; // default true
     const url = `${this.config.baseURL}/chat/completions`;
+    const maxTokens = options?.maxTokens ?? this.config.maxTokens ?? 2000;
+    const timeoutMs = options?.timeoutMs ?? this.config.timeoutMs ?? 30_000;
+    const thinking = this.config.provider === 'deepseek'
+      ? options?.thinking ?? this.config.thinking ?? 'enabled'
+      : null;
+    const reasoningEffort = thinking === 'enabled'
+      ? options?.reasoningEffort ?? this.config.reasoningEffort ?? 'high'
+      : null;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.config.timeoutMs ?? 30_000);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const response = await fetch(url, {
@@ -24,9 +40,13 @@ class OpenAICompatibleProvider implements LLMProvider {
         body: JSON.stringify({
           model: this.config.model,
           messages,
-          temperature: this.config.temperature ?? 0.3,
-          max_tokens: this.config.maxTokens ?? 2000,
+          ...(thinking === 'enabled'
+            ? {}
+            : { temperature: this.config.temperature ?? 0.3 }),
+          max_tokens: maxTokens,
           ...(useJsonFormat ? { response_format: { type: 'json_object' } } : {}),
+          ...(thinking ? { thinking: { type: thinking } } : {}),
+          ...(reasoningEffort ? { reasoning_effort: reasoningEffort } : {}),
         }),
         signal: controller.signal,
       });
@@ -36,11 +56,52 @@ class OpenAICompatibleProvider implements LLMProvider {
         throw new Error(`LLM API error ${response.status}: ${errorBody}`);
       }
 
-      const data = await response.json();
-      return data.choices[0].message.content;
+      const data = await response.json() as {
+        choices?: Array<{
+          finish_reason?: unknown;
+          message?: { content?: unknown; reasoning_content?: unknown };
+        }>;
+        usage?: {
+          prompt_tokens?: unknown;
+          completion_tokens?: unknown;
+          total_tokens?: unknown;
+          completion_tokens_details?: { reasoning_tokens?: unknown };
+        };
+      };
+      const choice = data.choices?.[0];
+      if (!choice?.message) {
+        throw new Error('LLM API returned no completion choice');
+      }
+      const content = typeof choice.message.content === 'string' ? choice.message.content : '';
+      const reasoning = typeof choice.message.reasoning_content === 'string' ? choice.message.reasoning_content : '';
+      const numberOrUndefined = (value: unknown): number | undefined => (
+        typeof value === 'number' && Number.isFinite(value) ? value : undefined
+      );
+      return {
+        content,
+        finishReason: typeof choice.finish_reason === 'string' ? choice.finish_reason : null,
+        reasoningChars: reasoning.length,
+        usage: {
+          promptTokens: numberOrUndefined(data.usage?.prompt_tokens),
+          completionTokens: numberOrUndefined(data.usage?.completion_tokens),
+          reasoningTokens: numberOrUndefined(data.usage?.completion_tokens_details?.reasoning_tokens),
+          totalTokens: numberOrUndefined(data.usage?.total_tokens),
+        },
+        request: {
+          jsonFormat: useJsonFormat,
+          maxTokens,
+          timeoutMs,
+          thinking,
+          reasoningEffort,
+        },
+      };
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  async chat(messages: LLMMessage[], options?: ChatOptions): Promise<string> {
+    return (await this.complete(messages, options)).content;
   }
 }
 
@@ -102,10 +163,18 @@ export function validateConfig(): ConfigValidation {
   return { valid: true, provider: providerType, model, issues: issues.length > 0 ? issues : [] };
 }
 
-export function createLLMProvider(override?: { provider: string; model: string }): LLMProvider {
+function positiveInteger(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function roleSetting(role: LLMRuntimeOverride['role'], suffix: string): string | undefined {
+  return role ? process.env[`${role}_${suffix}`] : undefined;
+}
+
+export function createLLMProvider(override?: LLMRuntimeOverride): LLMProvider {
   const config = validateConfig();
-  const maxTokens = process.env.LLM_MAX_TOKENS ? Number(process.env.LLM_MAX_TOKENS) : undefined;
-  const timeoutMs = process.env.LLM_TIMEOUT_MS ? Number(process.env.LLM_TIMEOUT_MS) : undefined;
 
   if (!config.valid) {
     throw new LLMError('bad_config', config.issues.join(' '), 500);
@@ -113,6 +182,23 @@ export function createLLMProvider(override?: { provider: string; model: string }
 
   const providerType = override?.provider ?? process.env.LLM_PROVIDER ?? config.provider!;
   const model = override?.model ?? config.model!;
+  const deepseekDefaults: Record<string, number> = {
+    TUTOR: 16_000,
+    STUDENT: 10_000,
+    EVALUATOR: 20_000,
+  };
+  const maxTokens = positiveInteger(roleSetting(override?.role, 'LLM_MAX_TOKENS'))
+    ?? positiveInteger(process.env.LLM_MAX_TOKENS)
+    ?? (providerType === 'deepseek' ? deepseekDefaults[override?.role ?? 'TUTOR'] : 2000);
+  const timeoutMs = positiveInteger(roleSetting(override?.role, 'LLM_TIMEOUT_MS'))
+    ?? positiveInteger(process.env.LLM_TIMEOUT_MS)
+    ?? (providerType === 'deepseek' && override?.role === 'EVALUATOR' ? 300_000 : 180_000);
+  const thinking = providerType === 'deepseek'
+    ? (roleSetting(override?.role, 'LLM_THINKING') ?? process.env.LLM_THINKING ?? 'enabled')
+    : 'disabled';
+  const normalizedThinking = thinking === 'disabled' ? 'disabled' : 'enabled';
+  const reasoningEffort = (roleSetting(override?.role, 'LLM_REASONING_EFFORT')
+    ?? process.env.LLM_REASONING_EFFORT) === 'max' ? 'max' : 'high';
 
   if (providerType === 'openai') {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -121,6 +207,7 @@ export function createLLMProvider(override?: { provider: string; model: string }
       apiKey,
       baseURL: process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1',
       model,
+      provider: 'openai',
       maxTokens,
       timeoutMs,
     });
@@ -133,8 +220,11 @@ export function createLLMProvider(override?: { provider: string; model: string }
       apiKey,
       baseURL: process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com',
       model,
+      provider: 'deepseek',
       maxTokens,
       timeoutMs,
+      thinking: normalizedThinking,
+      reasoningEffort,
     });
   }
 

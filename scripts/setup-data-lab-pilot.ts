@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '../app/lib/db';
 import { createCampaign, startCampaign } from '../app/lib/dataLab/service';
 import type { SessionUser } from '../app/lib/session';
+import './load-script-env';
 
 async function upsertUser(username: string, displayName: string, role: 'annotator' | 'reviewer') {
   return db.user.upsert({

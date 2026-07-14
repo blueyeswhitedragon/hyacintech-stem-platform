@@ -54,6 +54,8 @@ next-env.d.ts
 # local operational backups
 /backups/
 /logs/
+/tmp/
+/data/sft/v3/runs/*/run.lock
 
 # local source captures and incomplete external downloads
 /basic.smartedu.cn.har
