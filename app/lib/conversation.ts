@@ -3,6 +3,8 @@ import { db } from './db';
 import type { Message } from '@/app/models/types';
 import type { AssignmentStatus, StageData } from '@/app/models/stageData';
 import { initialWelcomeMessage } from './welcome';
+import { ensureRuntimeModelVersion } from './modelRegistry';
+import { TUTOR_LANGUAGE_CONTRACT_VERSION } from './tutorLanguage';
 import {
   DEFAULT_STYLE_FAMILY,
   DEFAULT_STYLE_POLICY_VERSION,
@@ -46,6 +48,7 @@ export type EnsureConversationResult =
       styleFamily: StyleFamily;
       stylePolicyVersion: string;
       safetyQuizCompleted: boolean;
+      contractVersion: string;
     }
   | { ok: false; error: 'not_found' | 'forbidden' };
 
@@ -85,7 +88,7 @@ export async function ensureStudentConversation(
   if (existing?.conversationId) {
     const conv = await db.conversation.findUnique({
       where: { id: existing.conversationId },
-      select: { messages: true, stageData: true, safetyQuizCompleted: true, resolvedStyleFamily: true, stylePolicyVersion: true },
+      select: { messages: true, stageData: true, safetyQuizCompleted: true, resolvedStyleFamily: true, stylePolicyVersion: true, contractVersion: true },
     });
     return {
       ok: true,
@@ -98,6 +101,7 @@ export async function ensureStudentConversation(
       styleFamily: isStyleFamily(conv?.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
       stylePolicyVersion: conv?.stylePolicyVersion ?? DEFAULT_STYLE_POLICY_VERSION,
       safetyQuizCompleted: conv?.safetyQuizCompleted ?? false,
+      contractVersion: conv?.contractVersion ?? 'stage-contract-v2',
     };
   }
 
@@ -105,6 +109,8 @@ export async function ensureStudentConversation(
     assignmentTitle: assignment.title,
     topicDirection: assignment.topicDirection ?? undefined,
   })];
+  // 新会话固定到 tutor-language-v1；旧会话保留其历史合同与模型。
+  const runtimeModel = await ensureRuntimeModelVersion();
   const styleSelection: AssistantStyleSelection = assignment.assistantStyleFamily === 'auto' || isStyleFamily(assignment.assistantStyleFamily)
     ? assignment.assistantStyleFamily
     : 'auto';
@@ -114,8 +120,11 @@ export async function ensureStudentConversation(
       data: {
         userId: studentId,
         messages: JSON.stringify(welcome),
-        resolvedStyleFamily,
-        stylePolicyVersion: assignment.stylePolicyVersion,
+        // 历史字段保留但新会话不再消费五风格。
+        resolvedStyleFamily: '',
+        stylePolicyVersion: '',
+        contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
+        deployedModelVersionId: runtimeModel.id,
         traceCoverage: 'COMPLETE',
       },
       select: { id: true },
@@ -159,6 +168,7 @@ export async function ensureStudentConversation(
     styleFamily: resolvedStyleFamily,
     stylePolicyVersion: assignment.stylePolicyVersion,
     safetyQuizCompleted: false,
+    contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
   };
 }
 
@@ -175,6 +185,7 @@ export interface ConversationForUser {
   safetyQuizCompleted: boolean;
   styleFamily: StyleFamily;
   stylePolicyVersion: string;
+  contractVersion: string;
 }
 
 /**
@@ -195,6 +206,7 @@ export async function getConversationForUser(
       safetyQuizCompleted: true,
       resolvedStyleFamily: true,
       stylePolicyVersion: true,
+      contractVersion: true,
       studentAssignment: {
         select: {
           id: true,
@@ -222,5 +234,6 @@ export async function getConversationForUser(
     safetyQuizCompleted: conv.safetyQuizCompleted,
     styleFamily: isStyleFamily(conv.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
     stylePolicyVersion: conv.stylePolicyVersion || DEFAULT_STYLE_POLICY_VERSION,
+    contractVersion: conv.contractVersion,
   };
 }

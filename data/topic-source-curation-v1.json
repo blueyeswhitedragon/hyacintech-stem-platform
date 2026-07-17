@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-07-16",
+  "reviewPolicy": "首轮只判断是否值得管理员继续补充原始资源，不把旧脚本派生问题视为可靠事实。SHORTLISTED 表示项目机制明确；REVIEW 表示标题可能有价值但证据不足；其余默认 REJECTED。",
+  "shortlistedFamilies": [
+    {
+      "familyKey": "curated-water-treatment-carbon-alum",
+      "label": "活性炭和明矾的净水作用",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "有明确材料差异和水处理效果，可形成水处理科学探究；需补充原始测量方式。",
+      "topicLibraryIds": ["smartedu-0016"]
+    },
+    {
+      "familyKey": "curated-photosynthesis-factors",
+      "label": "光合作用影响因素",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "有明确生物机制和可观察结果，适合作为生命健康类探究；多个标题合并为一个项目家族。",
+      "topicLibraryIds": ["smartedu-0018", "smartedu-0019", "smartedu-0020"]
+    },
+    {
+      "familyKey": "curated-structure-stability-strength",
+      "label": "结构稳定性与强度",
+      "resourceType": "HYBRID_RESOURCE",
+      "reason": "可保留承重工程目标，并把结构参数转成性能测试；搜索结果、任务单、课时和视频合并。",
+      "topicLibraryIds": ["smartedu-0021", "smartedu-0030", "smartedu-0087", "smartedu-0088", "smartedu-0090", "smartedu-0091", "smartedu-0095"]
+    },
+    {
+      "familyKey": "curated-elastic-potential-energy",
+      "label": "弹性势能影响因素",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "物理机制明确，可形成可重复测量的参数—结果问题。",
+      "topicLibraryIds": ["smartedu-0023"]
+    },
+    {
+      "familyKey": "curated-evaporation-rate",
+      "label": "蒸发快慢影响因素",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "现象清楚、课堂可行；两个近义资源合并。",
+      "topicLibraryIds": ["smartedu-0025", "smartedu-0028"]
+    },
+    {
+      "familyKey": "curated-electromagnet-strength",
+      "label": "电磁铁磁性强弱",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "变量和测量方向明确，适合低压安全探究；课件、项目学习、视频和任务单合并。",
+      "topicLibraryIds": ["smartedu-0026", "smartedu-0075", "smartedu-0076", "smartedu-0077", "smartedu-0078", "smartedu-0079", "smartedu-0081", "smartedu-0085"]
+    },
+    {
+      "familyKey": "curated-pressure-effect",
+      "label": "压力作用效果",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "有清晰物理机制和课堂可测结果，值得补充原始实验条件。",
+      "topicLibraryIds": ["smartedu-0027"]
+    },
+    {
+      "familyKey": "curated-dissolution-rate",
+      "label": "物质溶解快慢",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "生活情境和化学机制明确；正文资源与课件合并。",
+      "topicLibraryIds": ["smartedu-0071", "smartedu-0074"]
+    },
+    {
+      "familyKey": "curated-motion-speed-same-distance",
+      "label": "相同距离内运动快慢",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "可形成距离固定、时间可测的物理探究；需确认不是单纯概念讲解。",
+      "topicLibraryIds": ["smartedu-0113"]
+    },
+    {
+      "familyKey": "curated-water-filter-device",
+      "label": "水质检测与自制净水器",
+      "resourceType": "HYBRID_RESOURCE",
+      "reason": "真实水处理需求、过滤机制和性能测试都较明确；十个资源载体只算一个项目家族。",
+      "topicLibraryIds": ["smartedu-0114", "smartedu-0115", "smartedu-0116", "smartedu-0117", "smartedu-0119", "smartedu-0120", "smartedu-0122", "smartedu-0123", "smartedu-0124", "smartedu-0125"]
+    },
+    {
+      "familyKey": "curated-solar-water-purifier",
+      "label": "太阳能净水器",
+      "resourceType": "HYBRID_RESOURCE",
+      "reason": "具有太阳能集热、蒸发冷凝和净水目标，不能再按普通过滤材料模板处理。",
+      "topicLibraryIds": ["smartedu-0157"]
+    },
+    {
+      "familyKey": "curated-flower-life-project",
+      "label": "花卉的一生项目",
+      "resourceType": "HYBRID_RESOURCE",
+      "reason": "具有完整生命过程和项目化学习情境，适合生命健康模块；需补充具体学生任务。",
+      "topicLibraryIds": ["smartedu-0160"]
+    },
+    {
+      "familyKey": "curated-wetland-ecology-imbalance",
+      "label": "湿地水体生态失衡",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "真实生态问题和系统变量明确，适合用课堂模型进行探究。",
+      "topicLibraryIds": ["smartedu-0163"]
+    },
+    {
+      "familyKey": "curated-smart-shading-system",
+      "label": "智能遮光系统",
+      "resourceType": "STUDENT_ENGINEERING_RESOURCE",
+      "reason": "真实需求、传感器阈值、响应准确率和设计迭代链完整，是优先工程样例。",
+      "topicLibraryIds": ["smartedu-0164"]
+    },
+    {
+      "familyKey": "curated-mars-food-supply",
+      "label": "火星基地食物供给系统",
+      "resourceType": "HYBRID_RESOURCE",
+      "reason": "高概念工程情境明确，可保留人工控制资源供给机制后寻找课堂代理。",
+      "topicLibraryIds": ["smartedu-0170"]
+    },
+    {
+      "familyKey": "curated-aquarium-ecosystem",
+      "label": "水族箱生态系统",
+      "resourceType": "STUDENT_INQUIRY_RESOURCE",
+      "reason": "适合封闭生态系统、环境条件和生物状态探究；需补充原任务。",
+      "topicLibraryIds": ["smartedu-0174"]
+    },
+    {
+      "familyKey": "curated-inverted-cup-drainer",
+      "label": "有柄杯倒置沥水装置",
+      "resourceType": "STUDENT_ENGINEERING_RESOURCE",
+      "reason": "卫生需求、结构设计和排水性能明确，适合低风险工程参数测试。",
+      "topicLibraryIds": ["smartedu-0175"]
+    },
+    {
+      "familyKey": "curated-waste-sorting-project",
+      "label": "垃圾分类项目",
+      "resourceType": "HYBRID_RESOURCE",
+      "reason": "真实环境问题明确，可能转成分类装置或行为系统探究；需确认原项目机制。",
+      "topicLibraryIds": ["smartedu-0177"]
+    },
+    {
+      "familyKey": "curated-vision-test-box",
+      "label": "防作弊视力检测箱",
+      "resourceType": "STUDENT_ENGINEERING_RESOURCE",
+      "reason": "使用情境、装置目标和检测性能较明确，适合工程验证；需核查隐私与健康边界。",
+      "topicLibraryIds": ["smartedu-0178"]
+    },
+    {
+      "familyKey": "curated-ebike-seat-pressure-safety",
+      "label": "电动自行车车座压力安全装置",
+      "resourceType": "STUDENT_ENGINEERING_RESOURCE",
+      "reason": "安全需求、压力检测和误触发性能明确，但必须降阶为低压桌面模型。",
+      "topicLibraryIds": ["smartedu-0180"]
+    }
+  ],
+  "reviewTopicLibraryIds": [
+    "smartedu-0022", "smartedu-0024",
+    "smartedu-0059", "smartedu-0060", "smartedu-0061", "smartedu-0062", "smartedu-0063", "smartedu-0065", "smartedu-0066", "smartedu-0067", "smartedu-0068",
+    "smartedu-0102", "smartedu-0104", "smartedu-0106", "smartedu-0107",
+    "smartedu-0143", "smartedu-0144", "smartedu-0151", "smartedu-0152", "smartedu-0155", "smartedu-0156", "smartedu-0158", "smartedu-0161", "smartedu-0162", "smartedu-0166", "smartedu-0167", "smartedu-0169", "smartedu-0171", "smartedu-0172", "smartedu-0181", "smartedu-0182", "smartedu-0183"
+  ],
+  "reviewReason": "标题可能包含可用现象或工程项目，但现有目录没有足够原始摘要，或与现有 TopicCard/高概念主题重复；暂不送模型编译。",
+  "defaultRejectedReason": "该条更像探究方法教学、教师课件/复习材料、科普人物/公开课、展示网站或过于宽泛的标题，不能仅凭现有信息可靠生成学生 TopicCard。"
+}

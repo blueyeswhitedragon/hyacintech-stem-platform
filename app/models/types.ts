@@ -67,6 +67,13 @@ export interface SafetyQuiz {
 }
 
 export interface ChatResponse {
+  /** 新合同的原始语言目标；服务器产物不包含在此对象中。 */
+  tutor_language?: {
+    dialogue: string;
+    interactionType: 'open_question' | 'clarification' | 'explanation' | 'checkpoint' | 'information';
+    focus: string;
+    hints: string[];
+  };
   dialogue: string;
   next_action_type: 'ask_choice' | 'text_input' | 'confirmation' | 'info';
   options?: string[];

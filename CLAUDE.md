@@ -12,6 +12,7 @@ npm run build      # Production build
 npm run start      # Start production server
 npm run lint       # ESLint
 npm run db:migrate # prisma migrate dev (apply schema changes + reseed)
+npm run db:deploy  # deploy committed migrations (new server / CI / production)
 npm run db:seed    # Seed demo teacher + class (tsx prisma/seed.ts)
 npm run db:studio  # Open Prisma Studio (inspect dev.db)
 ```
@@ -36,10 +37,15 @@ npx tsx scripts/test-report-summary.ts     # buildPriorSummary
 ### First-time setup
 
 ```
-npm install                      # postinstall runs `prisma generate`
+npm ci                           # postinstall runs `prisma generate`
 cp .env.example .env             # then set DATABASE_URL + a 32+ char SESSION_SECRET
-npx prisma migrate dev --name init   # creates prisma/dev.db + runs seed
+npm run db:deploy                # creates/updates the configured database
+npm run db:seed                  # optional demo teaching accounts
+npm run data-lab:init            # optional Data Lab administrator
+npm run model:bootstrap          # register the configured runtime model
 ```
+
+Use `npm run db:migrate` only while authoring a new Prisma migration. Fresh servers and deployment upgrades must use `npm run db:deploy` so they apply committed migrations without development prompts.
 
 Seed creates teacher `teacher1` / password `demo1234` and one demo class.
 
@@ -228,9 +234,24 @@ GuestWorkspace — same components, no DB, local state, no teacher review
 
 ### Data Lab
 
-`/data-lab` is an isolated data-production workspace for `annotator`, `reviewer`, and `admin` roles. It supports immutable dataset imports, structured assistant-only annotation, anonymous arbitration, frozen ShareGPT releases, external training-run registration, and blind-eval artifact import. Public registration still only permits `student` and `teacher`; background roles are admin-managed.
+`/data-lab` is an isolated data-production and model handoff workspace for `annotator`, `reviewer`, and `admin` roles. Public registration still only permits `student` and `teacher`; background roles are admin-managed and every API mutation enforces its role independently of page guards.
 
-M9A style lineage is end-to-end: assignments select one of five versioned styles or stable `auto`; conversations freeze the resolved style; online prompts consume it; all slots of a double-annotation sample share it; revisions and release items persist it. New frozen releases expose both canonical `clean` and model-ready `training` JSON. `training` prepends the versioned style instruction as a system message, while manifest schema v2 records per-style counts and hashes. Blind-eval collection uses `--style`, rejects cross-style comparisons, and the admin page aggregates results per style. Pre-M9A2 releases intentionally have no `training` export.
+The current production path is:
+
+```
+source material / generated drafts → TopicCard review and preview
+  → Smoke 6 → Calibration 12 → Trial 36 + human sign-off
+  → Full 180 / EVAL → model A/B candidates and cross-critique
+  → annotator first review → reviewer final confirmation
+  → immutable Release download → training on an external compute platform
+  → training/evaluation results registered in Model Records → staged deployment/rollback
+```
+
+TopicCard V2 is the compiler input for inquiry scenarios; `caseCompiler.ts` maps it into deterministic P1/P2/P4 student messages and evidence tables without changing the student-facing six-phase contract. Expansion gates and review provenance are defined in `docs/tutor-language-bootstrap-workflow.md`. Data Lab is a data export and result registry, not an in-process training console.
+
+The previous `DatasetBatch` / `AnnotationCampaign` ShareGPT five-style workflow is frozen and retained read-only for history, exports, and audit lineage. Its import/create/start APIs return 410 and must not be presented as the primary workflow.
+
+Legacy M9A style lineage remains end-to-end for historical records: assignments select one of five versioned styles or stable `auto`; conversations freeze the resolved style; revisions and release items persist it. Historical frozen releases expose canonical `clean` and model-ready `training` JSON. This does not reopen the legacy campaign workflow for new data.
 
 M9B1 adds `ModelVersion`, `ModelDeployment`, and immutable `GenerationTrace`. `npm run model:bootstrap` (also called by the launcher) idempotently registers the configured runtime model and first production baseline without persisting secrets. Formal chat uses `callLLMWithTrace()` and `persistGenerationTurn()` so display messages, stage data/advance, and trace commit in one transaction. Trace rows always store the structured response, prompt/request fingerprints, a versioned prompt template, and non-secret generation/contract evidence. The exact rendered system prompt is captured separately only when the assignment has explicit `GRANTED` data consent; old or unconsented traces leave that field empty and cannot be nominated as positive training candidates. New formal conversations set `traceCoverage=COMPLETE`; pre-migration or otherwise unverified conversations remain `LEGACY_UNVERIFIED`. Guest chat remains outside this persistence path.
 
@@ -238,7 +259,7 @@ M9B2 adds opt-in production feedback. Assignments default to `dataContributionMo
 
 M9C adds transformation evidence and training eligibility. Revisions persist a declared transformation type plus server-computed text/structure metrics from `trainingEligibility.ts`; overclaiming a light edit as a rewrite is rejected. Production `NO_CHANGE`/`LIGHT_EDIT` remains monitoring-only, while material corrections can produce SFT and chosen/rejected preference records. Work review and arbitration reject self-authored revisions. Release manifest schema v3 records per-item eligibility and emits eligibility-filtered `training` plus `preference`. Non-draft training registration requires a parent `ModelVersion` and recomputes current authorization, leakage, and correction eligibility.
 
-M9D completes deployment governance. Evaluation imports resolve transcript tags to `ModelVersion`; `deploymentGate.ts` requires ready training lineage, non-regressing aggregate results, and independent coverage/non-regression for all five styles. Only `ELIGIBLE` models can advance 10% → 30% → 100%. `resolveConversationModel()` uses a stable conversation hash and persists `Conversation.deployedModelVersionId`; chat uses that registered provider/external model. Normal promotion preserves conversation stickiness. Rollback creates a 100% baseline deployment and repins conversations still using the failed candidate. Deployment APIs are admin-only and every mutation is audited.
+M9D completes deployment governance. Evaluation imports resolve transcript tags to `ModelVersion`; `deploymentGate.ts` requires ready training lineage, complete verified artifacts, coverage and non-regression across all six phases, no critical errors, acceptable judge consistency, and structure-parse performance no worse than baseline. Only `ELIGIBLE` models can advance 10% → 30% → 100%, with online observation gates between stages. `resolveConversationModel()` uses a stable conversation hash and persists `Conversation.deployedModelVersionId`; chat uses that registered provider/external model. Normal promotion preserves conversation stickiness. Rollback creates a 100% baseline deployment and repins conversations still using the failed candidate. Deployment APIs are admin-only and every mutation is audited.
 
 M9E adds terminal annotation-campaign lifecycle governance. Admins may archive an `ACTIVE` campaign, atomically changing unfinished tasks to `CANCELLED`, disabling participants, and preserving assignees, drafts, submissions, work reviews, arbitration, releases, and audit history. Archived work can still be approved, invalidated, selected, merged, or rejected, but it cannot be returned to annotators or reopened. Only an empty `DRAFT` campaign can be permanently deleted. Claim, draft-save, and submit writes all re-check that the campaign is still `ACTIVE` to close archive races.
 
@@ -248,7 +269,7 @@ Initialization:
 
 ```bash
 npm run data-lab:init   # requires ADMIN_USERNAME / ADMIN_PASSWORD / ADMIN_DISPLAY_NAME
-npm run data-lab:pilot  # optional 12-sample pilot and demo annotation accounts
+npm run model:bootstrap # idempotently register the configured runtime model/baseline
 npm run data-lab:test
 ```
 
@@ -269,4 +290,4 @@ npm run data-lab:test
 
 ### Env vars
 
-`OPENAI_API_KEY` (+ optional `OPENAI_API_BASE`) or `DEEPSEEK_API_KEY` (+ optional `DEEPSEEK_API_BASE`). Optional overrides: `LLM_PROVIDER`, `LLM_MODEL` (defaults `gpt-4o` / `deepseek-v4-pro`).
+`DATABASE_URL`, a 32+ character `SESSION_SECRET`, and at least one valid provider key are required. Provider keys are `OPENAI_API_KEY` (+ optional `OPENAI_API_BASE`) and `DEEPSEEK_API_KEY` (+ optional `DEEPSEEK_API_BASE`). Optional runtime overrides include `LLM_PROVIDER`, `LLM_MODEL`, role-specific token/timeout settings, `EXTRACTOR_LLM_*`, `DATA_LAB_AI_CURATOR_*`, `DATA_LAB_MODEL_A/B*`, `ENABLE_MODEL_DEPLOYMENT`, and `PROMOTE_RUNTIME_PROMPT_BASELINE`. `.env.example` is the canonical inventory and separates production settings from script/test-only variables.

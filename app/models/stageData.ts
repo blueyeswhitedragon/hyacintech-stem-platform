@@ -58,6 +58,8 @@ export interface Stage2ExperimentPlan {
 
 export interface Stage2Data {
   submitted: boolean;
+  /** 新合同：学生已明确确认由服务器组装的方案事实。 */
+  factsConfirmed?: boolean;
   approved: boolean | null; // null=未审核
   teacherFeedback?: string;
   experimentPlan?: Stage2ExperimentPlan;
@@ -151,7 +153,14 @@ export interface Stage6Data {
   finalReadonly: boolean;
 }
 
+export interface ExtractedFactLedgerEntry {
+  value: unknown;
+  sourceQuote: string;
+}
+
 export interface StageData {
+  /** 仅保存通过逐字来源校验的学生事实；Tutor 历史永不写入。 */
+  extractedFacts?: Record<string, ExtractedFactLedgerEntry>;
   stage1?: Stage1Data;
   stage2?: Stage2Data;
   stage3?: Stage3Data;

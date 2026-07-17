@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { checkBlacklistedKeywords, getPromptForPhase, type PromptContext } from '@/app/prompts';
+import { checkBlacklistedKeywords } from '@/app/prompts';
 import { classifyError } from '@/app/lib/llm/errors';
-import { callLLM } from '@/app/lib/llm/chat';
 import { checkRateLimit } from '@/app/lib/guestRateLimit';
 import { PhaseEnum, type Message } from '@/app/models/types';
 import type { Stage2Data, StageData } from '@/app/models/stageData';
 import type { StageTriggerType } from '@/app/lib/stageContract';
+import { callStudentFactExtractor, mergeExtractedFacts } from '@/app/lib/stateExtractor';
+import { attachServerOwnedArtifacts, tutorFocusPlan, updateServerAnalysis, visibleDataRows } from '@/app/lib/serverTutorState';
+import { buildTutorVisibleState, callTutorLanguageWithTrace, toCompatibleChatResponse } from '@/app/lib/tutorLanguage';
+import { validateConfig } from '@/app/lib/llm/provider';
 
 const MAX_MESSAGE_LEN = 2000;
 const MAX_HISTORY = 20;
@@ -16,12 +19,14 @@ function clientIp(req: Request): string {
   return req.headers.get('x-real-ip') ?? 'local';
 }
 
-// POST /api/guest/chat —— 体验模式聊天（免登录，限流，不落库）
+function isSystemTrigger(triggerType: StageTriggerType) {
+  return ['STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP'].includes(triggerType);
+}
+
+// POST /api/guest/chat —— 体验模式使用 tutor-language-v1；不落库，但仍先独立提取学生事实。
 export async function POST(req: Request) {
   const rl = checkRateLimit(clientIp(req));
-  if (!rl.ok) {
-    return NextResponse.json({ error: 'rate_limited', message: rl.error }, { status: 429 });
-  }
+  if (!rl.ok) return NextResponse.json({ error: 'rate_limited', message: rl.error }, { status: 429 });
 
   let body: {
     message?: string;
@@ -43,28 +48,19 @@ export async function POST(req: Request) {
 
   const message = body.message?.trim();
   if (!message) return NextResponse.json({ error: '消息不能为空' }, { status: 400 });
-  if (message.length > MAX_MESSAGE_LEN) {
-    return NextResponse.json({ error: `消息过长（上限 ${MAX_MESSAGE_LEN} 字）` }, { status: 400 });
-  }
+  if (message.length > MAX_MESSAGE_LEN) return NextResponse.json({ error: `消息过长（上限 ${MAX_MESSAGE_LEN} 字）` }, { status: 400 });
 
   const blacklistedKeyword = checkBlacklistedKeywords(message);
   if (blacklistedKeyword) {
-    return NextResponse.json(
-      {
-        error: 'safety_violation',
-        keyword: blacklistedKeyword,
-        message: `您的请求包含可能存在安全风险的内容（${blacklistedKeyword}），请调整后重试。为了确保实验安全，我们建议使用更安全的替代方案。`,
-      },
-      { status: 400 }
-    );
+    return NextResponse.json({
+      error: 'safety_violation', keyword: blacklistedKeyword,
+      message: `您的请求包含可能存在安全风险的内容（${blacklistedKeyword}），请调整后重试。为了确保实验安全，我们建议使用更安全的替代方案。`,
+    }, { status: 400 });
   }
 
   const stage = typeof body.stage === 'number' && body.stage >= 1 && body.stage <= 6 ? body.stage : 1;
   const history = Array.isArray(body.history) ? body.history.slice(-MAX_HISTORY) : [];
-
-  const allowedTriggers: StageTriggerType[] = [
-    'USER_MESSAGE', 'STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP', 'OPTIONAL_COACHING',
-  ];
+  const allowedTriggers: StageTriggerType[] = ['USER_MESSAGE', 'STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP', 'OPTIONAL_COACHING'];
   const triggerType = body.triggerType && allowedTriggers.includes(body.triggerType)
     ? body.triggerType
     : stage === PhaseEnum.Execution && body.needSafetyQuiz
@@ -74,34 +70,54 @@ export async function POST(req: Request) {
         : stage === PhaseEnum.Reflection
           ? 'OPTIONAL_COACHING'
           : 'USER_MESSAGE';
-  const context: PromptContext = { triggerType };
-  if (stage === PhaseEnum.PlanDesign && body.priorSummary) {
-    context.priorSummary = body.priorSummary;
-  }
-  if (stage === PhaseEnum.Execution) {
-    if (body.needSafetyQuiz) context.needSafetyQuiz = true;
-    if (body.priorSummary) context.priorSummary = body.priorSummary;
-  }
-  if (stage === PhaseEnum.DataAnalysis) {
-    context.dataRows = body.dataRows ?? [];
-    context.dataSchema = body.dataSchema;
-  }
-  if ((stage === PhaseEnum.ResultsFormation || stage === PhaseEnum.Reflection) && body.priorSummary) {
-    context.priorSummary = body.priorSummary;
-  }
 
   try {
-    const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
-    const visibleContext = stage === PhaseEnum.DataAnalysis
-      ? JSON.stringify({ schema: body.dataSchema, rows: body.dataRows ?? [], rowNumbers: (body.dataRows ?? []).map((_, index) => index + 1) })
-      : JSON.stringify({ stageData: body.stageData, priorSummary: body.priorSummary });
-    const response = await callLLM(systemPrompt, message, history, {
+    let stageData = body.stageData ?? {};
+    let advanceTo: number | undefined;
+    if ([1, 2].includes(stage) && !isSystemTrigger(triggerType)) {
+      const sources = [...history.filter((item) => item.role === 'user').map((item) => item.content), message];
+      try {
+        const extraction = await callStudentFactExtractor({ stage, studentMessages: sources });
+        const merged = mergeExtractedFacts(stage, stageData, extraction.accepted);
+        stageData = merged.stageData;
+        advanceTo = merged.advanceTo;
+      } catch (error) {
+        console.warn('Guest extractor failed; continuing without state write:', error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    let analysisAccepted = false;
+    if (stage === 4 && !isSystemTrigger(triggerType)) {
+      const analysis = updateServerAnalysis(stageData, message);
+      stageData = analysis.stageData;
+      analysisAccepted = analysis.accepted;
+    }
+
+    const server = attachServerOwnedArtifacts({
       stage,
-      hasStage2Schema: body.hasStage2Schema === true,
+      stageData,
       triggerType,
-      visibleContext,
+      safetyQuizCompleted: body.needSafetyQuiz === false,
     });
-    return NextResponse.json(response);
+    stageData = server.stageData;
+    const focus = tutorFocusPlan(stage, stageData, { triggerType, analysisAccepted });
+    const visibleFacts = stage === 4
+      ? { 研究方案: stageData.stage2?.experimentPlan, 数据记录: visibleDataRows(stageData), 已接受分析次数: stageData.stage4?.analysisCount ?? 0 }
+      : buildTutorVisibleState(stage, stageData, { 前序摘要: body.priorSummary });
+    const config = validateConfig();
+    if (!config.valid || !config.provider || !config.model) throw new Error(config.issues.join(' '));
+    const tutor = await callTutorLanguageWithTrace({
+      phase: stage,
+      triggerType,
+      currentStudentMessage: isSystemTrigger(triggerType) ? '' : message,
+      priorStudentMessages: history.filter((item) => item.role === 'user').map((item) => item.content),
+      tutorHistory: history.filter((item) => item.role === 'assistant' && !item.messageType).map((item) => item.content),
+      visibleFacts,
+      allowedFocusIds: focus.allowedFocusIds,
+      focusDescriptions: focus.focusDescriptions,
+    }, { provider: config.provider, model: config.model });
+    const response = toCompatibleChatResponse(tutor.response, server.envelope);
+    return NextResponse.json({ ...response, stageData, currentStage: advanceTo ?? stage });
   } catch (err) {
     console.error('体验模式聊天出错:', err);
     const { error, detail, status } = classifyError(err);

@@ -1,5 +1,5 @@
 import { db } from '@/app/lib/db';
-import { chooseRolloutModel, evaluateDeploymentGate } from '@/app/lib/deploymentGate';
+import { chooseRolloutModel, evaluateDeploymentGate, evaluateOnlineObservationGate, type OnlineObservationInput } from '@/app/lib/deploymentGate';
 import { parseJson } from '@/app/lib/dataLab/validation';
 
 export async function refreshModelDeploymentGate(modelVersionId: string) {
@@ -16,7 +16,7 @@ export async function refreshModelDeploymentGate(modelVersionId: string) {
   const report = evaluateDeploymentGate({
     candidateTag: model.tag,
     trainingReady,
-    runs: runs.map((run) => ({ id: run.id, modelATag: run.modelATag, modelBTag: run.modelBTag, styleFamily: run.styleFamily, summary: parseJson(run.summaryJson, {}) })),
+    runs: runs.map((run) => ({ id: run.id, modelATag: run.modelATag, modelBTag: run.modelBTag, styleFamily: run.styleFamily, scope: run.scope, summary: parseJson(run.summaryJson, {}) })),
   });
   await db.$transaction(async (tx) => {
     await tx.evaluationRun.updateMany({
@@ -38,6 +38,23 @@ export async function createOrPromoteDeployment(input: { modelVersionId: string;
   if (gate.result !== 'PASS') throw new Error(`部署门禁未通过：${gate.failures.join('、')}`);
   const active = await db.modelDeployment.findFirst({ where: { environment: 'PRODUCTION', status: 'ACTIVE' }, orderBy: { startedAt: 'desc' } });
   const sameCandidate = active?.modelVersionId === model.id;
+  if (sameCandidate && active && (active.rolloutPercent === 10 || active.rolloutPercent === 30)) {
+    const observation = parseJson<Partial<Omit<OnlineObservationInput, 'rolloutPercent' | 'startedAt'>>>(active.observationJson, {});
+    if (!active.startedAt) throw new Error('当前灰度缺少 startedAt，无法核验线上观察窗口');
+    const online = evaluateOnlineObservationGate({
+      rolloutPercent: active.rolloutPercent,
+      startedAt: active.startedAt,
+      sessions: observation.sessions ?? 0,
+      criticalErrors: observation.criticalErrors ?? 0,
+      structureFailureRate: observation.structureFailureRate ?? 1,
+      baselineStructureFailureRate: observation.baselineStructureFailureRate ?? 0,
+      teacherRejectRate: observation.teacherRejectRate ?? 1,
+      baselineTeacherRejectRate: observation.baselineTeacherRejectRate ?? 0,
+      earlyTerminationRate: observation.earlyTerminationRate ?? 1,
+      baselineEarlyTerminationRate: observation.baselineEarlyTerminationRate ?? 0,
+    });
+    if (!online.pass) throw new Error(`线上灰度门禁未通过：${online.failures.join('、')}`);
+  }
   const expected = sameCandidate ? (active.rolloutPercent === 10 ? 30 : active.rolloutPercent === 30 ? 100 : null) : 10;
   if (input.rolloutPercent !== expected) throw new Error(`灰度比例必须按 10% → 30% → 100% 晋级，下一步应为 ${expected ?? '无'}`);
   if (!active && input.rolloutPercent !== 10) throw new Error('首次部署必须从 10% 开始');
@@ -64,6 +81,20 @@ export async function rollbackDeployment(input: { deploymentId: string; adminId:
     await tx.dataLabAuditLog.create({ data: { actorId: input.adminId, action: 'MODEL_DEPLOYMENT_ROLLED_BACK', entityType: 'ModelDeployment', entityId: rollback.id, payloadJson: JSON.stringify({ rolledBackDeploymentId: active.id }) } });
     return rollback;
   });
+}
+
+export async function updateDeploymentObservation(input: {
+  deploymentId: string;
+  adminId: string;
+  observation: Omit<OnlineObservationInput, 'rolloutPercent' | 'startedAt' | 'now'>;
+}) {
+  const deployment = await db.modelDeployment.findUnique({ where: { id: input.deploymentId } });
+  if (!deployment || deployment.status !== 'ACTIVE' || ![10, 30].includes(deployment.rolloutPercent)) throw new Error('只有 ACTIVE 的 10%/30% 灰度可记录观察指标');
+  const values = Object.values(input.observation);
+  if (values.some((value) => typeof value !== 'number' || !Number.isFinite(value) || value < 0)) throw new Error('观察指标必须是非负数');
+  const updated = await db.modelDeployment.update({ where: { id: deployment.id }, data: { observationJson: JSON.stringify({ ...input.observation, recordedAt: new Date().toISOString() }) } });
+  await db.dataLabAuditLog.create({ data: { actorId: input.adminId, action: 'DEPLOYMENT_OBSERVATION_UPDATED', entityType: 'ModelDeployment', entityId: deployment.id, payloadJson: JSON.stringify(input.observation) } });
+  return updated;
 }
 
 export async function resolveConversationModel(conversationId: string) {

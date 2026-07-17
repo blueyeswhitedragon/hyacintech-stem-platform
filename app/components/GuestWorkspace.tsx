@@ -58,7 +58,8 @@ export default function GuestWorkspace() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.message || data.error || '请求失败，请重试。');
 
-    // 本地结构化提取（与服务端同源纯函数）
+    // tutor-language-v1 由服务端拥有结构化状态；旧响应仍保留本地兼容提取。
+    if (data.stageData) return data as ChatApiResponse;
     const { stageData: nextSD, advanceTo } = extractStageData(stage, data, stageData, {
       studentMessage: message,
       dataRows: stageData.stage3?.rows ?? [],

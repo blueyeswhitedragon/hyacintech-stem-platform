@@ -2,21 +2,26 @@
 
 AI驱动的科学探究学习平台，基于上海市初中科学课程标准。AI 教师引导学生完成「选题定向 → 方案设计 → 过程执行 → 数据分析 → 报告成型 → 结果反思」六个阶段，全程安全监护。支持**正式账号**（班级/作业/教师审核）和**直接体验**（无需注册、浏览器内运行）两种模式。
 
-## 第一次安装
+## 第一次安装（本地开发）
 
 ```bash
-npm install                      # postinstall 会自动运行 prisma generate
+npm ci                           # postinstall 会自动运行 prisma generate
 cp .env.example .env             # 按下方说明填写环境变量
-npm run db:migrate               # 应用 SQLite / Prisma 迁移
+npm run db:deploy                # 按顺序应用已提交的 Prisma 迁移
 npm run db:seed                  # 创建演示教学账号
+npm run data-lab:init            # 可选：创建 Data Lab 管理员
+npm run model:bootstrap          # 登记当前运行模型与初始基线
 ```
+
+修改 `prisma/schema.prisma` 并创建新迁移时才使用 `npm run db:migrate`；新服务器、CI 和已有环境升级统一使用可重复执行的 `npm run db:deploy`。
 
 ### 环境变量（`.env`）
 
 ```env
 DATABASE_URL="file:./dev.db"              # SQLite 数据库路径
 SESSION_SECRET="至少32字符的随机字符串"      # 生成方式：openssl rand -base64 32
-OPENAI_API_KEY="sk-..."                    # 或 DEEPSEEK_API_KEY="sk-..."
+OPENAI_API_KEY="sk-..."                    # 至少配置一个有效提供方密钥
+# DEEPSEEK_API_KEY="sk-..."                # Data Lab A/B 使用两家时需同时配置
 # 可选：
 # LLM_PROVIDER=openai|deepseek            # 自动检测，无需设置
 # LLM_MODEL=gpt-4o|deepseek-v4-pro        # 默认 gpt-4o / deepseek-v4-pro
@@ -26,6 +31,8 @@ ADMIN_USERNAME="data-admin"
 ADMIN_PASSWORD="请替换为至少8字符的强密码"
 ADMIN_DISPLAY_NAME="数据平台主管"
 ```
+
+完整可选项、Data Lab A/B 模型和脚本专用变量见 [`.env.example`](./.env.example)。真实 `.env` 已被 Git 忽略，不应上传；生产环境也不要使用示例密钥或示例会话密钥。
 
 ## 运行
 
@@ -41,6 +48,26 @@ npm run data-lab:import -- --file <候选集.json> --batch <唯一批次名>  # 
 npm run data-lab:pilot  # 创建 2 位演示标注者、1 位复审者和 12 样本试运行活动（双标后为 22 条任务）
 npm run data-lab:test   # Data Lab 纯函数与数据库闭环测试
 ```
+
+## 新服务器生产部署
+
+需要 Node.js 20.9 或更高版本。以下顺序适用于全新检出和普通升级；SQLite 数据库升级前应先备份实际数据库文件。
+
+```bash
+git clone <repository-url>
+cd hyacintech-stem-platform
+npm ci
+cp .env.example .env             # 首次部署执行；填写真实密钥、数据库路径和管理员配置
+npm run db:deploy
+npm run db:seed                  # 可选：需要演示教学账号时执行，幂等
+npm run data-lab:init            # 需要 Data Lab 时执行，幂等
+npm run model:bootstrap          # 登记当前运行模型与生产基线，幂等
+npm run lint
+npm run build
+npm run start
+```
+
+生产数据库不要与测试共用。可用临时 SQLite URL 完成回归，例如先对 `DATABASE_URL="file:/tmp/hyacintech-verify.db"` 运行 `db:deploy`、`db:seed`、`data-lab:init`、`data-lab:test:setup` 和 `data-lab:test`。自托管时建议由 systemd 等进程管理器守护 `npm run start`，并在前面配置 Nginx/Caddy 反向代理、HTTPS、请求大小限制和限流；`public/uploads/`、SQLite 数据库及 `backups/` 需要独立持久化和备份。
 
 ## 种子演示账号
 
@@ -58,15 +85,20 @@ npm run data-lab:test   # Data Lab 纯函数与数据库闭环测试
 
 管理员、标注者和复审者登录后进入 `/data-lab`。后台角色不能自助注册，只能通过管理员 Seed 或账号管理页创建。
 
+当前正式数据生产主线：
+
 ```text
-ShareGPT/manifest 导入
-  → 自动结构与语义质检
-  → 双人独立标注 / Silver 单审
-  → 匿名复审仲裁
-  → Human Gold + Reviewed Silver 冻结发布（clean + 风格可控 training）
-  → 主办方训练任务登记
-  → transcript/verdict 双盲结果导入
+课程素材 / AI 生成草稿
+  → TopicCard 审核与案例预览
+  → Smoke 6 → Calibration 12 → Trial 36（自动门禁 + 人工签署）
+  → Full 180 / EVAL 扩产 → 双模型 A/B 候选与交叉检查
+  → 标注员初审 → 定稿人最终确认
+  → 冻结 Release 并下载交付
+  → 外部算力平台训练
+  → 模型档案回填训练/评测结果 → 10% / 30% / 100% 部署或回滚
 ```
+
+Data Lab 的定位是数据出口与外部训练结果登记簿，不在站内执行训练。旧 `DatasetBatch / AnnotationCampaign` ShareGPT 五风格链路已冻结，只读保留用于历史查询、导出与审计；新数据不得再从该入口创建或启动活动。
 
 历史 `dataset-base-v1` 共 489 条，已因六阶段状态机漂移整体标记为 `LEGACY_QUARANTINED`，不能创建新标注活动、冻结为训练版本或导出 SFT。它们只保留为新 rollout 的场景种子、rejected preference 与回归案例；新的正向数据必须使用 dataset schema v3、当前阶段合同和角色分离的逐轮生成，经自动校验与人工审核后才能进入训练。
 
@@ -76,7 +108,7 @@ M9B2 已建立正式使用数据的安全入口：回流默认关闭，学生可
 
 M9C 已把候选接入人工纠正与训练资格：服务端验证修订是否真的达到实质纠正，阻止同人自审；冻结版本分别输出 SFT training 与 chosen/rejected preference，训练登记绑定父模型并重新检查当前资格。
 
-M9D 已完成模型晋级闭环：双盲结果关联稳定模型版本，五种风格分别通过门禁后才能按 10% → 30% → 100% 灰度；正式会话稳定绑定模型，异常时可一键回滚并切回上一安全基线。至此 M9 全部完成。
+M9D 已完成模型晋级闭环：双盲结果关联稳定模型版本，覆盖六个探究阶段并通过胜率、严重错误、裁判一致性、结构解析和评测产物完整性门禁后，才能按 10% → 30% → 100% 灰度；10%/30% 还需满足观察时长、会话量和线上质量指标。正式会话稳定绑定模型，异常时可一键回滚并切回上一安全基线。至此 M9 全部完成。
 
 M9E 已补齐批量标注活动的安全收尾：管理员可以结束并归档不再需要的活动，未完成任务会停止分发，已提交内容、工作量审核、仲裁和发布血缘全部保留；只有从未启动且没有业务记录的草稿活动允许永久删除。
 
@@ -109,7 +141,7 @@ app/
   auth/         # 登录/注册页
   student/      # 学生端：dashboard/assignments/[id]
   teacher/      # 教师端：dashboard/classes/assignments/review
-  data-lab/     # 数据导入、标注、仲裁、发布、训练与评测登记
+  data-lab/     # TopicCard、案例生成、双审、版本交付、模型与部署登记
   experience/   # 体验模式
   components/   # 共享 UI 组件（ConversationChat/DataTableEditor/ChartViewer/ReportViewer…）
   lib/          # 服务端逻辑（db/session/auth/queries/conversation/llm/stageAdvance/review…）
@@ -122,12 +154,15 @@ scripts/        # 单测（test-stage-extraction/test-stage-advance/test-review/
 public/uploads/ # 学生上传的实验图片（Git 忽略，仅保留 .gitkeep）
 ```
 
-完整架构文档见 [`CLAUDE.md`](./CLAUDE.md)，实施路线见 [`ROADMAP.md`](./ROADMAP.md)。
+完整架构文档见 [`CLAUDE.md`](./CLAUDE.md)，实施路线见 [`ROADMAP.md`](./ROADMAP.md)。Tutor 数据生产规则见 [`docs/tutor-language-bootstrap-workflow.md`](./docs/tutor-language-bootstrap-workflow.md)，TopicCard V2 工程桥见 [`docs/topic-card-v2-engineering-bridge.md`](./docs/topic-card-v2-engineering-bridge.md)，本轮界面动线设计见 [`docs/data-lab-ui-redesign-proposal.md`](./docs/data-lab-ui-redesign-proposal.md)。
 
 模型迭代的风格控制、生产数据安全回流、训练血缘与灰度部署设计见 [`docs/model-improvement-loop.md`](./docs/model-improvement-loop.md)。
 
 ## Data Lab 使用教程
 
+- [Tutor 数据生产与门禁主流程](./docs/tutor-language-bootstrap-workflow.md)
+- [Data Lab 界面与管理员动线](./docs/data-lab-ui-redesign-proposal.md)
+- [TopicCard V2 工程探究兼容层](./docs/topic-card-v2-engineering-bridge.md)
 - [标注员录屏讲稿](./docs/data-lab-annotator-recording-script.md)
 - [团队内部管理与审核速查](./docs/data-lab-team-quick-guide.md)
 - [旧版标注者与复审者详细教程（历史参考）](./docs/data-lab-annotator-reviewer-guide.md)

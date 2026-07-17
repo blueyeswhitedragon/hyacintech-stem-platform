@@ -18,6 +18,7 @@ export default function ModelVersionForm({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageTone, setMessageTone] = useState<'success' | 'error'>('success');
 
   async function submit(formData: FormData) {
     setPending(true);
@@ -37,9 +38,11 @@ export default function ModelVersionForm({
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? '登记失败');
+      setMessageTone('success');
       setMessage('模型版本已登记');
       router.refresh();
     } catch (error) {
+      setMessageTone('error');
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setPending(false);
@@ -109,7 +112,7 @@ export default function ModelVersionForm({
         <button disabled={pending} className="bg-gray-950 px-4 py-2 text-sm text-white">
           {pending ? '登记中…' : '登记模型版本'}
         </button>
-        {message && <span className="text-sm text-gray-600">{message}</span>}
+        {message && <span className={`text-sm ${messageTone === 'success' ? 'text-green-700' : 'text-red-700'}`}>{message}</span>}
       </div>
     </form>
   );

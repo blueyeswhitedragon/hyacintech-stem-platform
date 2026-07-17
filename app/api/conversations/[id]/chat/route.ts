@@ -11,6 +11,7 @@ import {
 } from '@/app/lib/modelRegistry';
 import { resolveConversationModel } from '@/app/lib/deployment';
 import { extractStageData } from '@/app/lib/stageExtraction';
+import { resolveChatContractBranch, runNewTutorTurn } from '@/app/lib/tutorTurn';
 import { buildPriorSummary } from '@/app/lib/reportSummary';
 import { shouldNudgeConvergence } from '@/app/lib/pacing';
 import { PhaseEnum, type Message } from '@/app/models/types';
@@ -103,16 +104,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   }
 
   try {
-    // 轮次累加（含本条消息）+ 超阈值注入「该收敛」提示
     const stage = conv.currentStage;
     const prevRounds = conv.stageData.roundCounts ?? {};
     const roundCount = (prevRounds[stage] ?? 0) + 1;
-
-    let context = buildContext(stage, conv);
-    if (shouldNudgeConvergence(stage, roundCount)) {
-      context = { ...(context ?? {}), nudgeConverge: true };
-    }
-    const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
     const modelVersion = await resolveConversationModel(conversationId);
     const modelIdentity: RuntimeModelIdentity = {
       tag: modelVersion.tag,
@@ -121,6 +115,61 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       promptPolicyVersion: modelVersion.promptPolicyVersion,
       contractVersion: modelVersion.contractVersion,
     };
+
+    const contractBranch = resolveChatContractBranch(conv.contractVersion, modelVersion.contractVersion);
+    if (contractBranch === 'TUTOR_LANGUAGE_V1') {
+      const turn = await runNewTutorTurn({ conversationId, message, conv, modelIdentity });
+      const stageData = turn.stageData;
+      stageData.roundCounts = { ...prevRounds, [stage]: roundCount };
+      const updatedMessages = [...conv.messages, turn.userMessage, turn.assistantMessage];
+      if (turn.response.stage1_confirmed && turn.response.snapshot) {
+        updatedMessages.push({
+          id: uuidv4(),
+          role: 'assistant',
+          content: turn.response.snapshot,
+          messageType: 'confirmation_doc',
+        });
+      }
+      const nextStage = turn.advanceTo ?? stage;
+      await persistGenerationTurn({
+        conversationId,
+        studentAssignmentId: conv.studentAssignmentId,
+        currentStage: stage,
+        nextStage,
+        updatedMessages,
+        stageData,
+        stageDataChanged: JSON.stringify(stageData) !== JSON.stringify(conv.stageData),
+        userMessageId: turn.userMessage.id,
+        assistantMessageId: turn.assistantMessage.id,
+        userMessage: message,
+        systemPrompt: turn.systemPrompt,
+        systemPromptTemplate: turn.systemPromptTemplate,
+        trainingSystemPromptSnapshot: conv.dataConsentStatus === 'GRANTED' ? turn.systemPrompt : '',
+        response: turn.response,
+        modelVersionId: modelVersion.id,
+        modelIdentity,
+        // 历史列保留为空；新合同不消费五风格。
+        styleFamily: '',
+        stylePolicyVersion: '',
+        generationParams: turn.generationParams,
+        contractCheck: turn.contractCheck,
+        triggerType: stage === PhaseEnum.Execution && !conv.safetyQuizCompleted
+          ? 'STAGE_ENTER'
+          : stage === PhaseEnum.ResultsFormation && !conv.stageData.stage5?.sections
+            ? 'REPORT_BOOTSTRAP'
+            : stage === PhaseEnum.Reflection
+              ? 'OPTIONAL_COACHING'
+              : 'USER_MESSAGE',
+      });
+      return NextResponse.json({ ...turn.response, currentStage: nextStage, stageData });
+    }
+
+    // 历史会话继续走 stage-contract-v2，不改变既有解析、风格快照和结构化产物。
+    let context = buildContext(stage, conv);
+    if (shouldNudgeConvergence(stage, roundCount)) {
+      context = { ...(context ?? {}), nudgeConverge: true };
+    }
+    const systemPrompt = getPromptForPhase(stage as PhaseEnum, context);
     const visibleContext = stage === PhaseEnum.DataAnalysis
       ? JSON.stringify({ schema: context?.dataSchema, rows: context?.dataRows ?? [], rowNumbers: (context?.dataRows ?? []).map((_, index) => index + 1) })
       : JSON.stringify({ stageData: conv.stageData, priorSummary: context?.priorSummary });
@@ -131,45 +180,21 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       visibleContext,
     }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
     const response = llmResult.response;
-
-    // 结构化提取（纯函数）
     const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData, {
       studentMessage: message,
       dataRows: conv.stageData.stage3?.rows ?? [],
     });
-
-    // 记录本阶段轮次
     stageData.roundCounts = { ...prevRounds, [stage]: roundCount };
-
     const userMessage: Message = { id: uuidv4(), role: 'user', content: message, status: 'sent' };
     const assistantMessage: Message = {
-      id: uuidv4(),
-      role: 'assistant',
-      content: response.dialogue,
-      options: response.options,
-      hints: response.hints,
-      actionType: response.next_action_type,
-      phaseComplete: response.phase_complete,
+      id: uuidv4(), role: 'assistant', content: response.dialogue, options: response.options,
+      hints: response.hints, actionType: response.next_action_type, phaseComplete: response.phase_complete,
     };
     const updatedMessages = [...conv.messages, userMessage, assistantMessage];
-
-    // 确认书卡片一并持久化（刷新后仍可见；客户端也会即时插入，reload 时以服务端为准）
     if (response.stage1_confirmed && response.snapshot) {
-      updatedMessages.push({
-        id: uuidv4(),
-        role: 'assistant',
-        content: response.snapshot,
-        messageType: 'confirmation_doc',
-      });
+      updatedMessages.push({ id: uuidv4(), role: 'assistant', content: response.snapshot, messageType: 'confirmation_doc' });
     }
-
-    // 阶段推进只认 stage1 的 advanceTo（stage1_confirmed）。
-    // 其余阶段一律显式推进：3→4/4→5 走 /advance 按钮，2→3/5→6 走教师审核，
-    // 6→完成走 stage6-respond。phase_complete 仅作 UI 提示，不再驱动阶段。
     const nextStage = advanceTo ?? conv.currentStage;
-
-    const stageDataChanged = JSON.stringify(stageData) !== JSON.stringify(conv.stageData);
-
     await persistGenerationTurn({
       conversationId,
       studentAssignmentId: conv.studentAssignmentId,
@@ -177,7 +202,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       nextStage,
       updatedMessages,
       stageData,
-      stageDataChanged,
+      stageDataChanged: JSON.stringify(stageData) !== JSON.stringify(conv.stageData),
       userMessageId: userMessage.id,
       assistantMessageId: assistantMessage.id,
       userMessage: message,
@@ -192,7 +217,6 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       contractCheck: llmResult.trace.contractCheck,
       triggerType: context?.triggerType ?? 'USER_MESSAGE',
     });
-
     return NextResponse.json({ ...response, currentStage: nextStage, stageData });
   } catch (err) {
     console.error('会话聊天处理出错:', err);

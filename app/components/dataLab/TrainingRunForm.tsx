@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DATA_LAB_STATUS_LABELS } from '@/app/lib/dataLab/labels';
+
+const TRAINING_RUN_STATUSES = ['DRAFT', 'SUBMITTED', 'RUNNING', 'SUCCEEDED', 'FAILED'] as const;
 
 export default function TrainingRunForm({
   releases,
@@ -12,6 +15,7 @@ export default function TrainingRunForm({
 }) {
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
+  const [messageTone, setMessageTone] = useState<'success' | 'error'>('success');
   const [pending, setPending] = useState(false);
 
   async function create(formData: FormData) {
@@ -35,9 +39,11 @@ export default function TrainingRunForm({
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? '登记失败');
+      setMessageTone('success');
       setMessage('训练任务已登记并保存资格报告');
       router.refresh();
     } catch (error) {
+      setMessageTone('error');
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setPending(false);
@@ -51,9 +57,9 @@ export default function TrainingRunForm({
     <label className="text-sm">基础模型显示名<input name="baseModel" required placeholder="Qwen3.5-35B-A3B" className="mt-1 w-full border px-3 py-2" /></label>
     <label className="text-sm">主办方任务 ID<input name="externalTaskId" className="mt-1 w-full border px-3 py-2" /></label>
     <label className="text-sm">输出模型标签<input name="modelTag" className="mt-1 w-full border px-3 py-2" /></label>
-    <label className="text-sm">状态<select name="status" className="mt-1 w-full border px-3 py-2"><option>DRAFT</option><option>SUBMITTED</option><option>RUNNING</option><option>SUCCEEDED</option><option>FAILED</option></select></label>
+    <label className="text-sm">外部训练状态<select name="status" className="mt-1 w-full border px-3 py-2">{TRAINING_RUN_STATUSES.map((status) => <option key={status} value={status}>{DATA_LAB_STATUS_LABELS[status]}</option>)}</select></label>
     <label className="text-sm md:col-span-2">训练参数 JSON<textarea name="parameters" defaultValue="{}" className="mt-1 min-h-20 w-full border p-2 font-mono text-xs" /></label>
     <label className="text-sm">备注<textarea name="notes" className="mt-1 min-h-20 w-full border p-2" /></label>
-    <div className="flex items-center gap-3 md:col-span-3"><button disabled={pending} className="bg-gray-950 px-4 py-2 text-sm text-white">登记并检查资格</button>{message && <span className="text-sm text-gray-600">{message}</span>}</div>
+    <div className="flex items-center gap-3 md:col-span-3"><button disabled={pending} className="bg-gray-950 px-4 py-2 text-sm text-white">登记并检查资格</button>{message && <span className={`text-sm ${messageTone === 'success' ? 'text-green-700' : 'text-red-700'}`}>{message}</span>}</div>
   </form>;
 }
