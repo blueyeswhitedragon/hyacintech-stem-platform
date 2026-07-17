@@ -22,6 +22,8 @@ export interface GenerationTraceInput {
   assistantMessageId: string;
   userMessage: string;
   systemPrompt: string;
+  /** 不含学生数据的版本化模板；新合同应显式提供。 */
+  systemPromptTemplate?: string;
   /** Exact rendered prompt; callers must supply it only after explicit consent. */
   trainingSystemPromptSnapshot?: string;
   response: ChatResponse;
@@ -37,7 +39,7 @@ export function buildGenerationTraceData(input: GenerationTraceInput) {
   const responseJson = JSON.stringify(input.response);
   // Store the versioned template and style/trigger contract, not the fully
   // rendered prompt containing student rows, reports or teacher feedback.
-  const tracePromptTemplate = getPromptForPhase((input.traceStage ?? input.currentStage) as PhaseEnum, {
+  const tracePromptTemplate = input.systemPromptTemplate ?? getPromptForPhase((input.traceStage ?? input.currentStage) as PhaseEnum, {
     styleFamily: input.styleFamily as import('@/app/lib/stylePolicy').StyleFamily,
     stylePolicyVersion: input.stylePolicyVersion,
     triggerType: input.triggerType,

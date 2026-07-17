@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 4,
+  "tags": {
+    "A": "baseline-model-tag",
+    "B": "candidate-model-tag"
+  },
+  "scope": "full",
+  "summary": {
+    "phase": {
+      "1": {
+        "A": 0,
+        "B": 1,
+        "tie": 0,
+        "inconsistent": 0,
+        "criticalErrors": 0,
+        "parseSuccessA": 1,
+        "parseTotalA": 1,
+        "parseSuccessB": 1,
+        "parseTotalB": 1
+      }
+    },
+    "criticalErrors": 0
+  }
+}

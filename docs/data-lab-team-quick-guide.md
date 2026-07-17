@@ -1,5 +1,8 @@
 # Data Lab 团队内部速查
 
+> **2026-07-15 工作流更新**：新数据请使用 `TopicCard → Prompt v2 Smoke 6 → Prompt v2.1 Calibration 12 → A/B 候选与交叉 critique → 首次审核 → 最终确认 → TRIAL_36 → FULL_180/TRAIN → Release`。正式教学 Tutor 暂时保持 Prompt v1；PILOT/旧 v1 校准数据仅作监测和回归，不能发布。Critic 失败时只重试 Critic，不重复生成已保存的 A/B。旧 DatasetBatch/AnnotationCampaign/五风格页面仅作历史读取、导出和审计。详见 `docs/tutor-language-bootstrap-workflow.md`。
+
+
 本文面向团队内部的管理员和复审人员，重点说明日常操作。标注员请使用单独的录屏教程。
 
 ## 一、启动平台
@@ -195,3 +198,10 @@ npx tsx scripts/blind-eval.ts judge baseline-evidence tuned-evidence --scope smo
 6. 出现结构、安全或效果问题时点击“一键回滚”；紧急回滚会把仍绑定候选模型的会话切回上一安全基线。
 
 部署记录保存门禁快照、上一模型、灰度比例和操作人。不要直接修改 `.env` 冒充灰度；如需紧急禁止部署操作，可设置 `ENABLE_MODEL_DEPLOYMENT=false` 并重启。
+
+## Tutor 数据职责速记（2026-07-16）
+
+- 管理员：TopicCard、学生案例、批次策略、案例 revision、淘汰替换、Release。
+- Annotator：Tutor A/B 初审与草稿修订。
+- Reviewer：唯一正式人工审核门，可修改后直接定稿。
+- AI：默认辅助 Annotator；只有管理员逐批授权时才可直送 Reviewer。

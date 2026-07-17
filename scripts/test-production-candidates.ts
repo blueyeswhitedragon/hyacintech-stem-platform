@@ -9,7 +9,6 @@ import {
   setStudentDataConsent,
 } from '../app/lib/productionCandidates';
 import { redactProductionRecord } from '../app/lib/redaction';
-import { createCampaign, startCampaign } from '../app/lib/dataLab/service';
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
 import type { SessionUser } from '../app/lib/session';
 
@@ -112,7 +111,6 @@ async function main() {
   check(legacyContextRejected, '缺少经授权完整上下文的历史轨迹不能进入正向训练候选池');
 
   const teacherSession: SessionUser = { id: teacher.id, username: teacher.username, displayName: teacher.displayName, role: 'teacher' };
-  const adminSession: SessionUser = { id: admin.id, username: admin.username, displayName: admin.displayName, role: 'admin' };
 
   const candidate = await nominateProductionCandidate({ studentAssignmentId: studentAssignment.id, assistantMessageId, teacherId: teacher.id, triggerType: 'TEACHER_NOMINATION', triggerNote: '导师泄露身份' });
   check(candidate.status === 'NOMINATED', '教师提名进入隔离候选池');
@@ -121,23 +119,18 @@ async function main() {
   check(candidate.redactedRecordJson.includes('阶段1完整上下文'), '候选快照保留模型当轮实际可见上下文');
   check(candidate.redactedRecordJson.includes('我先观察了第一组'), '候选快照保留脱敏后的模型可见对话历史');
   await reviewProductionCandidate({ id: candidate.id, action: 'APPROVE', adminId: admin.id });
-  const batchName = `production-batch-${suffix}`;
-  const converted = await convertProductionCandidates({ ids: [candidate.id], batchName, adminId: admin.id });
-  const convertedCandidate = await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id }, include: { convertedSample: true } });
-  check(converted.batch.sourceType === 'production_trace', '通过候选转换为独立 production_trace 批次');
-  check(convertedCandidate.status === 'CONVERTED' && convertedCandidate.convertedSample?.sourceKind === 'production_trace', '转换后候选与脱敏样本双向追溯');
+  const converted = await convertProductionCandidates({ ids: [candidate.id], batchName: `production-trace-${suffix}`, adminId: admin.id });
+  const convertedCandidate = await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id }, include: { convertedTutorTurnCase: true } });
+  check(converted.cases.length === 1 && converted.cases[0].dataSource === 'PRODUCTION_TRACE', '通过候选转换为独立 TutorTurnCase');
+  check(convertedCandidate.status === 'CONVERTED' && convertedCandidate.convertedTutorTurnCase?.dataSource === 'PRODUCTION_TRACE', '转换后候选与 TutorTurnCase 双向追溯');
 
   await setStudentDataConsent({ studentAssignmentId: studentAssignment.id, studentId: student.id, decision: 'WITHDRAW' });
   check((await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id } })).status === 'WITHDRAWN', '撤回授权使已转换候选停止使用');
-  const campaign = await createCampaign({ name: `withdrawn-campaign-${suffix}`, selection: { batchIds: [converted.batch.id] }, user: adminSession });
-  let excluded = false;
-  try { await startCampaign(campaign.id, adminSession); } catch (error) { excluded = error instanceof Error && error.message.includes('没有匹配样本'); }
-  check(excluded, '撤回候选不会被新标注活动领取');
+  check((await db.tutorTurnCase.findUniqueOrThrow({ where: { id: converted.cases[0].id } })).status === 'BLOCKED', '旧合同生产轨迹只能进入阻断/重生成路径');
 
   await db.dataLabAuditLog.deleteMany({ where: { actorId: { in: [teacher.id, student.id, admin.id] } } });
-  await db.annotationCampaign.delete({ where: { id: campaign.id } });
   await db.productionCandidate.delete({ where: { id: candidate.id } });
-  await db.datasetBatch.delete({ where: { id: converted.batch.id } });
+  await db.tutorTurnCase.delete({ where: { id: converted.cases[0].id } });
   await db.generationTrace.deleteMany({ where: { id: { in: [trace.id, systemTrace.id, legacyTrace.id] } } });
   await db.studentAssignment.delete({ where: { id: studentAssignment.id } });
   await db.conversation.delete({ where: { id: conversation.id } });

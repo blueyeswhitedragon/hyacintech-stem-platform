@@ -4,6 +4,8 @@ import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
 import type { SessionUser } from '@/app/lib/session';
 import type { UserRole } from '@/app/lib/roles';
+import { TUTOR_LANGUAGE_CONTRACT_VERSION, TUTOR_LANGUAGE_PROMPT_VERSIONS, type TutorLanguagePromptVersion } from '@/app/lib/tutorLanguage';
+import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
 import {
   STYLE_FAMILIES,
   type AutoCheckResult,
@@ -1532,12 +1534,26 @@ export async function createTrainingRun(input: {
   const requestedStatus = input.status ?? 'DRAFT';
   const release = await db.datasetRelease.findUnique({
     where: { id: input.releaseId },
-    include: { items: { include: { sample: { include: { batch: true, productionCandidate: { include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } } } } }, revision: { include: { workReview: true } } } } },
+    include: { items: { include: {
+      sample: { include: { batch: true, productionCandidate: { include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } } } } },
+      finalizedTutorTurn: { include: { case: true } },
+      revision: { include: { workReview: true } },
+    } } },
   });
   if (!release || release.status !== 'FROZEN') throw new Error('训练只能使用已冻结数据版本');
   if (requestedStatus !== 'DRAFT' && !input.parentModelVersionId) throw new Error('提交或运行训练前必须选择父模型版本');
   if (input.parentModelVersionId && !(await db.modelVersion.findUnique({ where: { id: input.parentModelVersionId } }))) throw new Error('父模型版本不存在');
   const results = release.items.map((item) => {
+    if (item.finalizedTutorTurn) {
+      const reasons: string[] = [];
+      if (item.finalizedTutorTurn.trainingEligibility !== 'SFT_ALLOWED') reasons.push('FINALIZED_TURN_NOT_ELIGIBLE');
+      if (item.finalizedTutorTurn.case.split !== 'TRAIN') reasons.push('NON_TRAIN_SPLIT_BLOCKED');
+      if (item.finalizedTutorTurn.case.contractVersion !== TUTOR_LANGUAGE_CONTRACT_VERSION) reasons.push('TUTOR_CONTRACT_STALE');
+      if (!TUTOR_LANGUAGE_PROMPT_VERSIONS.includes(item.finalizedTutorTurn.case.promptVersion as TutorLanguagePromptVersion)) reasons.push('TUTOR_PROMPT_UNSUPPORTED');
+      if (item.finalizedTutorTurn.case.extractorVersion !== EXTRACTOR_VERSION) reasons.push('EXTRACTOR_VERSION_STALE');
+      return { eligibility: reasons.length ? 'BLOCKED' as const : 'SFT_ALLOWED' as const, reasons };
+    }
+    if (!item.sample) return { eligibility: 'BLOCKED' as const, reasons: ['RELEASE_ITEM_SOURCE_XOR_INVALID'] };
     const candidate = item.sample.productionCandidate;
     const leakage = candidate ? parseJson<{ blocked?: boolean }>(candidate.leakageCheckJson, {}) : {};
     const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(item.revision?.transformationMetricsJson ?? '{}', {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
@@ -1603,6 +1619,20 @@ export async function importEvaluation(input: {
     db.modelVersion.findUnique({ where: { tag: modelATag }, select: { id: true } }),
     db.modelVersion.findUnique({ where: { tag: modelBTag }, select: { id: true } }),
   ]);
+  if (!verdict || transcripts.length < 2) throw new Error('评测导入必须同时包含完整 verdict 和两个模型 transcript');
+  if (!modelAVersion || !modelBVersion) throw new Error('评测产物中的 A/B 模型身份必须能解析到 ModelVersion');
+  const collectScenarioIds = (value: unknown, ids = new Set<string>()): Set<string> => {
+    if (Array.isArray(value)) for (const item of value) collectScenarioIds(item, ids);
+    else if (value && typeof value === 'object') for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+      if (key === 'scenarioId' && typeof child === 'string' && child.trim()) ids.add(child);
+      collectScenarioIds(child, ids);
+    }
+    return ids;
+  };
+  const scenarioIds = [...new Set(transcripts.flatMap((file) => [...collectScenarioIds(file.json)]))];
+  if (scenarioIds.length === 0) throw new Error('transcript 缺少可核验 scenarioId');
+  const rawSummary = verdict.json.summary && typeof verdict.json.summary === 'object' ? verdict.json.summary as Record<string, unknown> : {};
+  const summary = { ...rawSummary, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true, scenarioCount: scenarioIds.length } };
   const scope = verdict?.json.scope ?? transcripts[0]?.json.scope ?? 'unknown';
   const run = await db.$transaction(async (tx) => {
     const created = await tx.evaluationRun.create({
@@ -1611,7 +1641,7 @@ export async function importEvaluation(input: {
         modelATag,
         modelBTag,
         scope,
-        summaryJson: JSON.stringify(verdict?.json.summary ?? {}),
+        summaryJson: JSON.stringify(summary),
         styleFamily: styleFamilies[0],
         stylePolicyVersion: stylePolicyVersions[0],
         modelAVersionId: modelAVersion?.id,
@@ -1674,6 +1704,13 @@ export async function listDataLabUsers() {
             createdTrainingRuns: true,
             createdEvaluationRuns: true,
             dataLabAuditLogs: true,
+            createdTopicCards: true,
+            approvedTopicCards: true,
+            createdBootstrapRuns: true,
+            assignedTutorReviews: true,
+            operatedTutorReviews: true,
+            finalizedFirstReviews: true,
+            finalizedSecondReviews: true,
           },
         },
       },
@@ -1706,11 +1743,13 @@ async function assertLastActiveAdmin(target: { id: string; role: string; isActiv
 }
 
 async function activeAccountWork(targetUserId: string) {
-  const [tasks, reviews] = await Promise.all([
+  const [tasks, reviews, tutorEdits, tutorConfirms] = await Promise.all([
     db.annotationTask.count({ where: { assignedToId: targetUserId, status: { in: ['IN_PROGRESS', 'RETURNED'] } } }),
     db.reviewCase.count({ where: { assignedReviewerId: targetUserId, status: 'IN_REVIEW' } }),
+    db.tutorReviewTask.count({ where: { assignedToId: targetUserId, type: 'EDIT', status: { in: ['IN_PROGRESS', 'RETURNED'] } } }),
+    db.tutorReviewTask.count({ where: { assignedToId: targetUserId, type: 'CONFIRM', status: 'IN_PROGRESS' } }),
   ]);
-  return { tasks, reviews };
+  return { tasks: tasks + tutorEdits, reviews: reviews + tutorConfirms };
 }
 
 export async function updateDataLabUser(input: { targetUserId: string; username: string; displayName: string; role: UserRole; actor: SessionUser }) {

@@ -46,6 +46,15 @@ model User {
   processedCandidates    ProductionCandidate[]  @relation("CandidateProcessor")
   dataLabAuditLogs       DataLabAuditLog[]      @relation("AuditActor")
 
+  createdTopicCards      TopicCard[]              @relation("TopicCardCreator")
+  approvedTopicCards     TopicCard[]              @relation("TopicCardApprover")
+  createdTopicSources    TopicSourceCandidate[]    @relation("TopicSourceCreator")
+  createdBootstrapRuns   BootstrapGenerationRun[] @relation("BootstrapRunCreator")
+  assignedTutorReviews   TutorReviewTask[]        @relation("TutorReviewAssignee")
+  operatedTutorReviews   TutorReviewTask[]        @relation("TutorReviewOperator")
+  finalizedFirstReviews  FinalizedTutorTurn[]     @relation("FinalizedFirstReviewer")
+  finalizedSecondReviews FinalizedTutorTurn[]     @relation("FinalizedSecondReviewer")
+
   @@index([role, isActive])
 }
 
@@ -122,16 +131,18 @@ model Conversation {
   stylePolicyVersion     String  @default("style-v1")
   traceCoverage          String  @default("LEGACY_UNVERIFIED")
   deployedModelVersionId String?
+  contractVersion        String  @default("stage-contract-v2")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user                 User               @relation(fields: [userId], references: [id])
+  user                  User                   @relation(fields: [userId], references: [id])
   // 1:1 关系的外键持有方是 StudentAssignment.conversationId，此处为虚拟反向关系。
   // （框架2在两侧都写了外键，Prisma 不允许循环 1:1，故只在 StudentAssignment 侧保留 FK。）
-  studentAssignment    StudentAssignment?
-  generationTraces     GenerationTrace[]
-  deployedModelVersion ModelVersion?      @relation("ConversationDeployedModel", fields: [deployedModelVersionId], references: [id], onDelete: SetNull)
+  studentAssignment     StudentAssignment?
+  generationTraces      GenerationTrace[]
+  deployedModelVersion  ModelVersion?          @relation("ConversationDeployedModel", fields: [deployedModelVersionId], references: [id], onDelete: SetNull)
+  stateExtractionTraces StateExtractionTrace[]
 }
 
 model DatasetBatch {
@@ -366,7 +377,8 @@ model DatasetRelease {
 model DatasetReleaseItem {
   id                    String   @id @default(uuid())
   releaseId             String
-  sampleId              String
+  sampleId              String?
+  finalizedTutorTurnId  String?
   revisionId            String?
   tier                  String
   weight                Float    @default(1)
@@ -378,11 +390,13 @@ model DatasetReleaseItem {
   eligibilityReasonJson String   @default("[]")
   createdAt             DateTime @default(now())
 
-  release  DatasetRelease      @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  sample   DatasetSample       @relation(fields: [sampleId], references: [id])
-  revision AnnotationRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
+  release            DatasetRelease      @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  sample             DatasetSample?      @relation(fields: [sampleId], references: [id])
+  finalizedTutorTurn FinalizedTutorTurn? @relation(fields: [finalizedTutorTurnId], references: [id])
+  revision           AnnotationRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
 
   @@unique([releaseId, sampleId])
+  @@unique([releaseId, finalizedTutorTurnId])
   @@index([tier])
 }
 
@@ -479,6 +493,7 @@ model ModelDeployment {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   gateReportJson         String    @default("{}")
+  observationJson        String    @default("{}")
 
   modelVersion         ModelVersion   @relation("DeploymentModel", fields: [modelVersionId], references: [id])
   previousModelVersion ModelVersion?  @relation("PreviousDeploymentModel", fields: [previousModelVersionId], references: [id], onDelete: SetNull)
@@ -527,35 +542,303 @@ model GenerationTrace {
 }
 
 model ProductionCandidate {
-  id                    String    @id @default(uuid())
-  generationTraceId     String    @unique
-  status                String    @default("NOMINATED")
-  triggerType           String
-  triggerNote           String    @default("")
-  signalJson            String    @default("{}")
-  consentStatusSnapshot String
-  dataPolicyVersion     String
-  redactedRecordJson    String
-  redactionReportJson   String    @default("{}")
-  contentSha256         String
-  familyKey             String
-  leakageCheckJson      String    @default("{}")
-  nominatedById         String?
-  processedById         String?
-  rejectionReason       String    @default("")
-  convertedSampleId     String?   @unique
-  processedAt           DateTime?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                       String    @id @default(uuid())
+  generationTraceId        String    @unique
+  status                   String    @default("NOMINATED")
+  triggerType              String
+  triggerNote              String    @default("")
+  signalJson               String    @default("{}")
+  consentStatusSnapshot    String
+  dataPolicyVersion        String
+  redactedRecordJson       String
+  redactionReportJson      String    @default("{}")
+  contentSha256            String
+  familyKey                String
+  leakageCheckJson         String    @default("{}")
+  nominatedById            String?
+  processedById            String?
+  rejectionReason          String    @default("")
+  convertedSampleId        String?   @unique
+  convertedTutorTurnCaseId String?   @unique
+  processedAt              DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
-  generationTrace GenerationTrace @relation(fields: [generationTraceId], references: [id], onDelete: Cascade)
-  nominatedBy     User?           @relation("CandidateNominator", fields: [nominatedById], references: [id], onDelete: SetNull)
-  processedBy     User?           @relation("CandidateProcessor", fields: [processedById], references: [id], onDelete: SetNull)
-  convertedSample DatasetSample?  @relation(fields: [convertedSampleId], references: [id], onDelete: SetNull)
+  generationTrace        GenerationTrace @relation(fields: [generationTraceId], references: [id], onDelete: Cascade)
+  nominatedBy            User?           @relation("CandidateNominator", fields: [nominatedById], references: [id], onDelete: SetNull)
+  processedBy            User?           @relation("CandidateProcessor", fields: [processedById], references: [id], onDelete: SetNull)
+  convertedSample        DatasetSample?  @relation(fields: [convertedSampleId], references: [id], onDelete: SetNull)
+  convertedTutorTurnCase TutorTurnCase?  @relation(fields: [convertedTutorTurnCaseId], references: [id], onDelete: SetNull)
 
   @@index([status, createdAt])
   @@index([contentSha256])
   @@index([familyKey])
+}
+
+model TopicSourceCandidate {
+  id                  String   @id @default(uuid())
+  sourceKey           String   @unique
+  familyKey           String
+  familyOverrideKey   String   @default("")
+  title               String
+  summary             String   @default("")
+  resourceType        String   @default("UNCLASSIFIED")
+  sourcePlatform      String
+  sourceResourceId    String   @default("")
+  sourceUrl           String   @default("")
+  authorizationStatus String   @default("UNCONFIRMED")
+  rawSourceJson       String   @default("{}")
+  legacyHintsJson     String   @default("{}")
+  qualitySignalsJson  String   @default("[]")
+  status              String   @default("NEW")
+  createdById         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  createdBy User?       @relation("TopicSourceCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  cards     TopicCard[]
+
+  @@index([status, createdAt])
+  @@index([familyKey])
+  @@index([familyOverrideKey])
+  @@index([authorizationStatus])
+}
+
+model TopicCard {
+  id                       String    @id @default(uuid())
+  displayTitle             String
+  studentOpening           String
+  internalArchetype        String
+  subject                  String
+  gradeBand                String
+  coreMechanism            String
+  acceptableDirectionsJson String    @default("[]")
+  forbiddenDirectionsJson  String    @default("[]")
+  curriculumAnchorsJson    String    @default("[]")
+  sourceJson               String    @default("{}")
+  compilerEvidenceJson     String    @default("{}")
+  schemaVersion            Int       @default(1)
+  revision                 Int       @default(1)
+  revisionOfId             String?
+  activityMode             String    @default("")
+  contextModule            String    @default("")
+  disciplineAnchorsJson    String    @default("[]")
+  authenticNeed            String    @default("")
+  stakeholder              String    @default("")
+  engineeringGoal          String    @default("")
+  constraintsJson          String    @default("[]")
+  performanceCriteriaJson  String    @default("[]")
+  inquiryBridgesJson       String    @default("[]")
+  sourceCandidateId        String?
+  status                   String    @default("DRAFT")
+  rejectionReason          String    @default("")
+  createdById              String?
+  approvedById             String?
+  approvedAt               DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  createdBy       User?                 @relation("TopicCardCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  approvedBy      User?                 @relation("TopicCardApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  revisionOf      TopicCard?            @relation("TopicCardRevisions", fields: [revisionOfId], references: [id], onDelete: SetNull)
+  revisions       TopicCard[]           @relation("TopicCardRevisions")
+  sourceCandidate TopicSourceCandidate? @relation(fields: [sourceCandidateId], references: [id], onDelete: SetNull)
+  cases           TutorTurnCase[]
+
+  @@index([status, subject])
+  @@index([approvedAt])
+  @@index([schemaVersion, status])
+  @@index([contextModule, activityMode])
+  @@index([revisionOfId, revision])
+  @@index([sourceCandidateId])
+}
+
+model BootstrapGenerationRun {
+  id                     String    @id @default(uuid())
+  kind                   String
+  status                 String    @default("PENDING")
+  modelConfigJson        String    @default("{}")
+  promptHashesJson       String    @default("{}")
+  parametersJson         String    @default("{}")
+  reviewPolicy           String    @default("HUMAN_ANNOTATOR_REQUIRED")
+  aiDirectAuthorizedById String?
+  aiDirectAuthorizedAt   DateTime?
+  totalItems             Int       @default(0)
+  completedItems         Int       @default(0)
+  failedItems            Int       @default(0)
+  failureReason          String    @default("")
+  parentRunId            String?
+  createdById            String?
+  createdAt              DateTime  @default(now())
+  startedAt              DateTime?
+  completedAt            DateTime?
+
+  parent     BootstrapGenerationRun?  @relation("BootstrapRunChain", fields: [parentRunId], references: [id], onDelete: SetNull)
+  children   BootstrapGenerationRun[] @relation("BootstrapRunChain")
+  createdBy  User?                    @relation("BootstrapRunCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  cases      TutorTurnCase[]
+  candidates TutorCandidate[]
+
+  @@index([kind, status, createdAt])
+  @@index([reviewPolicy, status, createdAt])
+}
+
+model TutorTurnCase {
+  id                    String   @id @default(uuid())
+  topicCardId           String?
+  generationRunId       String?
+  revisionOfId          String?
+  revision              Int      @default(1)
+  phase                 Int
+  triggerType           String   @default("USER_MESSAGE")
+  studentMessage        String   @default("")
+  historyJson           String   @default("[]")
+  stageStateJson        String   @default("{}")
+  visibleFactsJson      String   @default("{}")
+  privateReviewSpecJson String   @default("{}")
+  dataSource            String   @default("BOOTSTRAP")
+  split                 String   @default("TRAIN")
+  contractVersion       String   @default("tutor-language-v1")
+  extractorVersion      String   @default("student-fact-extractor-v1")
+  promptVersion         String   @default("tutor-language-prompt-v1")
+  systemPrompt          String
+  promptSha256          String
+  hardCheckJson         String   @default("{}")
+  status                String   @default("READY")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  topicCard           TopicCard?              @relation(fields: [topicCardId], references: [id], onDelete: SetNull)
+  generationRun       BootstrapGenerationRun? @relation(fields: [generationRunId], references: [id], onDelete: SetNull)
+  candidates          TutorCandidate[]
+  reviewTasks         TutorReviewTask[]
+  finalizedTurn       FinalizedTutorTurn?
+  productionCandidate ProductionCandidate?
+
+  @@index([status, split, phase])
+  @@index([topicCardId, phase])
+  @@index([revisionOfId, revision])
+}
+
+model TutorCandidate {
+  id                     String   @id @default(uuid())
+  caseId                 String
+  generationRunId        String?
+  slot                   String
+  attempt                Int      @default(1)
+  provider               String
+  modelFamily            String
+  externalModelId        String
+  modelVersionTag        String
+  rawOutput              String
+  normalizedOutput       String
+  deterministicCheckJson String   @default("{}")
+  critiqueJson           String   @default("{}")
+  generationParamsJson   String   @default("{}")
+  promptSha256           String
+  status                 String   @default("GENERATED")
+  createdAt              DateTime @default(now())
+
+  case                TutorTurnCase           @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  generationRun       BootstrapGenerationRun? @relation(fields: [generationRunId], references: [id], onDelete: SetNull)
+  selectedBy          TutorReviewTask[]       @relation("ReviewSelectedCandidate")
+  rejectedBy          TutorReviewTask[]       @relation("ReviewRejectedCandidate")
+  finalizedAsSelected FinalizedTutorTurn[]    @relation("FinalizedSelectedCandidate")
+  finalizedAsRejected FinalizedTutorTurn[]    @relation("FinalizedRejectedCandidate")
+
+  @@unique([caseId, generationRunId, slot])
+  @@index([modelFamily, externalModelId])
+}
+
+model TutorReviewTask {
+  id                            String    @id @default(uuid())
+  caseId                        String
+  type                          String
+  status                        String    @default("PENDING")
+  assignedToId                  String?
+  leaseExpiresAt                DateTime?
+  operatorId                    String?
+  decision                      String    @default("")
+  selectedCandidateId           String?
+  preferenceRejectedCandidateId String?
+  draftJson                     String    @default("{}")
+  reason                        String    @default("")
+  preferenceReason              String    @default("")
+  warningClosureJson            String    @default("{}")
+  submissionMode                String    @default("HUMAN")
+  authorizedById                String?
+  caseIssueJson                 String    @default("{}")
+  createdAt                     DateTime  @default(now())
+  updatedAt                     DateTime  @updatedAt
+  submittedAt                   DateTime?
+
+  case                        TutorTurnCase   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  assignedTo                  User?           @relation("TutorReviewAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  operator                    User?           @relation("TutorReviewOperator", fields: [operatorId], references: [id], onDelete: SetNull)
+  selectedCandidate           TutorCandidate? @relation("ReviewSelectedCandidate", fields: [selectedCandidateId], references: [id], onDelete: SetNull)
+  preferenceRejectedCandidate TutorCandidate? @relation("ReviewRejectedCandidate", fields: [preferenceRejectedCandidateId], references: [id], onDelete: SetNull)
+
+  @@unique([caseId, type])
+  @@index([type, status, createdAt])
+  @@index([assignedToId, status])
+  @@index([submissionMode, status])
+}
+
+model FinalizedTutorTurn {
+  id                            String   @id @default(uuid())
+  caseId                        String   @unique
+  finalOutputJson               String
+  selectedCandidateId           String?
+  preferenceRejectedCandidateId String?
+  editMetricsJson               String   @default("{}")
+  reviewerEditMetricsJson       String   @default("{}")
+  draftProvenance               String   @default("LEGACY_DOUBLE_REVIEW")
+  draftPreparedById             String?
+  humanReviewerId               String?
+  firstReviewerId               String
+  secondReviewerId              String
+  warningClosureJson            String   @default("{}")
+  preferenceReason              String   @default("")
+  trainingEligibility           String   @default("BLOCKED")
+  eligibilityReasonJson         String   @default("[]")
+  contentSha256                 String
+  createdAt                     DateTime @default(now())
+
+  case                        TutorTurnCase        @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  selectedCandidate           TutorCandidate?      @relation("FinalizedSelectedCandidate", fields: [selectedCandidateId], references: [id], onDelete: SetNull)
+  preferenceRejectedCandidate TutorCandidate?      @relation("FinalizedRejectedCandidate", fields: [preferenceRejectedCandidateId], references: [id], onDelete: SetNull)
+  firstReviewer               User                 @relation("FinalizedFirstReviewer", fields: [firstReviewerId], references: [id])
+  secondReviewer              User                 @relation("FinalizedSecondReviewer", fields: [secondReviewerId], references: [id])
+  releaseItems                DatasetReleaseItem[]
+
+  @@index([trainingEligibility, createdAt])
+  @@index([contentSha256])
+}
+
+model StateExtractionTrace {
+  id                    String   @id @default(uuid())
+  conversationId        String
+  userMessageId         String
+  stage                 Int
+  extractorVersion      String
+  providerSnapshot      String
+  externalModelSnapshot String
+  modelFamily           String
+  promptVersion         String
+  promptSha256          String
+  sourceMessagesJson    String
+  rawOutput             String
+  validatedFactsJson    String   @default("[]")
+  rejectedFactsJson     String   @default("[]")
+  generationParamsJson  String   @default("{}")
+  status                String   @default("SUCCEEDED")
+  failureReason         String   @default("")
+  createdAt             DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([extractorVersion, status])
 }
 
 model EvaluationArtifact {

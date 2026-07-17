@@ -14,7 +14,7 @@
     "data-lab:import": "tsx scripts/import-data-lab-batch.ts",
     "data-lab:pilot": "tsx scripts/setup-data-lab-pilot.ts",
     "data-lab:test:setup": "tsx scripts/setup-data-lab-test-fixtures.ts",
-    "data-lab:test": "tsx scripts/test-stage-contract.ts && tsx scripts/test-stage-artifacts.ts && tsx scripts/test-dataset-v3-gates.ts && tsx scripts/test-stage-extraction.ts && tsx scripts/test-stage-advance.ts && tsx scripts/test-report-summary.ts && tsx scripts/test-style-policy.ts && tsx scripts/test-style-persistence.ts && tsx scripts/test-generation-trace.ts && tsx scripts/test-production-candidates.ts && tsx scripts/test-training-eligibility.ts && tsx scripts/test-deployment-gate.ts && tsx scripts/test-data-lab.ts && tsx scripts/test-workload-review.ts && tsx scripts/test-campaign-lifecycle.ts && tsx scripts/test-account-lifecycle.ts && tsx scripts/test-data-lab-integration.ts",
+    "data-lab:test": "tsx scripts/test-tutor-language-pipeline.ts && tsx scripts/test-stage-contract.ts && tsx scripts/test-stage-artifacts.ts && tsx scripts/test-dataset-v3-gates.ts && tsx scripts/test-stage-extraction.ts && tsx scripts/test-stage-advance.ts && tsx scripts/test-report-summary.ts && tsx scripts/test-style-policy.ts && tsx scripts/test-style-persistence.ts && tsx scripts/test-generation-trace.ts && tsx scripts/test-production-candidates.ts && tsx scripts/test-training-eligibility.ts && tsx scripts/test-deployment-gate.ts && tsx scripts/test-data-lab.ts && tsx scripts/test-workload-review.ts && tsx scripts/test-campaign-lifecycle.ts && tsx scripts/test-account-lifecycle.ts && tsx scripts/test-topic-card-v2.ts && tsx scripts/test-tutor-bootstrap-integration.ts",
     "model:bootstrap": "tsx scripts/bootstrap-model-registry.ts",
     "data-lab:test:session": "tsx scripts/test-session-revalidation.ts",
     "data-lab:audit-contract": "tsx scripts/audit-chat-contract.ts",
@@ -26,7 +26,20 @@
     "postinstall": "prisma generate",
     "data-lab:build-v3-plan": "tsx scripts/build-dataset-v3-plan.ts",
     "data-lab:distill-rollout": "tsx scripts/distill-dataset-v3.ts",
-    "data-lab:validate-v3": "tsx scripts/validate-dataset-v3.ts"
+    "data-lab:validate-v3": "tsx scripts/validate-dataset-v3.ts",
+    "test:tutor-language": "tsx scripts/test-tutor-language-pipeline.ts",
+    "test:tutor-bootstrap": "tsx scripts/test-tutor-bootstrap-integration.ts",
+    "data-lab:mark-calibration": "tsx scripts/mark-tutor-calibration-run.ts",
+    "data-lab:calibration-12": "tsx scripts/run-tutor-calibration-12.ts",
+    "data-lab:supersede-calibration": "tsx scripts/supersede-tutor-calibration-run.ts",
+    "data-lab:calibration-first-review": "tsx scripts/submit-calibration-12-first-review.ts",
+    "data-lab:revise-calibration-return": "tsx scripts/revise-calibration-returned-case.ts",
+    "data-lab:confirm-remaining-calibration": "tsx scripts/confirm-remaining-calibration.ts",
+    "data-lab:trial-36": "tsx scripts/run-tutor-trial-36.ts",
+    "data-lab:supersede-trial": "tsx scripts/supersede-tutor-trial-run.ts",
+    "data-lab:trial-first-review": "tsx scripts/submit-trial-36-first-review.ts",
+    "data-lab:build-topic-sources": "tsx scripts/build-topic-source-catalog.ts",
+    "test:topic-card-v2": "tsx scripts/test-topic-card-v2.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

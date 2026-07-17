@@ -1,8 +1,9 @@
 import { db } from '@/app/lib/db';
 import { validateConfig } from '@/app/lib/llm/provider';
+import { TUTOR_LANGUAGE_CONTRACT_VERSION, TUTOR_LANGUAGE_PROMPT_VERSION } from '@/app/lib/tutorLanguage';
 
-export const PROMPT_POLICY_VERSION = 'stem-six-phase-v2';
-export const CHAT_CONTRACT_VERSION = 'stage-contract-v2';
+export const PROMPT_POLICY_VERSION = TUTOR_LANGUAGE_PROMPT_VERSION;
+export const CHAT_CONTRACT_VERSION = TUTOR_LANGUAGE_CONTRACT_VERSION;
 
 export const MODEL_VERSION_STATUSES = [
   'DRAFT',
@@ -192,7 +193,7 @@ export function listModelVersions() {
   return db.modelVersion.findMany({
     include: {
       parent: { select: { id: true, tag: true } },
-      trainingRun: { select: { id: true, name: true } },
+      trainingRun: { select: { id: true, name: true, status: true, externalTaskId: true, createdAt: true, release: { select: { id: true, version: true } } } },
       createdBy: { select: { displayName: true } },
       _count: { select: { generationTraces: true, children: true } },
     },

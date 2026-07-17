@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import CampaignManager from '@/app/components/dataLab/CampaignManager';
+import { redirect } from 'next/navigation';
 import CampaignLifecycleActions from '@/app/components/dataLab/CampaignLifecycleActions';
 import ExpiredTaskManager from '@/app/components/dataLab/ExpiredTaskManager';
-import StartCampaignButton from '@/app/components/dataLab/StartCampaignButton';
-import { listAssignableAnnotators, listBatches, listCampaignProgress, listExpiredAnnotationTasks } from '@/app/lib/dataLab/service';
+import { listCampaignProgress, listExpiredAnnotationTasks } from '@/app/lib/dataLab/service';
+import { getCurrentUser } from '@/app/lib/session';
 
 const statusLabels: Record<string, string> = {
   DRAFT: '待启动',
@@ -25,7 +25,7 @@ function CampaignCard({ campaign }: { campaign: CampaignProgress }) {
         <p className="mt-1 text-xs text-gray-500">{campaign.participantCount > 0 ? `${campaign.participantCount} 名当前参与者` : campaign.status === 'ARCHIVED' ? '参与者分配已停用' : '旧活动：所有标注员可领取'} · 创建者 {campaign.createdBy.displayName}</p>
         {campaign.completedAt && <p className="mt-1 text-xs text-gray-400">结束于 {new Date(campaign.completedAt).toLocaleString('zh-CN')}</p>}
       </div>
-      <div className="flex flex-wrap items-center gap-2">{campaign.status === 'DRAFT' && <StartCampaignButton id={campaign.id} />}<CampaignLifecycleActions campaign={campaign} /></div>
+      <CampaignLifecycleActions campaign={campaign} />
     </div>
 
     <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
@@ -42,9 +42,9 @@ function CampaignCard({ campaign }: { campaign: CampaignProgress }) {
 }
 
 export default async function CampaignsPage() {
-  const [batches, annotators, campaigns, expiredTasks] = await Promise.all([
-    listBatches(),
-    listAssignableAnnotators(),
+  const user = await getCurrentUser();
+  if (!user || user.role !== 'admin') redirect('/data-lab');
+  const [campaigns, expiredTasks] = await Promise.all([
     listCampaignProgress(),
     listExpiredAnnotationTasks(),
   ]);
@@ -52,8 +52,7 @@ export default async function CampaignsPage() {
   const archivedCampaigns = campaigns.filter((campaign) => campaign.status === 'ARCHIVED');
 
   return <div className="space-y-6">
-    <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">管理员</p><h1 className="mt-1 text-2xl font-semibold">标注任务分配</h1><p className="mt-1 text-sm text-gray-500">选择数据、人员和审核强度，系统自动按队列分发。</p></div><Link href="/data-lab/workload" className="rounded-lg border bg-white px-4 py-2 text-sm text-blue-700 hover:bg-blue-50">查看有效标注统计</Link></div>
-    <CampaignManager batches={batches.filter((batch) => batch.status === 'ACTIVE').map((batch) => ({ id: batch.id, name: batch.name }))} annotators={annotators} />
+    <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">历史数据，只读</p><h1 className="mt-1 text-2xl font-semibold">旧标注活动</h1><p className="mt-1 text-sm text-gray-500">不再创建或启动五风格标注活动；现有记录可归档，空草稿可删除，过期任务仍可释放。</p></div><Link href="/data-lab/workload" className="rounded-lg border bg-white px-4 py-2 text-sm text-blue-700 hover:bg-blue-50">查看有效标注统计</Link></div>
 
     <section className="space-y-3">
       <div><h2 className="font-semibold">当前活动</h2><p className="mt-1 text-xs text-gray-500">任务条数按每位参与者的一次独立标注计算；双标样本会产生两条任务。不再使用的活动请结束并归档，不要删除历史提交。</p></div>

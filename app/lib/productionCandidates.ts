@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
 import type { Message } from '@/app/models/types';
 import { detectDatasetLeakage } from '@/app/lib/datasetLeakage';
@@ -9,8 +8,9 @@ import {
 } from '@/app/lib/redaction';
 import type { ShareGPTRecord } from '@/app/lib/dataLab/types';
 import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
-import { parseJson, sha256, validateShareGPTRecord } from '@/app/lib/dataLab/validation';
-import { ACTIVE_DATASET_BATCH_STATUS } from '@/app/lib/dataLab/datasetPolicy';
+import { buildTutorLanguagePrompt, TUTOR_LANGUAGE_CONTRACT_VERSION, TUTOR_LANGUAGE_PROMPT_VERSION } from '@/app/lib/tutorLanguage';
+import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
+import { parseJson } from '@/app/lib/dataLab/validation';
 
 export const DATA_POLICY_VERSION = 'student-data-policy-v1';
 export const CONSENT_STATUSES = ['PENDING', 'GRANTED', 'DECLINED', 'WITHDRAWN'] as const;
@@ -235,7 +235,7 @@ export async function reviewProductionCandidate(input: {
 
 export async function convertProductionCandidates(input: { ids: string[]; batchName: string; adminId: string }) {
   const ids = [...new Set(input.ids)];
-  if (ids.length === 0 || !input.batchName.trim()) throw new Error('请选择候选并填写批次名称');
+  if (ids.length === 0) throw new Error('请选择生产候选');
   const candidates = await db.productionCandidate.findMany({
     where: { id: { in: ids } },
     include: { generationTrace: { include: { conversation: { include: { studentAssignment: true } } } } },
@@ -243,50 +243,40 @@ export async function convertProductionCandidates(input: { ids: string[]; batchN
   if (candidates.length !== ids.length || candidates.some((item) => item.status !== 'APPROVED')) throw new Error('只能转换全部处于 APPROVED 的候选');
   if (candidates.some((item) => item.generationTrace.conversation.studentAssignment?.dataConsentStatus !== 'GRANTED')) throw new Error('部分候选授权已失效');
 
-  const batchId = randomUUID();
-  const records = candidates.map((item) => parseJson<ShareGPTRecord>(item.redactedRecordJson, {} as ShareGPTRecord));
-  const summary = { records: records.length, sourceType: 'production_trace', requiresHumanCorrection: records.length };
-  const batch = await db.$transaction(async (tx) => {
-    const created = await tx.datasetBatch.create({
-      data: {
-        id: batchId,
-        name: input.batchName.trim(),
-        sourceType: 'production_trace',
-        sourceFileName: `production-candidates-${batchId}.json`,
-        sourceSha256: sha256(JSON.stringify(records)),
-        status: ACTIVE_DATASET_BATCH_STATUS,
-        manifestJson: JSON.stringify({ schemaVersion: 1, candidateIds: ids, dataPolicyVersion: DATA_POLICY_VERSION }),
-        summaryJson: JSON.stringify(summary),
-        importedById: input.adminId,
-      },
-    });
-    for (let index = 0; index < candidates.length; index++) {
-      const candidate = candidates[index];
-      const record = records[index];
-      const check = validateShareGPTRecord(record);
-      const sample = await tx.datasetSample.create({
-        data: {
-          batchId: created.id,
-          sourceRecordId: record.id,
-          familyKey: candidate.familyKey,
-          phase: record.phase,
-          scenario: record.scenario,
-          sourceKind: 'production_trace',
-          candidateTier: 'production_candidate',
-          rubricTargetsJson: JSON.stringify(record.rubricTargets ?? []),
-          autoCheckJson: JSON.stringify(check),
-          originalRecordJson: JSON.stringify(record),
-        },
-      });
-      await tx.productionCandidate.update({
-        where: { id: candidate.id },
-        data: { status: 'CONVERTED', convertedSampleId: sample.id, processedAt: new Date() },
-      });
+  const created = await db.$transaction(async (tx) => {
+    const cases = [];
+    for (const candidate of candidates) {
+      const record = parseJson<ShareGPTRecord>(candidate.redactedRecordJson, {} as ShareGPTRecord);
+      const messages = Array.isArray(record.conversations) ? record.conversations : [];
+      const lastHumanIndex = messages.map((message) => message.from).lastIndexOf('human');
+      const studentMessage = lastHumanIndex >= 0 ? messages[lastHumanIndex].value : '';
+      const history = messages.slice(0, Math.max(0, lastHumanIndex)).filter((message) => message.from === 'human' || message.from === 'gpt').map((message) => ({ role: message.from === 'human' ? 'user' : 'assistant', content: message.value }));
+      const response = parseJson<{ tutor_language?: { focus?: string } }>(candidate.generationTrace.responseJson, {});
+      const allowedFocusIds = response.tutor_language?.focus ? [response.tutor_language.focus] : ['production_correction'];
+      const template = buildTutorLanguagePrompt({ phase: candidate.generationTrace.stage, triggerType: candidate.triggerType, visibleFacts: {}, allowedFocusIds });
+      const contractCurrent = candidate.generationTrace.contractVersion === TUTOR_LANGUAGE_CONTRACT_VERSION;
+      const caseItem = await tx.tutorTurnCase.create({ data: {
+        phase: candidate.generationTrace.stage,
+        triggerType: candidate.triggerType,
+        studentMessage,
+        historyJson: JSON.stringify(history),
+        stageStateJson: '{}',
+        visibleFactsJson: JSON.stringify({ allowedFocusIds, redactedProductionContext: record.meta?.generationContext ?? {} }),
+        privateReviewSpecJson: JSON.stringify({ source: 'PRODUCTION_TRACE', requiresMaterialCorrection: true, authorizationSnapshot: candidate.consentStatusSnapshot, leakageCheck: parseJson(candidate.leakageCheckJson, {}) }),
+        dataSource: 'PRODUCTION_TRACE', split: 'TRAIN',
+        contractVersion: contractCurrent ? TUTOR_LANGUAGE_CONTRACT_VERSION : candidate.generationTrace.contractVersion,
+        extractorVersion: EXTRACTOR_VERSION,
+        promptVersion: contractCurrent ? TUTOR_LANGUAGE_PROMPT_VERSION : candidate.generationTrace.promptVersion,
+        systemPrompt: contractCurrent ? (candidate.generationTrace.trainingSystemPromptSnapshot || candidate.generationTrace.systemPromptSnapshot) : template,
+        promptSha256: candidate.generationTrace.promptSha256,
+        hardCheckJson: JSON.stringify({ errors: contractCurrent ? [] : ['LEGACY_CONTRACT_REQUIRES_REGENERATION'] }),
+        status: contractCurrent ? 'READY' : 'BLOCKED',
+      } });
+      await tx.productionCandidate.update({ where: { id: candidate.id }, data: { status: 'CONVERTED', convertedTutorTurnCaseId: caseItem.id, processedAt: new Date() } });
+      cases.push(caseItem);
     }
-    await tx.dataLabAuditLog.create({
-      data: { actorId: input.adminId, action: 'PRODUCTION_CANDIDATES_CONVERTED', entityType: 'DatasetBatch', entityId: created.id, payloadJson: JSON.stringify({ candidateIds: ids }) },
-    });
-    return created;
+    await tx.dataLabAuditLog.create({ data: { actorId: input.adminId, action: 'PRODUCTION_CANDIDATES_CONVERTED', entityType: 'TutorTurnCase', entityId: cases[0]?.id ?? 'none', payloadJson: JSON.stringify({ candidateIds: ids, caseIds: cases.map((item) => item.id), legacyBatchNameIgnored: input.batchName }) } });
+    return cases;
   });
-  return { batch, summary };
+  return { cases: created, summary: { records: created.length, sourceType: 'PRODUCTION_TRACE', requiresHumanCorrection: created.length } };
 }

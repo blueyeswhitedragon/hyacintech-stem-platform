@@ -54,8 +54,8 @@ export interface LLMProvider {
 export type LLMRuntimeRole = 'TUTOR' | 'STUDENT' | 'EVALUATOR';
 
 export interface LLMRuntimeOverride {
-  provider: string;
-  model: string;
+  provider?: string;
+  model?: string;
   role?: LLMRuntimeRole;
 }
 

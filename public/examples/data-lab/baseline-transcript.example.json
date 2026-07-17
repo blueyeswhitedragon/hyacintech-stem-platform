@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 4,
+  "tag": "baseline-model-tag",
+  "scope": "full",
+  "scenarios": [
+    {
+      "scenarioId": "P1-001",
+      "phase": 1,
+      "messages": []
+    }
+  ]
+}
