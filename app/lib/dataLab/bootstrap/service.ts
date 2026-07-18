@@ -212,6 +212,15 @@ function blockingTopicCardCritique(raw: string) {
   return { issues, overrideReason: String(evidence.adminOverride?.reason ?? '').trim() };
 }
 
+export async function deleteTopicCard(id: string, user: SessionUser) {
+  const card = await db.topicCard.findUnique({ where: { id }, include: { cases: true } });
+  if (!card) throw new Error('话题卡不存在');
+  if (!['DRAFT', 'REJECTED'].includes(card.status)) throw new Error('只能删除草稿或已拒绝的话题卡');
+  if (card.cases.length > 0) throw new Error('已被案例引用的话题卡不能删除');
+  await db.topicCard.delete({ where: { id } });
+  await audit(user.id, 'TOPIC_CARD_DELETED', 'TopicCard', id, { status: card.status, displayTitle: card.displayTitle });
+}
+
 export async function decideTopicCard(id: string, decision: 'APPROVE' | 'REJECT', reason: string, user: SessionUser) {
   const card = await db.topicCard.findUnique({ where: { id } });
   if (!card) throw new Error('话题卡不存在');
@@ -289,7 +298,7 @@ disciplineAnchors 只能从 biology、chemistry、physics、earth_science、math
 学生开场应自然表达困惑或需求，不得列出桥、变量或答案菜单。
 只输出一个 JSON 对象：
 {"resourceAssessment":{"type":"STUDENT_INQUIRY_RESOURCE|STUDENT_ENGINEERING_RESOURCE|HYBRID_RESOURCE","reason":""},"displayTitle":"","studentOpening":"","subject":"","gradeBand":"初中","coreMechanism":"","activityMode":"","contextModule":"","disciplineAnchors":[],"authenticNeed":"","stakeholder":"","engineeringGoal":"","constraints":[],"performanceCriteria":[],"inquiryBridges":[],"forbiddenDirections":[],"curriculumAnchors":[]}。不要输出 internalArchetype。`;
-  const completion = await provider.complete([{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(source) }], { useJsonFormat: true, maxTokens: 3600 });
+  const completion = await provider.complete([{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(source) }], { useJsonFormat: true, maxTokens: 8000 });
   return { raw: completion.content, parsed: objectFromRaw(completion.content), promptSha256: sha256(system), params: { ...completion.request, usage: completion.usage } };
 }
 
@@ -297,8 +306,8 @@ async function critiqueCompiledCard(source: Record<string, unknown>, target: Rec
   const provider = createLLMProvider(config ? { provider: config.provider, model: config.model, role: 'EVALUATOR' } : { role: 'EVALUATOR' });
   const system = `你是 TopicCard V2 审核者。不要改写卡片，不打 Gold 分数。检查：RESOURCE_TYPE_MISMATCH、ENGINEERING_CONTEXT_LOST、PROXY_DRIFT、GENERIC_PARAMETER_TEMPLATE、NO_MEASURABLE_PERFORMANCE、NO_RETURN_TO_DESIGN、UNIQUE_ANSWER、GRADE_OR_CURRICULUM_MISMATCH、SAFETY、SOURCE_TITLE_COPY、INTERNAL_TERM、PROJECT_FAMILY_DUPLICATE。
 只输出 JSON：{"issues":[{"quote":"目标原文","category":"上述类别","message":"具体问题","confidence":"high|medium|low"}]}。没有问题时 issues 为空。`;
-  const completion = await provider.complete([{ role: 'system', content: system }, { role: 'user', content: JSON.stringify({ source, target }) }], { useJsonFormat: true, maxTokens: 1800 });
-  return objectFromRaw(completion.content) ?? { issues: [{ category: 'CRITIQUE_PARSE_FAILED', message: '批评输出无法解析', confidence: 'low' }] };
+  const completion = await provider.complete([{ role: 'system', content: system }, { role: 'user', content: JSON.stringify({ source, target }) }], { useJsonFormat: true, maxTokens: 4000 });
+  return objectFromRaw(completion.content) ?? { issues: [{ category: 'CRITIQUE_PARSE_FAILED', message: '批评输出无法解析', confidence: 'low', rawSnippet: completion.content.slice(0, 300) }] };
 }
 
 function compiledResourceAssessment(parsed: Record<string, unknown>) {
@@ -399,6 +408,26 @@ export async function compileTopicCardsWithModels(input: {
 
 export type TutorCaseProfile = 'SMOKE_6' | 'CALIBRATION_12' | 'TRIAL_36' | 'FULL_180' | 'EVAL_80' | 'CUSTOM';
 
+export function minTopicCardRequirement(profile: TutorCaseProfile): { total: number; description: string } {
+  switch (profile) {
+    case 'SMOKE_6': return { total: 3, description: '至少 3 张已批准话题卡' };
+    case 'CALIBRATION_12': return { total: 6, description: '至少 6 张已批准话题卡' };
+    case 'TRIAL_36': return { total: 10, description: '至少 10 张已批准话题卡，建议覆盖多个情境模块' };
+    case 'FULL_180': return { total: 15, description: '满足正式集覆盖要求' };
+    case 'EVAL_80': return { total: 10, description: '至少 10 张已批准话题卡' };
+    default: return { total: 1, description: '至少 1 张已批准话题卡' };
+  }
+}
+
+export class ExistingTutorCaseRunError extends Error {
+  code = 'EXISTING_PROFILE_RUN' as const;
+
+  constructor(public existingRun: { id: string; createdAt: Date }) {
+    super('该类型已有有效案例批次，确认后才能创建新批次');
+    this.name = 'ExistingTutorCaseRunError';
+  }
+}
+
 export const TOPIC_CARD_IDEATION_PROMPT_VERSION = 'topic-card-ideation-v1';
 
 function ideationSystemPrompt() {
@@ -425,7 +454,7 @@ export async function generateTopicCardDrafts(input: {
   const count = Math.min(Math.max(Math.trunc(input.count ?? 1), 1), 5);
   const critiqueCard = deps.critiqueCard ?? critiqueCompiledCard;
   const provider = createLLMProvider({ role: 'EVALUATOR' });
-  const complete = deps.complete ?? ((messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>) => provider.complete(messages, { useJsonFormat: true, maxTokens: 3600 }));
+  const complete = deps.complete ?? ((messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>) => provider.complete(messages, { useJsonFormat: true, maxTokens: 8000 }));
   const system = ideationSystemPrompt();
   const existing = await db.topicCard.findMany({
     where: { status: { in: ['DRAFT', 'APPROVED'] } },
@@ -459,7 +488,38 @@ export async function generateTopicCardDrafts(input: {
       const parsed = objectFromRaw(completion.content);
       if (!parsed) {
         failed += 1;
-        failures.push({ index, kind: 'PARSE_FAILED', reason: '模型输出无法解析为 JSON 对象' });
+        const reason = `模型输出无法解析为 JSON 对象。原始响应前 500 字符：${completion.content.slice(0, 500)}`;
+        failures.push({ index, kind: 'PARSE_FAILED', reason });
+        // 创建 REJECTED 卡供调试
+        const rejectedCard = await db.topicCard.create({
+          data: {
+            displayTitle: `[解析失败 #${index + 1}]`,
+            studentOpening: '模型返回内容无法解析为有效 JSON',
+            internalArchetype: 'ai_ideation_parse_failed',
+            subject: 'biology_ecology',
+            gradeBand: '初中',
+            coreMechanism: '解析失败',
+            acceptableDirectionsJson: '[]',
+            forbiddenDirectionsJson: '[]',
+            curriculumAnchorsJson: '[]',
+            sourceJson: JSON.stringify({ kind: 'AI_IDEATION', theme: input.theme?.trim() ?? '', promptVersion: TOPIC_CARD_IDEATION_PROMPT_VERSION, runId: run.id }),
+            compilerEvidenceJson: JSON.stringify({ runId: run.id, promptSha256: sha256(system), raw: completion.content.slice(0, 2000), parseError: true }),
+            schemaVersion: 2,
+            activityMode: '',
+            contextModule: '',
+            disciplineAnchorsJson: '[]',
+            authenticNeed: '',
+            stakeholder: '',
+            engineeringGoal: '',
+            constraintsJson: '[]',
+            performanceCriteriaJson: '[]',
+            inquiryBridgesJson: '[]',
+            status: 'REJECTED',
+            rejectionReason: reason,
+            createdById: input.user.id,
+          },
+        });
+        cards.push(rejectedCard);
         continue;
       }
       const source = { kind: 'AI_IDEATION', theme: input.theme?.trim() ?? '', promptVersion: TOPIC_CARD_IDEATION_PROMPT_VERSION, runId: run.id };
@@ -576,6 +636,7 @@ export async function compileTutorTurnCases(input: {
   topicCardIds?: string[];
   promptVersion?: TutorLanguagePromptVersion;
   reviewPolicy?: TutorReviewPolicy;
+  allowExistingRun?: boolean;
   user: SessionUser;
 }) {
   if (!TUTOR_CASE_SPLITS.includes(input.split)) throw new Error('split 无效');
@@ -583,6 +644,19 @@ export async function compileTutorTurnCases(input: {
   if (!TUTOR_LANGUAGE_PROMPT_VERSIONS.includes(promptVersion)) throw new Error('promptVersion 无效');
   const reviewPolicy = input.reviewPolicy ?? 'HUMAN_ANNOTATOR_REQUIRED';
   if (!TUTOR_REVIEW_POLICIES.includes(reviewPolicy)) throw new Error('reviewPolicy 无效');
+  if (input.profile !== 'CUSTOM' && !input.allowExistingRun) {
+    const existingRun = await db.bootstrapGenerationRun.findFirst({
+      where: {
+        kind: 'CASE_COMPILATION',
+        status: 'COMPLETED',
+        parametersJson: { contains: `"profile":"${input.profile}"` },
+        cases: { some: { status: { not: 'SUPERSEDED' } } },
+      },
+      orderBy: { completedAt: 'desc' },
+      select: { id: true, createdAt: true },
+    });
+    if (existingRun) throw new ExistingTutorCaseRunError(existingRun);
+  }
   const where: Prisma.TopicCardWhereInput = { status: 'APPROVED', ...(input.topicCardIds?.length ? { id: { in: input.topicCardIds } } : {}) };
   const cards = await db.topicCard.findMany({ where, orderBy: { approvedAt: 'asc' }, include: { sourceCandidate: { select: { familyKey: true, familyOverrideKey: true } } } });
   const topicCoverage = tutorTopicCardCoverage(cards);
@@ -604,6 +678,10 @@ export async function compileTutorTurnCases(input: {
     if (!latestTrial || !signoff) throw new Error('180 正式集必须在最新 36 案例试验通过自动指标并完成人工逐条复盘签署后生成');
     const diversityFailures = tutorTopicCardDiversityFailures(cards);
     if (diversityFailures.length) throw new Error(`180 条正式集的话题多样性门槛未通过：${diversityFailures.join('、')}`);
+  }
+  const requirement = minTopicCardRequirement(input.profile);
+  if (cards.length < requirement.total) {
+    throw new Error(`${requirement.description}，当前只有 ${cards.length} 张`);
   }
   const fixedScenarios = input.profile === 'SMOKE_6'
     ? SMOKE_6_SCENARIOS
@@ -959,23 +1037,110 @@ async function latestPair(caseId: string) {
 }
 
 export async function listTutorCases() {
-  const cases = await db.tutorTurnCase.findMany({
+  return db.tutorTurnCase.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { topicCard: { select: { displayTitle: true, subject: true, status: true } }, generationRun: { select: { id: true, reviewPolicy: true, parametersJson: true, createdAt: true } }, _count: { select: { candidates: true, reviewTasks: true } }, finalizedTurn: { select: { id: true, trainingEligibility: true } } },
+    select: {
+      id: true,
+      phase: true,
+      triggerType: true,
+      studentMessage: true,
+      split: true,
+      status: true,
+      promptVersion: true,
+      hardCheckJson: true,
+      topicCard: { select: { displayTitle: true, subject: true, status: true } },
+      generationRun: { select: { id: true, status: true, reviewPolicy: true, parametersJson: true, createdAt: true, completedAt: true, failureReason: true } },
+      _count: { select: { candidates: true, reviewTasks: true } },
+      finalizedTurn: { select: { id: true, trainingEligibility: true } },
+    },
   });
-  return cases;
+}
+
+export async function supersedeTutorCaseRun(runId: string, reason: string, user: SessionUser) {
+  if (!reason.trim()) throw new Error('请填写替代此批次的原因');
+  const run = await db.bootstrapGenerationRun.findUnique({
+    where: { id: runId },
+    include: {
+      cases: {
+        include: {
+          finalizedTurn: { select: { id: true } },
+          reviewTasks: { select: { status: true } },
+          _count: { select: { candidates: true } },
+        },
+      },
+    },
+  });
+  if (!run || run.kind !== 'CASE_COMPILATION') throw new Error('案例编译批次不存在');
+  if (run.status === 'SUPERSEDED') return { runId, status: 'SUPERSEDED', cases: run.cases.length };
+  if (run.status !== 'COMPLETED') throw new Error('只有已完成的案例编译批次可以标记为历史批次');
+  if (run.cases.some((item) => item.finalizedTurn || item.reviewTasks.some((task) => task.status === 'SUBMITTED'))) {
+    throw new Error('已有定稿或已提交审核记录的批次不能整体标记为已替代');
+  }
+  const preservedCandidates = run.cases.reduce((sum, item) => sum + item._count.candidates, 0);
+  await db.$transaction([
+    db.tutorTurnCase.updateMany({ where: { generationRunId: runId, status: { not: 'SUPERSEDED' } }, data: { status: 'SUPERSEDED' } }),
+    db.tutorReviewTask.updateMany({ where: { case: { generationRunId: runId }, status: { in: ['PENDING', 'RETURNED', 'IN_PROGRESS'] } }, data: { status: 'SUPERSEDED', assignedToId: null, leaseExpiresAt: null } }),
+    db.bootstrapGenerationRun.update({ where: { id: runId }, data: { status: 'SUPERSEDED', failureReason: reason.trim() } }),
+    db.dataLabAuditLog.create({ data: {
+      actorId: user.id,
+      action: 'TUTOR_CASE_RUN_SUPERSEDED',
+      entityType: 'BootstrapGenerationRun',
+      entityId: runId,
+      payloadJson: JSON.stringify({ reason: reason.trim(), cases: run.cases.length, preservedCandidates }),
+    } }),
+  ]);
+  return { runId, status: 'SUPERSEDED', cases: run.cases.length, preservedCandidates };
+}
+
+export async function overrideBlockedCases(runId: string, reason: string, user: SessionUser) {
+  if (!reason.trim()) throw new Error('请填写忽略阻断的理由');
+  const run = await db.bootstrapGenerationRun.findUnique({ where: { id: runId }, include: { cases: { where: { status: 'BLOCKED' } } } });
+  if (!run || run.kind !== 'CASE_COMPILATION') throw new Error('案例编译批次不存在');
+  if (!run.cases.length) throw new Error('该批次没有被阻断的案例');
+  await db.$transaction([
+    ...run.cases.map((item) => db.tutorTurnCase.update({ where: { id: item.id }, data: { status: 'READY', hardCheckJson: JSON.stringify({ errors: [], overrideReason: reason.trim(), overriddenAt: new Date().toISOString() }) } })),
+    db.dataLabAuditLog.create({ data: { actorId: user.id, action: 'TUTOR_CASES_BLOCK_OVERRIDDEN', entityType: 'BootstrapGenerationRun', entityId: runId, payloadJson: JSON.stringify({ reason: reason.trim(), count: run.cases.length, originalErrors: run.cases.map((item) => ({ id: item.id, errors: item.hardCheckJson })) }) } }),
+  ]);
+  return { runId, unblocked: run.cases.length };
+}
+
+export async function deleteGenerationRun(runId: string, user: SessionUser) {
+  const run = await db.bootstrapGenerationRun.findUnique({
+    where: { id: runId },
+    include: { cases: { include: { finalizedTurn: { select: { id: true } }, _count: { select: { candidates: true, reviewTasks: true } } } } },
+  });
+  if (!run || run.kind !== 'CASE_COMPILATION') throw new Error('案例编译批次不存在');
+  const hasData = run.cases.some((item) => item.finalizedTurn || item._count.candidates > 0 || item._count.reviewTasks > 0);
+  if (hasData) throw new Error('该批次下的案例已有候选、审核记录或定稿，无法删除；请改为"标记为已替代"');
+  await db.$transaction([
+    db.tutorTurnCase.deleteMany({ where: { generationRunId: runId } }),
+    db.bootstrapGenerationRun.delete({ where: { id: runId } }),
+    db.dataLabAuditLog.create({ data: { actorId: user.id, action: 'TUTOR_CASE_RUN_DELETED', entityType: 'BootstrapGenerationRun', entityId: runId, payloadJson: JSON.stringify({ cases: run.cases.length, profile: run.parametersJson }) } }),
+  ]);
+  return { runId, deleted: run.cases.length };
 }
 
 export async function tutorWorkflowCounts() {
-  const [topicDrafts, approvedTopics, casesReady, editPending, confirmPending, caseQualityPending, finalized] = await Promise.all([
+  const [latestProfileRuns, topicDrafts, approvedTopics, editPending, confirmPending, caseQualityPending, finalized] = await Promise.all([
+    Promise.all((['SMOKE_6', 'CALIBRATION_12', 'TRIAL_36', 'FULL_180', 'EVAL_80'] as TutorCaseProfile[]).map((profile) => latestCaseCompilationRun(profile))),
     db.topicCard.count({ where: { status: 'DRAFT' } }),
     db.topicCard.count({ where: { status: 'APPROVED' } }),
-    db.tutorTurnCase.count({ where: { status: { in: ['READY', 'NEEDS_REGEN'] } } }),
     db.tutorReviewTask.count({ where: { type: 'EDIT', status: { in: ['PENDING', 'RETURNED'] }, case: { status: 'IN_REVIEW' } } }),
     db.tutorReviewTask.count({ where: { type: 'CONFIRM', status: 'PENDING', case: { status: 'AWAITING_CONFIRMATION' } } }),
     db.tutorReviewTask.count({ where: { type: 'CASE', status: 'PENDING', case: { status: 'CASE_NEEDS_REVISION' } } }),
     db.finalizedTutorTurn.count(),
   ]);
+  const latestRunIds = latestProfileRuns.flatMap((run) => run ? [run.id] : []);
+  const casesReady = await db.tutorTurnCase.count({
+    where: {
+      status: { in: ['READY', 'NEEDS_REGEN'] },
+      OR: [
+        { generationRunId: { in: latestRunIds } },
+        { generationRunId: null },
+        { generationRun: { kind: 'CASE_COMPILATION', status: 'COMPLETED', parametersJson: { contains: '"profile":"CUSTOM"' } } },
+      ],
+    },
+  });
   return { topicDrafts, approvedTopics, casesReady, editPending, confirmPending, caseQualityPending, finalized };
 }
 

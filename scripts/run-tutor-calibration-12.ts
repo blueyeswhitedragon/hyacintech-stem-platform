@@ -64,7 +64,7 @@ async function main() {
   };
 
   if (!runId) {
-    const compiled = await compileTutorTurnCases({ profile: 'CALIBRATION_12', split: 'PILOT', user });
+    const compiled = await compileTutorTurnCases({ profile: 'CALIBRATION_12', split: 'PILOT', allowExistingRun: true, user });
     runId = compiled.runId;
     console.log(JSON.stringify({ event: 'CALIBRATION_COMPILED', runId, cases: compiled.cases.length }, null, 2));
   }
