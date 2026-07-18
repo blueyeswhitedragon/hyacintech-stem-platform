@@ -209,12 +209,12 @@ export const GATE_METRIC_META: Record<string, LabelMeta> = {
 
 export const GATE_FAILURE_LABELS: Record<string, string> = {
   HARD_OR_INTERNAL_LEAK_ERRORS: '仍有硬错误或内部信息泄漏',
-  LIGHT_EDIT_RATE_BELOW_75_PERCENT: '无需大改比例低于 75%',
-  DIRECT_CONFIRM_RATE_BELOW_85_PERCENT: '直接确认率低于 85%',
+  LIGHT_EDIT_RATE_BELOW_75_PERCENT: '无需大改比例低于 75%（超过 25% 的案例在定稿时被大幅重写，说明模型生成质量不足）',
+  DIRECT_CONFIRM_RATE_BELOW_85_PERCENT: '直接确认率低于 85%（超过 15% 的案例在定稿时被退回过，需要返工后重新提交）',
   EXACT_DUPLICATES_PRESENT: '存在完全重复案例',
   NEAR_DUPLICATE_RATE_AT_OR_ABOVE_10_PERCENT: '近重复率达到或超过 10%',
   TEMPLATE_REPEAT_RATE_AT_OR_ABOVE_10_PERCENT: '模板化表达重复率达到或超过 10%',
-  TRIAL_REQUIRES_36_CASES: '需要完成并定稿 36 条试验案例',
+  TRIAL_REQUIRES_36_CASES: '需要完成并定稿 36 条试验案例（创建案例 → 生成双候选 → 初审 → 定稿，全流程走完后统计）',
   SMOKE_REQUIRES_SIX_FINALIZED_CASES: '需要完成并定稿 6 条冒烟案例',
   SMOKE_REQUIRES_FOUR_LIGHT_OR_NO_EDIT: '至少 4 条冒烟案例应无需大改',
   SMOKE_REQUIRES_ALL_DIRECT_CONFIRM: '6 条冒烟案例均需一次通过定稿',
@@ -226,6 +226,18 @@ export const GATE_FAILURE_LABELS: Record<string, string> = {
   CALIBRATION_WARNING_CLOSURES_NOT_STRUCTURED: '自动检测信号尚未全部完成结构化复核',
   CALIBRATION_CRITIC_FALSE_POSITIVE_RATE_TOO_HIGH: '交叉检查误报过多',
 };
+
+export const HARD_CHECK_ERROR_LABELS: Record<string, string> = {
+  PRIVATE_SPEC_LEAK: '学生消息泄漏了内部约束',
+};
+
+export function hardCheckErrorLabel(error: string): string {
+  const separator = error.indexOf(':');
+  const code = separator >= 0 ? error.slice(0, separator) : error;
+  const detail = separator >= 0 ? error.slice(separator + 1).trim() : '';
+  const label = HARD_CHECK_ERROR_LABELS[code] ?? '案例未通过自动硬检查';
+  return detail ? `${label}：“${detail}”` : label;
+}
 
 export const EVALUATION_SCOPE_LABELS: Record<string, string> = {
   full: '完整门禁评测',

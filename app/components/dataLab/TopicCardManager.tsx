@@ -146,6 +146,7 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
   const [preview, setPreview] = useState<TopicPreview | null>(null);
   const [previewErrors, setPreviewErrors] = useState<string[]>([]);
   const [previewPending, setPreviewPending] = useState(false);
+  const [autofillPending, setAutofillPending] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [confirmingApproval, setConfirmingApproval] = useState(false);
@@ -205,7 +206,7 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? '保存失败');
-      setForm(empty); setEditingId(null); setMessageTone('success'); setMessage(editingId ? '话题卡已更新并回到待审核状态。' : '话题卡草稿已创建。'); router.refresh();
+      setForm(empty); setEditingId(null); setManualOpen(false); setPreview(null); setPreviewErrors([]); setMessageTone('success'); setMessage(editingId ? '话题卡已更新并回到待审核状态。' : '话题卡草稿已创建。'); router.refresh();
     } catch (error) { setMessageTone('error'); setMessage(error instanceof Error ? error.message : String(error)); }
     finally { setPending(false); }
   }
@@ -224,7 +225,11 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
       bridges: parsedBridges.length >= 2 ? parsedBridges : [...parsedBridges, ...Array.from({ length: 2 - parsedBridges.length }, (_, index) => blankBridge(parsedBridges.length + index))],
       compilerEvidence: parseObject(card.compilerEvidenceJson), criticOverrideReason: String((parseObject(card.compilerEvidenceJson).adminOverride as { reason?: unknown } | undefined)?.reason ?? ''),
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToEditor();
+  }
+
+  function scrollToEditor() {
+    requestAnimationFrame(() => document.getElementById('topic-card-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
   async function createRevision(cardId: string) {
@@ -253,7 +258,7 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
       constraints: [...new Set(picked.flatMap((card) => parseList(card.constraintsJson)))].join('\n'), performanceCriteria: [...new Set(picked.flatMap((card) => parseList(card.performanceCriteriaJson)))].join('\n'),
       bridges: bridges.length >= 2 ? bridges : [blankBridge(0), blankBridge(1)], compilerEvidence: { mergedFrom: picked.map((card) => card.id) }, criticOverrideReason: '',
     });
-    setSelected([]); window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelected([]); scrollToEditor();
   }
 
   async function approveSelected() {
@@ -283,6 +288,91 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
       setRejectingId(null); setRejectReason(''); setMessageTone('success'); setMessage(action === 'APPROVE' ? '话题卡已批准，可用于案例批次。' : '话题卡已拒绝并记录理由。'); router.refresh();
     } catch (error) { setMessageTone('error'); setMessage(error instanceof Error ? error.message : String(error)); }
     finally { setPending(false); }
+  }
+
+  async function deleteCard(id: string) {
+    setPending(true); setMessage(null);
+    try {
+      const response = await fetch(`/api/data-lab/topic-cards/${id}`, { method: 'DELETE' });
+      const data = await response.json(); if (!response.ok) throw new Error(data.error ?? '删除失败');
+      setMessageTone('success'); setMessage('话题卡已删除。'); router.refresh();
+    } catch (error) { setMessageTone('error'); setMessage(error instanceof Error ? error.message : String(error)); }
+    finally { setPending(false); }
+  }
+
+  async function deleteSelected() {
+    setPending(true); setMessage(null);
+    let successful = 0;
+    let failed = 0;
+    const reasons: string[] = [];
+    try {
+      for (const id of [...selected]) {
+        const response = await fetch(`/api/data-lab/topic-cards/${id}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (response.ok) successful += 1;
+        else { failed += 1; reasons.push(data.error ?? '删除失败'); }
+      }
+      setSelected([]); setMessageTone(failed ? 'error' : 'success'); setMessage(`批量删除完成：成功 ${successful} 张，失败 ${failed} 张${reasons.length ? `。${[...new Set(reasons)].join('；')}` : ''}`); router.refresh();
+    } catch (error) { setMessageTone('error'); setMessage(error instanceof Error ? error.message : String(error)); }
+    finally { setPending(false); }
+  }
+
+  async function autofillCard() {
+    setAutofillPending(true); setMessage(null);
+    try {
+      const response = await fetch('/api/data-lab/topic-cards/autofill', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cardPayload()),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? 'AI 填充失败');
+      const filled = data.filled;
+      // 只填充空白字段
+      setForm((current) => ({
+        displayTitle: current.displayTitle.trim() || filled.displayTitle,
+        studentOpening: current.studentOpening.trim() || filled.studentOpening,
+        internalArchetype: current.internalArchetype || filled.internalArchetype,
+        subject: current.subject || filled.subject,
+        gradeBand: current.gradeBand || filled.gradeBand,
+        coreMechanism: current.coreMechanism.trim() || filled.coreMechanism,
+        forbiddenDirections: current.forbiddenDirections.trim() || (filled.forbiddenDirections ?? []).join('\n'),
+        curriculumAnchors: current.curriculumAnchors.trim() || (filled.curriculumAnchors ?? []).join('\n'),
+        sourceTitle: current.sourceTitle,
+        sourceCandidateId: current.sourceCandidateId,
+        activityMode: current.activityMode || filled.activityMode || 'SCIENTIFIC_INQUIRY',
+        contextModule: current.contextModule || filled.contextModule || 'LIFE_HEALTH',
+        disciplineAnchors: current.disciplineAnchors.length ? current.disciplineAnchors : filled.disciplineAnchors,
+        authenticNeed: current.authenticNeed.trim() || filled.authenticNeed,
+        stakeholder: current.stakeholder.trim() || filled.stakeholder,
+        engineeringGoal: current.engineeringGoal.trim() || filled.engineeringGoal,
+        constraints: current.constraints.trim() || (filled.constraints ?? []).join('\n'),
+        performanceCriteria: current.performanceCriteria.trim() || (filled.performanceCriteria ?? []).join('\n'),
+        bridges: (filled.inquiryBridges ?? []).map((bridge: any, index: number) => {
+          const existing = current.bridges[index];
+          if (existing && existing.factor.trim() && existing.phenomenon.trim()) return existing;
+          const scaffold = bridge.testScaffold || {};
+          const range = Array.isArray(scaffold.safeValueRange) ? scaffold.safeValueRange : [];
+          return {
+            label: bridge.label || `候选方向 ${index + 1}`,
+            retainedFeature: bridge.retainedFeature || '',
+            researchQuestion: bridge.researchQuestion || '',
+            factor: bridge.factor || '',
+            phenomenon: bridge.phenomenon || '',
+            levels: Array.isArray(scaffold.levels) ? scaffold.levels.join('\n') : '',
+            measurement: scaffold.measurement || '',
+            unit: scaffold.unit || '',
+            metricKind: scaffold.metricKind || 'OTHER',
+            safeMin: range[0] !== undefined ? String(range[0]) : '',
+            safeMax: range[1] !== undefined ? String(range[1]) : '',
+            controlledConditions: Array.isArray(scaffold.controlledConditions) ? scaffold.controlledConditions.join('\n') : '',
+            returnToDesign: bridge.returnToDesign || '',
+          };
+        }),
+        compilerEvidence: current.compilerEvidence,
+        criticOverrideReason: current.criticOverrideReason,
+      }));
+      setMessageTone('success'); setMessage('AI 已自动填充缺失字段，请检查并修改后保存。');
+    } catch (error) { setMessageTone('error'); setMessage(error instanceof Error ? error.message : String(error)); }
+    finally { setAutofillPending(false); }
   }
 
   async function generateWithDefaultModel() {
@@ -334,13 +424,13 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
   }
 
   const cardSections = <div className="space-y-5">
-    <div className="flex flex-wrap items-center gap-2 border bg-white p-3 text-sm"><span>已选 {selected.length} 张</span><button disabled={pending || selected.length === 0} onClick={() => setConfirmingApproval(true)} className="bg-green-700 px-3 py-1.5 text-xs text-white disabled:opacity-40">批量批准</button><button disabled={selected.length < 2} onClick={mergeSelected} className="border px-3 py-1.5 text-xs disabled:opacity-40">合并为新版草稿</button></div>
-    {['DRAFT', 'APPROVED', 'SUPERSEDED', 'REJECTED'].map((status) => <section key={status} className="space-y-3"><h2 className="font-semibold">{DATA_LAB_STATUS_LABELS[status]}（{grouped[status]?.length ?? 0}）</h2>{(grouped[status] ?? []).map((card) => <article key={card.id} className="border bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="flex items-start gap-2"><input type="checkbox" checked={selected.includes(card.id)} onChange={(event) => setSelected(event.target.checked ? [...selected, card.id] : selected.filter((id) => id !== card.id))} className="mt-1" /><div><div className="text-xs text-gray-500">{card.schemaVersion === 2 ? '新版话题结构' : '历史话题结构'} · 第 {card.revision} 版 · {TOPIC_DISCIPLINE_LABELS[card.subject] ?? '其他学科'} · {TOPIC_ACTIVITY_MODE_LABELS[card.activityMode] ?? '旧版活动'} · {TOPIC_CONTEXT_MODULE_LABELS[card.contextModule] ?? '情境未分类'} · 已生成 {card._count.cases} 个案例</div><h3 className="mt-1 font-semibold">{card.displayTitle}</h3><p className="mt-2 text-sm text-gray-700">学生开场：{card.studentOpening}</p>{card.revisionOf && <p className="mt-1 text-xs text-violet-700">修订自：{card.revisionOf.displayTitle} 第 {card.revisionOf.revision} 版</p>}{card.sourceCandidate && <p className="mt-1 text-xs text-blue-700">来源素材：{card.sourceCandidate.title}</p>}</div></div><span className="bg-gray-100 px-2 py-1 text-xs">{DATA_LAB_STATUS_LABELS[card.status] ?? '状态待确认'}</span></div>
+    <div className="flex flex-wrap items-center gap-2 border bg-white p-3 text-sm"><span>已选 {selected.length} 张</span><button disabled={pending || selected.length === 0} onClick={() => setConfirmingApproval(true)} className="bg-green-700 px-3 py-1.5 text-xs text-white disabled:opacity-40">批量批准</button><button disabled={pending || selected.length === 0} onClick={deleteSelected} className="border border-red-500 px-3 py-1.5 text-xs text-red-700 disabled:opacity-40">删除选中</button><button disabled={selected.length < 2} onClick={mergeSelected} className="border px-3 py-1.5 text-xs disabled:opacity-40">合并为新版草稿</button></div>
+    {['DRAFT', 'APPROVED', 'SUPERSEDED', 'REJECTED'].map((status) => <section key={status} className="space-y-3"><h2 className="font-semibold">{DATA_LAB_STATUS_LABELS[status]}（{grouped[status]?.length ?? 0}）</h2>{(grouped[status] ?? []).map((card) => <article key={card.id} className="border bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="flex items-start gap-2"><input type="checkbox" checked={selected.includes(card.id)} onChange={(event) => setSelected(event.target.checked ? [...selected, card.id] : selected.filter((id) => id !== card.id))} className="mt-1" /><div><div className="text-xs text-gray-500">{card.schemaVersion === 2 ? '新版话题结构' : '历史话题结构'} · 第 {card.revision} 版 · {TOPIC_DISCIPLINE_LABELS[card.subject] ?? '其他学科'} · {TOPIC_ACTIVITY_MODE_LABELS[card.activityMode] ?? '旧版活动'} · {TOPIC_CONTEXT_MODULE_LABELS[card.contextModule] ?? '情境未分类'} · 已生成 {card._count.cases} 个案例</div><h3 className="mt-1 font-semibold">{card.displayTitle}</h3><p className="mt-2 text-sm text-gray-700">学生开场：{card.studentOpening}</p>{card.revisionOf && <div className="mt-2 inline-block rounded border border-violet-300 bg-violet-50 px-2 py-1 text-xs text-violet-900">📝 修订自：{card.revisionOf.displayTitle} 第 {card.revisionOf.revision} 版</div>}{card.sourceCandidate && <p className="mt-1 text-xs text-blue-700">来源素材：{card.sourceCandidate.title}</p>}</div></div><span className="bg-gray-100 px-2 py-1 text-xs">{DATA_LAB_STATUS_LABELS[card.status] ?? '状态待确认'}</span></div>
       <div className="mt-3 grid gap-3 text-xs text-gray-600 md:grid-cols-3"><div><b>核心机制</b><p>{card.coreMechanism}</p>{card.schemaVersion === 2 && <><b className="mt-2 block">真实需求</b><p>{card.authenticNeed}</p></>}</div><div><b>研究路线（仅审核）</b><pre className="whitespace-pre-wrap">{parseList(card.acceptableDirectionsJson).join('\n')}</pre></div><div><b>禁止方向（仅审核）</b><pre className="whitespace-pre-wrap">{parseList(card.forbiddenDirectionsJson).join('\n') || '无'}</pre></div></div>
-      {criticIssues(parseObject(card.compilerEvidenceJson)).length > 0 && <div className="mt-3 border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900"><b>需要人工确认才能批准：</b>{criticIssues(parseObject(card.compilerEvidenceJson)).map((issue) => String(issue.message ?? '需要人工核对')).join('；')}<p className="mt-1 text-gray-600">操作方法：点「修改」→ 到底部「模型复核问题」→ 填写处理说明 → 保存 → 再批准。</p></div>}
+      {status === 'DRAFT' && criticIssues(parseObject(card.compilerEvidenceJson)).length > 0 && <div className="mt-3 border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900"><b>需要人工确认才能批准：</b>{criticIssues(parseObject(card.compilerEvidenceJson)).map((issue) => String(issue.message ?? '需要人工核对')).join('；')}<p className="mt-1 text-gray-600">操作方法：点「修改」→ 到底部「模型复核问题」→ 填写处理说明 → 保存 → 再批准。</p></div>}
       {status === 'DRAFT' && card.schemaVersion === 2 && hasEmptyBridges(card.inquiryBridgesJson) && <div className="mt-3 border border-orange-200 bg-orange-50 p-3 text-xs text-orange-900"><b>研究路线不完整，需要补全后才能批准。</b><p className="mt-1">这张卡从旧版迁移而来，研究路线只有方向名，缺少具体实验设计（自变量、因变量、测试档位、测量方式等）。</p><p className="mt-1 text-gray-600">操作方法：点「修改」→ 第 2 步「研究路线」→ 逐条补全 → 保存 → 再批准。</p></div>}
       {card.rejectionReason && <p className="mt-3 text-sm text-red-700">拒绝原因：{card.rejectionReason}</p>}
-      <div className="mt-3 flex flex-wrap gap-2">{status === 'DRAFT' && <><button disabled={pending} onClick={() => edit(card)} className="border px-3 py-1.5 text-xs">修改</button><button disabled={pending} onClick={() => decide(card.id, 'APPROVE')} className="bg-green-700 px-3 py-1.5 text-xs text-white">批准</button><button disabled={pending} onClick={() => { setRejectingId(card.id); setRejectReason(''); }} className="border border-red-500 px-3 py-1.5 text-xs text-red-700">拒绝</button></>}{status === 'APPROVED' && <button disabled={pending} onClick={() => createRevision(card.id)} className="border border-violet-600 px-3 py-1.5 text-xs text-violet-700">创建新版修订</button>}</div>
+      <div className="mt-3 flex flex-wrap gap-2">{status === 'DRAFT' && <><button disabled={pending} onClick={() => edit(card)} className="border px-3 py-1.5 text-xs">修改</button><button disabled={pending} onClick={() => decide(card.id, 'APPROVE')} className="bg-green-700 px-3 py-1.5 text-xs text-white">批准</button><button disabled={pending} onClick={() => { setRejectingId(card.id); setRejectReason(''); }} className="border border-red-500 px-3 py-1.5 text-xs text-red-700">拒绝</button><button disabled={pending} onClick={() => deleteCard(card.id)} className="border px-3 py-1.5 text-xs text-gray-600">删除</button></>}{status === 'REJECTED' && <button disabled={pending} onClick={() => deleteCard(card.id)} className="border px-3 py-1.5 text-xs text-gray-600">删除</button>}{status === 'APPROVED' && <button disabled={pending} onClick={() => createRevision(card.id)} className="border border-violet-600 px-3 py-1.5 text-xs text-violet-700">创建新版修订</button>}</div>
     </article>)}{(grouped[status]?.length ?? 0) === 0 && <p className="border bg-white p-4 text-sm text-gray-500">当前没有{DATA_LAB_STATUS_LABELS[status]}话题卡。</p>}</section>)}
   </div>;
 
@@ -377,7 +467,8 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
 
     <section><div className="mb-3"><h2 className="font-semibold">待审核与已启用话题卡</h2><p className="mt-1 text-sm text-gray-500">常规工作是审核模型产出的草稿；只在素材无法编译时使用手工建卡。</p></div>{cardSections}</section>
 
-    <details open={manualOpen} onToggle={(event) => setManualOpen(event.currentTarget.open)} className="border bg-white p-5"><summary className="cursor-pointer font-semibold">{editingId ? '编辑话题卡' : '高级：手工创建话题卡'}</summary><div className="mt-5 space-y-6">
+    <details id="topic-card-editor" open={manualOpen} onToggle={(event) => setManualOpen(event.currentTarget.open)} className="scroll-mt-4 border bg-white p-5"><summary className="cursor-pointer font-semibold">{editingId ? '编辑话题卡' : '高级：手工创建话题卡'}</summary><div className="mt-5 space-y-6">
+      {editingId && <div className="flex items-center gap-3 rounded border border-blue-200 bg-blue-50 p-3 text-sm"><span className="text-blue-900">修改现有卡片时，可使用 AI 自动填充缺失字段（如研究路线），然后手工微调。</span><button disabled={autofillPending || pending} onClick={autofillCard} className="rounded bg-blue-700 px-3 py-1.5 text-xs text-white disabled:opacity-40">{autofillPending ? '🤖 AI 填充中…' : '🤖 AI 自动填充'}</button></div>}
       <nav className="grid gap-2 text-sm sm:grid-cols-4"><a href="#topic-context" className="border-b-2 border-gray-900 pb-2">1. 情境</a><a href="#topic-routes" className="border-b-2 border-gray-300 pb-2">2. 研究路线</a><a href="#topic-boundaries" className="border-b-2 border-gray-300 pb-2">3. 边界</a><a href="#topic-preview" className="border-b-2 border-gray-300 pb-2">4. 预览</a></nav>
 
       <section id="topic-context" className="scroll-mt-20"><h3 className="font-semibold">1. 情境</h3><p className="mt-1 text-xs text-gray-500">定义学生真实面对的问题。保存后会成为案例标题、开场和情境背景。</p><div className="mt-3 grid gap-3 md:grid-cols-2">

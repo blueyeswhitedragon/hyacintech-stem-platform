@@ -61,7 +61,7 @@ async function main() {
   const user: SessionUser = { id: adminRow.id, username: adminRow.username, displayName: adminRow.displayName, role: 'admin' };
 
   if (!runId) {
-    const compiled = await compileTutorTurnCases({ profile: 'TRIAL_36', split: 'PILOT', user });
+    const compiled = await compileTutorTurnCases({ profile: 'TRIAL_36', split: 'PILOT', allowExistingRun: true, user });
     runId = compiled.runId;
     console.log(JSON.stringify({ event: 'TRIAL_COMPILED', runId, cases: compiled.cases.length, promptVersion: compiled.promptVersion }, null, 2));
   }
