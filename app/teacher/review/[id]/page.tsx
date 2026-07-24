@@ -6,6 +6,7 @@ import { parseStageData } from '@/app/lib/conversation';
 import AuthNav from '@/app/components/AuthNav';
 import ReviewActionForm from '@/app/components/ReviewActionForm';
 import CandidateNominationPanel from '@/app/components/CandidateNominationPanel';
+import { limitationsDiscussion } from '@/app/lib/reportFields';
 
 export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/review/[id]'>) {
   const user = await getCurrentUser();
@@ -52,11 +53,7 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
             <div className="p-4 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
               {stageData.stage1.snapshot}
             </div>
-            <div className="px-4 pb-3 text-sm text-gray-600">
-              拟改变因素方向：{stageData.stage1.factorDirection || stageData.stage1.variables?.independent || '—'}
-              {' · '}关注现象方向：{stageData.stage1.phenomenonDirection || stageData.stage1.variables?.dependent || '—'}
-              <div className="mt-1 text-xs text-amber-700">变量水平、测量方式与控制变量在方案设计阶段审核。</div>
-            </div>
+            <div className="px-4 pb-3 text-xs text-gray-500">变量、水平、测量方式与控制条件均在本页的方案设计成果中审核。</div>
           </section>
         )}
 
@@ -149,15 +146,51 @@ export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/r
             {([
               ['purpose', '研究目的'], ['hypothesis', '假设'], ['materials', '材料'],
               ['procedure', '步骤'], ['dataSummary', '数据概述'], ['analysis', '数据分析'],
-              ['conclusion', '结论'], ['reflection', '反思'],
+              ['conclusion', '结论'], ['reflection', '局限与讨论'],
             ] as const).map(([k, label]) => (
               <div key={k}>
                 <div className="text-sm font-medium text-gray-600">{label}</div>
                 <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-                  {stageData.stage5!.sections[k] || <span className="text-gray-400">（空）</span>}
+                  {(k === 'reflection'
+                    ? limitationsDiscussion(stageData.stage5!.sections)
+                    : stageData.stage5!.sections[k]) || <span className="text-gray-400">（空）</span>}
                 </div>
               </div>
             ))}
+
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-gray-700">原始实验数据</h3>
+              {stage3Cols.length > 0 && stage3Rows.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border text-sm">
+                    <thead className="bg-gray-50"><tr><th className="border p-2">#</th>{stage3Cols.map((column) => <th key={column.key} className="border p-2 text-left">{column.title}</th>)}</tr></thead>
+                    <tbody>{stage3Rows.map((row, rowIndex) => (
+                      <tr key={rowIndex}><td className="border p-2 text-center">{rowIndex + 1}</td>{stage3Cols.map((column) => <td key={column.key} className="border p-2">{String(row[column.key] ?? '—')}</td>)}</tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              ) : <p className="text-sm text-gray-400">（无实验数据）</p>}
+            </div>
+
+            <div>
+              <h3 className="mb-2 text-sm font-medium text-gray-700">已接受的数据分析证据</h3>
+              {(stageData.stage4?.evidenceRounds ?? []).length > 0 ? (
+                <div className="space-y-2">{stageData.stage4!.evidenceRounds!.map((round, index) => (
+                  <div key={round.roundFingerprint ?? index} className="rounded border bg-gray-50 p-2 text-sm">
+                    <div className="font-medium">第 {index + 1} 轮：{round.observation}</div>
+                    <div className="mt-1 text-gray-600">{round.citations.join('；')}</div>
+                  </div>
+                ))}</div>
+              ) : <p className="text-sm text-gray-400">（无已接受证据）</p>}
+            </div>
+
+            {(stageData.stage5.uploadedDocUrl || stageData.stage5.uploadedText) && (
+              <div>
+                <h3 className="mb-2 text-sm font-medium text-gray-700">学生上传的 Word 报告</h3>
+                {stageData.stage5.uploadedDocUrl && <a href={stageData.stage5.uploadedDocUrl} target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline">下载原文件</a>}
+                {stageData.stage5.uploadedText && <div className="mt-2 max-h-72 overflow-y-auto whitespace-pre-wrap rounded border border-amber-200 bg-amber-50 p-2 text-sm">{stageData.stage5.uploadedText}</div>}
+              </div>
+            )}
 
             {stageData.stage5.aiReferenceScore && (
               <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm">

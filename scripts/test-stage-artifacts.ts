@@ -1,5 +1,7 @@
 import { attachDeterministicArtifacts, buildDataTableSchema } from '../app/lib/stageArtifacts';
+import { attachServerOwnedArtifacts } from '../app/lib/serverTutorState';
 import { validateStageResponseBehavior } from '../app/lib/stageContract';
+import { studentVisibleStageData } from '../app/lib/stageState';
 import type { ChatResponse, ExperimentPlan } from '../app/models/types';
 import type { StageData } from '../app/models/stageData';
 
@@ -44,6 +46,19 @@ const p2Issues = validateStageResponseBehavior(2, p2Response, {
   visibleContext: JSON.stringify({ confirmedFacts: confirmedText, currentStudentMessage: confirmedText.at(-1) }),
 });
 check('P2 服务器生成表与确认方案通过契约', !p2Issues.some((item) => item.severity === 'error'));
+
+const stage3Entry = attachServerOwnedArtifacts({
+  stage: 3,
+  stageData: { stage2: { schema, experimentPlan: plan, submitted: true, approved: true } },
+  triggerType: 'STAGE_ENTER',
+  safetyQuizCompleted: false,
+});
+check('P3 服务端状态不持久化安全题答案键', !Object.hasOwn(stage3Entry.stageData.stage3?.safetyQuiz ?? {}, 'correct'));
+check('P3 学生响应不包含安全题答案键', !Object.hasOwn(stage3Entry.envelope.artifacts?.safety_quiz ?? {}, 'correct'));
+const sanitized = studentVisibleStageData({
+  stage3: { rows: [], safetyQuiz: { question: '旧题', options: ['A', 'B'], correct: 1, passed: false } },
+});
+check('旧会话答案键在学生边界被剥离', !Object.hasOwn(sanitized.stage3?.safetyQuiz ?? {}, 'correct'));
 
 const stageData: StageData = {
   stage1: {

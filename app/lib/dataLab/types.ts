@@ -42,12 +42,12 @@ export const ISSUE_TAG_META: Record<IssueTag, { label: string; description: stri
 };
 
 export const PHASE_META: Record<number, { label: string; goal: string; guardrail: string }> = {
-  1: { label: '选题定向', goal: '把兴趣转化为保留原机制、课堂可行的研究问题与因素/现象方向。', guardrail: '不要在本阶段确定水平、测量方式、控制变量或完整方案。' },
-  2: { label: '方案设计', goal: '正式操作化变量、水平、测量、控制、步骤、安全与数据表。', guardrail: '方案未成型前不要生成最终数据表，也不要提前讨论结果。' },
+  1: { label: '选题定向', goal: '把兴趣转化为一个清楚、可探究的核心问题，并由学生明确确认。', guardrail: '不要在本阶段追问变量、水平、测量、材料、步骤或完整方案。' },
+  2: { label: '方案设计', goal: '由学生说明假设、变量、水平、测量、控制、材料、步骤、重复与安全，再确认服务器方案预览。', guardrail: '方案未按当前草案哈希确认前不要冻结数据表，也不要提前讨论结果。' },
   3: { label: '过程执行', goal: '按已审核方案安全执行并记录真实数据与异常。', guardrail: '不要改动核心方案、编造数据或提前分析趋势。' },
   4: { label: '数据分析', goal: '让学生逐轮引用真实数据，形成观察、证据、异常与审慎解释。', guardrail: '不要替学生给出完整趋势、确定因果或最终结论。' },
-  5: { label: '报告成型', goal: '把目的、方法、数据和分析组织成完整报告。', guardrail: '不要代写学生应完成的结论和反思。' },
-  6: { label: '结果反思', goal: '评价证据质量、局限与下一步改进方向。', guardrail: '反思应建立在本次真实过程和结果之上。' },
+  5: { label: '报告成型', goal: '把目的、方法、数据和分析组织成报告，由学生完成结论与实验局限讨论。', guardrail: '不要代写学生结论、误差判断或改进讨论；个人学习反思属于阶段6。' },
+  6: { label: '结果反思', goal: '分别回应教师评分/反馈，并完成个人学习反思。', guardrail: '两段内容都应保留学生原文，不能由 Tutor 代写或合并。' },
 };
 
 export type AnnotationClaimReason =
@@ -85,6 +85,10 @@ export interface ShareGPTRecord {
     styleFamily?: StyleFamily;
     stylePolicyVersion?: string;
     stageContractVersion?: string;
+    contractVersion?: string;
+    promptVersion?: string;
+    promptPolicyVersion?: string;
+    extractorVersion?: string;
     systemPrompt?: string;
     stageTriggerType?: string;
     visibleContext?: string;

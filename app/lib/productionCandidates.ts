@@ -7,9 +7,7 @@ import {
   redactProductionRecord,
 } from '@/app/lib/redaction';
 import type { ShareGPTRecord } from '@/app/lib/dataLab/types';
-import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
-import { buildTutorLanguagePrompt, TUTOR_LANGUAGE_CONTRACT_VERSION, TUTOR_LANGUAGE_PROMPT_VERSION } from '@/app/lib/tutorLanguage';
-import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
+import { TUTOR_LANGUAGE_CONTRACT_VERSION } from '@/app/lib/tutorLanguage';
 import { parseJson } from '@/app/lib/dataLab/validation';
 
 export const DATA_POLICY_VERSION = 'student-data-policy-v1';
@@ -133,6 +131,11 @@ export async function nominateProductionCandidate(input: {
     .filter((message) => message.role === 'user' || message.role === 'assistant')
     .map((message) => ({ role: message.role, content: message.content }));
   const response = parseJson<Record<string, unknown>>(trace.responseJson, {});
+  const traceContract = parseJson<{
+    stageContractVersion?: string;
+    extractorVersion?: string;
+    promptPolicyVersion?: string;
+  }>(trace.contractCheckJson, {});
   const record: ShareGPTRecord = {
     id: `production-trace-${trace.id}`,
     source: 'production_trace',
@@ -148,10 +151,22 @@ export async function nominateProductionCandidate(input: {
       sourceKind: 'production_trace',
       styleFamily: trace.styleFamily as ShareGPTRecord['meta'] extends { styleFamily?: infer T } ? T : never,
       stylePolicyVersion: trace.stylePolicyVersion,
-      stageContractVersion: STAGE_CONTRACT_VERSION,
+      contractVersion: trace.contractVersion,
+      stageContractVersion: traceContract.stageContractVersion,
+      promptVersion: trace.promptVersion,
+      promptPolicyVersion: traceContract.promptPolicyVersion ?? trace.promptVersion,
+      extractorVersion: traceContract.extractorVersion,
       systemPrompt: trace.trainingSystemPromptSnapshot,
       stageTriggerType: trace.triggerType,
-      generationContext: { modelVisibleHistory },
+      generationContext: {
+        modelVisibleHistory,
+        traceProvenance: {
+          contractVersion: trace.contractVersion,
+          stageContractVersion: traceContract.stageContractVersion ?? null,
+          promptVersion: trace.promptVersion,
+          extractorVersion: traceContract.extractorVersion ?? null,
+        },
+      },
     },
   };
   const { record: redacted, report } = redactProductionRecord(record, [
@@ -253,23 +268,35 @@ export async function convertProductionCandidates(input: { ids: string[]; batchN
       const history = messages.slice(0, Math.max(0, lastHumanIndex)).filter((message) => message.from === 'human' || message.from === 'gpt').map((message) => ({ role: message.from === 'human' ? 'user' : 'assistant', content: message.value }));
       const response = parseJson<{ tutor_language?: { focus?: string } }>(candidate.generationTrace.responseJson, {});
       const allowedFocusIds = response.tutor_language?.focus ? [response.tutor_language.focus] : ['production_correction'];
-      const template = buildTutorLanguagePrompt({ phase: candidate.generationTrace.stage, triggerType: candidate.triggerType, visibleFacts: {}, allowedFocusIds });
+      const traceContract = parseJson<{
+        stageContractVersion?: string;
+        extractorVersion?: string;
+        promptPolicyVersion?: string;
+      }>(candidate.generationTrace.contractCheckJson, {});
       const contractCurrent = candidate.generationTrace.contractVersion === TUTOR_LANGUAGE_CONTRACT_VERSION;
       const caseItem = await tx.tutorTurnCase.create({ data: {
         phase: candidate.generationTrace.stage,
-        triggerType: candidate.triggerType,
+        triggerType: candidate.generationTrace.triggerType,
         studentMessage,
         historyJson: JSON.stringify(history),
         stageStateJson: '{}',
         visibleFactsJson: JSON.stringify({ allowedFocusIds, redactedProductionContext: record.meta?.generationContext ?? {} }),
         privateReviewSpecJson: JSON.stringify({ source: 'PRODUCTION_TRACE', requiresMaterialCorrection: true, authorizationSnapshot: candidate.consentStatusSnapshot, leakageCheck: parseJson(candidate.leakageCheckJson, {}) }),
         dataSource: 'PRODUCTION_TRACE', split: 'TRAIN',
-        contractVersion: contractCurrent ? TUTOR_LANGUAGE_CONTRACT_VERSION : candidate.generationTrace.contractVersion,
-        extractorVersion: EXTRACTOR_VERSION,
-        promptVersion: contractCurrent ? TUTOR_LANGUAGE_PROMPT_VERSION : candidate.generationTrace.promptVersion,
-        systemPrompt: contractCurrent ? (candidate.generationTrace.trainingSystemPromptSnapshot || candidate.generationTrace.systemPromptSnapshot) : template,
+        contractVersion: candidate.generationTrace.contractVersion,
+        extractorVersion: traceContract.extractorVersion ?? 'unknown',
+        promptVersion: candidate.generationTrace.promptVersion,
+        systemPrompt: candidate.generationTrace.trainingSystemPromptSnapshot,
         promptSha256: candidate.generationTrace.promptSha256,
-        hardCheckJson: JSON.stringify({ errors: contractCurrent ? [] : ['LEGACY_CONTRACT_REQUIRES_REGENERATION'] }),
+        hardCheckJson: JSON.stringify({
+          errors: contractCurrent ? [] : ['LEGACY_CONTRACT_REQUIRES_REGENERATION'],
+          provenance: {
+            contractVersion: candidate.generationTrace.contractVersion,
+            stageContractVersion: traceContract.stageContractVersion ?? null,
+            extractorVersion: traceContract.extractorVersion ?? null,
+            promptVersion: candidate.generationTrace.promptVersion,
+          },
+        }),
         status: contractCurrent ? 'READY' : 'BLOCKED',
       } });
       await tx.productionCandidate.update({ where: { id: candidate.id }, data: { status: 'CONVERTED', convertedTutorTurnCaseId: caseItem.id, processedAt: new Date() } });

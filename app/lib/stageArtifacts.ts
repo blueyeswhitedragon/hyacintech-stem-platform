@@ -35,7 +35,7 @@ function resultKey(index: number): string {
 }
 
 /** Build the chart-compatible wide table from an already confirmed plan. */
-export function buildDataTableSchema(plan: AnyPlan): ChatResponse['data_table_schema'] {
+export function buildDataTableSchema(plan: AnyPlan): NonNullable<ChatResponse['data_table_schema']> {
   const unit = planUnit(plan);
   const resultColumns: Stage2Column[] = plan.independentVariable.levels.map((level, index) => ({
     key: resultKey(index),

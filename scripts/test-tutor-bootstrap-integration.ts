@@ -80,13 +80,19 @@ async function main() {
   };
   const shadeCard = await createTopicCard({ ...shadeInput, disciplineAnchors: [...shadeInput.disciplineAnchors] }, admin);
   await decideTopicCard(shadeCard.id, 'APPROVE', '', admin);
-  const shadeCases = await compileTutorTurnCases({ profile: 'CUSTOM', counts: { 4: 1, 6: 1 }, split: 'PILOT', topicCardIds: [shadeCard.id], user: admin });
-  check(shadeCases.cases.every((item) => !item.studentMessage.includes('条件一')) && shadeCases.cases.some((item) => item.studentMessage.includes('下一版')), 'V2 工程卡生成真实水平数据并在 P6 返回设计');
+  const shadeCases = await compileTutorTurnCases({ profile: 'CUSTOM', counts: { 4: 1, 6: 4 }, split: 'PILOT', topicCardIds: [shadeCard.id], user: admin });
+  check(
+    shadeCases.cases.every((item) => !item.studentMessage.includes('条件一'))
+      && shadeCases.cases.some((item) => item.studentMessage.includes('老师说'))
+      && shadeCases.cases.some((item) => item.studentMessage.includes('学会了什么'))
+      && shadeCases.cases.some((item) => item.studentMessage.includes('下一版')),
+    'V2 工程卡生成真实水平数据并覆盖 P6 反馈、反思与返回设计',
+  );
   const shadeRevision = await createTopicCardRevision(shadeCard.id, admin);
   check(shadeRevision.schemaVersion === 2 && shadeRevision.revision === 2 && (await db.topicCard.findUniqueOrThrow({ where: { id: shadeCard.id } })).status === 'APPROVED', '创建 V2 修订时旧批准卡与历史案例保持不变');
   await updateTopicCard(shadeRevision.id, { ...shadeInput, displayTitle: '教室西晒时怎样改进自动遮光判断', disciplineAnchors: [...shadeInput.disciplineAnchors] }, admin);
   await decideTopicCard(shadeRevision.id, 'APPROVE', '', admin);
-  check((await db.topicCard.findUniqueOrThrow({ where: { id: shadeCard.id } })).status === 'SUPERSEDED' && (await db.tutorTurnCase.count({ where: { topicCardId: shadeCard.id } })) === 2, 'V2 修订批准后旧卡被替代但旧案例不改写');
+  check((await db.topicCard.findUniqueOrThrow({ where: { id: shadeCard.id } })).status === 'SUPERSEDED' && (await db.tutorTurnCase.count({ where: { topicCardId: shadeCard.id } })) === shadeCases.cases.length, 'V2 修订批准后旧卡被替代但旧案例不改写');
   let mockCompileCall = 0;
   const rejectedCompilation = await compileTopicCardsWithModels({ sources: [{ title: '信息不足的资源', summary: '占位说明' }], modelA: { provider: 'openai', model: 'mock-a' }, modelB: { provider: 'deepseek', model: 'mock-b' }, user: admin }, {
     compileCard: async () => {

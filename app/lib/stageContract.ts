@@ -1,7 +1,8 @@
 import type { ChatResponse } from '@/app/models/types';
 import { planUnit } from '@/app/lib/stageArtifacts';
+import { STAGE_CONTRACT_VERSION } from '@/app/lib/contractVersions';
 
-export const STAGE_CONTRACT_VERSION = 'stage-contract-v2';
+export { STAGE_CONTRACT_VERSION } from '@/app/lib/contractVersions';
 
 export type StageTriggerType =
   | 'USER_MESSAGE'
@@ -25,11 +26,9 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
     phase: 1,
     label: '选题定向',
     allow: [
-      '理解学生原始兴趣和希望保留的机制、困难或约束',
-      '判断课堂可行性、安全性和低成本代理方向',
+      '理解学生原始兴趣；机制、困难、约束和课堂代理只作为可选背景',
       '引导学生形成具体研究问题',
-      '确认拟改变因素方向和关注现象方向，但不做变量操作化',
-      '解释课堂代理与原始主题的对应关系',
+      '让学生明确核对并确认当前研究问题',
     ],
     forbid: [
       '正式确定自变量水平、梯度或实验组别',
@@ -38,7 +37,7 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
       '提供隐藏式课题或指标选项替学生决定',
       '阶段确认后继续生成额外确认轮',
     ],
-    completion: '输出 stage1_confirmed、theme_mapping、topic_direction 和 snapshot；不要输出阶段2方案。',
+    completion: '只需规范研究问题和学生明确确认；确认绑定问题哈希，由服务器生成 snapshot。不要要求任何阶段2字段。',
   },
   2: {
     phase: 2,
@@ -46,7 +45,8 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
     allow: [
       '正式确定自变量及水平、因变量及测量方式、控制变量',
       '确定材料、步骤、重复次数和安全方案',
-      '信息完整后输出 experiment_plan，由平台确定性生成 data_table_schema',
+      '信息完整后由服务器组装带 draftHash 的方案预览',
+      '学生核对当前 draftHash 后冻结方案，由平台确定性生成 data_table_schema 和风险',
       '让数据表直接服务于后续比较和图表分析',
     ],
     forbid: [
@@ -54,9 +54,9 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
       '信息不足时一次性代写完整方案',
       '提前讨论实验结果、趋势、结论或报告',
       '输出重复列 key、长表组别结构或与方案不一致的数据表',
-      '已生成数据表却使用非 confirmation 动作',
+      '把聊天中的口头同意当作方案冻结，或接受过期 draftHash',
     ],
-    completion: '输出完整 experiment_plan 并使用 confirmation；平台在校验前确定性附加有效 data_table_schema。',
+    completion: '所有方案事实完整后使用 checkpoint 展示服务器草案；专用确认端点冻结同一 draftHash 并生成数据表。',
   },
   3: {
     phase: 3,
@@ -101,12 +101,12 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
       '仅使用结构化方案、真实数据和已完成分析生成报告框架',
       '预填 purpose、hypothesis、materials、procedure、dataSummary、analysis',
       '缺失信息明确标注，不编造',
-      '保留 conclusion 和 reflection 给学生填写',
+      '保留 conclusion 和实验局限/讨论给学生填写',
     ],
     forbid: [
       '引用模型可见上下文中不存在的材料、步骤或数值',
       '使用通用 A/B/C 模板数据填充报告',
-      '直接代写最终结论和反思',
+      '直接代写最终结论和实验局限讨论',
       '将占位内容描述为已经完成的完整报告',
     ],
     completion: 'REPORT_BOOTSTRAP 触发时输出 report_sections；提交由报告面板按钮完成。',
@@ -115,7 +115,7 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
     phase: 6,
     label: '结果反思',
     allow: [
-      '基于真实报告、教师评价和证据局限提出一个反思问题',
+      '显示教师分数与反馈，引导学生先回应反馈，再反思学习过程',
       '引导学生自己识别误差、提出改进和限定迁移范围',
       '作为 Stage6Panel 最终学生反思的可选辅导',
     ],
@@ -125,7 +125,7 @@ export const STAGE_BEHAVIOR_CONTRACTS: Record<number, StageBehaviorContract> = {
       '引入与本次研究无关的新实验或复杂工程任务',
       '使用 confirmation 或 phase_complete 代替学生提交',
     ],
-    completion: '最终完成只由 Stage6Panel 的学生提交触发。',
+    completion: '学生填写对教师反馈的回应和学习反思后，只由 Stage6Panel 提交完成。',
   },
 };
 
@@ -513,21 +513,21 @@ export function validateStageResponseBehavior(
     if (questionCount(response.dialogue) > 1) {
       issues.push(issue('P1_MULTI_QUESTION_REVIEW', 'warning', '本轮出现多个问号；请人工确认它们是否服务于同一个核心教学任务', response.dialogue));
     }
-    if (!response.stage1_confirmed && /自变量|因变量/.test(text)) {
-      issues.push(issue('P1_FORMAL_VARIABLE_LANGUAGE', 'warning', '阶段1确认前应优先使用“拟改变因素/关注现象”而非正式变量术语', text));
+    if (/自变量|因变量|拟改变.{0,6}因素|关注.{0,6}现象/.test(activeStage1Text)) {
+      issues.push(issue('P1_VARIABLE_LANGUAGE', 'error', '阶段1只形成研究问题，不要求机制、变量方向或操作化字段', text));
     }
     if (response.stage1_confirmed) {
-      if (!response.topic_direction?.factor?.trim() || !response.topic_direction?.phenomenon?.trim()) {
-        issues.push(issue('P1_TOPIC_DIRECTION_MISSING', 'error', '阶段1确认必须包含 factor 与 phenomenon 方向'));
-      }
-      if (!response.theme_mapping || !response.snapshot?.trim()) {
-        issues.push(issue('P1_CONFIRMATION_ARTIFACT_MISSING', 'error', '阶段1确认必须包含 theme_mapping 与 snapshot'));
+      if (!response.snapshot?.trim() || !/研究问题\s*[:：]/.test(response.snapshot)) {
+        issues.push(issue('P1_CONFIRMATION_ARTIFACT_MISSING', 'error', '阶段1确认必须包含服务器生成的研究问题 snapshot'));
       }
       if (response.next_action_type !== 'confirmation') {
         issues.push(issue('P1_CONFIRMATION_ACTION_INVALID', 'error', '阶段1确认回复必须使用 confirmation'));
       }
       if (response.variables?.dependent?.trim() || (response.variables?.controlled?.length ?? 0) > 0) {
         issues.push(issue('P1_VARIABLE_OPERATIONALIZATION', 'error', '阶段1确认不能写入因变量操作化或控制变量'));
+      }
+      if (response.topic_direction?.factor?.trim() || response.topic_direction?.phenomenon?.trim()) {
+        issues.push(issue('P1_TOPIC_DIRECTION_FORBIDDEN', 'error', '阶段1确认不再要求 factor/phenomenon；它们属于阶段2'));
       }
     }
   }
@@ -543,13 +543,19 @@ export function validateStageResponseBehavior(
       if (!response.experiment_plan) {
         issues.push(issue('P2_PLAN_MISSING', 'error', '生成数据表时必须同时输出结构化 experiment_plan'));
       } else if (
+        !response.experiment_plan.hypothesis?.trim() ||
+        !response.experiment_plan.independentVariable.name.trim() ||
         response.experiment_plan.independentVariable.levels.length < 2 ||
+        !response.experiment_plan.dependentVariable.name.trim() ||
         !response.experiment_plan.dependentVariable.measurement.trim() ||
+        !Array.isArray(response.experiment_plan.controlledVariables) ||
+        response.experiment_plan.materials.length === 0 ||
         response.experiment_plan.procedure.length === 0 ||
         !Number.isInteger(response.experiment_plan.repeatCount) ||
-        response.experiment_plan.repeatCount < 1
+        response.experiment_plan.repeatCount < 1 ||
+        !Array.isArray(response.experiment_plan.safetyNotes)
       ) {
-        issues.push(issue('P2_PLAN_INCOMPLETE', 'error', 'experiment_plan 必须包含至少两个水平、因变量测量方式、非空步骤和有效重复次数'));
+        issues.push(issue('P2_PLAN_INCOMPLETE', 'error', 'experiment_plan 必须包含假设、变量名、至少两个水平、测量、已回答的控制/安全项、材料、步骤和重复次数'));
       }
       if (response.next_action_type !== 'confirmation') {
         issues.push(issue('P2_SCHEMA_ACTION_MISMATCH', 'error', '生成数据表时 next_action_type 必须为 confirmation'));

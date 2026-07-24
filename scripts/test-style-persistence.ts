@@ -197,7 +197,7 @@ async function main() {
     check('冻结版本生成独立 preference 文件', !!frozen.preferencePath && !!frozen.preferenceSha256);
     check('发布条目固化最终目标风格', frozen.items.length === 1 && frozen.items[0].styleFamily === 'evidence_analyst');
     const trainingRecords = JSON.parse(await readFile(frozen.trainingPath!, 'utf8')) as Array<{ conversations: Array<{ from: string; value: string }> }>;
-    check('training 文件把风格作为首条 system 消息', trainingRecords[0]?.conversations[0]?.from === 'system' && trainingRecords[0].conversations[0].value.includes('证据分析型'));
+    check('历史五风格记录不伪装成当前 Tutor cohort', trainingRecords.length === 0);
     check('外部基线不会伪造生产偏好对', (JSON.parse(await readFile(frozen.preferencePath!, 'utf8')) as unknown[]).length === 0);
     const styleSummary = releaseSummary as { byStyle?: Record<string, number> };
     check('冻结汇总按实际入选风格计数', styleSummary.byStyle?.evidence_analyst === 1);

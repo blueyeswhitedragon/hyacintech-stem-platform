@@ -8,7 +8,7 @@ interface Props {
   stage5?: Stage5Data;
   stage6?: Stage6Data;
   completed: boolean;
-  onSubmit: (response: string) => Promise<string | null>;
+  onSubmit: (responseToTeacherFeedback: string, learningReflection: string) => Promise<string | null>;
   guestMode?: boolean;
   /** 阶段2列定义 + 阶段3数据，用于在反思阶段继续展示完整报告与数据表。 */
   schemaColumns?: Stage2Column[];
@@ -16,13 +16,18 @@ interface Props {
 }
 
 export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guestMode, schemaColumns, dataRows }: Props) {
-  const [response, setResponse] = useState(stage6?.studentResponse ?? '');
+  const [feedbackResponse, setFeedbackResponse] = useState(
+    stage6?.responseToTeacherFeedback ?? stage6?.studentResponse ?? '',
+  );
+  const [learningReflection, setLearningReflection] = useState(
+    stage6?.learningReflection ?? stage6?.studentResponse ?? '',
+  );
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     setBusy(true); setErr(null);
-    const e = await onSubmit(response);
+    const e = await onSubmit(feedbackResponse, learningReflection);
     setBusy(false);
     if (e) setErr(e);
   };
@@ -87,25 +92,37 @@ export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guest
       {completed ? (
         <div className="space-y-2">
           <div className="text-green-700 font-medium">✅ 探究已完成</div>
-          <div className="text-sm text-gray-600">你的反思：</div>
+          <div className="text-sm text-gray-600">你对教师评价的回应：</div>
           <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-            {stage6?.studentResponse}
+            {stage6?.responseToTeacherFeedback ?? stage6?.studentResponse}
+          </div>
+          <div className="text-sm text-gray-600">你的学习反思：</div>
+          <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
+            {stage6?.learningReflection ?? stage6?.studentResponse}
           </div>
         </div>
       ) : (
         <div>
-          <div className="text-sm font-medium text-blue-700 mb-1">你的反思与回应</div>
+          <div className="text-sm font-medium text-blue-700 mb-1">回应教师评价</div>
           <textarea
-            value={response}
-            onChange={(e) => setResponse(e.target.value)}
-            rows={5}
+            value={feedbackResponse}
+            onChange={(e) => setFeedbackResponse(e.target.value)}
+            rows={4}
             className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="结合教师评价，谈谈你的收获、不足，以及下一步可以怎样深入研究……"
+            placeholder="你怎样理解教师的评分和反馈？准备保留或改进什么？"
+          />
+          <div className="text-sm font-medium text-blue-700 mb-1 mt-3">学习反思</div>
+          <textarea
+            value={learningReflection}
+            onChange={(e) => setLearningReflection(e.target.value)}
+            rows={4}
+            className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="这次探究中你学会了什么？下次会怎样开展探究？"
           />
           <div className="mt-2 flex items-center gap-2">
             <button
               onClick={handleSubmit}
-              disabled={busy || response.trim() === ''}
+              disabled={busy || feedbackResponse.trim() === '' || learningReflection.trim() === ''}
               className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
             >
               {busy ? '提交中…' : '提交反思，完成探究'}

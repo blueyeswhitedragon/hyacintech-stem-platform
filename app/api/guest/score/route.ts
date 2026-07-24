@@ -10,7 +10,7 @@ function clientIp(req: Request): string {
 }
 
 const KEYS: (keyof Stage5Sections)[] = [
-  'purpose', 'hypothesis', 'materials', 'procedure', 'dataSummary', 'analysis', 'conclusion', 'reflection',
+  'purpose', 'hypothesis', 'materials', 'procedure', 'dataSummary', 'analysis', 'conclusion', 'limitationsDiscussion', 'reflection',
 ];
 
 // POST /api/guest/score —— 体验模式报告 AI 参考评分（免登录，限流，不落库）
@@ -34,6 +34,8 @@ export async function POST(req: Request) {
   const sections = Object.fromEntries(
     KEYS.map((k) => [k, typeof body.sections![k] === 'string' ? body.sections![k] : ''])
   ) as unknown as Stage5Sections;
+  sections.limitationsDiscussion ||= sections.reflection;
+  sections.reflection = sections.limitationsDiscussion;
 
   const score = await generateReferenceScore(sections);
   return NextResponse.json({ score });

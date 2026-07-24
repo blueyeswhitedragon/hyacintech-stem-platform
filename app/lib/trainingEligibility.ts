@@ -1,6 +1,6 @@
 import type { ShareGPTRecord, TransformationType } from '@/app/lib/dataLab/types';
-import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
 import { isTrainableBatchStatus } from '@/app/lib/dataLab/datasetPolicy';
+import { tutorCohortReasons } from '@/app/lib/dataLab/trainingCohort';
 
 export const TRAINING_POLICY_VERSION = 'training-policy-v2';
 
@@ -83,6 +83,9 @@ export interface EligibilityInput {
   sourceKind: string;
   batchStatus?: string | null;
   stageContractVersion?: string | null;
+  contractVersion?: string | null;
+  promptVersion?: string | null;
+  extractorVersion?: string | null;
   candidateStatus?: string | null;
   consentStatus?: string | null;
   leakageBlocked?: boolean;
@@ -97,7 +100,12 @@ export function evaluateTrainingEligibility(input: EligibilityInput) {
   if (!input.workReviewApproved) reasons.push('WORK_REVIEW_NOT_APPROVED');
   if (!input.finallySelected) reasons.push('NOT_FINALLY_SELECTED');
   if (!input.batchStatus || !isTrainableBatchStatus(input.batchStatus)) reasons.push('DATASET_BATCH_NOT_TRAINABLE');
-  if (input.stageContractVersion !== STAGE_CONTRACT_VERSION) reasons.push('STAGE_CONTRACT_VERSION_MISMATCH');
+  reasons.push(...tutorCohortReasons({
+    contractVersion: input.contractVersion,
+    stageContractVersion: input.stageContractVersion,
+    extractorVersion: input.extractorVersion,
+    promptVersion: input.promptVersion,
+  }));
   if (input.sourceKind !== 'production_trace') {
     if (!['stage_contract_rollout', 'human_authored'].includes(input.sourceKind)) {
       reasons.push('SOURCE_KIND_NOT_TRAINABLE');

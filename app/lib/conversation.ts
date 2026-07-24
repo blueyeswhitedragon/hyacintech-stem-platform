@@ -5,6 +5,7 @@ import type { AssignmentStatus, StageData } from '@/app/models/stageData';
 import { initialWelcomeMessage } from './welcome';
 import { ensureRuntimeModelVersion } from './modelRegistry';
 import { TUTOR_LANGUAGE_CONTRACT_VERSION } from './tutorLanguage';
+import { recoverStageDataV3, studentVisibleStageData } from './stageState';
 import {
   DEFAULT_STYLE_FAMILY,
   DEFAULT_STYLE_POLICY_VERSION,
@@ -49,6 +50,7 @@ export type EnsureConversationResult =
       stylePolicyVersion: string;
       safetyQuizCompleted: boolean;
       contractVersion: string;
+      stageDataRecovered: boolean;
     }
   | { ok: false; error: 'not_found' | 'forbidden' };
 
@@ -90,18 +92,20 @@ export async function ensureStudentConversation(
       where: { id: existing.conversationId },
       select: { messages: true, stageData: true, safetyQuizCompleted: true, resolvedStyleFamily: true, stylePolicyVersion: true, contractVersion: true },
     });
+    const recovered = recoverStageDataV3(parseStageData(conv?.stageData ?? '{}'));
     return {
       ok: true,
       conversationId: existing.conversationId,
       studentAssignmentId: existing.id,
       currentStage: existing.currentStage,
       messages: parseMessages(conv?.messages ?? '[]'),
-      stageData: parseStageData(conv?.stageData ?? '{}'),
+      stageData: studentVisibleStageData(recovered.stageData),
       status: existing.status as AssignmentStatus,
       styleFamily: isStyleFamily(conv?.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
       stylePolicyVersion: conv?.stylePolicyVersion ?? DEFAULT_STYLE_POLICY_VERSION,
       safetyQuizCompleted: conv?.safetyQuizCompleted ?? false,
       contractVersion: conv?.contractVersion ?? 'stage-contract-v2',
+      stageDataRecovered: recovered.recovered,
     };
   }
 
@@ -169,6 +173,7 @@ export async function ensureStudentConversation(
     stylePolicyVersion: assignment.stylePolicyVersion,
     safetyQuizCompleted: false,
     contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
+    stageDataRecovered: false,
   };
 }
 
@@ -181,11 +186,13 @@ export interface ConversationForUser {
   studentAssignmentId: string;
   assignmentId: string;
   topicDirection: string | null;
+  dueDate: Date | null;
   dataConsentStatus: string;
   safetyQuizCompleted: boolean;
   styleFamily: StyleFamily;
   stylePolicyVersion: string;
   contractVersion: string;
+  stageDataRecovered: boolean;
 }
 
 /**
@@ -214,26 +221,29 @@ export async function getConversationForUser(
           status: true,
           assignmentId: true,
           dataConsentStatus: true,
-          assignment: { select: { topicDirection: true } },
+          assignment: { select: { topicDirection: true, dueDate: true } },
         },
       },
     },
   });
   if (!conv || conv.userId !== userId || !conv.studentAssignment) return null;
 
+  const recovered = recoverStageDataV3(parseStageData(conv.stageData));
   return {
     id: conv.id,
     messages: parseMessages(conv.messages),
-    stageData: parseStageData(conv.stageData),
+    stageData: recovered.stageData,
     currentStage: conv.studentAssignment.currentStage,
     status: conv.studentAssignment.status as AssignmentStatus,
     studentAssignmentId: conv.studentAssignment.id,
     assignmentId: conv.studentAssignment.assignmentId,
     topicDirection: conv.studentAssignment.assignment.topicDirection,
+    dueDate: conv.studentAssignment.assignment.dueDate,
     dataConsentStatus: conv.studentAssignment.dataConsentStatus,
     safetyQuizCompleted: conv.safetyQuizCompleted,
     styleFamily: isStyleFamily(conv.resolvedStyleFamily) ? conv.resolvedStyleFamily : DEFAULT_STYLE_FAMILY,
     stylePolicyVersion: conv.stylePolicyVersion || DEFAULT_STYLE_POLICY_VERSION,
     contractVersion: conv.contractVersion,
+    stageDataRecovered: recovered.recovered,
   };
 }

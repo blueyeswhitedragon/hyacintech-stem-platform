@@ -54,6 +54,12 @@ console.log('applyReview:');
   check('s5 reject → 留在 stage5', r.ok && r.currentStage === 5);
   check('s5 reject → submitted=false 数据保留', r.stageData.stage5?.submitted === false && r.stageData.stage5?.sections.conclusion === 'c');
 }
+{
+  const missing = applyReview('approve', 5, 5, sd5, { feedback: '未评分' });
+  const invalid = applyReview('approve', 5, 5, sd5, { score: 11 });
+  check('s5 approve 必须提供评分', !missing.ok && missing.error?.includes('必须填写') === true);
+  check('s5 评分必须在 0–10', !invalid.ok && invalid.error?.includes('0–10') === true);
+}
 // s5 approve 但分数 <6 → 需重写
 {
   const sd5: StageData = { stage5: { submitted: true, approved: null, sections: { purpose: '', hypothesis: '', materials: '', procedure: '', dataSummary: '', analysis: '', conclusion: 'c', reflection: 'r' } } };
@@ -89,19 +95,19 @@ const sd3: StageData = {
   check('s3 approve → 不动 analysisCount', r.stageData.stage4?.analysisCount === 3);
 }
 
-// s3 reject 且学生在第三阶段 → 留 3、写反馈
+// s3 reject 且学生在第三阶段 → 只写反馈，不推进也不锁定
 {
   const r = applyReview('reject', 3, 3, sd3, { feedback: '列设计混乱' });
-  check('s3 reject@3 → 回到 stage3', r.ok && r.currentStage === 3 && r.status === 'IN_PROGRESS');
-  check('s3 reject@3 → approved/submitted=false', r.stageData.stage3?.approved === false && r.stageData.stage3?.submitted === false);
+  check('s3 reject@3 → 不改阶段', r.ok && r.currentStage === undefined && r.status === 'IN_PROGRESS');
+  check('s3 reject@3 → approved=false 且保持 submitted', r.stageData.stage3?.approved === false && r.stageData.stage3?.submitted === true);
   check('s3 reject@3 → 写反馈', r.stageData.stage3?.teacherFeedback === '列设计混乱');
 }
 
-// s3 reject 且学生已在第四阶段 → 回退到 3 + 清零 analysisCount
+// s3 reject 且学生已在第四阶段 → 仍不回退，不清零分析
 {
   const r = applyReview('reject', 3, 4, sd3, { feedback: '重做' });
-  check('s3 reject@4 → 回退 stage3', r.ok && r.currentStage === 3);
-  check('s3 reject@4 → analysisCount 清零', r.stageData.stage4?.analysisCount === 0);
+  check('s3 reject@4 → 不回退 stage3', r.ok && r.currentStage === undefined);
+  check('s3 reject@4 → analysisCount 保留', r.stageData.stage4?.analysisCount === 3);
 }
 
 // s3 reject 且学生已在第五阶段 → 拒绝

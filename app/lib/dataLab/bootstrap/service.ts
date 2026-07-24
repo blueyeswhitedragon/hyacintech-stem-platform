@@ -28,6 +28,7 @@ import { DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION, parseTutorLanguageResponse, TUT
 import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
 import { deriveAcceptableDirections, effectiveFamilyKey, normalizeInquiryBridges, TOPIC_ACTIVITY_MODES, TOPIC_CARD_SCHEMA_V2, TOPIC_CONTEXT_MODULES, TOPIC_DISCIPLINE_ANCHORS, type TopicActivityMode, type TopicContextModule, type TopicDisciplineAnchor, type TopicInquiryBridge } from './topicCardV2';
 import { isLegacyTutorWarningClosure, isTutorWarningAssessment, isTutorWarningAssessmentV2, isTutorWarningClosed, sanitizeTutorWarningClosures, tutorWarningBlocksFinal, TUTOR_WARNING_SEVERITIES, type TutorWarningClosureMap, type TutorWarningDetectorVerdict, type TutorWarningFinalRelation, type TutorWarningSeverity } from './warningClosure';
+import { caseStageContractVersion, tutorCohortReasons, TUTOR_TRAINING_COHORT } from '@/app/lib/dataLab/trainingCohort';
 
 export const REVIEW_LEASE_MS = 30 * 60 * 1000;
 export const TUTOR_CRITIC_PROMPT_VERSION = 'tutor-critic-prompt-v2.1';
@@ -690,7 +691,15 @@ export async function compileTutorTurnCases(input: {
       : null;
   const total = fixedScenarios ? fixedScenarios.length : Object.values(counts).reduce((sum, value) => sum + value, 0);
   if (!total) throw new Error('案例数量必须大于 0');
-  const parameters = { profile: input.profile, counts: fixedScenarios ? undefined : counts, split: input.split, promptVersion, reviewPolicy, topicCoverage };
+  const parameters = {
+    profile: input.profile,
+    counts: fixedScenarios ? undefined : counts,
+    split: input.split,
+    promptVersion,
+    reviewPolicy,
+    topicCoverage,
+    trainingCohort: TUTOR_TRAINING_COHORT,
+  };
   const run = await db.bootstrapGenerationRun.create({
     data: { kind: 'CASE_COMPILATION', status: 'RUNNING', totalItems: total, parametersJson: JSON.stringify(parameters), reviewPolicy, ...(reviewPolicy === 'AI_DIRECT_TO_REVIEWER' ? { aiDirectAuthorizedById: input.user.id, aiDirectAuthorizedAt: new Date() } : {}), createdById: input.user.id, startedAt: new Date() },
   });
@@ -1098,7 +1107,10 @@ export async function overrideBlockedCases(runId: string, reason: string, user: 
   if (!run || run.kind !== 'CASE_COMPILATION') throw new Error('案例编译批次不存在');
   if (!run.cases.length) throw new Error('该批次没有被阻断的案例');
   await db.$transaction([
-    ...run.cases.map((item) => db.tutorTurnCase.update({ where: { id: item.id }, data: { status: 'READY', hardCheckJson: JSON.stringify({ errors: [], overrideReason: reason.trim(), overriddenAt: new Date().toISOString() }) } })),
+    ...run.cases.map((item) => {
+      const previousCheck = parseJson<Record<string, unknown>>(item.hardCheckJson, {});
+      return db.tutorTurnCase.update({ where: { id: item.id }, data: { status: 'READY', hardCheckJson: JSON.stringify({ ...previousCheck, errors: [], overrideReason: reason.trim(), overriddenAt: new Date().toISOString() }) } });
+    }),
     db.dataLabAuditLog.create({ data: { actorId: user.id, action: 'TUTOR_CASES_BLOCK_OVERRIDDEN', entityType: 'BootstrapGenerationRun', entityId: runId, payloadJson: JSON.stringify({ reason: reason.trim(), count: run.cases.length, originalErrors: run.cases.map((item) => ({ id: item.id, errors: item.hardCheckJson })) }) } }),
   ]);
   return { runId, unblocked: run.cases.length };
@@ -1561,9 +1573,12 @@ async function finalizeEligibility(input: {
 }) {
   const reasons: string[] = [];
   const reviewPolicy = await reviewPolicyForCase(input.caseItem);
-  if (input.caseItem.contractVersion !== TUTOR_LANGUAGE_CONTRACT_VERSION) reasons.push('CONTRACT_VERSION_STALE');
-  if (!TUTOR_LANGUAGE_PROMPT_VERSIONS.includes(input.caseItem.promptVersion as TutorLanguagePromptVersion)) reasons.push('PROMPT_VERSION_UNSUPPORTED');
-  if (input.caseItem.extractorVersion !== EXTRACTOR_VERSION) reasons.push('EXTRACTOR_VERSION_STALE');
+  reasons.push(...tutorCohortReasons({
+    contractVersion: input.caseItem.contractVersion,
+    stageContractVersion: caseStageContractVersion(input.caseItem.hardCheckJson),
+    extractorVersion: input.caseItem.extractorVersion,
+    promptVersion: input.caseItem.promptVersion,
+  }));
   if (input.caseItem.split === 'EVAL') reasons.push('EVAL_SPLIT_BLOCKED');
   if (input.draftProvenance !== 'AI_DIRECT_ADMIN_AUTHORIZED' && input.draftPreparedById === input.humanReviewerId) reasons.push('DRAFT_AND_FINAL_SAME_HUMAN');
   if (reviewPolicy.policy === 'HUMAN_ANNOTATOR_REQUIRED' && input.draftProvenance === 'AI_DIRECT_ADMIN_AUTHORIZED') reasons.push('HUMAN_ANNOTATOR_REQUIRED');
@@ -1803,7 +1818,11 @@ export async function resolveTutorCaseQualityTask(input: {
       promptVersion: task.case.promptVersion,
       systemPrompt,
       promptSha256: sha256(systemPrompt),
-      hardCheckJson: JSON.stringify({ errors: hardErrors, revisionReason: input.reason.trim() }),
+      hardCheckJson: JSON.stringify({
+        ...parseJson<Record<string, unknown>>(task.case.hardCheckJson, {}),
+        errors: hardErrors,
+        revisionReason: input.reason.trim(),
+      }),
       status: hardErrors.length ? 'BLOCKED' : 'READY',
     } });
     await tx.tutorReviewTask.update({ where: { id: task.id }, data: { status: 'SUBMITTED', operatorId: input.user.id, decision: 'APPROVE_REVISION', reason: input.reason.trim(), draftJson: JSON.stringify({ revisedCaseId: created.id, previousStudentMessage: task.case.studentMessage, studentMessage, visibleFacts }), submittedAt: new Date() } });
@@ -2037,7 +2056,14 @@ export async function createTutorTurnRelease(input: { version: string; finalized
     },
   });
   if (turns.length !== ids.length) throw new Error('部分已定稿导师回合不存在，请刷新后重新选择');
-  const blocked = turns.filter((turn) => turn.trainingEligibility !== 'SFT_ALLOWED' || turn.case.split !== 'TRAIN');
+  const blocked = turns.filter((turn) => turn.trainingEligibility !== 'SFT_ALLOWED'
+    || turn.case.split !== 'TRAIN'
+    || tutorCohortReasons({
+      contractVersion: turn.case.contractVersion,
+      stageContractVersion: caseStageContractVersion(turn.case.hardCheckJson),
+      extractorVersion: turn.case.extractorVersion,
+      promptVersion: turn.case.promptVersion,
+    }).length > 0);
   if (blocked.length) throw new Error(`所选数据中有 ${blocked.length} 条不具备正式训练集发布资格`);
   for (const turn of turns) {
     if (!turn.preferenceRejectedCandidate) continue;
@@ -2070,6 +2096,7 @@ export async function createTutorTurnRelease(input: { version: string; finalized
         schemaVersion: 4,
         sourceKind: 'finalized_tutor_turn',
         contractVersion: turn.case.contractVersion,
+        stageContractVersion: caseStageContractVersion(turn.case.hardCheckJson),
         promptVersion: turn.case.promptVersion,
         extractorVersion: turn.case.extractorVersion,
         triggerType: turn.case.triggerType,
@@ -2113,6 +2140,7 @@ export async function createTutorTurnRelease(input: { version: string; finalized
     frozenAt: new Date().toISOString(),
     source: 'FINALIZED_TUTOR_TURNS',
     contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
+    trainingCohort: TUTOR_TRAINING_COHORT,
     target: 'TutorLanguageResponse only; server artifacts excluded',
     summary: { clean: training.length, training: training.length, preference: preference.length, humanGold: 0, reviewedSilver: 0, byPhase: Object.fromEntries([1, 2, 3, 4, 5, 6].map((phase) => [phase, turns.filter((turn) => turn.case.phase === phase).length])), byDraftProvenance: Object.fromEntries(TUTOR_DRAFT_PROVENANCES.map((provenance) => [provenance, turns.filter((turn) => turn.draftProvenance === provenance).length])) },
     items: turns.map((turn) => ({ finalizedTutorTurnId: turn.id, caseId: turn.caseId, trainingEligibility: turn.trainingEligibility, preferenceEligible: Boolean(turn.preferenceRejectedCandidateId && turn.preferenceReason.trim()) })),
@@ -2153,7 +2181,7 @@ export async function createTutorTurnRelease(input: { version: string; finalized
       status: 'FROZEN', frozenAt: new Date(), summaryJson: JSON.stringify(manifest.summary),
       cleanPath: files.cleanPath, cleanSha256: sha256(cleanText), goldPath: files.goldPath, goldSha256: sha256(emptyText), silverPath: files.silverPath, silverSha256: sha256(emptyText),
       trainingPath: files.trainingPath, trainingSha256: sha256(trainingText), preferencePath: files.preferencePath, preferenceSha256: sha256(preferenceText),
-      eligibilityReportJson: JSON.stringify({ policyVersion: 'tutor-training-eligibility-v1', sftAllowed: turns.length, monitoringOnly: 0, blocked: 0 }),
+      eligibilityReportJson: JSON.stringify({ policyVersion: 'tutor-training-eligibility-v2', cohort: TUTOR_TRAINING_COHORT, sftAllowed: turns.length, monitoringOnly: 0, blocked: 0 }),
       manifestPath: files.manifestPath, manifestSha256: sha256(manifestText),
     } });
   });

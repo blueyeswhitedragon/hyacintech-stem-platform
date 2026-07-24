@@ -174,7 +174,7 @@ export function getPromptForPhase(phase: PhaseEnum, context?: PromptContext): st
   }
 
   if (phase === PhaseEnum.ResultsFormation && ctx.priorSummary) {
-    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。report_sections 由平台从同一结构化状态确定性生成，你不要自行输出或补写这些字段。dialogue 只能承接真实内容；conclusion 和 reflection 留给学生自己填写。\n\n${ctx.priorSummary}`;
+    prompt += `\n\n【前序阶段摘要】\n已自动注入前序阶段的结构化数据。report_sections 由平台从同一结构化状态确定性生成，你不要自行输出或补写这些字段。dialogue 只能承接真实内容；conclusion 和 limitationsDiscussion（局限、误差与改进讨论）留给学生自己填写，个人学习反思属于阶段6。\n\n${ctx.priorSummary}`;
   }
 
   if (phase === PhaseEnum.Reflection && ctx.priorSummary) {

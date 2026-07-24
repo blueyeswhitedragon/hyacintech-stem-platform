@@ -14,6 +14,7 @@ import { PhaseEnum } from '../app/models/types';
 import { assertTrainingConversationFormat, resolveRecordStyle, summarizeStyles, toTrainingShareGPTRecord, toTrainingShareGPTRecords, withStyleMetadata } from '../app/lib/dataLab/styleMetadata';
 import { aggregateEvaluationsByStyle } from '../app/lib/dataLab/evaluation';
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
+import { STAGE_CONTRACT_VERSION } from '../app/lib/stageContract';
 
 let passed = 0;
 let failed = 0;
@@ -94,7 +95,7 @@ const enriched = withStyleMetadata(sourceRecord, recordStyle);
 check('人工修订记录写入风格元数据', enriched.meta?.styleFamily === 'engineering_mentor' && enriched.meta?.stylePolicyVersion === DEFAULT_STYLE_POLICY_VERSION);
 const trainingRecord = toTrainingShareGPTRecord(enriched, recordStyle);
 check('训练导出首条为模型可见 system 风格指令', trainingRecord.conversations[0].from === 'system' && trainingRecord.conversations[0].value.includes('工程导师型'));
-check('训练导出包含完整生产阶段合同而非仅风格指令', trainingRecord.conversations[0].value.includes('阶段行为合同 stage-contract-v2') && trainingRecord.conversations[0].value.includes('选题定向'));
+check('训练导出包含完整生产阶段合同而非仅风格指令', trainingRecord.conversations[0].value.includes(`阶段行为合同 ${STAGE_CONTRACT_VERSION}`) && trainingRecord.conversations[0].value.includes('选题定向'));
 check('训练导出保留原始 human/gpt 对话', trainingRecord.conversations[1].from === 'human' && trainingRecord.conversations[2].from === 'gpt');
 check('训练导出剥离 evaluator-only expectedTransformation', !Object.prototype.hasOwnProperty.call(trainingRecord.meta ?? {}, 'expectedTransformation'));
 const multiTurn = toTrainingShareGPTRecords({

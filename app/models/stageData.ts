@@ -18,13 +18,23 @@ export interface ThemeMapping {
 export interface Stage1Data {
   confirmed: boolean;
   snapshot: string; // 纯文本《探究问题确认书》
+  /** 阶段1唯一必需的语义产物。 */
+  researchQuestion?: string;
+  /** 确认绑定到规范化研究问题；问题变化后旧确认立即失效。 */
+  confirmedQuestionHash?: string;
+  confirmationSource?: {
+    type: 'student_explicit' | 'legacy_recovery';
+    sourceQuote: string;
+    messageId?: string;
+  };
   themeMapping?: ThemeMapping;
+  /** @deprecated 阶段2字段的只读兼容镜像，不再作为阶段1门禁。 */
   factorDirection?: string;
+  /** @deprecated 阶段2字段的只读兼容镜像，不再作为阶段1门禁。 */
   phenomenonDirection?: string;
   /** @deprecated 兼容旧会话；新流程在阶段2才正式定义变量。 */
-  variables: {
+  variables?: {
     independent: string;
-    /** 第一阶段只确定自变量方向；因变量的具体测量方式下沉到第二阶段，故此处可空。 */
     dependent?: string;
     controlled?: string[];
   };
@@ -56,12 +66,65 @@ export interface Stage2ExperimentPlan {
   safetyNotes: string[];
 }
 
+export type Stage2CoreField =
+  | 'hypothesis'
+  | 'independent_variable'
+  | 'levels'
+  | 'dependent_variable'
+  | 'measurement'
+  | 'controls'
+  | 'repeats';
+
+export interface Stage2Readiness {
+  policyVersion: 'stage2-readiness-v1';
+  complete: boolean;
+  completedFields: Stage2CoreField[];
+  missingFields: Stage2CoreField[];
+  nextFocusId: Stage2CoreField | 'plan_confirmation';
+}
+
+export type Stage2PlanProvenanceSource = 'student_fact' | 'server_composed' | 'server_baseline';
+
+export interface Stage2PlanProvenanceEntry {
+  source: Stage2PlanProvenanceSource;
+  sourceFields: string[];
+}
+
+export type Stage2PlanProvenance = Partial<Record<
+  | 'researchQuestion'
+  | 'hypothesis'
+  | 'independentVariable'
+  | 'levels'
+  | 'dependentVariable'
+  | 'measurement'
+  | 'controlledVariables'
+  | 'materials'
+  | 'procedure'
+  | 'repeatCount'
+  | 'safetyNotes',
+  Stage2PlanProvenanceEntry
+>>;
+
 export interface Stage2Data {
   submitted: boolean;
-  /** 新合同：学生已明确确认由服务器组装的方案事实。 */
+  /** @deprecated 兼容旧记录；新流程以 confirmedPlanHash 为准。 */
   factsConfirmed?: boolean;
   approved: boolean | null; // null=未审核
   teacherFeedback?: string;
+  /** 从已验证学生事实实时组装、尚未冻结的服务器草案。 */
+  planDraft?: Stage2ExperimentPlan;
+  /** 科学核心字段的统一就绪状态，供抽取、Tutor、UI 与推进门禁共用。 */
+  readiness?: Stage2Readiness;
+  /** 方案各字段来自学生事实还是服务器组装；不进入 Tutor SFT 目标。 */
+  planProvenance?: Stage2PlanProvenance;
+  draftHash?: string;
+  /** 学生通过专用端点确认的草案哈希。 */
+  confirmedPlanHash?: string;
+  confirmationSource?: {
+    type: 'student_checkpoint' | 'legacy_recovery';
+    confirmedAt: string;
+  };
+  /** 冻结后的权威方案；只有确认 draftHash 后才写入。 */
   experimentPlan?: Stage2ExperimentPlan;
   schema: {
     columns: Stage2Column[];
@@ -83,7 +146,7 @@ export interface Stage3Data {
   safetyQuiz?: {
     question: string;
     options: string[];
-    correct: number;
+    correct?: number;
     selected?: number;
     passed: boolean;
   };
@@ -105,6 +168,14 @@ export interface Stage4Data {
     observation: string;
     citations: string[];
     matchedValues: string[];
+    evidence?: Array<{
+      rowIndex: number;
+      columnKey: string;
+      columnName: string;
+      citedValue: string;
+      fingerprint: string;
+    }>;
+    roundFingerprint?: string;
     anomaly?: string;
     interpretation?: string;
   }>;
@@ -118,7 +189,10 @@ export interface Stage5Sections {
   dataSummary: string;
   analysis: string;
   conclusion: string; // 学生填写
-  reflection: string; // 学生填写
+  /** 阶段5只讨论本次实验的局限、误差与改进，不承担阶段6的学习反思。 */
+  limitationsDiscussion?: string;
+  /** @deprecated 旧会话兼容镜像；新写入与 limitationsDiscussion 保持一致。 */
+  reflection: string;
 }
 
 export interface Stage5ReferenceScore {
@@ -140,6 +214,10 @@ export interface Stage5Data {
   approved: boolean | null;
   sections: Stage5Sections;
   aiReferenceScore?: Stage5ReferenceScore;
+  /** 本次送审的平台报告字段哈希；不包含上传 Word 的正文。 */
+  submittedSectionsHash?: string;
+  /** AI 参考分实际对应的平台报告字段哈希。 */
+  aiScoreSectionsHash?: string;
   teacherScore?: number;
   teacherFeedback?: string;
   /** docx 轻量导入：学生上传报告的原文件 URL（留存）。 */
@@ -149,7 +227,10 @@ export interface Stage5Data {
 }
 
 export interface Stage6Data {
+  /** @deprecated 旧客户端的合并文本镜像。 */
   studentResponse: string;
+  responseToTeacherFeedback: string;
+  learningReflection: string;
   finalReadonly: boolean;
 }
 
@@ -159,6 +240,24 @@ export interface ExtractedFactLedgerEntry {
 }
 
 export interface StageData {
+  contractMeta?: {
+    stageContractVersion: string;
+    extractorVersion: string;
+    revision: number;
+    stateHash: string;
+    lastMutation: string;
+    promptPolicyVersion?: string;
+    serverArtifactTypes?: string[];
+  };
+  timeline?: {
+    dueAt?: string;
+    lateEvents: Array<{
+      event: 'STAGE2_SUBMITTED' | 'DATA_COLLECTION_COMPLETED' | 'STAGE5_SUBMITTED' | 'FINAL_SUBMITTED';
+      stage: number;
+      occurredAt: string;
+      dueAt: string;
+    }>;
+  };
   /** 仅保存通过逐字来源校验的学生事实；Tutor 历史永不写入。 */
   extractedFacts?: Record<string, ExtractedFactLedgerEntry>;
   stage1?: Stage1Data;

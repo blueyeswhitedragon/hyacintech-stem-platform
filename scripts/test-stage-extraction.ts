@@ -66,8 +66,8 @@ console.log('extractStageData:');
     }),
     {}
   );
-  check('stage1 仅自变量写入', r.stageData.stage1?.variables.independent === '光照时长');
-  check('stage1 不伪造因变量', r.stageData.stage1?.variables.dependent === undefined && r.stageData.stage1?.phenomenonDirection === '');
+  check('stage1 仅自变量写入', r.stageData.stage1?.variables?.independent === '光照时长');
+  check('stage1 不伪造因变量', r.stageData.stage1?.variables?.dependent === undefined && r.stageData.stage1?.phenomenonDirection === '');
 }
 
 // 2. 解析器之外的畸形确认不会伪造方向；推进仍由 canAdvance 拦截

@@ -1,10 +1,11 @@
 /**
- * 纯函数：把第五阶段报告（六节 + 数据表 + 结论/反思 + 可选上传正文）组装成 .docx Buffer。
+ * 纯函数：把第五阶段报告（六节 + 数据表 + 结论/局限讨论 + 可选上传正文）组装成 .docx Buffer。
  *
  * 不依赖外部库——手写 WordprocessingML，再用内置 zlib 的 zip 工具打包（见 app/lib/zip.ts）。
  * 「框架含表格」的落点：数据表直接由 schemaColumns(表头) + dataRows(行) 生成为 Word 表格。
  */
 import type { Stage5Sections, Stage2Column } from '@/app/models/stageData';
+import { limitationsDiscussion } from './reportFields';
 import { zipDeflate } from './zip';
 
 export interface ReportDocxInput {
@@ -91,8 +92,8 @@ export function buildReportDocx(input: ReportDocxInput): Buffer {
 
   body.push(heading('结论'));
   body.push(para(sections.conclusion || '（未填写）'));
-  body.push(heading('反思'));
-  body.push(para(sections.reflection || '（未填写）'));
+  body.push(heading('局限与讨论'));
+  body.push(para(limitationsDiscussion(sections) || '（未填写）'));
 
   if (uploadedText && uploadedText.trim()) {
     body.push(heading('学生上传的报告（原文摘录）'));

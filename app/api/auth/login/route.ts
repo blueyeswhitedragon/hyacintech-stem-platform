@@ -28,7 +28,15 @@ export async function POST(request: Request) {
   if (!isUserRole(user.role)) {
     return NextResponse.json({ error: '账号角色无效，请联系管理员' }, { status: 403 });
   }
-  await db.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+  // 递增 sessionVersion，使其他设备上的旧 session 失效（单点登录）
+  const updatedUser = await db.user.update({
+    where: { id: user.id },
+    data: {
+      lastLoginAt: new Date(),
+      sessionVersion: { increment: 1 }
+    },
+    select: { sessionVersion: true }
+  });
   const session = await getSession();
 
   session.user = {
@@ -36,7 +44,7 @@ export async function POST(request: Request) {
     username: user.username,
     role: user.role,
     displayName: user.displayName,
-    sessionVersion: user.sessionVersion,
+    sessionVersion: updatedUser.sessionVersion,
   };
   await session.save();
 

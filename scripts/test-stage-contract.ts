@@ -1,4 +1,4 @@
-/** stage-contract-v2 deterministic allow/forbid tests. */
+/** Current deterministic stage-contract allow/forbid tests. */
 import type { ChatResponse } from '../app/models/types';
 import { validateStageResponseBehavior, type StageTriggerType } from '../app/lib/stageContract';
 
@@ -18,15 +18,13 @@ function codes(phase: number, value: ChatResponse, triggerType: StageTriggerType
   return findings(phase, value, triggerType, visibleContext).map((item) => item.code);
 }
 
-console.log('stage-contract-v2:');
+console.log('stage contract:');
 const p1Valid = response({
-  dialogue: '请查看确认书。测量方式和控制变量留到下一阶段。',
+  dialogue: '请核对确认书中的研究问题。',
   next_action_type: 'confirmation',
   phase_complete: true,
   stage1_confirmed: true,
-  snapshot: '研究问题：光照方向与发芽表现。具体方案留到阶段2。',
-  theme_mapping: { originalInterest: '种植物', retainedFeature: '人工光照', classroomProxy: '改变光照方向', researchQuestion: '光照方向是否影响发芽表现' },
-  topic_direction: { factor: '光照方向', phenomenon: '发芽表现' },
+  snapshot: '《探究问题确认书》\n研究问题：不同光照时长是否影响发芽率？',
 });
 check('P1 合法确认通过', codes(1, p1Valid).filter((code) => code.startsWith('P1_')).length === 0);
 check('P1 测量越界被拒', codes(1, response({ dialogue: '你准备用什么仪器测量株高？' })).includes('P1_MEASUREMENT_OVERREACH'));
@@ -37,6 +35,8 @@ check('P1 两个相关问号降为人工复核且允许提交', findings(1, resp
 check('P1 无问号但测量和步骤越界仍是硬错误', findings(1, response({ dialogue: '请同时确定研究问题、测量方式和实验步骤。' })).some((item) => item.severity === 'error' && ['P1_MEASUREMENT_OVERREACH', 'P1_PROCEDURE_OVERREACH'].includes(item.code)));
 
 const plan = {
+  researchQuestion: '不同光照时长是否影响发芽率',
+  hypothesis: '光照时长会影响发芽率',
   independentVariable: { name: '光照时长', levels: ['短', '长'] },
   dependentVariable: { name: '发芽数', measurement: '每天同一时间计数，单位个', unit: '个' },
   controlledVariables: ['种子数'], materials: ['绿豆'], procedure: ['连续记录'], repeatCount: 3, safetyNotes: [],
@@ -50,8 +50,8 @@ const schema = {
   ], minRows: 3, maxRows: 200,
 };
 const p2Visible = JSON.stringify({
-  businessContext: '已确认关注光照时长与发芽数。',
-  currentStudentMessage: '我确认比较短、长两种光照时长，每天同一时间计数发芽数，单位个，控制种子数，用绿豆连续记录，每个水平重复3次。',
+  businessContext: '已确认研究问题：不同光照时长是否影响发芽率。',
+  currentStudentMessage: '我的假设是光照时长会影响发芽率。我确认比较短、长两种光照时长，每天同一时间计数发芽数，单位个，控制种子数，用绿豆连续记录，每个水平重复3次。',
   confirmedFacts: ['我确认比较短、长两种光照时长，每天同一时间计数发芽数，单位个，控制种子数，用绿豆连续记录，每个水平重复3次。'],
   priorStudentMessages: [],
 });

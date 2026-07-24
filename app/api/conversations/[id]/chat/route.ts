@@ -16,6 +16,7 @@ import { buildPriorSummary } from '@/app/lib/reportSummary';
 import { shouldNudgeConvergence } from '@/app/lib/pacing';
 import { PhaseEnum, type Message } from '@/app/models/types';
 import type { StageData } from '@/app/models/stageData';
+import { studentVisibleStageData } from '@/app/lib/stageState';
 
 function buildContext(stage: number, conv: {
   topicDirection: string | null;
@@ -90,6 +91,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   if (!conv) {
     return NextResponse.json({ error: '会话不存在或无权访问' }, { status: 404 });
   }
+  if (conv.status !== 'IN_PROGRESS') {
+    return NextResponse.json({ error: '当前作业已提交或完成，暂不能继续发送消息' }, { status: 409 });
+  }
 
   const blacklistedKeyword = checkBlacklistedKeywords(message);
   if (blacklistedKeyword) {
@@ -120,7 +124,6 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     if (contractBranch === 'TUTOR_LANGUAGE_V1') {
       const turn = await runNewTutorTurn({ conversationId, message, conv, modelIdentity });
       const stageData = turn.stageData;
-      stageData.roundCounts = { ...prevRounds, [stage]: roundCount };
       const updatedMessages = [...conv.messages, turn.userMessage, turn.assistantMessage];
       if (turn.response.stage1_confirmed && turn.response.snapshot) {
         updatedMessages.push({
@@ -130,7 +133,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
           messageType: 'confirmation_doc',
         });
       }
-      const nextStage = turn.advanceTo ?? stage;
+      const nextStage = stage;
       await persistGenerationTurn({
         conversationId,
         studentAssignmentId: conv.studentAssignmentId,
@@ -161,7 +164,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
               ? 'OPTIONAL_COACHING'
               : 'USER_MESSAGE',
       });
-      return NextResponse.json({ ...turn.response, currentStage: nextStage, stageData });
+      return NextResponse.json({ ...turn.response, currentStage: nextStage, stageData: studentVisibleStageData(stageData) });
     }
 
     // 历史会话继续走 stage-contract-v2，不改变既有解析、风格快照和结构化产物。
@@ -217,7 +220,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       contractCheck: llmResult.trace.contractCheck,
       triggerType: context?.triggerType ?? 'USER_MESSAGE',
     });
-    return NextResponse.json({ ...response, currentStage: nextStage, stageData });
+    return NextResponse.json({ ...response, currentStage: nextStage, stageData: studentVisibleStageData(stageData) });
   } catch (err) {
     console.error('会话聊天处理出错:', err);
     const { error, detail, status } = classifyError(err);

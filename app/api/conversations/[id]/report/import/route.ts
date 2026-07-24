@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { unlink, writeFile } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
 import { requireRole } from '@/app/lib/auth';
-import { getConversationForUser } from '@/app/lib/conversation';
+import { getConversationForUser, parseStageData } from '@/app/lib/conversation';
 import { extractDocxText } from '@/app/lib/docxExtract';
 import type { StageData } from '@/app/models/stageData';
+import { finalizeStageData, recoverStageDataV3, studentVisibleStageData } from '@/app/lib/stageState';
 
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 const DOCX_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -22,6 +23,9 @@ export async function POST(request: Request, ctx: RouteContext<'/api/conversatio
 
   if (conv.currentStage !== 5) {
     return NextResponse.json({ error: '仅在报告成型阶段可上传报告' }, { status: 400 });
+  }
+  if (conv.status !== 'IN_PROGRESS') {
+    return NextResponse.json({ error: '报告已提交或作业已完成，不能上传' }, { status: 409 });
   }
   if (!conv.stageData.stage5?.sections) {
     return NextResponse.json({ error: '请先等待报告框架生成' }, { status: 400 });
@@ -60,18 +64,35 @@ export async function POST(request: Request, ctx: RouteContext<'/api/conversatio
   const dest = path.join(process.cwd(), 'public', 'uploads', filename);
   await writeFile(dest, buffer);
 
-  // 写入 stage5（独立字段，不覆盖 AI 框架各节）
-  const stageData: StageData = { ...conv.stageData };
-  stageData.stage5 = {
-    ...conv.stageData.stage5!,
-    uploadedDocUrl: `/uploads/${filename}`,
-    uploadedText: text,
-  };
-
-  await db.conversation.update({
-    where: { id: conversationId },
-    data: { stageData: JSON.stringify(stageData) },
+  // 重新读取并合并最新 JSON，避免覆盖同时发生的报告字段保存。
+  const result = await db.$transaction(async (tx) => {
+    const latest = await tx.studentAssignment.findUnique({
+      where: { id: conv.studentAssignmentId },
+      select: { status: true, currentStage: true, conversation: { select: { stageData: true } } },
+    });
+    if (!latest?.conversation || latest.status !== 'IN_PROGRESS' || latest.currentStage !== 5) {
+      return { ok: false as const };
+    }
+    const previous = recoverStageDataV3(parseStageData(latest.conversation.stageData)).stageData;
+    if (!previous.stage5?.sections || previous.stage5.submitted) return { ok: false as const };
+    const next: StageData = finalizeStageData(previous, {
+      ...previous,
+      stage5: {
+        ...previous.stage5,
+        uploadedDocUrl: `/uploads/${filename}`,
+        uploadedText: text,
+      },
+    }, { mutation: 'STAGE5_REPORT_IMPORTED' });
+    await tx.conversation.update({
+      where: { id: conversationId },
+      data: { stageData: JSON.stringify(next) },
+    });
+    return { ok: true as const, stageData: next };
   });
+  if (!result.ok) {
+    await unlink(dest).catch(() => undefined);
+    return NextResponse.json({ error: '报告已提交、阶段已变化或作业已完成' }, { status: 409 });
+  }
 
-  return NextResponse.json({ stageData });
+  return NextResponse.json({ stageData: studentVisibleStageData(result.stageData) });
 }

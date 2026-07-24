@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { requireUser } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
-import { getConversationForUser } from '@/app/lib/conversation';
+import { getConversationForUser, type ConversationForUser } from '@/app/lib/conversation';
 import { canAdvance } from '@/app/lib/stageAdvance';
 import { checkBlacklistedKeywords, getPromptForPhase, type PromptContext } from '@/app/prompts';
 import { PhaseEnum } from '@/app/models/types';
@@ -14,10 +14,68 @@ import { persistGenerationTurn } from '@/app/lib/generationTrace';
 import { buildAssistantTransitionMessage, buildStage4TransitionResult } from '@/app/lib/stageTransition';
 import { buildPriorSummary } from '@/app/lib/reportSummary';
 import { extractStageData } from '@/app/lib/stageExtraction';
+import { resolveChatContractBranch, runNewTutorSystemTurn } from '@/app/lib/tutorTurn';
+import type { StageTriggerType } from '@/app/lib/stageContract';
+import { recordLateEvent } from '@/app/lib/deadline';
+import { finalizeStageData, studentVisibleStageData } from '@/app/lib/stageState';
 
 const STAGE2_TRANSITION_TRIGGER = '系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。';
 const STAGE4_TRANSITION_TRIGGER = '系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。';
 const STAGE5_BOOTSTRAP_TRIGGER = '系统触发：学生已完成数据分析。请依据前序结构化状态生成阶段5报告框架。';
+
+async function generateTransition(input: {
+  stage: number;
+  triggerType: Extract<StageTriggerType, 'STAGE_TRANSITION' | 'REPORT_BOOTSTRAP'>;
+  triggerText: string;
+  conv: ConversationForUser;
+  modelVersion: {
+    id: string;
+    tag: string;
+    provider: string;
+    externalModelId: string;
+    promptPolicyVersion: string;
+    contractVersion: string;
+  };
+  legacySystemPrompt: string;
+  visibleContext: string;
+  priorSummary?: string;
+}) {
+  const modelIdentity: RuntimeModelIdentity = {
+    tag: input.modelVersion.tag,
+    provider: input.modelVersion.provider,
+    externalModelId: input.modelVersion.externalModelId,
+    promptPolicyVersion: input.modelVersion.promptPolicyVersion,
+    contractVersion: input.modelVersion.contractVersion,
+  };
+  const contractBranch = resolveChatContractBranch(input.conv.contractVersion, input.modelVersion.contractVersion);
+  if (contractBranch === 'TUTOR_LANGUAGE_V1') {
+    const turn = await runNewTutorSystemTurn({
+      stage: input.stage,
+      triggerType: input.triggerType,
+      stageData: input.conv.stageData,
+      messages: input.conv.messages,
+      modelIdentity,
+      priorSummary: input.priorSummary,
+      safetyQuizCompleted: input.conv.safetyQuizCompleted,
+    });
+    return { ...turn, modelIdentity, contractBranch };
+  }
+  const legacy = await callLLMWithTrace(input.legacySystemPrompt, input.triggerText, input.conv.messages, {
+    stage: input.stage,
+    triggerType: input.triggerType,
+    visibleContext: input.visibleContext,
+  }, { provider: input.modelVersion.provider, model: input.modelVersion.externalModelId });
+  return {
+    response: legacy.response,
+    stageData: input.conv.stageData,
+    systemPrompt: input.legacySystemPrompt,
+    systemPromptTemplate: undefined,
+    generationParams: legacy.trace.generationParams,
+    contractCheck: legacy.trace.contractCheck,
+    modelIdentity,
+    contractBranch,
+  };
+}
 
 // POST /api/conversations/[id]/advance —— 学生点按钮推进阶段（带 gating）
 // body: { to: number }
@@ -40,6 +98,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   const conv = await getConversationForUser(conversationId, auth.user.id);
   if (!conv) {
     return NextResponse.json({ error: '会话不存在或无权访问' }, { status: 404 });
+  }
+  if (conv.status !== 'IN_PROGRESS') {
+    return NextResponse.json({ error: '当前作业已提交或完成，不能推进阶段' }, { status: 409 });
   }
 
   const check = canAdvance(conv.currentStage, body.to, conv.stageData, {
@@ -64,19 +125,17 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       };
       const systemPrompt = getPromptForPhase(PhaseEnum.PlanDesign, promptContext);
       const modelVersion = await resolveConversationModel(conversationId);
-      const modelIdentity: RuntimeModelIdentity = {
-        tag: modelVersion.tag,
-        provider: modelVersion.provider,
-        externalModelId: modelVersion.externalModelId,
-        promptPolicyVersion: modelVersion.promptPolicyVersion,
-        contractVersion: modelVersion.contractVersion,
-      };
-      const llmResult = await callLLMWithTrace(systemPrompt, STAGE2_TRANSITION_TRIGGER, conv.messages, {
+      const generated = await generateTransition({
         stage: 2,
         triggerType: 'STAGE_TRANSITION',
+        triggerText: STAGE2_TRANSITION_TRIGGER,
+        conv,
+        modelVersion,
+        legacySystemPrompt: systemPrompt,
         visibleContext: JSON.stringify({ stageData: conv.stageData, priorSummary }),
-      }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
-      const transitionMessage = buildAssistantTransitionMessage(llmResult.response, uuidv4());
+        priorSummary,
+      });
+      const transitionMessage = buildAssistantTransitionMessage(generated.response, uuidv4());
       await persistGenerationTurn({
         conversationId,
         studentAssignmentId: conv.studentAssignmentId,
@@ -85,21 +144,22 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
         traceStage: 2,
         triggerType: 'STAGE_TRANSITION',
         updatedMessages: [...conv.messages, transitionMessage],
-        stageData: conv.stageData,
-        stageDataChanged: false,
+        stageData: generated.stageData,
+        stageDataChanged: true,
         userMessageId: uuidv4(),
         assistantMessageId: transitionMessage.id,
         userMessage: STAGE2_TRANSITION_TRIGGER,
-        systemPrompt,
-        response: llmResult.response,
+        systemPrompt: generated.systemPrompt,
+        systemPromptTemplate: generated.systemPromptTemplate,
+        response: generated.response,
         modelVersionId: modelVersion.id,
-        modelIdentity,
+        modelIdentity: generated.modelIdentity,
         styleFamily: conv.styleFamily,
         stylePolicyVersion: conv.stylePolicyVersion,
-        generationParams: llmResult.trace.generationParams,
-        contractCheck: llmResult.trace.contractCheck,
+        generationParams: generated.generationParams,
+        contractCheck: generated.contractCheck,
       });
-      return NextResponse.json({ currentStage: 2, stageData: conv.stageData, transitionMessage });
+      return NextResponse.json({ currentStage: 2, stageData: studentVisibleStageData(generated.stageData), transitionMessage });
     } catch (error) {
       console.error('阶段1→2过渡生成失败:', error);
       const classified = classifyError(error);
@@ -126,31 +186,32 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       };
       const systemPrompt = getPromptForPhase(PhaseEnum.DataAnalysis, promptContext);
       const modelVersion = await resolveConversationModel(conversationId);
-      const modelIdentity: RuntimeModelIdentity = {
-        tag: modelVersion.tag,
-        provider: modelVersion.provider,
-        externalModelId: modelVersion.externalModelId,
-        promptPolicyVersion: modelVersion.promptPolicyVersion,
-        contractVersion: modelVersion.contractVersion,
-      };
       const visibleContext = JSON.stringify({ schema, rows, rowNumbers: rows.map((_, index) => index + 1) });
-      const llmResult = await callLLMWithTrace(
-        systemPrompt,
-        STAGE4_TRANSITION_TRIGGER,
-        conv.messages,
-        {
-          stage: 4,
-          triggerType: 'STAGE_TRANSITION',
-          visibleContext,
-        },
-        { provider: modelVersion.provider, model: modelVersion.externalModelId },
-      );
-      const response = llmResult.response;
-      const { stageData, transitionMessage } = buildStage4TransitionResult(
-        conv.stageData,
+      const generated = await generateTransition({
+        stage: 4,
+        triggerType: 'STAGE_TRANSITION',
+        triggerText: STAGE4_TRANSITION_TRIGGER,
+        conv,
+        modelVersion,
+        legacySystemPrompt: systemPrompt,
+        visibleContext,
+      });
+      const response = generated.response;
+      const transition = buildStage4TransitionResult(
+        generated.stageData,
         response,
         uuidv4(),
       );
+      const stageData = finalizeStageData(
+        generated.stageData,
+        recordLateEvent(transition.stageData, conv.dueDate, 'DATA_COLLECTION_COMPLETED', 3),
+        {
+          mutation: 'STAGE3_DATA_COLLECTION_COMPLETED',
+          promptPolicyVersion: generated.modelIdentity.promptPolicyVersion,
+          serverArtifactTypes: Object.keys(generated.response.artifact_provenance ?? {}),
+        },
+      );
+      const transitionMessage = transition.transitionMessage;
 
       await persistGenerationTurn({
         conversationId,
@@ -165,19 +226,20 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
         userMessageId: uuidv4(),
         assistantMessageId: transitionMessage.id,
         userMessage: STAGE4_TRANSITION_TRIGGER,
-        systemPrompt,
+        systemPrompt: generated.systemPrompt,
+        systemPromptTemplate: generated.systemPromptTemplate,
         response,
         modelVersionId: modelVersion.id,
-        modelIdentity,
+        modelIdentity: generated.modelIdentity,
         styleFamily: conv.styleFamily,
         stylePolicyVersion: conv.stylePolicyVersion,
-        generationParams: llmResult.trace.generationParams,
-        contractCheck: llmResult.trace.contractCheck,
+        generationParams: generated.generationParams,
+        contractCheck: generated.contractCheck,
       });
 
       return NextResponse.json({
         currentStage: 4,
-        stageData,
+        stageData: studentVisibleStageData(stageData),
         transitionMessage,
       });
     } catch (error) {
@@ -205,20 +267,20 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       };
       const systemPrompt = getPromptForPhase(PhaseEnum.ResultsFormation, promptContext);
       const modelVersion = await resolveConversationModel(conversationId);
-      const modelIdentity: RuntimeModelIdentity = {
-        tag: modelVersion.tag,
-        provider: modelVersion.provider,
-        externalModelId: modelVersion.externalModelId,
-        promptPolicyVersion: modelVersion.promptPolicyVersion,
-        contractVersion: modelVersion.contractVersion,
-      };
-      const llmResult = await callLLMWithTrace(systemPrompt, STAGE5_BOOTSTRAP_TRIGGER, conv.messages, {
+      const generated = await generateTransition({
         stage: 5,
         triggerType: 'REPORT_BOOTSTRAP',
+        triggerText: STAGE5_BOOTSTRAP_TRIGGER,
+        conv,
+        modelVersion,
+        legacySystemPrompt: systemPrompt,
         visibleContext: JSON.stringify({ stageData: conv.stageData, priorSummary }),
-      }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
-      const { stageData } = extractStageData(5, llmResult.response, conv.stageData);
-      const transitionMessage = buildAssistantTransitionMessage(llmResult.response, uuidv4());
+        priorSummary,
+      });
+      const stageData = generated.contractBranch === 'TUTOR_LANGUAGE_V1'
+        ? generated.stageData
+        : extractStageData(5, generated.response, conv.stageData).stageData;
+      const transitionMessage = buildAssistantTransitionMessage(generated.response, uuidv4());
       await persistGenerationTurn({
         conversationId,
         studentAssignmentId: conv.studentAssignmentId,
@@ -232,16 +294,17 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
         userMessageId: uuidv4(),
         assistantMessageId: transitionMessage.id,
         userMessage: STAGE5_BOOTSTRAP_TRIGGER,
-        systemPrompt,
-        response: llmResult.response,
+        systemPrompt: generated.systemPrompt,
+        systemPromptTemplate: generated.systemPromptTemplate,
+        response: generated.response,
         modelVersionId: modelVersion.id,
-        modelIdentity,
+        modelIdentity: generated.modelIdentity,
         styleFamily: conv.styleFamily,
         stylePolicyVersion: conv.stylePolicyVersion,
-        generationParams: llmResult.trace.generationParams,
-        contractCheck: llmResult.trace.contractCheck,
+        generationParams: generated.generationParams,
+        contractCheck: generated.contractCheck,
       });
-      return NextResponse.json({ currentStage: 5, stageData, transitionMessage });
+      return NextResponse.json({ currentStage: 5, stageData: studentVisibleStageData(stageData), transitionMessage });
     } catch (error) {
       console.error('阶段4→5报告初始化失败:', error);
       const classified = classifyError(error);
@@ -256,5 +319,5 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   if (advanced.count !== 1) {
     return NextResponse.json({ error: '阶段已变化，请刷新后重试' }, { status: 409 });
   }
-  return NextResponse.json({ currentStage: body.to, stageData: conv.stageData });
+  return NextResponse.json({ currentStage: body.to, stageData: studentVisibleStageData(conv.stageData) });
 }

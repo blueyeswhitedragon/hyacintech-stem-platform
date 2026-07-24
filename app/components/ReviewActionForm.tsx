@@ -14,6 +14,8 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
   const [feedback, setFeedback] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const numericScore = Number(score);
+  const validStage5Score = score !== '' && Number.isFinite(numericScore) && numericScore >= 0 && numericScore <= 10;
 
   const act = async (action: 'approve' | 'reject') => {
     setBusy(true); setErr(null);
@@ -44,8 +46,7 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
       <h3 className="font-medium">审核操作</h3>
       {stage === 3 && (
         <div className="text-xs text-gray-500 bg-gray-50 border rounded p-2">
-          可选审核：通过=认可数据表（不改变学生进度）；驳回=打回让学生修改数据表。
-          若学生已在第四阶段，驳回会把他退回第三阶段并清空已有的数据分析轮次。
+          可选审核：通过只记录教师认可；驳回只留下修改建议。两种操作都不改变学生当前阶段，也不会清空数据或分析记录。
         </div>
       )}
       {stage === 5 && (
@@ -85,7 +86,7 @@ export default function ReviewActionForm({ studentAssignmentId, stage }: Props) 
       <div className="flex gap-2">
         <button
           onClick={() => act('approve')}
-          disabled={busy}
+          disabled={busy || (stage === 5 && !validStage5Score)}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
         >
           {busy ? '处理中…' : '通过'}

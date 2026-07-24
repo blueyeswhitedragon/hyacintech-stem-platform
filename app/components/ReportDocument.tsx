@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
+import { limitationsDiscussion } from '@/app/lib/reportFields';
 
 interface Props {
   stage5?: Stage5Data;
@@ -9,7 +10,7 @@ interface Props {
   schemaColumns?: Stage2Column[];
   /** 阶段3的实验数据 */
   dataRows?: Record<string, unknown>[];
-  /** 是否在文末只读展示学生填写的结论/反思（阶段6=true；阶段5由 ReportViewer 用可编辑框，传 false） */
+  /** 是否在文末只读展示学生填写的结论/局限讨论（阶段6=true；阶段5由 ReportViewer 编辑） */
   showStudentFields?: boolean;
 }
 
@@ -23,7 +24,7 @@ const AI_FIELDS: { key: keyof Stage5Data['sections']; label: string }[] = [
 ];
 
 /**
- * 只读的完整实验报告视图：AI 预填六节 + 嵌入数据表 + （可选）学生结论/反思 +
+ * 只读的完整实验报告视图：平台预填六节 + 嵌入数据表 + （可选）学生结论/局限讨论 +
  * 学生上传的报告 + 评分。被 ReportViewer（阶段5）与 Stage6Panel（阶段6）复用，
  * 使数据表与完整报告在第五、第六阶段都可见，消除「进入下一阶段后表格消失」的观感。
  */
@@ -83,7 +84,7 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
         </div>
       )}
 
-      {/* 学生填写的结论 / 反思（只读展示） */}
+      {/* 学生填写的结论 / 局限与讨论（只读展示） */}
       {showStudentFields && (
         <>
           <div>
@@ -93,9 +94,9 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
             </div>
           </div>
           <div>
-            <div className="text-sm font-medium text-blue-700 mb-1">反思</div>
+            <div className="text-sm font-medium text-blue-700 mb-1">局限与讨论</div>
             <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-              {sections.reflection || <span className="text-gray-400">（未填写）</span>}
+              {limitationsDiscussion(sections) || <span className="text-gray-400">（未填写）</span>}
             </div>
           </div>
         </>

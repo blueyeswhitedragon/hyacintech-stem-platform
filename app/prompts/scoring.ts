@@ -1,4 +1,5 @@
 import type { Stage5Sections } from '../models/stageData';
+import { limitationsDiscussion } from '@/app/lib/reportFields';
 
 /**
  * 生成报告参考评分的系统提示词。要求 LLM 只输出 Stage5ReferenceScore 形状的 JSON。
@@ -19,7 +20,7 @@ JSON 结构如下：
     "expression": 整数1-10（表达：科学性与清晰度）
   },
   "highlights": ["亮点1", "亮点2"],
-  "suggestions": [ { "text": "具体改进建议", "targetSection": "purpose|hypothesis|materials|procedure|dataSummary|analysis|conclusion|reflection" } ],
+  "suggestions": [ { "text": "具体改进建议", "targetSection": "purpose|hypothesis|materials|procedure|dataSummary|analysis|conclusion|limitationsDiscussion" } ],
   "safetyCompliance": true 或 false（实验是否安全合规）
 }
 
@@ -38,6 +39,6 @@ export function buildReportText(sections: Stage5Sections): string {
     `【数据概述】${sections.dataSummary}`,
     `【数据分析】${sections.analysis}`,
     `【结论】${sections.conclusion}`,
-    `【反思】${sections.reflection}`,
+    `【局限与讨论】${limitationsDiscussion(sections)}`,
   ].join('\n');
 }

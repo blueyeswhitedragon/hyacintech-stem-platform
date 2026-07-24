@@ -8,6 +8,7 @@ import {
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
 import { STAGE_CONTRACT_VERSION } from '../app/lib/stageContract';
 import { ACTIVE_DATASET_BATCH_STATUS, resolveImportedBatchStatus } from '../app/lib/dataLab/datasetPolicy';
+import { TUTOR_TRAINING_COHORT } from '../app/lib/dataLab/trainingCohort';
 
 let passed = 0;
 let failed = 0;
@@ -29,7 +30,13 @@ check(structural.structureChanged && structural.recommendedType !== 'LIGHT_EDIT'
 let overclaimBlocked = false;
 try { assertTransformationType('HUMAN_REWRITE', { ...material, textChangeRatio: 0.05, structureChanged: false, recommendedType: 'LIGHT_EDIT' }); } catch { overclaimBlocked = true; }
 check(overclaimBlocked, '服务端阻止把轻微差异虚报成人工重写');
-const current = { batchStatus: ACTIVE_DATASET_BATCH_STATUS, stageContractVersion: STAGE_CONTRACT_VERSION };
+const current = {
+  batchStatus: ACTIVE_DATASET_BATCH_STATUS,
+  stageContractVersion: STAGE_CONTRACT_VERSION,
+  contractVersion: TUTOR_TRAINING_COHORT.contractVersion,
+  promptVersion: TUTOR_TRAINING_COHORT.promptVersion,
+  extractorVersion: TUTOR_TRAINING_COHORT.extractorVersion,
+};
 check(evaluateTrainingEligibility({ sourceKind: 'stage_contract_rollout', ...current, workReviewApproved: true, finallySelected: true }).eligibility === 'SFT_ALLOWED', '当前合同的角色分离 rollout 可进入 SFT');
 check(evaluateTrainingEligibility({ sourceKind: 'sharegpt_clean', ...current, workReviewApproved: true, finallySelected: true }).eligibility === 'BLOCKED', '旧 sharegpt_clean 不能凭审核状态绕过来源隔离');
 check(evaluateTrainingEligibility({ sourceKind: 'production_trace', ...current, candidateStatus: 'CONVERTED', consentStatus: 'GRANTED', transformationType: 'NO_CHANGE', metrics: exact, workReviewApproved: true, finallySelected: true }).eligibility === 'MONITORING_ONLY', '生产原回答 NO_CHANGE 只能监测');
@@ -40,6 +47,7 @@ check(preference.prompt.length === 1 && preference.chosen[0].value !== preferenc
 check(evaluateTrainingEligibility({ sourceKind: 'production_trace', ...current, candidateStatus: 'WITHDRAWN', consentStatus: 'WITHDRAWN', transformationType: 'MATERIAL_CORRECTION', metrics: material, workReviewApproved: true, finallySelected: true }).eligibility === 'BLOCKED', '撤回授权阻断训练');
 check(evaluateTrainingEligibility({ sourceKind: 'production_trace', ...current, candidateStatus: 'CONVERTED', consentStatus: 'GRANTED', leakageBlocked: true, transformationType: 'MATERIAL_CORRECTION', metrics: material, workReviewApproved: true, finallySelected: true }).eligibility === 'BLOCKED', '泄漏命中阻断训练');
 check(evaluateTrainingEligibility({ sourceKind: 'stage_contract_rollout', batchStatus: 'LEGACY_QUARANTINED', stageContractVersion: STAGE_CONTRACT_VERSION, workReviewApproved: true, finallySelected: true }).eligibility === 'BLOCKED', '已隔离批次永远不能导出训练集');
+check((evaluateTrainingEligibility({ sourceKind: 'stage_contract_rollout', ...current, promptVersion: 'tutor-language-prompt-v1', workReviewApproved: true, finallySelected: true }).reasons as string[]).includes('PROMPT_VERSION_MISMATCH'), 'v3 数据使用 Prompt v1 时仍被精确 cohort 门禁阻断');
 check(resolveImportedBatchStatus({ name: '换了名字', sourceFileName: 'new.json', recordIds: ['stem-distill-dsv4-p1-a', 'stem-distill-dsv4-p2-b'], requestedStatus: 'ACTIVE' }).status === 'LEGACY_QUARANTINED', '旧 489 衍生记录换名导入仍自动隔离');
 
 console.log(`\nTraining eligibility tests: ${passed} passed, ${failed} failed`);

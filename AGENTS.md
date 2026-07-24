@@ -33,18 +33,28 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
 
 ## Architecture
 
-Six-phase STEM inquiry pipeline (1=选题定向, 2=方案设计, 3=过程执行, 4=数据分析, 5=报告成型, 6=结果反思). Two chat modes share the same LLM core:
-- **DB-backed** — `ConversationWorkspace` → `POST /api/conversations/[id]/chat`, server-authoritative `currentStage`
-- **Guest** — `GuestWorkspace` → `POST /api/guest/chat` (no DB, IP rate-limited, in-memory state)
+Six-phase STEM inquiry pipeline: 1=选题定向, 2=方案设计, 3=过程执行, 4=数据分析, 5=报告成型, 6=结果反思. The DB-backed flow is server-authoritative; Guest reuses versioned contracts where practical but owns its in-memory lifecycle separately.
 
-DB: SQLite + Prisma (6 models). Auth: iron-session (`hyacintech_session` cookie). Path alias: `@/*` → `./*` (project root, not `./src/*`).
+Stage boundaries are product contracts, not prompt suggestions:
+- **P1**: canonical research question + explicit confirmation only. Interest, mechanism, and classroom proxy are optional context. Variables, levels, measurement, controls, materials, procedure, repeats, and safety belong to P2.
+- **P2**: the server composes a complete plan preview. Confirmation is accepted only for the current draft hash, then freezes the plan and derives schema/risks.
+- **P3**: safety answers are verified server-side; approved schema and plan are immutable during collection. Teacher review is nonblocking.
+- **P4**: analysis progress requires distinct, verifiable citations to submitted row values, not message count.
+- **P5**: platform report sections are authoritative; uploaded Word files are attachments. Reflection here means experiment limitations/discussion. Teacher approval requires a valid 0–10 score.
+- **P6**: respond to teacher feedback and reflect on learning, then complete.
+
+SQLite + Prisma persist operational, teaching, Data Lab, model, and audit records. Do not hard-code a model count. Auth uses iron-session (`hyacintech_session`). Path alias `@/*` resolves from the project root.
 
 ## Conventions
 
 - All route handlers use `requireUser()` / `requireRole()` guards from `app/lib/auth.ts`
 - `checkBlacklistedKeywords()` must run before every chat LLM call
-- LLM parsing uses `safeParseChatResponse()` which **never throws** — always handle null
-- `extractStageData()` and `canAdvance()` are pure functions shared by both chat modes
+- Dynamic Tutor responses use the versioned Tutor parser/contract; legacy six-phase responses may still use `safeParseChatResponse()`. Always handle parse failure.
+- Stage artifacts, confirmation hashes, safety verification, evidence fingerprints, and transitions are server-owned. Never trust client claims for them.
+- Prompt execution is pinned to the model/conversation's recorded `promptPolicyVersion`; never silently replace it with a global current version.
+- Student-visible prompt state contains only authorized facts. TopicCard answer keys, hidden rubrics, Critic output, and evaluator-only evidence must never be injected into Tutor-visible state.
+- Pending, submitted, and completed assignment status is enforced on every write route. Soft deadlines record/display lateness but do not lock student work.
+- Existing releases and traces are immutable historical data. A new stage contract gets newly generated cases and explicit provenance; do not relabel or derive them from an old release.
 - Conversation ownership check: `getConversationForUser(conversationId, userId)` returns null if not owner → reply 404
 - `stageData` and `messages` are stored as JSON strings in the Conversation model
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import TutorLanguageEditor from '@/app/components/dataLab/TutorLanguageEditor';
 import {
   REVIEW_DECISION_LABELS,
@@ -137,7 +136,6 @@ function closureComplete(relation: TutorWarningFinalRelation | undefined, closur
 }
 
 export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
-  const router = useRouter();
   const [payload, setPayload] = useState<ReviewPayload | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -298,7 +296,7 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
       if (!response.ok) throw new Error(data.error ?? '提交失败');
       setMessage(`提交完成：${dataLabStatusLabel(data.status)}`);
       setPayload(null);
-      router.refresh();
+      window.location.href = window.location.pathname;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {

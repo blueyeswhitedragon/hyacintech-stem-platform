@@ -63,7 +63,8 @@ export interface AnalysisProgress {
 export interface SafetyQuiz {
   question: string;
   options: string[];
-  correct: number;
+  /** 仅旧响应/Guest 兼容；正式学生端不得依赖或展示答案键。 */
+  correct?: number;
 }
 
 export interface ChatResponse {
@@ -84,6 +85,7 @@ export interface ChatResponse {
   grounding_refs?: string[];
   /** 由服务端组合的事实性结构，不依赖模型自由生成。 */
   artifact_provenance?: {
+    experiment_plan?: 'server_composed';
     data_table_schema?: 'server_composed';
     report_sections?: 'server_composed';
   };
@@ -98,6 +100,10 @@ export interface ChatResponse {
   variables?: { independent: string; dependent?: string; controlled?: string[] };
   // 阶段2：方案成型
   experiment_plan?: ExperimentPlan;
+  stage2_plan_preview?: {
+    plan: ExperimentPlan;
+    draftHash: string;
+  };
   data_table_schema?: { columns: Stage2Column[]; minRows: number; maxRows: number };
   risks?: Stage2RiskAnnotation[];
   // 阶段3：首次进入
