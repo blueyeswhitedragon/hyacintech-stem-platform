@@ -1,0 +1,11 @@
+{
+  "turns": 21,
+  "fallbackTurns": 0,
+  "invalidRepairTurns": 0,
+  "averageDialogueChars": 48,
+  "hintTurns": 0,
+  "phase1Overreach": false,
+  "earlyStartClaim": false,
+  "stage4Rounds": 2,
+  "reportAnalysisChars": 213
+}

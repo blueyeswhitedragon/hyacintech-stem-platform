@@ -5,10 +5,12 @@ import { checkRateLimit } from '@/app/lib/guestRateLimit';
 import { PhaseEnum, type Message } from '@/app/models/types';
 import type { Stage2Data, StageData } from '@/app/models/stageData';
 import type { StageTriggerType } from '@/app/lib/stageContract';
-import { callStudentFactExtractor, mergeExtractedFacts } from '@/app/lib/stateExtractor';
+import { applyDeterministicExtractionFallbacks, callStudentFactExtractor, mergeExtractedFacts } from '@/app/lib/stateExtractor';
 import { attachServerOwnedArtifacts, tutorFocusPlan, updateServerAnalysis, visibleDataRows } from '@/app/lib/serverTutorState';
 import { buildTutorVisibleState, callTutorLanguageWithTrace, toCompatibleChatResponse } from '@/app/lib/tutorLanguage';
 import { validateConfig } from '@/app/lib/llm/provider';
+import { finalizeStageData } from '@/app/lib/stageState';
+import { evaluateStage2Readiness } from '@/app/lib/stage2Readiness';
 
 const MAX_MESSAGE_LEN = 2000;
 const MAX_HISTORY = 20;
@@ -73,16 +75,29 @@ export async function POST(req: Request) {
 
   try {
     let stageData = body.stageData ?? {};
-    let advanceTo: number | undefined;
     if ([1, 2].includes(stage) && !isSystemTrigger(triggerType)) {
-      const sources = [...history.filter((item) => item.role === 'user').map((item) => item.content), message];
+      const expectedFocusId = tutorFocusPlan(stage, stageData, { triggerType }).allowedFocusIds[0];
       try {
-        const extraction = await callStudentFactExtractor({ stage, studentMessages: sources });
-        const merged = mergeExtractedFacts(stage, stageData, extraction.accepted);
+        const extraction = await callStudentFactExtractor({
+          stage,
+          studentMessages: [message],
+          expectedFocusId,
+          existingFacts: stageData.extractedFacts,
+        });
+        const merged = mergeExtractedFacts(stage, stageData, extraction.accepted, {
+          currentStudentMessage: message,
+          expectedFocusId,
+        });
         stageData = merged.stageData;
-        advanceTo = merged.advanceTo;
       } catch (error) {
-        console.warn('Guest extractor failed; continuing without state write:', error instanceof Error ? error.message : String(error));
+        const deterministic = applyDeterministicExtractionFallbacks(stage, [], message, { expectedFocusId });
+        if (deterministic.accepted.length > 0) {
+          stageData = mergeExtractedFacts(stage, stageData, deterministic.accepted, {
+            currentStudentMessage: message,
+            expectedFocusId,
+          }).stageData;
+        }
+        console.warn('Guest extractor failed; continuing with deterministic facts only:', error instanceof Error ? error.message : String(error));
       }
     }
 
@@ -93,6 +108,14 @@ export async function POST(req: Request) {
       analysisAccepted = analysis.accepted;
     }
 
+    if (!isSystemTrigger(triggerType)) {
+      const previousRounds = stageData.roundCounts ?? {};
+      stageData = {
+        ...stageData,
+        roundCounts: { ...previousRounds, [stage]: (previousRounds[stage] ?? 0) + 1 },
+      };
+    }
+
     const server = attachServerOwnedArtifacts({
       stage,
       stageData,
@@ -100,12 +123,16 @@ export async function POST(req: Request) {
       safetyQuizCompleted: body.needSafetyQuiz === false,
     });
     stageData = server.stageData;
+    stageData = finalizeStageData(body.stageData ?? {}, stageData, {
+      mutation: isSystemTrigger(triggerType) ? `GUEST_${triggerType}` : 'GUEST_USER_MESSAGE',
+    });
     const focus = tutorFocusPlan(stage, stageData, { triggerType, analysisAccepted });
     const visibleFacts = stage === 4
       ? { 研究方案: stageData.stage2?.experimentPlan, 数据记录: visibleDataRows(stageData), 已接受分析次数: stageData.stage4?.analysisCount ?? 0 }
       : buildTutorVisibleState(stage, stageData, { 前序摘要: body.priorSummary });
     const config = validateConfig();
     if (!config.valid || !config.provider || !config.model) throw new Error(config.issues.join(' '));
+    const stage2Readiness = stage === 2 ? evaluateStage2Readiness(stageData) : undefined;
     const tutor = await callTutorLanguageWithTrace({
       phase: stage,
       triggerType,
@@ -115,9 +142,23 @@ export async function POST(req: Request) {
       visibleFacts,
       allowedFocusIds: focus.allowedFocusIds,
       focusDescriptions: focus.focusDescriptions,
+      completedFocusIds: stage2Readiness?.completedFields,
+      planReady: stage2Readiness?.complete,
     }, { provider: config.provider, model: config.model });
     const response = toCompatibleChatResponse(tutor.response, server.envelope);
-    return NextResponse.json({ ...response, stageData, currentStage: advanceTo ?? stage });
+    const publicStageData: StageData = stageData.stage3?.safetyQuiz ? {
+      ...stageData,
+      stage3: {
+        ...stageData.stage3,
+        safetyQuiz: {
+          question: stageData.stage3.safetyQuiz.question,
+          options: stageData.stage3.safetyQuiz.options,
+          selected: stageData.stage3.safetyQuiz.selected,
+          passed: stageData.stage3.safetyQuiz.passed,
+        },
+      },
+    } : stageData;
+    return NextResponse.json({ ...response, stageData: publicStageData, currentStage: stage });
   } catch (err) {
     console.error('体验模式聊天出错:', err);
     const { error, detail, status } = classifyError(err);

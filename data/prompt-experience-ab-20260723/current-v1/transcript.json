@@ -1,0 +1,2704 @@
+{
+  "promptVersion": "tutor-language-prompt-v1",
+  "model": {
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro"
+  },
+  "turns": [
+    {
+      "sequence": 1,
+      "stage": 1,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我最近发现不同光照时间下，豆苗长得好像不一样，想研究这个。",
+      "allowedFocusIds": [
+        "research_question"
+      ],
+      "visibleFacts": {
+        "是否已明确确认": false,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你观察到的很有趣。如果要把这个想法变成一个可以探究的核心问题，你觉得可以怎么表述？比如，是问“光照时长对豆苗的高度有什么影响”，还是问“豆苗在长光照和短光照下生长速度有什么不同”？试着用自己的话说一个你真正想研究的问题。",
+        "interactionType": "open_question",
+        "focus": "research_question",
+        "hints": [
+          "一个好的探究问题通常包含“什么因素影响什么结果”这样的关系，比如“改变光照时间，豆苗的高度会怎样变化？”"
+        ]
+      },
+      "rawOutput": "{\n  \"dialogue\": \"你观察到的很有趣。如果要把这个想法变成一个可以探究的核心问题，你觉得可以怎么表述？比如，是问“光照时长对豆苗的高度有什么影响”，还是问“豆苗在长光照和短光照下生长速度有什么不同”？试着用自己的话说一个你真正想研究的问题。\",\n  \"interactionType\": \"open_question\",\n  \"focus\": \"research_question\",\n  \"hints\": [\n    \"一个好的探究问题通常包含“什么因素影响什么结果”这样的关系，比如“改变光照时间，豆苗的高度会怎样变化？”\"\n  ]\n}",
+      "promptSha256": "a67911d2196b647b323c14b133308571ad09e7d9f2cf5c024d44b3cbb7dc8e51",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 399,
+          "completionTokens": 310,
+          "reasoningTokens": 180,
+          "totalTokens": 709
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 2,
+      "stage": 1,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "光照时长对豆苗高度的影响",
+      "allowedFocusIds": [
+        "direction_confirmation"
+      ],
+      "visibleFacts": {
+        "学生提出的研究问题": {
+          "内容": "光照时长对豆苗高度的影响",
+          "学生原文": "光照时长对豆苗高度的影响"
+        },
+        "是否已明确确认": false,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你想研究的是“光照时长对豆苗高度的影响”这个问题，对吗？我们先把它确定下来。",
+        "interactionType": "checkpoint",
+        "focus": "direction_confirmation",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"你想研究的是“光照时长对豆苗高度的影响”这个问题，对吗？我们先把它确定下来。\",\"interactionType\":\"checkpoint\",\"focus\":\"direction_confirmation\",\"hints\":[]}",
+      "promptSha256": "53b2f1a6aa17199d20c656759eda7032a6f5328f739b490b87906cb6e48cfbdb",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 499,
+          "completionTokens": 233,
+          "reasoningTokens": 188,
+          "totalTokens": 732
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 3,
+      "stage": 1,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我确认按这个问题做。",
+      "allowedFocusIds": [
+        "direction_confirmation"
+      ],
+      "visibleFacts": {
+        "学生提出的研究问题": {
+          "内容": "光照时长对豆苗高度的影响",
+          "学生原文": "光照时长对豆苗高度的影响"
+        },
+        "是否已明确确认": true,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "好的，屏幕上现在应该能看到刚才我们确认的研究问题：“光照时长对豆苗高度的影响”。请你核对一下内容是不是你要问的，没问题的话，直接点击页面上的“进入方案设计”按钮，我们就可以继续了。",
+        "interactionType": "checkpoint",
+        "focus": "direction_confirmation",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"好的，屏幕上现在应该能看到刚才我们确认的研究问题：“光照时长对豆苗高度的影响”。请你核对一下内容是不是你要问的，没问题的话，直接点击页面上的“进入方案设计”按钮，我们就可以继续了。\",\"interactionType\":\"checkpoint\",\"focus\":\"direction_confirmation\",\"hints\":[]}",
+      "promptSha256": "082208f00b545903599cb7b801e2bcb43afc87885cef7b8b231c5927e4c73393",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 532,
+          "completionTokens": 133,
+          "reasoningTokens": 62,
+          "totalTokens": 665
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 4,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我认为每天光照时间越多，豆苗高度越高。",
+      "allowedFocusIds": [
+        "independent_variable"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你的假设很明确。那么，为了验证这个假设，你准备主动改变哪个因素来做实验呢？",
+        "interactionType": "clarification",
+        "focus": "independent_variable",
+        "hints": [
+          "是光照时长，还是光照强度，或者是别的呢？"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"你的假设很明确。那么，为了验证这个假设，你准备主动改变哪个因素来做实验呢？\",\"interactionType\":\"clarification\",\"focus\":\"independent_variable\",\"hints\":[\"是光照时长，还是光照强度，或者是别的呢？\"]}",
+      "promptSha256": "fc996d04c674d888bd0ce4d1419eae22a353581c9c28f279d71065c8fedd0675",
+      "attempts": [
+        {
+          "attempt": 1,
+          "failure": "INVALID_TUTOR_LANGUAGE_JSON",
+          "finishReason": "stop"
+        }
+      ],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 650,
+          "completionTokens": 355,
+          "reasoningTokens": 296,
+          "totalTokens": 1005
+        },
+        "successfulAttempt": 2,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 5,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我准备改变每天光照时长。",
+      "allowedFocusIds": [
+        "levels"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "好的，那你想具体设置哪几个不同的光照时长来比较呢？比如每天光照6小时、12小时、18小时？请至少说出两个可以相互比较的水平。",
+        "interactionType": "clarification",
+        "focus": "levels",
+        "hints": [
+          "你可以想一想，多大的时长差异才能让豆苗的变化更明显？"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"好的，那你想具体设置哪几个不同的光照时长来比较呢？比如每天光照6小时、12小时、18小时？请至少说出两个可以相互比较的水平。\",\"interactionType\":\"clarification\",\"focus\":\"levels\",\"hints\":[\"你可以想一想，多大的时长差异才能让豆苗的变化更明显？\"]}",
+      "promptSha256": "7583b123c5ac6890f13e5774aaeb27c4d42e571dd239dee53e4bd8171d03cdb0",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 654,
+          "completionTokens": 318,
+          "reasoningTokens": 245,
+          "totalTokens": 972
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 6,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我准备比较0小时、8小时、12小时和24小时。",
+      "allowedFocusIds": [
+        "dependent_variable"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          },
+          "因素水平": {
+            "内容": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ],
+            "学生原文": "我准备比较0小时、8小时、12小时和24小时。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "好的，你准备比较0小时、8小时、12小时和24小时。那在这些不同光照时长的条件下，你准备观察或测量豆苗的哪个变化来作为实验结果呢？比如是看高度、叶子数量还是颜色？请说出你要记录的那个具体结果。",
+        "interactionType": "checkpoint",
+        "focus": "dependent_variable",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"好的，你准备比较0小时、8小时、12小时和24小时。那在这些不同光照时长的条件下，你准备观察或测量豆苗的哪个变化来作为实验结果呢？比如是看高度、叶子数量还是颜色？请说出你要记录的那个具体结果。\",\"interactionType\":\"checkpoint\",\"focus\":\"dependent_variable\",\"hints\":[]}",
+      "promptSha256": "2c821eb153d827252e7b5ab7f09c85b3deb1ebddbf6c32823dcde3fc91e51264",
+      "attempts": [
+        {
+          "attempt": 1,
+          "failure": "INVALID_TUTOR_LANGUAGE_JSON",
+          "finishReason": "stop"
+        }
+      ],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 790,
+          "completionTokens": 140,
+          "reasoningTokens": 58,
+          "totalTokens": 930
+        },
+        "successfulAttempt": 2,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 7,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我要观察豆苗高度。",
+      "allowedFocusIds": [
+        "measurement"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          },
+          "因素水平": {
+            "内容": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ],
+            "学生原文": "我准备比较0小时、8小时、12小时和24小时。"
+          },
+          "要观察的结果": {
+            "内容": "豆苗高度",
+            "学生原文": "我要观察豆苗高度。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你提到了要观察豆苗高度。为了在实验过程中得到可比较的数据，我们得想清楚具体怎么‘观察高度’。比如，你准备用什么工具来量？从豆苗的哪个位置量到哪个位置？是每天固定时间量一次，还是只在实验结束时量一次？",
+        "interactionType": "clarification",
+        "focus": "measurement",
+        "hints": [
+          "可以考虑用直尺从土壤表面量到豆苗最高点，每天同一时间记录。"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"你提到了要观察豆苗高度。为了在实验过程中得到可比较的数据，我们得想清楚具体怎么‘观察高度’。比如，你准备用什么工具来量？从豆苗的哪个位置量到哪个位置？是每天固定时间量一次，还是只在实验结束时量一次？\",\"interactionType\":\"clarification\",\"focus\":\"measurement\",\"hints\":[\"可以考虑用直尺从土壤表面量到豆苗最高点，每天同一时间记录。\"]}",
+      "promptSha256": "2a393f27f98f7dc1cd1daa03975fdbe4e26518feaf93f5324ab26af5b55dbf6a",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 816,
+          "completionTokens": 238,
+          "reasoningTokens": 134,
+          "totalTokens": 1054
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 8,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。",
+      "allowedFocusIds": [
+        "controls"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          },
+          "因素水平": {
+            "内容": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ],
+            "学生原文": "我准备比较0小时、8小时、12小时和24小时。"
+          },
+          "要观察的结果": {
+            "内容": "豆苗高度",
+            "学生原文": "我要观察豆苗高度。"
+          },
+          "测量方法": {
+            "内容": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "单位": {
+            "内容": "厘米",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "用刻度尺从土壤表面量到茎尖，每天固定时间测，单位用厘米，这个测量方法很具体。那为了让比较更公平，你觉得除了光照时长，还有哪些条件需要在整个实验里保持一致呢？比如水、温度、种子这些。",
+        "interactionType": "open_question",
+        "focus": "controls",
+        "hints": [
+          "想一想，哪些条件如果不一样了，也可能影响豆苗的高度，这样就不容易看出光照的真正作用了。"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"用刻度尺从土壤表面量到茎尖，每天固定时间测，单位用厘米，这个测量方法很具体。那为了让比较更公平，你觉得除了光照时长，还有哪些条件需要在整个实验里保持一致呢？比如水、温度、种子这些。\",\"interactionType\":\"open_question\",\"focus\":\"controls\",\"hints\":[\"想一想，哪些条件如果不一样了，也可能影响豆苗的高度，这样就不容易看出光照的真正作用了。\"]}",
+      "promptSha256": "0f7e08f2a0f339ee962f7156038b4285221db199b578ed4f15b1fc51b08d8390",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 978,
+          "completionTokens": 197,
+          "reasoningTokens": 95,
+          "totalTokens": 1175
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 9,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "豆苗数量、水和营养液量、水位、温度、测量时间都保持一致。",
+      "allowedFocusIds": [
+        "repeats"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          },
+          "因素水平": {
+            "内容": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ],
+            "学生原文": "我准备比较0小时、8小时、12小时和24小时。"
+          },
+          "要观察的结果": {
+            "内容": "豆苗高度",
+            "学生原文": "我要观察豆苗高度。"
+          },
+          "测量方法": {
+            "内容": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "单位": {
+            "内容": "厘米",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "保持一致的条件": {
+            "内容": [
+              "豆苗数量",
+              "水和营养液量",
+              "水位",
+              "温度",
+              "测量时间"
+            ],
+            "学生原文": "豆苗数量、水和营养液量、水位、温度、测量时间都保持一致。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你提到了豆苗数量、水和营养液量、水位、温度、测量时间都保持一致，这能很好地控制无关变量。那么，为了让实验结果更可靠，每个光照时长下你准备种几盆豆苗呢？比如，0小时、8小时、12小时、24小时这些组，每组只用一盆豆苗，还是每组重复种3盆？说说你的想法。",
+        "interactionType": "open_question",
+        "focus": "repeats",
+        "hints": [
+          "如果只用一盆，万一那盆豆苗本身比较弱，就可能让我们误以为是光照造成的差异。"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"你提到了豆苗数量、水和营养液量、水位、温度、测量时间都保持一致，这能很好地控制无关变量。那么，为了让实验结果更可靠，每个光照时长下你准备种几盆豆苗呢？比如，0小时、8小时、12小时、24小时这些组，每组只用一盆豆苗，还是每组重复种3盆？说说你的想法。\",\"interactionType\":\"open_question\",\"focus\":\"repeats\",\"hints\":[\"如果只用一盆，万一那盆豆苗本身比较弱，就可能让我们误以为是光照造成的差异。\"]}",
+      "promptSha256": "2fad1b6d5dcabbc5392b42fa6e8a967e73d79328dbe53953d4789f0919e97b46",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 1089,
+          "completionTokens": 467,
+          "reasoningTokens": 338,
+          "totalTokens": 1556
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 10,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "每个水平做10次重复，最后取平均值。",
+      "allowedFocusIds": [
+        "plan_confirmation"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          },
+          "因素水平": {
+            "内容": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ],
+            "学生原文": "我准备比较0小时、8小时、12小时和24小时。"
+          },
+          "要观察的结果": {
+            "内容": "豆苗高度",
+            "学生原文": "我要观察豆苗高度。"
+          },
+          "测量方法": {
+            "内容": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "单位": {
+            "内容": "厘米",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "保持一致的条件": {
+            "内容": [
+              "豆苗数量",
+              "水和营养液量",
+              "水位",
+              "温度",
+              "测量时间"
+            ],
+            "学生原文": "豆苗数量、水和营养液量、水位、温度、测量时间都保持一致。"
+          },
+          "重复次数": {
+            "内容": 10,
+            "学生原文": "每个水平做10次重复，最后取平均值。"
+          }
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你把实验的各个关键部分都考虑得很周全，包括重复10次取平均值。现在屏幕上应该能看到根据我们刚才讨论自动整理出的完整方案预览。请你仔细核对一下每个部分是否准确，确认没问题后，点击页面上的“确认方案”按钮，我们就可以进入下一步了。",
+        "interactionType": "checkpoint",
+        "focus": "plan_confirmation",
+        "hints": []
+      },
+      "rawOutput": "{\n  \"dialogue\": \"你把实验的各个关键部分都考虑得很周全，包括重复10次取平均值。现在屏幕上应该能看到根据我们刚才讨论自动整理出的完整方案预览。请你仔细核对一下每个部分是否准确，确认没问题后，点击页面上的“确认方案”按钮，我们就可以进入下一步了。\",\n  \"interactionType\": \"checkpoint\",\n  \"focus\": \"plan_confirmation\",\n  \"hints\": []\n}",
+      "promptSha256": "cf51cd7497878c08e2a7a45cbec8acaeee8dbdb86671ba9264f5ccabc39550f6",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 1223,
+          "completionTokens": 297,
+          "reasoningTokens": 202,
+          "totalTokens": 1520
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 11,
+      "stage": 2,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "方案可以了，我确认这个方案。",
+      "allowedFocusIds": [
+        "plan_confirmation"
+      ],
+      "visibleFacts": {
+        "阶段一已确认": {
+          "研究问题": "光照时长对豆苗高度的影响"
+        },
+        "学生已说明的方案事实": {
+          "假设": {
+            "内容": "我认为每天光照时间越多，豆苗高度越高。",
+            "学生原文": "我认为每天光照时间越多，豆苗高度越高。"
+          },
+          "要改变的因素": {
+            "内容": "每天光照时长",
+            "学生原文": "我准备改变每天光照时长。"
+          },
+          "因素水平": {
+            "内容": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ],
+            "学生原文": "我准备比较0小时、8小时、12小时和24小时。"
+          },
+          "要观察的结果": {
+            "内容": "豆苗高度",
+            "学生原文": "我要观察豆苗高度。"
+          },
+          "测量方法": {
+            "内容": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "单位": {
+            "内容": "厘米",
+            "学生原文": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+          },
+          "保持一致的条件": {
+            "内容": [
+              "豆苗数量",
+              "水和营养液量",
+              "水位",
+              "温度",
+              "测量时间"
+            ],
+            "学生原文": "豆苗数量、水和营养液量、水位、温度、测量时间都保持一致。"
+          },
+          "重复次数": {
+            "内容": 10,
+            "学生原文": "每个水平做10次重复，最后取平均值。"
+          }
+        },
+        "服务器方案预览": {
+          "方案": {
+            "researchQuestion": "光照时长对豆苗高度的影响",
+            "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+            "independentVariable": {
+              "name": "每天光照时长",
+              "levels": [
+                "0小时",
+                "8小时",
+                "12小时",
+                "24小时"
+              ]
+            },
+            "dependentVariable": {
+              "name": "豆苗高度",
+              "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+              "unit": "厘米"
+            },
+            "controlledVariables": [
+              "豆苗数量",
+              "水和营养液量",
+              "水位",
+              "温度",
+              "测量时间"
+            ],
+            "materials": [
+              "用于设置每天光照时长各水平的材料或装置",
+              "用于用刻度尺从土壤表面量到茎尖，每天固定时间测量的测量工具",
+              "数量足够且条件一致的实验对象"
+            ],
+            "procedure": [
+              "按0小时、8小时、12小时、24小时设置每天光照时长的不同实验组",
+              "各组保持豆苗数量、水和营养液量、水位、温度、测量时间一致，只改变每天光照时长",
+              "每个水平安排10次重复实验",
+              "用刻度尺从土壤表面量到茎尖，每天固定时间测量，并如实记录豆苗高度"
+            ],
+            "repeatCount": 10,
+            "safetyNotes": [
+              "保持实验区域整洁；材料或装置出现异常时立即停止，并告知教师。"
+            ]
+          },
+          "草案哈希": "642773e24f9d3b71cf38308f16f88935e2a1cd9e5f78c0eb9acbfcf28cbde510",
+          "是否已确认当前版本": false,
+          "字段来源": {
+            "researchQuestion": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage1.researchQuestion"
+              ]
+            },
+            "hypothesis": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.hypothesis"
+              ]
+            },
+            "independentVariable": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.independentVariable.name"
+              ]
+            },
+            "levels": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.independentVariable.levels"
+              ]
+            },
+            "dependentVariable": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.dependentVariable.name"
+              ]
+            },
+            "measurement": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.dependentVariable.measurement",
+                "stage2.dependentVariable.unit"
+              ]
+            },
+            "controlledVariables": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.controlledVariables"
+              ]
+            },
+            "materials": {
+              "source": "server_composed",
+              "sourceFields": [
+                "stage2.independentVariable.name",
+                "stage2.dependentVariable.measurement"
+              ]
+            },
+            "procedure": {
+              "source": "server_composed",
+              "sourceFields": [
+                "stage2.independentVariable.name",
+                "stage2.independentVariable.levels",
+                "stage2.controlledVariables",
+                "stage2.repeatCount",
+                "stage2.dependentVariable.measurement"
+              ]
+            },
+            "repeatCount": {
+              "source": "student_fact",
+              "sourceFields": [
+                "stage2.repeatCount"
+              ]
+            },
+            "safetyNotes": {
+              "source": "server_baseline",
+              "sourceFields": []
+            }
+          }
+        },
+        "方案核心就绪状态": {
+          "policyVersion": "stage2-readiness-v1",
+          "complete": true,
+          "completedFields": [
+            "hypothesis",
+            "independent_variable",
+            "levels",
+            "dependent_variable",
+            "measurement",
+            "controls",
+            "repeats"
+          ],
+          "missingFields": [],
+          "nextFocusId": "plan_confirmation"
+        },
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "好的，你已确认方案内容无误。现在请点击页面上的“确认方案”按钮，正式锁定这个实验设计，我们就可以准备动手实验了。",
+        "interactionType": "checkpoint",
+        "focus": "plan_confirmation",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"好的，你已确认方案内容无误。现在请点击页面上的“确认方案”按钮，正式锁定这个实验设计，我们就可以准备动手实验了。\",\"interactionType\":\"checkpoint\",\"focus\":\"plan_confirmation\",\"hints\":[]}",
+      "promptSha256": "c347f7f3622ebc7a83aa229c502db733e2e305db222d565aac7e8bf463c4b194",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 1954,
+          "completionTokens": 147,
+          "reasoningTokens": 91,
+          "totalTokens": 2101
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 12,
+      "stage": 3,
+      "triggerType": "STAGE_ENTER",
+      "studentMessage": "",
+      "allowedFocusIds": [
+        "safety_checkpoint"
+      ],
+      "visibleFacts": {
+        "已批准实验方案": {
+          "研究问题": "光照时长对豆苗高度的影响",
+          "假设": "我认为每天光照时间越多，豆苗高度越高。",
+          "要改变的因素": "每天光照时长",
+          "因素水平": [
+            "0小时",
+            "8小时",
+            "12小时",
+            "24小时"
+          ],
+          "要观察的结果": "豆苗高度",
+          "测量方法": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+          "单位": "厘米",
+          "保持一致的条件": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "材料": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "步骤": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "每个水平重复次数": 10,
+          "安全注意": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "安全检查是否通过": true,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "现在我们要亲手操作实验了。动手之前，确保安全是第一位的。请你仔细阅读屏幕上出现的实验安全提示，然后完成那道安全判断题。完成后告诉我你的选择。",
+        "interactionType": "checkpoint",
+        "focus": "safety_checkpoint",
+        "hints": [
+          "注意选择最符合安全操作要求的答案。"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"现在我们要亲手操作实验了。动手之前，确保安全是第一位的。请你仔细阅读屏幕上出现的实验安全提示，然后完成那道安全判断题。完成后告诉我你的选择。\",\"interactionType\":\"checkpoint\",\"focus\":\"safety_checkpoint\",\"hints\":[\"注意选择最符合安全操作要求的答案。\"]}",
+      "promptSha256": "1b1a760ad7d51cad455a08f70686c8dd2db5f65c4925572c65ff73513e03834c",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 1239,
+          "completionTokens": 334,
+          "reasoningTokens": 264,
+          "totalTokens": 1573
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 13,
+      "stage": 3,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我会先停止操作并告诉老师，再继续记录。",
+      "allowedFocusIds": [
+        "execution_support"
+      ],
+      "visibleFacts": {
+        "已批准实验方案": {
+          "研究问题": "光照时长对豆苗高度的影响",
+          "假设": "我认为每天光照时间越多，豆苗高度越高。",
+          "要改变的因素": "每天光照时长",
+          "因素水平": [
+            "0小时",
+            "8小时",
+            "12小时",
+            "24小时"
+          ],
+          "要观察的结果": "豆苗高度",
+          "测量方法": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+          "单位": "厘米",
+          "保持一致的条件": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "材料": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "步骤": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "每个水平重复次数": 10,
+          "安全注意": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "安全检查是否通过": true,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你考虑得很周全，遇到异常先停止并报告老师，这是保障实验安全的关键一步。现在我们已经有了完整的实验方案，在正式动手之前，你觉得第一步具体要做哪些准备？比如，摆放水培容器、调配营养液、设置遮光材料，你打算从哪儿开始？",
+        "interactionType": "open_question",
+        "focus": "execution_support",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"你考虑得很周全，遇到异常先停止并报告老师，这是保障实验安全的关键一步。现在我们已经有了完整的实验方案，在正式动手之前，你觉得第一步具体要做哪些准备？比如，摆放水培容器、调配营养液、设置遮光材料，你打算从哪儿开始？\",\"interactionType\":\"open_question\",\"focus\":\"execution_support\",\"hints\":[]}",
+      "promptSha256": "422c5558d4108a52761c68b1c5e979911410356b6aba59feca833b5d64e55d55",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 1283,
+          "completionTokens": 310,
+          "reasoningTokens": 223,
+          "totalTokens": 1593
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 14,
+      "stage": 4,
+      "triggerType": "STAGE_TRANSITION",
+      "studentMessage": "",
+      "allowedFocusIds": [
+        "cite_evidence"
+      ],
+      "visibleFacts": {
+        "研究方案": {
+          "researchQuestion": "光照时长对豆苗高度的影响",
+          "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+          "independentVariable": {
+            "name": "每天光照时长",
+            "levels": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ]
+          },
+          "dependentVariable": {
+            "name": "豆苗高度",
+            "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "unit": "厘米"
+          },
+          "controlledVariables": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "materials": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "procedure": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "repeatCount": 10,
+          "safetyNotes": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "数据记录": [
+          {
+            "行号": 1,
+            "重复序号": 1,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18.2,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 2,
+            "重复序号": 2,
+            "0小时：豆苗高度（厘米）": 6.5,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 15.8,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 3,
+            "重复序号": 3,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 14.9,
+            "12小时：豆苗高度（厘米）": 18.1,
+            "24小时：豆苗高度（厘米）": 16.4,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 4,
+            "重复序号": 4,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 15.2,
+            "12小时：豆苗高度（厘米）": 18.7,
+            "24小时：豆苗高度（厘米）": 16,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 5,
+            "重复序号": 5,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 14.7,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 6,
+            "重复序号": 6,
+            "0小时：豆苗高度（厘米）": 6,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.3,
+            "24小时：豆苗高度（厘米）": 16.2,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 7,
+            "重复序号": 7,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 15.3,
+            "12小时：豆苗高度（厘米）": 18.6,
+            "24小时：豆苗高度（厘米）": 15.7,
+            "客观异常备注": "24小时组第7次转移培养液时有短暂停顿，原始值保留"
+          },
+          {
+            "行号": 8,
+            "重复序号": 8,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18,
+            "24小时：豆苗高度（厘米）": 16.3,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 9,
+            "重复序号": 9,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 10,
+            "重复序号": 10,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          }
+        ],
+        "已接受分析次数": 0
+      },
+      "response": {
+        "dialogue": "现在我们有实验数据了。请你从数据表里选一个具体的比较，例如比较8小时光照和12小时光照条件下的豆苗高度有什么不同？你可以直接引用某次重复的数值，也可以先算一下每个条件下的平均值再比较。用数据说话。",
+        "interactionType": "open_question",
+        "focus": "cite_evidence",
+        "hints": [
+          "提示：如果比较平均值，可以先计算8小时条件下10次重复的平均高度，再计算12小时条件下的平均高度。"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"现在我们有实验数据了。请你从数据表里选一个具体的比较，例如比较8小时光照和12小时光照条件下的豆苗高度有什么不同？你可以直接引用某次重复的数值，也可以先算一下每个条件下的平均值再比较。用数据说话。\",\"interactionType\":\"open_question\",\"focus\":\"cite_evidence\",\"hints\":[\"提示：如果比较平均值，可以先计算8小时条件下10次重复的平均高度，再计算12小时条件下的平均高度。\"]}",
+      "promptSha256": "9b844327630c6f1584ec5797f0876d4e30714be4a31a144711eb4c6caf4ea84f",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 2073,
+          "completionTokens": 428,
+          "reasoningTokens": 322,
+          "totalTokens": 2501
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 15,
+      "stage": 4,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+      "allowedFocusIds": [
+        "interpret_evidence"
+      ],
+      "visibleFacts": {
+        "研究方案": {
+          "researchQuestion": "光照时长对豆苗高度的影响",
+          "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+          "independentVariable": {
+            "name": "每天光照时长",
+            "levels": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ]
+          },
+          "dependentVariable": {
+            "name": "豆苗高度",
+            "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "unit": "厘米"
+          },
+          "controlledVariables": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "materials": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "procedure": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "repeatCount": 10,
+          "safetyNotes": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "数据记录": [
+          {
+            "行号": 1,
+            "重复序号": 1,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18.2,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 2,
+            "重复序号": 2,
+            "0小时：豆苗高度（厘米）": 6.5,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 15.8,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 3,
+            "重复序号": 3,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 14.9,
+            "12小时：豆苗高度（厘米）": 18.1,
+            "24小时：豆苗高度（厘米）": 16.4,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 4,
+            "重复序号": 4,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 15.2,
+            "12小时：豆苗高度（厘米）": 18.7,
+            "24小时：豆苗高度（厘米）": 16,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 5,
+            "重复序号": 5,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 14.7,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 6,
+            "重复序号": 6,
+            "0小时：豆苗高度（厘米）": 6,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.3,
+            "24小时：豆苗高度（厘米）": 16.2,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 7,
+            "重复序号": 7,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 15.3,
+            "12小时：豆苗高度（厘米）": 18.6,
+            "24小时：豆苗高度（厘米）": 15.7,
+            "客观异常备注": "24小时组第7次转移培养液时有短暂停顿，原始值保留"
+          },
+          {
+            "行号": 8,
+            "重复序号": 8,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18,
+            "24小时：豆苗高度（厘米）": 16.3,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 9,
+            "重复序号": 9,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 10,
+            "重复序号": 10,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          }
+        ],
+        "已接受分析次数": 1
+      },
+      "response": {
+        "dialogue": "你留意到第4行里12小时组比0小时组高了12.4厘米。单看这一组数据，你觉得它是否支持‘光照越长，豆苗越高’的假设？或者你还需要综合所有重复的平均值再判断？别忘了8小时组和24小时组的数据也在等着你。",
+        "interactionType": "open_question",
+        "focus": "interpret_evidence",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"你留意到第4行里12小时组比0小时组高了12.4厘米。单看这一组数据，你觉得它是否支持‘光照越长，豆苗越高’的假设？或者你还需要综合所有重复的平均值再判断？别忘了8小时组和24小时组的数据也在等着你。\",\"interactionType\":\"open_question\",\"focus\":\"interpret_evidence\",\"hints\":[]}",
+      "promptSha256": "683caa41289715527f6bceb2b3d0aeb58e6caa618ff033c42a632c74af081153",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 2163,
+          "completionTokens": 294,
+          "reasoningTokens": 204,
+          "totalTokens": 2457
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 16,
+      "stage": 4,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "这说明在这两组数据中，12小时光照下的豆苗高度暂时高于0小时，但这还不能单独证明一定是光照造成的。",
+      "allowedFocusIds": [
+        "cite_evidence"
+      ],
+      "visibleFacts": {
+        "研究方案": {
+          "researchQuestion": "光照时长对豆苗高度的影响",
+          "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+          "independentVariable": {
+            "name": "每天光照时长",
+            "levels": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ]
+          },
+          "dependentVariable": {
+            "name": "豆苗高度",
+            "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "unit": "厘米"
+          },
+          "controlledVariables": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "materials": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "procedure": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "repeatCount": 10,
+          "safetyNotes": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "数据记录": [
+          {
+            "行号": 1,
+            "重复序号": 1,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18.2,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 2,
+            "重复序号": 2,
+            "0小时：豆苗高度（厘米）": 6.5,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 15.8,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 3,
+            "重复序号": 3,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 14.9,
+            "12小时：豆苗高度（厘米）": 18.1,
+            "24小时：豆苗高度（厘米）": 16.4,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 4,
+            "重复序号": 4,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 15.2,
+            "12小时：豆苗高度（厘米）": 18.7,
+            "24小时：豆苗高度（厘米）": 16,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 5,
+            "重复序号": 5,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 14.7,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 6,
+            "重复序号": 6,
+            "0小时：豆苗高度（厘米）": 6,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.3,
+            "24小时：豆苗高度（厘米）": 16.2,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 7,
+            "重复序号": 7,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 15.3,
+            "12小时：豆苗高度（厘米）": 18.6,
+            "24小时：豆苗高度（厘米）": 15.7,
+            "客观异常备注": "24小时组第7次转移培养液时有短暂停顿，原始值保留"
+          },
+          {
+            "行号": 8,
+            "重复序号": 8,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18,
+            "24小时：豆苗高度（厘米）": 16.3,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 9,
+            "重复序号": 9,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 10,
+            "重复序号": 10,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          }
+        ],
+        "已接受分析次数": 1
+      },
+      "response": {
+        "dialogue": "你说得很严谨，单次对照确实无法排除偶然因素的影响。那么，如果综合所有10次重复的数据，你可以先算一下0小时组的平均高度是多少，然后与12小时组的平均值做个比较吗？另外，别忘了24小时组的数据——这些平均值或许会告诉我们更有趣的事情。",
+        "interactionType": "open_question",
+        "focus": "cite_evidence",
+        "hints": [
+          "先分别加总每个光照条件下的10个高度值，再除以10，就得到了该组的平均高度。"
+        ]
+      },
+      "rawOutput": "{\n  \"dialogue\": \"你说得很严谨，单次对照确实无法排除偶然因素的影响。那么，如果综合所有10次重复的数据，你可以先算一下0小时组的平均高度是多少，然后与12小时组的平均值做个比较吗？另外，别忘了24小时组的数据——这些平均值或许会告诉我们更有趣的事情。\",\n  \"interactionType\": \"open_question\",\n  \"focus\": \"cite_evidence\",\n  \"hints\": [\"先分别加总每个光照条件下的10个高度值，再除以10，就得到了该组的平均高度。\"]\n}",
+      "promptSha256": "f200763a77fcf4d063dff1437f9dfa09a500a181978dbcaf47f2f20ff5d80015",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 2249,
+          "completionTokens": 440,
+          "reasoningTokens": 319,
+          "totalTokens": 2689
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 17,
+      "stage": 4,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。",
+      "allowedFocusIds": [
+        "interpret_evidence"
+      ],
+      "visibleFacts": {
+        "研究方案": {
+          "researchQuestion": "光照时长对豆苗高度的影响",
+          "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+          "independentVariable": {
+            "name": "每天光照时长",
+            "levels": [
+              "0小时",
+              "8小时",
+              "12小时",
+              "24小时"
+            ]
+          },
+          "dependentVariable": {
+            "name": "豆苗高度",
+            "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+            "unit": "厘米"
+          },
+          "controlledVariables": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "materials": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "procedure": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "repeatCount": 10,
+          "safetyNotes": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "数据记录": [
+          {
+            "行号": 1,
+            "重复序号": 1,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18.2,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 2,
+            "重复序号": 2,
+            "0小时：豆苗高度（厘米）": 6.5,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 15.8,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 3,
+            "重复序号": 3,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 14.9,
+            "12小时：豆苗高度（厘米）": 18.1,
+            "24小时：豆苗高度（厘米）": 16.4,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 4,
+            "重复序号": 4,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 15.2,
+            "12小时：豆苗高度（厘米）": 18.7,
+            "24小时：豆苗高度（厘米）": 16,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 5,
+            "重复序号": 5,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 14.7,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 6,
+            "重复序号": 6,
+            "0小时：豆苗高度（厘米）": 6,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.3,
+            "24小时：豆苗高度（厘米）": 16.2,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 7,
+            "重复序号": 7,
+            "0小时：豆苗高度（厘米）": 6.2,
+            "8小时：豆苗高度（厘米）": 15.3,
+            "12小时：豆苗高度（厘米）": 18.6,
+            "24小时：豆苗高度（厘米）": 15.7,
+            "客观异常备注": "24小时组第7次转移培养液时有短暂停顿，原始值保留"
+          },
+          {
+            "行号": 8,
+            "重复序号": 8,
+            "0小时：豆苗高度（厘米）": 6.3,
+            "8小时：豆苗高度（厘米）": 14.8,
+            "12小时：豆苗高度（厘米）": 18,
+            "24小时：豆苗高度（厘米）": 16.3,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 9,
+            "重复序号": 9,
+            "0小时：豆苗高度（厘米）": 6.1,
+            "8小时：豆苗高度（厘米）": 15.1,
+            "12小时：豆苗高度（厘米）": 18.5,
+            "24小时：豆苗高度（厘米）": 16.1,
+            "客观异常备注": ""
+          },
+          {
+            "行号": 10,
+            "重复序号": 10,
+            "0小时：豆苗高度（厘米）": 6.4,
+            "8小时：豆苗高度（厘米）": 15,
+            "12小时：豆苗高度（厘米）": 18.4,
+            "24小时：豆苗高度（厘米）": 15.9,
+            "客观异常备注": ""
+          }
+        ],
+        "已接受分析次数": 2
+      },
+      "response": {
+        "dialogue": "你提到第2行里12小时组比24小时组高2.7厘米。这个发现很有意思，因为它看起来和你的假设方向不太一样。单看这一行数据，你觉得可能是什么原因导致24小时组的豆苗反而矮一些？",
+        "interactionType": "open_question",
+        "focus": "interpret_evidence",
+        "hints": [
+          "可以想一想，会不会是光照太长反而对生长有影响？或者这一行数据可能有偶然误差？"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"你提到第2行里12小时组比24小时组高2.7厘米。这个发现很有意思，因为它看起来和你的假设方向不太一样。单看这一行数据，你觉得可能是什么原因导致24小时组的豆苗反而矮一些？\",\"interactionType\":\"open_question\",\"focus\":\"interpret_evidence\",\"hints\":[\"可以想一想，会不会是光照太长反而对生长有影响？或者这一行数据可能有偶然误差？\"]}",
+      "promptSha256": "297ddb0a8ae13e2d188e9acdd39668e4ba44346e8022b7773d06438342a7a4d8",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 2351,
+          "completionTokens": 185,
+          "reasoningTokens": 86,
+          "totalTokens": 2536
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 18,
+      "stage": 5,
+      "triggerType": "REPORT_BOOTSTRAP",
+      "studentMessage": "",
+      "allowedFocusIds": [
+        "report_handoff"
+      ],
+      "visibleFacts": {
+        "已确认研究方向": "《探究问题确认书》\n研究问题：光照时长对豆苗高度的影响",
+        "已批准实验方案": {
+          "研究问题": "光照时长对豆苗高度的影响",
+          "假设": "我认为每天光照时间越多，豆苗高度越高。",
+          "要改变的因素": "每天光照时长",
+          "因素水平": [
+            "0小时",
+            "8小时",
+            "12小时",
+            "24小时"
+          ],
+          "要观察的结果": "豆苗高度",
+          "测量方法": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+          "单位": "厘米",
+          "保持一致的条件": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "材料": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "步骤": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "每个水平重复次数": 10,
+          "安全注意": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "数据记录行数": 10,
+        "已接受分析": [
+          {
+            "observation": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+            "citations": [
+              "第4行「0小时：豆苗高度（厘米）」=6.3",
+              "第4行「12小时：豆苗高度（厘米）」=18.7",
+              "第8行「0小时：豆苗高度（厘米）」=6.3"
+            ],
+            "matchedValues": [
+              "6.3",
+              "18.7"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 3,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "cec0025f687873782872f37f2ae58fcd790f0162cdf03daed410c1dda99f1eef"
+              },
+              {
+                "rowIndex": 3,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.7",
+                "fingerprint": "59118213a473cced0021a66b016a1d2a0b9c4b065370216893441de4716d139e"
+              },
+              {
+                "rowIndex": 7,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "b79feb79bd31bd2ab9ab55c1c4568c7830fa53f52c3ec1032fbe81d0f565edaf"
+              }
+            ],
+            "roundFingerprint": "4b772646f41c03518cd7b343a53ec7cd74c699f529542664c6e664792ee0bab8"
+          },
+          {
+            "observation": "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。",
+            "citations": [
+              "第2行「12小时：豆苗高度（厘米）」=18.5",
+              "第2行「24小时：豆苗高度（厘米）」=15.8"
+            ],
+            "matchedValues": [
+              "18.5",
+              "15.8"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 1,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.5",
+                "fingerprint": "909a117064dbce42d99ae20864b0ca4ca467e34fd7104bc600d9e82a18681bd5"
+              },
+              {
+                "rowIndex": 1,
+                "columnKey": "result_d",
+                "columnName": "24小时：豆苗高度（厘米）",
+                "citedValue": "15.8",
+                "fingerprint": "551adfe53599a1873aae618a9277337daf309d906be64a66dbb60e206ec0e2a8"
+              }
+            ],
+            "roundFingerprint": "b27488336229eb14479958dfd031e423669562701732e8ffae30e18cb41a6a66"
+          }
+        ],
+        "报告框架是否已由服务器生成": true,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "在你刚才分析数据的基础上，系统已经根据你的探究过程自动生成了一份实验报告框架，就显示在屏幕上了。这份框架把研究报告需要包含的部分都列了出来，比如引言、方法、结果等，但具体内容还需要你用自己的话来填补。请你先仔细核对框架，看看有没有漏掉你们做过的步骤，然后就可以开始补充文字和图表了。",
+        "interactionType": "information",
+        "focus": "report_handoff",
+        "hints": []
+      },
+      "rawOutput": "{\"dialogue\":\"在你刚才分析数据的基础上，系统已经根据你的探究过程自动生成了一份实验报告框架，就显示在屏幕上了。这份框架把研究报告需要包含的部分都列了出来，比如引言、方法、结果等，但具体内容还需要你用自己的话来填补。请你先仔细核对框架，看看有没有漏掉你们做过的步骤，然后就可以开始补充文字和图表了。\",\"interactionType\":\"information\",\"focus\":\"report_handoff\",\"hints\":[]}",
+      "promptSha256": "0d73ceb12ee512df4275009b2ba0446147cd861078dcd749aff055a35d9ccaa5",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 2379,
+          "completionTokens": 280,
+          "reasoningTokens": 179,
+          "totalTokens": 2659
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 19,
+      "stage": 5,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我会检查报告中的结论和局限是否都能从数据和实验过程得到支持。",
+      "allowedFocusIds": [
+        "report_gap"
+      ],
+      "visibleFacts": {
+        "已确认研究方向": "《探究问题确认书》\n研究问题：光照时长对豆苗高度的影响",
+        "已批准实验方案": {
+          "研究问题": "光照时长对豆苗高度的影响",
+          "假设": "我认为每天光照时间越多，豆苗高度越高。",
+          "要改变的因素": "每天光照时长",
+          "因素水平": [
+            "0小时",
+            "8小时",
+            "12小时",
+            "24小时"
+          ],
+          "要观察的结果": "豆苗高度",
+          "测量方法": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+          "单位": "厘米",
+          "保持一致的条件": [
+            "豆苗数量",
+            "水和营养液量",
+            "水位",
+            "温度",
+            "测量时间"
+          ],
+          "材料": [
+            "豆苗",
+            "水培容器",
+            "营养液",
+            "刻度尺",
+            "遮光材料"
+          ],
+          "步骤": [
+            "设置0、8、12、24小时四个光照条件",
+            "各组保持其他条件一致",
+            "每天固定时间测量豆苗高度并记录",
+            "每个水平安排10次重复并计算平均值"
+          ],
+          "每个水平重复次数": 10,
+          "安全注意": [
+            "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+          ]
+        },
+        "数据记录行数": 10,
+        "已接受分析": [
+          {
+            "observation": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+            "citations": [
+              "第4行「0小时：豆苗高度（厘米）」=6.3",
+              "第4行「12小时：豆苗高度（厘米）」=18.7",
+              "第8行「0小时：豆苗高度（厘米）」=6.3"
+            ],
+            "matchedValues": [
+              "6.3",
+              "18.7"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 3,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "cec0025f687873782872f37f2ae58fcd790f0162cdf03daed410c1dda99f1eef"
+              },
+              {
+                "rowIndex": 3,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.7",
+                "fingerprint": "59118213a473cced0021a66b016a1d2a0b9c4b065370216893441de4716d139e"
+              },
+              {
+                "rowIndex": 7,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "b79feb79bd31bd2ab9ab55c1c4568c7830fa53f52c3ec1032fbe81d0f565edaf"
+              }
+            ],
+            "roundFingerprint": "4b772646f41c03518cd7b343a53ec7cd74c699f529542664c6e664792ee0bab8"
+          },
+          {
+            "observation": "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。",
+            "citations": [
+              "第2行「12小时：豆苗高度（厘米）」=18.5",
+              "第2行「24小时：豆苗高度（厘米）」=15.8"
+            ],
+            "matchedValues": [
+              "18.5",
+              "15.8"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 1,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.5",
+                "fingerprint": "909a117064dbce42d99ae20864b0ca4ca467e34fd7104bc600d9e82a18681bd5"
+              },
+              {
+                "rowIndex": 1,
+                "columnKey": "result_d",
+                "columnName": "24小时：豆苗高度（厘米）",
+                "citedValue": "15.8",
+                "fingerprint": "551adfe53599a1873aae618a9277337daf309d906be64a66dbb60e206ec0e2a8"
+              }
+            ],
+            "roundFingerprint": "b27488336229eb14479958dfd031e423669562701732e8ffae30e18cb41a6a66"
+          }
+        ],
+        "报告框架是否已由服务器生成": true,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "这个想法很好。那从你已有的数据和分析来看，你觉得报告里哪个部分的证据还不够充分？比如，关于24小时和12小时的比较，除了单行数据，有没有用平均值来支持你的说法？",
+        "interactionType": "open_question",
+        "focus": "report_gap",
+        "hints": [
+          "试着检查报告中关于‘光照越长豆苗越高’的假设是不是在所有光照时长下都成立，看看有没有反例需要解释。"
+        ]
+      },
+      "rawOutput": "{\n  \"dialogue\": \"这个想法很好。那从你已有的数据和分析来看，你觉得报告里哪个部分的证据还不够充分？比如，关于24小时和12小时的比较，除了单行数据，有没有用平均值来支持你的说法？\",\n  \"interactionType\": \"open_question\",\n  \"focus\": \"report_gap\",\n  \"hints\": [\"试着检查报告中关于‘光照越长豆苗越高’的假设是不是在所有光照时长下都成立，看看有没有反例需要解释。\"]\n}",
+      "promptSha256": "0740d509dad2c6f32c1eb9f72d32457f55d8e6468aa32c954363a02da1a16a3c",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 2458,
+          "completionTokens": 345,
+          "reasoningTokens": 236,
+          "totalTokens": 2803
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 20,
+      "stage": 6,
+      "triggerType": "OPTIONAL_COACHING",
+      "studentMessage": "",
+      "allowedFocusIds": [
+        "reflection_coaching"
+      ],
+      "visibleFacts": {
+        "研究问题": "光照时长对豆苗高度的影响",
+        "已接受分析": [
+          {
+            "observation": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+            "citations": [
+              "第4行「0小时：豆苗高度（厘米）」=6.3",
+              "第4行「12小时：豆苗高度（厘米）」=18.7",
+              "第8行「0小时：豆苗高度（厘米）」=6.3"
+            ],
+            "matchedValues": [
+              "6.3",
+              "18.7"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 3,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "cec0025f687873782872f37f2ae58fcd790f0162cdf03daed410c1dda99f1eef"
+              },
+              {
+                "rowIndex": 3,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.7",
+                "fingerprint": "59118213a473cced0021a66b016a1d2a0b9c4b065370216893441de4716d139e"
+              },
+              {
+                "rowIndex": 7,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "b79feb79bd31bd2ab9ab55c1c4568c7830fa53f52c3ec1032fbe81d0f565edaf"
+              }
+            ],
+            "roundFingerprint": "4b772646f41c03518cd7b343a53ec7cd74c699f529542664c6e664792ee0bab8"
+          },
+          {
+            "observation": "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。",
+            "citations": [
+              "第2行「12小时：豆苗高度（厘米）」=18.5",
+              "第2行「24小时：豆苗高度（厘米）」=15.8"
+            ],
+            "matchedValues": [
+              "18.5",
+              "15.8"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 1,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.5",
+                "fingerprint": "909a117064dbce42d99ae20864b0ca4ca467e34fd7104bc600d9e82a18681bd5"
+              },
+              {
+                "rowIndex": 1,
+                "columnKey": "result_d",
+                "columnName": "24小时：豆苗高度（厘米）",
+                "citedValue": "15.8",
+                "fingerprint": "551adfe53599a1873aae618a9277337daf309d906be64a66dbb60e206ec0e2a8"
+              }
+            ],
+            "roundFingerprint": "b27488336229eb14479958dfd031e423669562701732e8ffae30e18cb41a6a66"
+          }
+        ],
+        "报告摘要": {
+          "目的": "探究光照时长对豆苗高度的影响",
+          "假设": "我认为每天光照时间越多，豆苗高度越高。",
+          "材料": "豆苗、水培容器、营养液、刻度尺、遮光材料",
+          "步骤": "1. 设置0、8、12、24小时四个光照条件\n2. 各组保持其他条件一致\n3. 每天固定时间测量豆苗高度并记录\n4. 每个水平安排10次重复并计算平均值",
+          "数据摘要": "共10行真实记录。第1行：重复序号=1；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18.2；24小时：豆苗高度（厘米）=16.1；第2行：重复序号=2；0小时：豆苗高度（厘米）=6.5；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=15.8；第3行：重复序号=3；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=14.9；12小时：豆苗高度（厘米）=18.1；24小时：豆苗高度（厘米）=16.4；第4行：重复序号=4；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=15.2；12小时：豆苗高度（厘米）=18.7；24小时：豆苗高度（厘米）=16；第5行：重复序号=5；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=14.7；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9；第6行：重复序号=6；0小时：豆苗高度（厘米）=6；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.3；24小时：豆苗高度（厘米）=16.2；第7行：重复序号=7；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=15.3；12小时：豆苗高度（厘米）=18.6；24小时：豆苗高度（厘米）=15.7；客观异常备注=24小时组第7次转移培养液时有短暂停顿，原始值保留；第8行：重复序号=8；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18；24小时：豆苗高度（厘米）=16.3；第9行：重复序号=9；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=16.1；第10行：重复序号=10；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9",
+          "分析": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。；第4行「0小时：豆苗高度（厘米）」=6.3；第4行「12小时：豆苗高度（厘米）」=18.7；第8行「0小时：豆苗高度（厘米）」=6.3；第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。；第2行「12小时：豆苗高度（厘米）」=18.5；第2行「24小时：豆苗高度（厘米）」=15.8",
+          "结论": "在本次数据中，12小时光照组的平均高度最高，24小时组低于12小时组；这个结果部分支持原来的猜想，但还需要更多重复和控制条件来判断。",
+          "局限与讨论": "样本数量和观察时间有限，24小时组还出现过一次操作停顿；后续可以延长观察时间并进一步统一操作。"
+        },
+        "教师评价": {},
+        "学生是否已回应教师评价": false,
+        "学生是否已完成学习反思": false,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你在分析里引用了第2行和第4行的单次数据，这确实展示了局部差距。但为了看整体趋势，你算过各组的平均值吗？比如，12小时组所有10次重复的平均高度是多少？24小时组呢？用平均值来比较，也许能更可靠地判断光照时长的影响。你想现在算算看？还是先看看报告结论里引用的数据来源？",
+        "interactionType": "open_question",
+        "focus": "reflection_coaching",
+        "hints": [
+          "你可以从数据表里快速提取每一列，求均值；或者先列出每组的10个数值再观察趋势。"
+        ]
+      },
+      "rawOutput": "{\n  \"dialogue\": \"你在分析里引用了第2行和第4行的单次数据，这确实展示了局部差距。但为了看整体趋势，你算过各组的平均值吗？比如，12小时组所有10次重复的平均高度是多少？24小时组呢？用平均值来比较，也许能更可靠地判断光照时长的影响。你想现在算算看？还是先看看报告结论里引用的数据来源？\",\n  \"interactionType\": \"open_question\",\n  \"focus\": \"reflection_coaching\",\n  \"hints\": [\n    \"你可以从数据表里快速提取每一列，求均值；或者先列出每组的10个数值再观察趋势。\"\n  ]\n}",
+      "promptSha256": "9deb66f0eb5f3e9a8d022301365f7e81a28e130e2437bad7bcbeef5e126a81f5",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 3259,
+          "completionTokens": 1155,
+          "reasoningTokens": 1003,
+          "totalTokens": 4414
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    },
+    {
+      "sequence": 21,
+      "stage": 6,
+      "triggerType": "USER_MESSAGE",
+      "studentMessage": "我发现控制条件和记录异常同样重要，下一次我会先把测量步骤写得更清楚。",
+      "allowedFocusIds": [
+        "reflection_coaching"
+      ],
+      "visibleFacts": {
+        "研究问题": "光照时长对豆苗高度的影响",
+        "已接受分析": [
+          {
+            "observation": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+            "citations": [
+              "第4行「0小时：豆苗高度（厘米）」=6.3",
+              "第4行「12小时：豆苗高度（厘米）」=18.7",
+              "第8行「0小时：豆苗高度（厘米）」=6.3"
+            ],
+            "matchedValues": [
+              "6.3",
+              "18.7"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 3,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "cec0025f687873782872f37f2ae58fcd790f0162cdf03daed410c1dda99f1eef"
+              },
+              {
+                "rowIndex": 3,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.7",
+                "fingerprint": "59118213a473cced0021a66b016a1d2a0b9c4b065370216893441de4716d139e"
+              },
+              {
+                "rowIndex": 7,
+                "columnKey": "result_a",
+                "columnName": "0小时：豆苗高度（厘米）",
+                "citedValue": "6.3",
+                "fingerprint": "b79feb79bd31bd2ab9ab55c1c4568c7830fa53f52c3ec1032fbe81d0f565edaf"
+              }
+            ],
+            "roundFingerprint": "4b772646f41c03518cd7b343a53ec7cd74c699f529542664c6e664792ee0bab8"
+          },
+          {
+            "observation": "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。",
+            "citations": [
+              "第2行「12小时：豆苗高度（厘米）」=18.5",
+              "第2行「24小时：豆苗高度（厘米）」=15.8"
+            ],
+            "matchedValues": [
+              "18.5",
+              "15.8"
+            ],
+            "evidence": [
+              {
+                "rowIndex": 1,
+                "columnKey": "result_c",
+                "columnName": "12小时：豆苗高度（厘米）",
+                "citedValue": "18.5",
+                "fingerprint": "909a117064dbce42d99ae20864b0ca4ca467e34fd7104bc600d9e82a18681bd5"
+              },
+              {
+                "rowIndex": 1,
+                "columnKey": "result_d",
+                "columnName": "24小时：豆苗高度（厘米）",
+                "citedValue": "15.8",
+                "fingerprint": "551adfe53599a1873aae618a9277337daf309d906be64a66dbb60e206ec0e2a8"
+              }
+            ],
+            "roundFingerprint": "b27488336229eb14479958dfd031e423669562701732e8ffae30e18cb41a6a66"
+          }
+        ],
+        "报告摘要": {
+          "目的": "探究光照时长对豆苗高度的影响",
+          "假设": "我认为每天光照时间越多，豆苗高度越高。",
+          "材料": "豆苗、水培容器、营养液、刻度尺、遮光材料",
+          "步骤": "1. 设置0、8、12、24小时四个光照条件\n2. 各组保持其他条件一致\n3. 每天固定时间测量豆苗高度并记录\n4. 每个水平安排10次重复并计算平均值",
+          "数据摘要": "共10行真实记录。第1行：重复序号=1；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18.2；24小时：豆苗高度（厘米）=16.1；第2行：重复序号=2；0小时：豆苗高度（厘米）=6.5；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=15.8；第3行：重复序号=3；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=14.9；12小时：豆苗高度（厘米）=18.1；24小时：豆苗高度（厘米）=16.4；第4行：重复序号=4；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=15.2；12小时：豆苗高度（厘米）=18.7；24小时：豆苗高度（厘米）=16；第5行：重复序号=5；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=14.7；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9；第6行：重复序号=6；0小时：豆苗高度（厘米）=6；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.3；24小时：豆苗高度（厘米）=16.2；第7行：重复序号=7；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=15.3；12小时：豆苗高度（厘米）=18.6；24小时：豆苗高度（厘米）=15.7；客观异常备注=24小时组第7次转移培养液时有短暂停顿，原始值保留；第8行：重复序号=8；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18；24小时：豆苗高度（厘米）=16.3；第9行：重复序号=9；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=16.1；第10行：重复序号=10；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9",
+          "分析": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。；第4行「0小时：豆苗高度（厘米）」=6.3；第4行「12小时：豆苗高度（厘米）」=18.7；第8行「0小时：豆苗高度（厘米）」=6.3；第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。；第2行「12小时：豆苗高度（厘米）」=18.5；第2行「24小时：豆苗高度（厘米）」=15.8",
+          "结论": "在本次数据中，12小时光照组的平均高度最高，24小时组低于12小时组；这个结果部分支持原来的猜想，但还需要更多重复和控制条件来判断。",
+          "局限与讨论": "样本数量和观察时间有限，24小时组还出现过一次操作停顿；后续可以延长观察时间并进一步统一操作。"
+        },
+        "教师评价": {},
+        "学生是否已回应教师评价": false,
+        "学生是否已完成学习反思": false,
+        "作业限定方向": "光照时长与豆苗高度"
+      },
+      "response": {
+        "dialogue": "你从这次实验里总结出控制条件和记录异常都很重要，能举个具体的例子说说吗？比如在操作中，你觉得哪个步骤的控制或记录如果再清楚一点，可能会让结论更可靠？",
+        "interactionType": "open_question",
+        "focus": "reflection_coaching",
+        "hints": [
+          "你可以回想一下，记录的那次培养液短暂停顿，如果没写下来，会对判断结果有什么影响？"
+        ]
+      },
+      "rawOutput": "{\"dialogue\":\"你从这次实验里总结出控制条件和记录异常都很重要，能举个具体的例子说说吗？比如在操作中，你觉得哪个步骤的控制或记录如果再清楚一点，可能会让结论更可靠？\",\"interactionType\":\"open_question\",\"focus\":\"reflection_coaching\",\"hints\":[\"你可以回想一下，记录的那次培养液短暂停顿，如果没写下来，会对判断结果有什么影响？\"]}",
+      "promptSha256": "01ebce60b0cae3ed2f37e535585d11a773a6bacf4a668b8e904a27ee9e68930d",
+      "attempts": [],
+      "generationParams": {
+        "jsonFormat": true,
+        "maxTokens": 1200,
+        "timeoutMs": 180000,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 3359,
+          "completionTokens": 304,
+          "reasoningTokens": 212,
+          "totalTokens": 3663
+        },
+        "successfulAttempt": 1,
+        "promptVersion": "tutor-language-prompt-v1",
+        "validatorPolicyVersion": "tutor-semantic-validator-v2"
+      }
+    }
+  ],
+  "stageData": {
+    "extractedFacts": {
+      "stage1.researchQuestion": {
+        "value": "光照时长对豆苗高度的影响",
+        "sourceQuote": "光照时长对豆苗高度的影响"
+      },
+      "stage1.confirmed": {
+        "value": true,
+        "sourceQuote": "我确认按这个问题做。"
+      },
+      "stage2.hypothesis": {
+        "value": "我认为每天光照时间越多，豆苗高度越高。",
+        "sourceQuote": "我认为每天光照时间越多，豆苗高度越高。"
+      },
+      "stage2.independentVariable.name": {
+        "value": "每天光照时长",
+        "sourceQuote": "我准备改变每天光照时长。"
+      },
+      "stage2.independentVariable.levels": {
+        "value": [
+          "0小时",
+          "8小时",
+          "12小时",
+          "24小时"
+        ],
+        "sourceQuote": "我准备比较0小时、8小时、12小时和24小时。"
+      },
+      "stage2.dependentVariable.name": {
+        "value": "豆苗高度",
+        "sourceQuote": "我要观察豆苗高度。"
+      },
+      "stage2.dependentVariable.measurement": {
+        "value": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+        "sourceQuote": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+      },
+      "stage2.dependentVariable.unit": {
+        "value": "厘米",
+        "sourceQuote": "用刻度尺从土壤表面量到茎尖，每天固定时间测量，单位用厘米。"
+      },
+      "stage2.controlledVariables": {
+        "value": [
+          "豆苗数量",
+          "水和营养液量",
+          "水位",
+          "温度",
+          "测量时间"
+        ],
+        "sourceQuote": "豆苗数量、水和营养液量、水位、温度、测量时间都保持一致。"
+      },
+      "stage2.repeatCount": {
+        "value": 10,
+        "sourceQuote": "每个水平做10次重复，最后取平均值。"
+      }
+    },
+    "stage1": {
+      "confirmed": true,
+      "snapshot": "《探究问题确认书》\n研究问题：光照时长对豆苗高度的影响",
+      "researchQuestion": "光照时长对豆苗高度的影响",
+      "confirmedQuestionHash": "simulated-confirmed-question"
+    },
+    "stage2": {
+      "submitted": false,
+      "approved": null,
+      "planDraft": {
+        "researchQuestion": "光照时长对豆苗高度的影响",
+        "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+        "independentVariable": {
+          "name": "每天光照时长",
+          "levels": [
+            "0小时",
+            "8小时",
+            "12小时",
+            "24小时"
+          ]
+        },
+        "dependentVariable": {
+          "name": "豆苗高度",
+          "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+          "unit": "厘米"
+        },
+        "controlledVariables": [
+          "豆苗数量",
+          "水和营养液量",
+          "水位",
+          "温度",
+          "测量时间"
+        ],
+        "materials": [
+          "豆苗",
+          "水培容器",
+          "营养液",
+          "刻度尺",
+          "遮光材料"
+        ],
+        "procedure": [
+          "设置0、8、12、24小时四个光照条件",
+          "各组保持其他条件一致",
+          "每天固定时间测量豆苗高度并记录",
+          "每个水平安排10次重复并计算平均值"
+        ],
+        "repeatCount": 10,
+        "safetyNotes": [
+          "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+        ]
+      },
+      "readiness": {
+        "policyVersion": "stage2-readiness-v1",
+        "complete": true,
+        "completedFields": [
+          "hypothesis",
+          "independent_variable",
+          "levels",
+          "dependent_variable",
+          "measurement",
+          "controls",
+          "repeats"
+        ],
+        "missingFields": [],
+        "nextFocusId": "plan_confirmation"
+      },
+      "planProvenance": {
+        "researchQuestion": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage1.researchQuestion"
+          ]
+        },
+        "hypothesis": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.hypothesis"
+          ]
+        },
+        "independentVariable": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.independentVariable.name"
+          ]
+        },
+        "levels": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.independentVariable.levels"
+          ]
+        },
+        "dependentVariable": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.dependentVariable.name"
+          ]
+        },
+        "measurement": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.dependentVariable.measurement",
+            "stage2.dependentVariable.unit"
+          ]
+        },
+        "controlledVariables": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.controlledVariables"
+          ]
+        },
+        "materials": {
+          "source": "server_composed",
+          "sourceFields": [
+            "stage2.independentVariable.name",
+            "stage2.dependentVariable.measurement"
+          ]
+        },
+        "procedure": {
+          "source": "server_composed",
+          "sourceFields": [
+            "stage2.independentVariable.name",
+            "stage2.independentVariable.levels",
+            "stage2.controlledVariables",
+            "stage2.repeatCount",
+            "stage2.dependentVariable.measurement"
+          ]
+        },
+        "repeatCount": {
+          "source": "student_fact",
+          "sourceFields": [
+            "stage2.repeatCount"
+          ]
+        },
+        "safetyNotes": {
+          "source": "server_baseline",
+          "sourceFields": []
+        }
+      },
+      "draftHash": "642773e24f9d3b71cf38308f16f88935e2a1cd9e5f78c0eb9acbfcf28cbde510",
+      "schema": {
+        "columns": [
+          {
+            "key": "trial",
+            "title": "重复序号",
+            "type": "number",
+            "required": true
+          },
+          {
+            "key": "result_a",
+            "title": "0小时：豆苗高度（厘米）",
+            "type": "number",
+            "required": true
+          },
+          {
+            "key": "result_b",
+            "title": "8小时：豆苗高度（厘米）",
+            "type": "number",
+            "required": true
+          },
+          {
+            "key": "result_c",
+            "title": "12小时：豆苗高度（厘米）",
+            "type": "number",
+            "required": true
+          },
+          {
+            "key": "result_d",
+            "title": "24小时：豆苗高度（厘米）",
+            "type": "number",
+            "required": true
+          },
+          {
+            "key": "notes",
+            "title": "客观异常备注",
+            "type": "text",
+            "required": false
+          }
+        ],
+        "minRows": 10,
+        "maxRows": 200
+      },
+      "experimentPlan": {
+        "researchQuestion": "光照时长对豆苗高度的影响",
+        "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+        "independentVariable": {
+          "name": "每天光照时长",
+          "levels": [
+            "0小时",
+            "8小时",
+            "12小时",
+            "24小时"
+          ]
+        },
+        "dependentVariable": {
+          "name": "豆苗高度",
+          "measurement": "用刻度尺从土壤表面量到茎尖，每天固定时间测量",
+          "unit": "厘米"
+        },
+        "controlledVariables": [
+          "豆苗数量",
+          "水和营养液量",
+          "水位",
+          "温度",
+          "测量时间"
+        ],
+        "materials": [
+          "豆苗",
+          "水培容器",
+          "营养液",
+          "刻度尺",
+          "遮光材料"
+        ],
+        "procedure": [
+          "设置0、8、12、24小时四个光照条件",
+          "各组保持其他条件一致",
+          "每天固定时间测量豆苗高度并记录",
+          "每个水平安排10次重复并计算平均值"
+        ],
+        "repeatCount": 10,
+        "safetyNotes": [
+          "保持台面整洁，培养液或装置异常时停止操作并告知教师。"
+        ]
+      },
+      "confirmedPlanHash": "642773e24f9d3b71cf38308f16f88935e2a1cd9e5f78c0eb9acbfcf28cbde510"
+    },
+    "stage3": {
+      "rows": [
+        {
+          "trial": 1,
+          "result_a": 6.2,
+          "result_b": 14.8,
+          "result_c": 18.2,
+          "result_d": 16.1,
+          "notes": ""
+        },
+        {
+          "trial": 2,
+          "result_a": 6.5,
+          "result_b": 15.1,
+          "result_c": 18.5,
+          "result_d": 15.8,
+          "notes": ""
+        },
+        {
+          "trial": 3,
+          "result_a": 6.1,
+          "result_b": 14.9,
+          "result_c": 18.1,
+          "result_d": 16.4,
+          "notes": ""
+        },
+        {
+          "trial": 4,
+          "result_a": 6.3,
+          "result_b": 15.2,
+          "result_c": 18.7,
+          "result_d": 16,
+          "notes": ""
+        },
+        {
+          "trial": 5,
+          "result_a": 6.4,
+          "result_b": 14.7,
+          "result_c": 18.4,
+          "result_d": 15.9,
+          "notes": ""
+        },
+        {
+          "trial": 6,
+          "result_a": 6,
+          "result_b": 15,
+          "result_c": 18.3,
+          "result_d": 16.2,
+          "notes": ""
+        },
+        {
+          "trial": 7,
+          "result_a": 6.2,
+          "result_b": 15.3,
+          "result_c": 18.6,
+          "result_d": 15.7,
+          "notes": "24小时组第7次转移培养液时有短暂停顿，原始值保留"
+        },
+        {
+          "trial": 8,
+          "result_a": 6.3,
+          "result_b": 14.8,
+          "result_c": 18,
+          "result_d": 16.3,
+          "notes": ""
+        },
+        {
+          "trial": 9,
+          "result_a": 6.1,
+          "result_b": 15.1,
+          "result_c": 18.5,
+          "result_d": 16.1,
+          "notes": ""
+        },
+        {
+          "trial": 10,
+          "result_a": 6.4,
+          "result_b": 15,
+          "result_c": 18.4,
+          "result_d": 15.9,
+          "notes": ""
+        }
+      ],
+      "safetyQuiz": {
+        "question": "出现异常时应该怎样做？",
+        "options": [
+          "停止并告知教师",
+          "继续完成",
+          "自行增强材料"
+        ],
+        "passed": true
+      },
+      "submitted": true
+    },
+    "stage4": {
+      "analysisCount": 2,
+      "observations": [
+        "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+        "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。"
+      ],
+      "evidenceCitations": [
+        "6.3",
+        "18.7",
+        "18.5",
+        "15.8"
+      ],
+      "evidenceRounds": [
+        {
+          "observation": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。",
+          "citations": [
+            "第4行「0小时：豆苗高度（厘米）」=6.3",
+            "第4行「12小时：豆苗高度（厘米）」=18.7",
+            "第8行「0小时：豆苗高度（厘米）」=6.3"
+          ],
+          "matchedValues": [
+            "6.3",
+            "18.7"
+          ],
+          "evidence": [
+            {
+              "rowIndex": 3,
+              "columnKey": "result_a",
+              "columnName": "0小时：豆苗高度（厘米）",
+              "citedValue": "6.3",
+              "fingerprint": "cec0025f687873782872f37f2ae58fcd790f0162cdf03daed410c1dda99f1eef"
+            },
+            {
+              "rowIndex": 3,
+              "columnKey": "result_c",
+              "columnName": "12小时：豆苗高度（厘米）",
+              "citedValue": "18.7",
+              "fingerprint": "59118213a473cced0021a66b016a1d2a0b9c4b065370216893441de4716d139e"
+            },
+            {
+              "rowIndex": 7,
+              "columnKey": "result_a",
+              "columnName": "0小时：豆苗高度（厘米）",
+              "citedValue": "6.3",
+              "fingerprint": "b79feb79bd31bd2ab9ab55c1c4568c7830fa53f52c3ec1032fbe81d0f565edaf"
+            }
+          ],
+          "roundFingerprint": "4b772646f41c03518cd7b343a53ec7cd74c699f529542664c6e664792ee0bab8"
+        },
+        {
+          "observation": "第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。",
+          "citations": [
+            "第2行「12小时：豆苗高度（厘米）」=18.5",
+            "第2行「24小时：豆苗高度（厘米）」=15.8"
+          ],
+          "matchedValues": [
+            "18.5",
+            "15.8"
+          ],
+          "evidence": [
+            {
+              "rowIndex": 1,
+              "columnKey": "result_c",
+              "columnName": "12小时：豆苗高度（厘米）",
+              "citedValue": "18.5",
+              "fingerprint": "909a117064dbce42d99ae20864b0ca4ca467e34fd7104bc600d9e82a18681bd5"
+            },
+            {
+              "rowIndex": 1,
+              "columnKey": "result_d",
+              "columnName": "24小时：豆苗高度（厘米）",
+              "citedValue": "15.8",
+              "fingerprint": "551adfe53599a1873aae618a9277337daf309d906be64a66dbb60e206ec0e2a8"
+            }
+          ],
+          "roundFingerprint": "b27488336229eb14479958dfd031e423669562701732e8ffae30e18cb41a6a66"
+        }
+      ]
+    },
+    "stage5": {
+      "submitted": false,
+      "approved": null,
+      "sections": {
+        "purpose": "探究光照时长对豆苗高度的影响",
+        "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+        "materials": "豆苗、水培容器、营养液、刻度尺、遮光材料",
+        "procedure": "1. 设置0、8、12、24小时四个光照条件\n2. 各组保持其他条件一致\n3. 每天固定时间测量豆苗高度并记录\n4. 每个水平安排10次重复并计算平均值",
+        "dataSummary": "共10行真实记录。第1行：重复序号=1；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18.2；24小时：豆苗高度（厘米）=16.1；第2行：重复序号=2；0小时：豆苗高度（厘米）=6.5；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=15.8；第3行：重复序号=3；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=14.9；12小时：豆苗高度（厘米）=18.1；24小时：豆苗高度（厘米）=16.4；第4行：重复序号=4；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=15.2；12小时：豆苗高度（厘米）=18.7；24小时：豆苗高度（厘米）=16；第5行：重复序号=5；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=14.7；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9；第6行：重复序号=6；0小时：豆苗高度（厘米）=6；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.3；24小时：豆苗高度（厘米）=16.2；第7行：重复序号=7；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=15.3；12小时：豆苗高度（厘米）=18.6；24小时：豆苗高度（厘米）=15.7；客观异常备注=24小时组第7次转移培养液时有短暂停顿，原始值保留；第8行：重复序号=8；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18；24小时：豆苗高度（厘米）=16.3；第9行：重复序号=9；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=16.1；第10行：重复序号=10；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9",
+        "analysis": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。；第4行「0小时：豆苗高度（厘米）」=6.3；第4行「12小时：豆苗高度（厘米）」=18.7；第8行「0小时：豆苗高度（厘米）」=6.3；第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。；第2行「12小时：豆苗高度（厘米）」=18.5；第2行「24小时：豆苗高度（厘米）」=15.8",
+        "conclusion": "在本次数据中，12小时光照组的平均高度最高，24小时组低于12小时组；这个结果部分支持原来的猜想，但还需要更多重复和控制条件来判断。",
+        "limitationsDiscussion": "样本数量和观察时间有限，24小时组还出现过一次操作停顿；后续可以延长观察时间并进一步统一操作。",
+        "reflection": "样本数量和观察时间有限，24小时组还出现过一次操作停顿；后续可以延长观察时间并进一步统一操作。"
+      }
+    },
+    "stage6": {
+      "studentResponse": "",
+      "responseToTeacherFeedback": "",
+      "learningReflection": "",
+      "finalReadonly": false
+    }
+  },
+  "reportSections": {
+    "purpose": "探究光照时长对豆苗高度的影响",
+    "hypothesis": "我认为每天光照时间越多，豆苗高度越高。",
+    "materials": "豆苗、水培容器、营养液、刻度尺、遮光材料",
+    "procedure": "1. 设置0、8、12、24小时四个光照条件\n2. 各组保持其他条件一致\n3. 每天固定时间测量豆苗高度并记录\n4. 每个水平安排10次重复并计算平均值",
+    "dataSummary": "共10行真实记录。第1行：重复序号=1；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18.2；24小时：豆苗高度（厘米）=16.1；第2行：重复序号=2；0小时：豆苗高度（厘米）=6.5；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=15.8；第3行：重复序号=3；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=14.9；12小时：豆苗高度（厘米）=18.1；24小时：豆苗高度（厘米）=16.4；第4行：重复序号=4；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=15.2；12小时：豆苗高度（厘米）=18.7；24小时：豆苗高度（厘米）=16；第5行：重复序号=5；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=14.7；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9；第6行：重复序号=6；0小时：豆苗高度（厘米）=6；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.3；24小时：豆苗高度（厘米）=16.2；第7行：重复序号=7；0小时：豆苗高度（厘米）=6.2；8小时：豆苗高度（厘米）=15.3；12小时：豆苗高度（厘米）=18.6；24小时：豆苗高度（厘米）=15.7；客观异常备注=24小时组第7次转移培养液时有短暂停顿，原始值保留；第8行：重复序号=8；0小时：豆苗高度（厘米）=6.3；8小时：豆苗高度（厘米）=14.8；12小时：豆苗高度（厘米）=18；24小时：豆苗高度（厘米）=16.3；第9行：重复序号=9；0小时：豆苗高度（厘米）=6.1；8小时：豆苗高度（厘米）=15.1；12小时：豆苗高度（厘米）=18.5；24小时：豆苗高度（厘米）=16.1；第10行：重复序号=10；0小时：豆苗高度（厘米）=6.4；8小时：豆苗高度（厘米）=15；12小时：豆苗高度（厘米）=18.4；24小时：豆苗高度（厘米）=15.9",
+    "analysis": "第4行中，0小时组是6.3厘米，12小时组是18.7厘米，12小时组比0小时组高12.4厘米。；第4行「0小时：豆苗高度（厘米）」=6.3；第4行「12小时：豆苗高度（厘米）」=18.7；第8行「0小时：豆苗高度（厘米）」=6.3；第2行中，12小时组是18.5厘米，24小时组是15.8厘米，12小时组比24小时组高2.7厘米。；第2行「12小时：豆苗高度（厘米）」=18.5；第2行「24小时：豆苗高度（厘米）」=15.8",
+    "conclusion": "在本次数据中，12小时光照组的平均高度最高，24小时组低于12小时组；这个结果部分支持原来的猜想，但还需要更多重复和控制条件来判断。",
+    "limitationsDiscussion": "样本数量和观察时间有限，24小时组还出现过一次操作停顿；后续可以延长观察时间并进一步统一操作。",
+    "reflection": "样本数量和观察时间有限，24小时组还出现过一次操作停顿；后续可以延长观察时间并进一步统一操作。"
+  }
+}

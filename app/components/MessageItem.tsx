@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Message } from '../models/types';
+import { confirmationDocumentBody } from '../lib/confirmationFlow';
 
 interface MessageItemProps {
   message: Message;
@@ -32,17 +33,15 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isLastUser, onResend
   const showActions = isUser && isLastUser && hover;
   const isConfirmationDoc = message.messageType === 'confirmation_doc';
 
-  // 探究问题确认书 / 阶段确认书：以卡片样式渲染，区别于普通对话
+  // 旧消息仍使用 confirmation_doc 类型，但学生端只显示紧凑确认状态。
   if (isConfirmationDoc) {
     return (
       <div className="mb-4 text-left">
-        <div className="inline-block max-w-[85%] border-2 border-green-400 rounded-xl bg-green-50 shadow-sm overflow-hidden">
-          <div className="bg-green-500 text-white px-4 py-1.5 text-sm font-medium">
-            📋 探究问题确认书
-          </div>
-          <div className="px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-            {renderWithBold(message.content)}
-          </div>
+        <div className="inline-flex max-w-[85%] items-start gap-2 rounded-md border border-green-300 bg-green-50 px-3 py-2">
+          <span className="shrink-0 text-sm font-medium text-green-800">已确认研究问题</span>
+          <span className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+            {renderWithBold(confirmationDocumentBody(message.content))}
+          </span>
         </div>
       </div>
     );

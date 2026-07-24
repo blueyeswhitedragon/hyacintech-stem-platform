@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Message } from '../models/types';
 import type { StageData, Stage3FileAssociation, AssignmentStatus } from '../models/stageData';
 import ConversationChat, { type ChatApiResponse } from './ConversationChat';
@@ -8,9 +8,9 @@ import DataTableEditor from './DataTableEditor';
 import ChartViewer from './ChartViewer';
 import ReportViewer from './ReportViewer';
 import Stage6Panel from './Stage6Panel';
-import SchemaEditor from './SchemaEditor';
+import Stage2PlanPreview from './Stage2PlanPreview';
 import Fireworks from './Fireworks';
-import type { Stage2Column } from '../models/stageData';
+import { evaluateStage2Readiness } from '../lib/stage2Readiness';
 
 interface Props {
   conversationId: string;
@@ -19,6 +19,27 @@ interface Props {
   initialStageData: StageData;
   initialStatus: AssignmentStatus;
   initialSafetyQuizCompleted: boolean;
+  initialDueDate?: string | null;
+}
+
+function hydrateStage1Confirmation(messages: Message[], stageData: StageData): Message[] {
+  const stage1 = stageData.stage1;
+  if (!stage1?.confirmed || !stage1.snapshot) return messages;
+  const existingIndex = messages.map((message) => message.messageType).lastIndexOf('confirmation_doc');
+  if (existingIndex >= 0) {
+    return messages.map((message, index) => index === existingIndex
+      ? { ...message, actionType: 'confirmation', phaseComplete: true }
+      : message);
+  }
+  return [...messages, {
+    id: `stage1-confirmation-${stage1.confirmedQuestionHash ?? 'legacy'}`,
+    role: 'assistant',
+    content: stage1.snapshot,
+    messageType: 'confirmation_doc',
+    actionType: 'confirmation',
+    phaseComplete: true,
+    status: 'sent',
+  }];
 }
 
 export default function ConversationWorkspace({
@@ -28,13 +49,23 @@ export default function ConversationWorkspace({
   initialStageData,
   initialStatus,
   initialSafetyQuizCompleted,
+  initialDueDate,
 }: Props) {
+  const [hydratedMessages] = useState(() => hydrateStage1Confirmation(initialMessages, initialStageData));
   const [stage, setStage] = useState(initialStage);
   const [stageData, setStageData] = useState<StageData>(initialStageData);
   const [status, setStatus] = useState<AssignmentStatus>(initialStatus);
   const [completed, setCompleted] = useState(initialStatus === 'COMPLETED');
   const [injectedMessage, setInjectedMessage] = useState<Message | null>(null);
   const [safetyQuizCompleted, setSafetyQuizCompleted] = useState(initialSafetyQuizCompleted);
+  const [overdue, setOverdue] = useState(false);
+
+  useEffect(() => {
+    if (!initialDueDate) return;
+    const remaining = new Date(initialDueDate).getTime() - Date.now();
+    const timer = window.setTimeout(() => setOverdue(true), Math.max(0, remaining));
+    return () => window.clearTimeout(timer);
+  }, [initialDueDate]);
   // 发送消息到会话端点（ConversationChat 注入；服务端已有历史，忽略 history 参数）
   const sendChat = async (message: string): Promise<ChatApiResponse> => {
     const res = await fetch(`/api/conversations/${conversationId}/chat`, {
@@ -85,18 +116,20 @@ export default function ConversationWorkspace({
 
   const submitStage2 = () => postAction('submit-stage2');
   const submitStage5 = () => postAction('submit-stage5');
-  const respondStage6 = (response: string) => postAction('stage6-respond', { response });
+  const respondStage6 = (responseToTeacherFeedback: string, learningReflection: string) => postAction('stage6-respond', {
+    responseToTeacherFeedback,
+    learningReflection,
+  });
 
-  /** 保存学生对数据表列定义的修改（阶段2） */
-  const saveSchema = async (columns: Stage2Column[]): Promise<string | null> => {
-    const res = await fetch(`/api/conversations/${conversationId}/stage-data`, {
-      method: 'PATCH',
+  const confirmStage2Plan = async (draftHash: string): Promise<string | null> => {
+    const res = await fetch(`/api/conversations/${conversationId}/confirm-stage2-plan`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stage2: { columns } }),
+      body: JSON.stringify({ draftHash }),
     });
-    const data = await res.json();
-    if (!res.ok) return data.error || '保存失败';
-    setStageData(data.stageData);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return data.error || '方案确认失败';
+    if (data.stageData) setStageData(data.stageData);
     return null;
   };
 
@@ -116,11 +149,11 @@ export default function ConversationWorkspace({
     return null;
   };
 
-  const saveStage5 = async (conclusion: string, reflection: string): Promise<string | null> => {
+  const saveStage5 = async (conclusion: string, limitationsDiscussion: string): Promise<string | null> => {
     const res = await fetch(`/api/conversations/${conversationId}/stage-data`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stage5: { conclusion, reflection } }),
+      body: JSON.stringify({ stage5: { conclusion, limitationsDiscussion } }),
     });
     const data = await res.json();
     if (!res.ok) return data.error || '保存失败';
@@ -192,6 +225,12 @@ export default function ConversationWorkspace({
 
   const pendingStage2 = status === 'PENDING_STAGE2';
   const pendingStage5 = status === 'PENDING_STAGE5';
+  const readOnlyReason = completed
+    ? '探究已完成，内容已锁定。'
+    : pendingStage2 || pendingStage5
+      ? '已提交教师审核，审核完成前内容只读。'
+      : undefined;
+  const lateRecorded = (stageData.timeline?.lateEvents.length ?? 0) > 0;
   const rejected2 = stageData.stage2?.approved === false ? stageData.stage2.teacherFeedback : null;
   const rejected3 = stageData.stage3?.approved === false ? stageData.stage3.teacherFeedback : null;
   const rejected5 = stageData.stage5?.approved === false ? stageData.stage5.teacherFeedback : null;
@@ -221,23 +260,44 @@ export default function ConversationWorkspace({
   function renderPanel() {
     switch (stage) {
       case 2:
-        if (!stageData.stage2?.schema) return null;
+        const formalStage2 = stageData.stage2;
+        const readiness = formalStage2?.readiness ?? evaluateStage2Readiness(stageData);
+        const planConfirmed = Boolean(formalStage2?.confirmedPlanHash
+          && formalStage2.confirmedPlanHash === formalStage2.draftHash
+          && formalStage2.experimentPlan);
         return (
           <div>
             {banner}
-            <SchemaEditor
-              columns={stageData.stage2.schema.columns}
-              onSave={saveSchema}
+            <Stage2PlanPreview
+              plan={formalStage2?.planDraft}
+              draftHash={formalStage2?.draftHash}
+              readiness={readiness}
+              provenance={formalStage2?.planProvenance}
+              confirmed={planConfirmed}
+              onConfirm={pendingStage2 || planConfirmed ? undefined : confirmStage2Plan}
             />
-            {stageData.stage2.aiRiskAnnotations && stageData.stage2.aiRiskAnnotations.length > 0 && (
+            {planConfirmed && formalStage2 && formalStage2.schema.columns.length > 0 && (
+              <section className="border-b border-gray-200 px-4 py-4">
+                <h2 className="mb-2 text-sm font-semibold text-gray-900">数据表结构</h2>
+                <div className="space-y-1 text-sm text-gray-700">
+                  {formalStage2.schema.columns.map((column) => (
+                    <div key={column.key} className="flex justify-between gap-3 border-b border-gray-100 py-1 last:border-0">
+                      <span>{column.title}</span>
+                      <span className="text-xs text-gray-500">{column.type}{column.required ? ' · 必填' : ''}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+            {planConfirmed && formalStage2?.aiRiskAnnotations && formalStage2.aiRiskAnnotations.length > 0 && (
               <div className="mx-4 mb-3 bg-amber-50 border border-amber-200 rounded p-2 text-sm">
                 <div className="font-medium text-amber-800 mb-1">⚠️ 安全/风险提示</div>
-                {stageData.stage2.aiRiskAnnotations.map((r, i) => (
+                {formalStage2.aiRiskAnnotations.map((r, i) => (
                   <div key={i} className="text-amber-700">· {r.description}（{r.severity}）</div>
                 ))}
               </div>
             )}
-            {!pendingStage2 && (
+            {planConfirmed && !pendingStage2 && (
               <div className="px-4 pb-4">
                 <button
                   onClick={submitStage2}
@@ -302,19 +362,30 @@ export default function ConversationWorkspace({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-full">
+    <div className="flex h-full min-h-0 flex-col">
+      {overdue && !completed && (
+        <div className="mb-3 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          已超过截止时间，仍可继续完成；后续里程碑提交会记录为迟交{lateRecorded ? '（已记录）' : ''}。
+        </div>
+      )}
+      <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
       <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
         <div className="min-h-0 flex-1">
           <ConversationChat
-            initialMessages={initialMessages}
+            initialMessages={hydratedMessages}
             stage={stage}
             completed={completed}
             send={sendChat}
             onResult={onChatResult}
             onSafetyPassed={markSafetyPassed}
-            onPhaseConfirm={onPhaseConfirm}
+            onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
+            phaseConfirmLabel="研究问题无误，进入方案设计"
             roundCount={stageData.roundCounts?.[stage] ?? 0}
             injectedMessage={injectedMessage}
+            initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
+              ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
+              : null}
+            readOnlyReason={readOnlyReason}
           />
         </div>
       </div>
@@ -324,6 +395,7 @@ export default function ConversationWorkspace({
         </div>
       )}
       {completed && <Fireworks />}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,26 @@
+{
+  "experiment": "experience-mode-prompt-ab",
+  "createdAt": "2026-07-23T16:59:15.518Z",
+  "outputRoot": "/root/hyacintech-stem-platform/data/prompt-experience-ab-20260723",
+  "model": {
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro"
+  },
+  "promptVersions": [
+    "tutor-language-prompt-v1",
+    "tutor-language-prompt-v2.3"
+  ],
+  "scenario": {
+    "researchQuestion": "光照时长对豆苗高度的影响",
+    "levels": [
+      "0小时",
+      "8小时",
+      "12小时",
+      "24小时"
+    ],
+    "rows": 10,
+    "repeatCount": 10
+  },
+  "noDatabaseWrites": true,
+  "notes": "A/B uses identical student messages and structured state; only Tutor prompt version changes."
+}

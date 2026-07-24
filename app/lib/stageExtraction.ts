@@ -34,6 +34,9 @@ export function extractStageData(
     stageData.stage1 = {
       confirmed: true,
       snapshot: response.snapshot ?? '',
+      researchQuestion: response.theme_mapping?.researchQuestion
+        ?? response.snapshot?.match(/研究问题\s*[:：]\s*([^\n]+)/)?.[1]?.trim()
+        ?? '',
       themeMapping: response.theme_mapping,
       factorDirection: factor,
       phenomenonDirection: phenomenon,
@@ -60,12 +63,13 @@ export function extractStageData(
 
   // 阶段3：保存本次真实安全题。只有服务端核验答案后才会置 passed=true。
   if (currentStage === 3 && response.safety_quiz) {
+    if (!Number.isInteger(response.safety_quiz.correct)) return { stageData };
     stageData.stage3 = {
       ...(prev.stage3 ?? { rows: [] }),
       safetyQuiz: {
         question: response.safety_quiz.question,
         options: response.safety_quiz.options,
-        correct: response.safety_quiz.correct,
+        correct: response.safety_quiz.correct!,
         passed: prev.stage3?.safetyQuiz?.passed ?? false,
       },
     };
@@ -111,7 +115,7 @@ export function extractStageData(
     return { stageData };
   }
 
-  // 阶段5：生成报告框架 → 预填各节（conclusion/reflection 留空给学生）
+  // 阶段5：生成报告框架 → 预填各节（结论、局限与讨论留空给学生）
   if (currentStage === 5 && response.report_sections) {
     stageData.stage5 = {
       submitted: prev.stage5?.submitted ?? false,
@@ -119,9 +123,12 @@ export function extractStageData(
       sections: {
         ...response.report_sections,
         conclusion: prev.stage5?.sections?.conclusion ?? '',
-        reflection: prev.stage5?.sections?.reflection ?? '',
+        limitationsDiscussion: prev.stage5?.sections?.limitationsDiscussion ?? prev.stage5?.sections?.reflection ?? '',
+        reflection: prev.stage5?.sections?.limitationsDiscussion ?? prev.stage5?.sections?.reflection ?? '',
       },
       aiReferenceScore: prev.stage5?.aiReferenceScore,
+      submittedSectionsHash: prev.stage5?.submittedSectionsHash,
+      aiScoreSectionsHash: prev.stage5?.aiScoreSectionsHash,
       teacherScore: prev.stage5?.teacherScore,
       teacherFeedback: prev.stage5?.teacherFeedback,
     };

@@ -1,4 +1,5 @@
 import type { StageData } from '@/app/models/stageData';
+import { limitationsDiscussion } from '@/app/lib/reportFields';
 
 /** 给阶段5用：把前序阶段内容压成一段文本摘要。 */
 export function buildPriorSummary(stageData: StageData): string {
@@ -73,10 +74,18 @@ export function buildPriorSummary(stageData: StageData): string {
       `数据概述：${report.dataSummary}`,
       `分析：${report.analysis}`,
       `学生结论：${report.conclusion || '待填写'}`,
-      `学生反思：${report.reflection || '待填写'}`,
+      `局限与讨论：${limitationsDiscussion(report) || '待填写'}`,
       stageData.stage5.teacherScore !== undefined ? `教师评分：${stageData.stage5.teacherScore}` : '',
       stageData.stage5.teacherFeedback?.trim() ? `教师反馈：${stageData.stage5.teacherFeedback.trim()}` : '',
     ].filter(Boolean).join('\n'));
+  }
+
+  if (stageData.stage6) {
+    parts.push([
+      '【结果反思】',
+      `对教师评价的回应：${stageData.stage6.responseToTeacherFeedback || stageData.stage6.studentResponse || '待填写'}`,
+      `学习反思：${stageData.stage6.learningReflection || stageData.stage6.studentResponse || '待填写'}`,
+    ].join('\n'));
   }
 
   return parts.join('\n\n') || '（前序阶段暂无结构化摘要，请参考对话历史）';

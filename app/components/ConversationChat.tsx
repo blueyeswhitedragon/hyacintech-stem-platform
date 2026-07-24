@@ -8,9 +8,11 @@ import MessageItem from './MessageItem';
 import StageProgress from './StageProgress';
 import { shouldShowEscapeHatch } from '../lib/pacing';
 import { injectMessageOnce } from '../lib/messageInjection';
+import { phaseConfirmationAction } from '../lib/confirmationFlow';
 
-/** 逃生按钮发送的强制收敛消息：促使模型立即输出确认书（仍由模型产出结构化信号，不绕过 gating）。 */
-const FORCE_CONVERGE_TEXT = '我觉得讨论得差不多了，请你直接给出《探究问题确认书》，让我进入下一阶段。';
+/** 逃生按钮发送的强制收敛消息：促使模型核对研究问题，不绕过服务器门禁。 */
+const FORCE_CONVERGE_TEXT = '我觉得研究问题已经清楚了，请直接让我核对并确认这个问题。';
+const EXPLICIT_PHASE_CONFIRM_TEXT = '我确认按这个问题做。';
 
 export interface ChatApiResponse extends ChatResponse {
   currentStage?: number;
@@ -28,12 +30,17 @@ interface Props {
   onResult?: (data: ChatApiResponse) => void;
   /** 安全问答答对后的回调（正式模式 POST safety-quiz；体验模式本地无操作）。 */
   onSafetyPassed?: (selected: number) => void | Promise<void>;
-  /** 当阶段完成且用户点击"确认"时，直接推进阶段（不再发 LLM 请求）。 */
+  /** 用户确认完成后推进阶段；未形成确认书时组件会先通过 send 写入显式确认。 */
   onPhaseConfirm?: () => Promise<string | null>;
+  phaseConfirmLabel?: string;
   /** 本阶段累计对话轮次，用于判断是否显示「我已准备好，进入下一步」逃生按钮。 */
   roundCount?: number;
   /** 服务端或父级生成的助手主动消息；按稳定 id 去重注入，不产生用户消息。 */
   injectedMessage?: Message | null;
+  /** 从服务器状态恢复的未完成安全题（不含答案键）。 */
+  initialSafetyQuiz?: SafetyQuiz | null;
+  /** 待审/已完成时由父级给出只读原因。 */
+  readOnlyReason?: string;
 }
 
 const noop = () => {};
@@ -45,31 +52,44 @@ function structuredNotice(data: ChatApiResponse): string | null {
     return `✅ 已生成实验数据表结构（共 ${n} 列），将在「过程执行」阶段用于录入数据。`;
   }
   if (data.report_sections) {
-    return '✅ 已生成报告框架（目的/假设/材料/步骤/数据/分析已预填），请补充结论与反思。';
+    return '已生成报告框架（目的、假设、材料、步骤、数据和分析已预填），请补充结论与局限讨论。';
   }
   return null;
 }
 
-export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, roundCount = 0, injectedMessage }: Props) {
+export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, phaseConfirmLabel = '确认，进入下一阶段', roundCount = 0, injectedMessage, initialSafetyQuiz = null, readOnlyReason }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [quiz, setQuiz] = useState<SafetyQuiz | null>(null);
+  const [quiz, setQuiz] = useState<SafetyQuiz | null>(initialSafetyQuiz);
   const [quizChoice, setQuizChoice] = useState<number | null>(null);
   const [quizError, setQuizError] = useState<string | null>(null);
   const [hintsEnabled, setHintsEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // 并发发送守卫：用 ref 而非 isLoading，确保确认按钮流程中（isLoading=true）仍可执行自动触发消息
   const sendingRef = useRef(false);
+  const confirmingRef = useRef(false);
   const displayedMessages = injectMessageOnce(messages, injectedMessage);
+  const initialSafetyQuizSignature = initialSafetyQuiz ? JSON.stringify(initialSafetyQuiz) : '';
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, injectedMessage, isLoading]);
 
-  const doSend = async (text: string) => {
-    if (text.trim() === '' || sendingRef.current) return;
+  useEffect(() => {
+    if (!initialSafetyQuizSignature) return;
+    const restoredQuiz = JSON.parse(initialSafetyQuizSignature) as SafetyQuiz;
+    const timer = window.setTimeout(() => {
+      setQuiz(restoredQuiz);
+      setQuizChoice(null);
+      setQuizError(null);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [initialSafetyQuizSignature]);
+
+  const doSend = async (text: string): Promise<ChatApiResponse | null> => {
+    if (text.trim() === '' || sendingRef.current || readOnlyReason) return null;
     sendingRef.current = true;
 
     const userMessage: Message = { id: uuidv4(), role: 'user', content: text, status: 'sent' };
@@ -86,7 +106,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
       } catch (e) {
         setError(e instanceof Error ? e.message : '请求失败，请重试。');
         setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
-        return;
+        return null;
       }
 
       const assistantMessage: Message = {
@@ -101,7 +121,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
       setMessages((prev) => [...prev, assistantMessage]);
       onResult?.(data);
 
-      // 结构化产出：阶段确认书 → 独立卡片消息
+      // 结构化产出：底层仍保留 snapshot，学生端渲染为紧凑确认状态。
       if (data.stage1_confirmed && data.snapshot) {
         setMessages((prev) => [
           ...prev,
@@ -126,9 +146,11 @@ export default function ConversationChat({ initialMessages, stage, completed, se
           { id: uuidv4(), role: 'assistant', content: notice },
         ]);
       }
+      return data;
     } catch {
       setError('发送消息失败，请重试');
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
+      return null;
     } finally {
       sendingRef.current = false;
       setIsLoading(false);
@@ -147,23 +169,37 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   /** 选项/提示仅展示，不发送 —— 引导学生思考方向而非代答 */
   // handleOptionClick removed — options are display-only
 
-  /** 确认按钮：始终直接推进阶段，不作为对话输入 */
+  /** 未形成确认书时先记录学生确认；确认落库后再推进阶段。 */
   const handleConfirm = async () => {
-    if (!onPhaseConfirm) return;
+    if (!onPhaseConfirm || !confirmationAction || confirmingRef.current || readOnlyReason) return;
+    confirmingRef.current = true;
     setIsLoading(true);
     setError(null);
-    const err = await onPhaseConfirm();
-    setIsLoading(false);
-    if (err) setError(err);
+    try {
+      if (confirmationAction === 'CONFIRM_AND_ADVANCE') {
+        const confirmation = await doSend(EXPLICIT_PHASE_CONFIRM_TEXT);
+        if (!confirmation) return;
+        // 历史合同可能仍由聊天回合直接推进；不要再重复调用 /advance。
+        if (typeof confirmation.currentStage === 'number' && confirmation.currentStage > stage) return;
+        if (confirmation.stage1_confirmed !== true || confirmation.phase_complete !== true) {
+          setError('研究问题尚未完成确认，请根据导师提示补充后再确认。');
+          return;
+        }
+        setIsLoading(true);
+      }
+      const err = await onPhaseConfirm();
+      if (err) setError(err);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : '推进失败，请重试');
+    } finally {
+      confirmingRef.current = false;
+      setIsLoading(false);
+    }
   };
 
   const submitQuiz = async () => {
     if (!quiz || quizChoice === null) return;
-    if (quizChoice !== quiz.correct) {
-      setQuizError('回答不正确，请再想一想安全要点后重新选择。');
-      return;
-    }
-    // 答对 → 通知调用方（正式模式 POST safety-quiz；体验模式无操作）
+    // 只提交选择；正式模式由服务器持有答案键并判断正确性。
     try {
       await onSafetyPassed?.(quizChoice);
     } catch (error) {
@@ -182,6 +218,10 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   const assistantMessages = displayedMessages.filter((m) => m.role === 'assistant');
   const lastWithAction = [...assistantMessages].reverse().find(m => m.actionType);
   const lastActionType = lastWithAction?.actionType ?? null;
+  const confirmationAction = onPhaseConfirm
+    ? phaseConfirmationAction(stage, lastActionType ?? undefined, lastWithAction?.phaseComplete)
+    : null;
+  const canConfirmPhase = confirmationAction !== null;
   const options =
     stage !== 1 && hintsEnabled && lastActionType === 'ask_choice' && lastWithAction?.options?.length ? lastWithAction.options : null;
   const hints =
@@ -191,15 +231,19 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   // 则按钮直接渲染在该卡片下方（同一视觉块）；否则退回底部固定条（阶段3/4等无卡片场景）。
   const lastDocIndex = displayedMessages.reduce(
     (acc, m, i) => (m.messageType === 'confirmation_doc' ? i : acc), -1);
-  const confirmAttachedToDoc = lastActionType === 'confirmation' && lastDocIndex === displayedMessages.length - 1;
+  const confirmAttachedToDoc = canConfirmPhase && lastDocIndex === displayedMessages.length - 1;
 
   const confirmButton = (
     <button
       onClick={handleConfirm}
-      disabled={isLoading}
+      disabled={Boolean(readOnlyReason) || isLoading}
       className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 text-lg font-medium"
     >
-      {isLoading ? '处理中…' : '确认，进入下一阶段'}
+      {isLoading
+        ? '处理中…'
+        : confirmationAction === 'CONFIRM_AND_ADVANCE'
+          ? '方向无误，确认并进入方案设计'
+          : phaseConfirmLabel}
     </button>
   );
 
@@ -219,7 +263,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
             onEdit={noop}
           />
         ))}
-        {/* 确认书卡片存在时，确认按钮紧跟卡片渲染在消息流内（同一视觉块） */}
+        {/* 确认状态存在时，确认按钮紧跟状态渲染。 */}
         {confirmAttachedToDoc && (
           <div className="mb-4 -mt-2 text-left">{confirmButton}</div>
         )}
@@ -248,18 +292,8 @@ export default function ConversationChat({ initialMessages, stage, completed, se
               {stage === 1 ? '思考线索' : '思维提示'}
             </span>
           </div>
-          <div className="space-y-1.5">
-            {hints.map((hint, index) => (
-              <div
-                key={index}
-                className="rounded-md border border-amber-200 border-l-4 border-l-amber-400 bg-white px-3 py-2 text-sm text-amber-950"
-              >
-                <span className="mr-2 text-xs font-medium text-amber-700">
-                  {stage === 1 ? `线索${index + 1}` : `提示${index + 1}`}
-                </span>
-                <span>{hint}</span>
-              </div>
-            ))}
+          <div className="rounded-md border border-amber-200 border-l-4 border-l-amber-400 bg-white px-3 py-2 text-sm text-amber-950">
+            {hints[0]}
           </div>
         </div>
       )}
@@ -279,9 +313,15 @@ export default function ConversationChat({ initialMessages, stage, completed, se
         </div>
       )}
 
-      {lastActionType === 'confirmation' && !confirmAttachedToDoc && (
+      {canConfirmPhase && !confirmAttachedToDoc && (
         <div className="p-4 bg-gray-50 flex justify-center">
           {confirmButton}
+        </div>
+      )}
+
+      {readOnlyReason && (
+        <div className="border-t border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {readOnlyReason}
         </div>
       )}
 
@@ -353,14 +393,14 @@ export default function ConversationChat({ initialMessages, stage, completed, se
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={quiz ? '请先完成上方安全问答…' : '输入你的问题或回答...'}
+            placeholder={readOnlyReason ?? (quiz ? '请先完成上方安全问答…' : '输入你的问题或回答...')}
             className="flex-1 resize-none border rounded-l-lg p-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
             rows={2}
-            disabled={isLoading || quiz !== null}
+            disabled={Boolean(readOnlyReason) || isLoading || quiz !== null}
           />
           <button
             onClick={sendMessage}
-            disabled={isLoading || quiz !== null || inputValue.trim() === ''}
+            disabled={Boolean(readOnlyReason) || isLoading || quiz !== null || inputValue.trim() === ''}
             className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 disabled:opacity-50"
           >
             发送

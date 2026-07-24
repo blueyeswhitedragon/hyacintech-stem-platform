@@ -346,26 +346,10 @@ export default function TopicCardManager({ cards }: { cards: CardView[] }) {
         engineeringGoal: current.engineeringGoal.trim() || filled.engineeringGoal,
         constraints: current.constraints.trim() || (filled.constraints ?? []).join('\n'),
         performanceCriteria: current.performanceCriteria.trim() || (filled.performanceCriteria ?? []).join('\n'),
-        bridges: (filled.inquiryBridges ?? []).map((bridge: any, index: number) => {
+        bridges: (Array.isArray(filled.inquiryBridges) ? filled.inquiryBridges : []).map((bridge: unknown, index: number) => {
           const existing = current.bridges[index];
           if (existing && existing.factor.trim() && existing.phenomenon.trim()) return existing;
-          const scaffold = bridge.testScaffold || {};
-          const range = Array.isArray(scaffold.safeValueRange) ? scaffold.safeValueRange : [];
-          return {
-            label: bridge.label || `候选方向 ${index + 1}`,
-            retainedFeature: bridge.retainedFeature || '',
-            researchQuestion: bridge.researchQuestion || '',
-            factor: bridge.factor || '',
-            phenomenon: bridge.phenomenon || '',
-            levels: Array.isArray(scaffold.levels) ? scaffold.levels.join('\n') : '',
-            measurement: scaffold.measurement || '',
-            unit: scaffold.unit || '',
-            metricKind: scaffold.metricKind || 'OTHER',
-            safeMin: range[0] !== undefined ? String(range[0]) : '',
-            safeMax: range[1] !== undefined ? String(range[1]) : '',
-            controlledConditions: Array.isArray(scaffold.controlledConditions) ? scaffold.controlledConditions.join('\n') : '',
-            returnToDesign: bridge.returnToDesign || '',
-          };
+          return bridgeFromUnknown(bridge, index);
         }),
         compilerEvidence: current.compilerEvidence,
         criticOverrideReason: current.criticOverrideReason,

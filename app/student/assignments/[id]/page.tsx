@@ -26,6 +26,7 @@ export default async function StudentConversationPage(
     where: { id: assignmentId },
     select: {
       title: true,
+      dueDate: true,
       dataContributionMode: true,
       studentAssignments: {
         where: { studentId: user.id },
@@ -64,6 +65,7 @@ export default async function StudentConversationPage(
             initialStageData={result.stageData}
             initialStatus={result.status}
             initialSafetyQuizCompleted={result.safetyQuizCompleted}
+            initialDueDate={assignment?.dueDate?.toISOString() ?? null}
           />
         </div>
       </div>

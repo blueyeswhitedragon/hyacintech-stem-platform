@@ -70,7 +70,7 @@ Phase state is managed via React state in `ConversationWorkspace.tsx` (server-au
 
 ### Data flow
 
-There are two chat entry points sharing the same LLM core (`callLLM` in `app/lib/llm/chat.ts`):
+There are two chat entry points. They share versioned stage semantics, but persistence, lifecycle, and trace responsibilities differ:
 
 ```
 # Guest mode (/experience, in-memory, not persisted)
@@ -78,9 +78,8 @@ GuestWorkspace.tsx (client, ConversationChat injected)
   → POST /api/guest/chat (body: { message, stage, history, dataRows?, needSafetyQuiz? })
     → checkRateLimit(IP) → 429 if exceeded
     → checkBlacklistedKeywords() → 400 safety_violation if hit
-    → getPromptForPhase(stage, context)  ← client-sent stage + optional dataRows/needSafetyQuiz
-    → callLLM() + classifyError()
-    → client-side extractStageData() merges structured output; advance via canAdvance()
+    → versioned Tutor turn with server-computed visible state and roundCount
+    → client keeps returned in-memory state; server validates safety and contract output
 
 # DB-backed six-phase flow — the real student path
 ConversationWorkspace.tsx (client, owns stage/stageData/status)
@@ -88,10 +87,10 @@ ConversationWorkspace.tsx (client, owns stage/stageData/status)
   → POST /api/conversations/[id]/chat  (body: { message })
     → requireUser() + getConversationForUser() (ownership: conversation.userId === user.id → else 404)
     → checkBlacklistedKeywords() → 400 safety_violation if hit
-    → getPromptForPhase(currentStage, context)  ← stage is server-authoritative
-    → callLLM() → createLLMProvider().chat() → safeParseChatResponse() (retry w/o JSON mode on fail)
-    → extractStageData() merges structured output
-    → Stage 4: analysisCount++ tracked in stageData.stage4
+    → resolve the conversation/model-pinned promptPolicyVersion
+    → build server-owned visible state → callLLMWithTrace() → versioned parser/contract checks
+    → extract versioned student facts and compose server artifacts
+    → Stage 4: accept only distinct evidence fingerprints tied to submitted cells
     → stageData.roundCounts[stage]++ per student message (feeds pacing nudge)
     → $transaction persists messages(+stageData+currentStage); on LLM error: nothing persisted
   ← ChatResponse + { currentStage, stageData }
@@ -101,22 +100,22 @@ ConversationWorkspace.tsx (client, owns stage/stageData/status)
 
 | Transition | Mechanism |
 |---|---|
-| 1 → 2 | **Confirm button** — `canAdvance(1,2)` checks `stage1.confirmed && variables.independent && variables.dependent`. Stage 1 `extractStageData` writes data but does NOT auto-advance. |
-| 2 → 3 | Teacher review (approve → stage 3; reject → stay at 2) |
-| 3 → 4 | Button via `/advance` — `canAdvance(3,4)` checks all required columns filled |
-| 4 → 5 | Button via `/advance` — `canAdvance(4,5)` requires `stage4.analysisCount >= 2` (at least 2 rounds of analysis discussion) |
-| 5 → 6 | Teacher review (approve + score≥6 → stage 6; score<6 or reject → stay at 5 with rewrite prompt) |
+| 1 → 2 | Confirm the current canonical research question. Requires only question + explicit confirmation tied to its hash. |
+| 2 → 3 | Confirm the current server-composed complete plan by `draftHash`, submit, then teacher review. Approval advances; rejection reopens P2. |
+| 3 → 4 | Complete the server-verified safety quiz when required and fill every required cell in the locked schema. Teacher P3 review remains nonblocking. |
+| 4 → 5 | Cite at least two distinct submitted cell values in accepted analysis rounds. Duplicate text/row indices alone do not count. |
+| 5 → 6 | Teacher approval with a finite score in 0–10; score≥6 advances, otherwise reopens P5 for revision. |
 | 6 → done | `/stage6-respond` → `COMPLETED`, triggers fireworks celebration |
 
-`canAdvance` in `app/lib/stageAdvance.ts` handles **1→2, 3→4, 4→5**. 2→3 and 5→6 go through teacher review. `phase_complete` is a UI hint only, not an auto-advance trigger.
+`canAdvance` handles student-driven transitions. Teacher-reviewed transitions go through review routes. `phase_complete` is a UI hint only. Every route must re-check the server-owned assignment/conversation status; pending, submitted, and completed work is read-only. Deadlines are soft and record lateness rather than blocking writes.
 
 ### Confirmation button behavior
 
-The confirm button (rendered when `lastActionType === 'confirmation'`):
-- **Always** calls `onPhaseConfirm()` → `advanceTo(stage + 1)` — never sends a chat message
-- No cancel button exists
-- `lastActionType` finds the most recent assistant message WITH an `actionType` (skipping `confirmation_doc` cards)
-- Confirm only appears at genuine phase completion (enforced by prompt rules: LLM must not emit `"confirmation"` mid-discussion)
+Confirmation is a server-owned checkpoint, not a generic LLM action:
+- P1 confirmation is tied to a hash of the canonical question; changing the question invalidates it.
+- P2 shows a server-composed preview and sends `{ draftHash }` to the dedicated plan-confirmation endpoint. Stale hashes are rejected.
+- `direction_confirmation` and `plan_confirmation` must return `checkpoint`; semantic contract checks reject stage-overreaching Tutor output even when its JSON is valid.
+- Confirmation documents/previews are hydrated from persisted stage state, so older recoverable conversations do not depend on a particular assistant message still being visible.
 
 ### Pacing guard (anti-over-questioning)
 
@@ -126,7 +125,7 @@ The confirm button (rendered when `lastActionType === 'confirmation'`):
 
 ### Persistence & auth
 
-- **Database** — Prisma + SQLite. Schema in `prisma/schema.prisma` (6 models: `User / Class / ClassMember / Assignment / StudentAssignment / Conversation`). Access via the singleton in `app/lib/db.ts`. `StudentAssignment ↔ Conversation` 1:1 holds its FK on `StudentAssignment.conversationId` only. `StudentAssignment` has `@@unique([assignmentId, studentId])`. `Conversation.stageData`/`messages` are JSON strings.
+- **Database** — Prisma + SQLite. Schema in `prisma/schema.prisma`; it includes teaching, Data Lab, model-governance, and audit models, so documentation must not assume a fixed model count. Access is via the singleton in `app/lib/db.ts`. `Conversation.stageData`/`messages` are JSON strings and carry versioned stage metadata without a Prisma migration.
 - **Auth** — iron-session (encrypted cookie `hyacintech_session`). `app/lib/session.ts` + `app/lib/auth.ts`. `requireUser()` / `requireRole(role)` return `{ ok, user } | { ok:false, error, status }`.
 - **Classes & assignments** — Routes under `app/api/classes/*` and `app/api/{assignments,student/assignments}/*`. `DELETE /api/classes/[id]` cascades in a transaction.
 - **Conversation persistence** — `app/lib/conversation.ts`: `ensureStudentConversation(assignmentId, studentId)` find-or-create with an assignment-aware welcome message; `getConversationForUser(conversationId, userId)` ownership-checked load. Visiting `/student/assignments/[id]` auto-creates/resumes.
@@ -146,7 +145,7 @@ The confirm button (rendered when `lastActionType === 'confirmation'`):
 
 ### Confirmation document (探究问题确认书)
 
-When the LLM emits `stage1_confirmed: true` + `snapshot`, `ConversationChat` inserts a special message with `messageType: 'confirmation_doc'`. `MessageItem` renders these as **green-bordered cards** with a "📋 探究问题确认书" header, visually distinct from regular chat bubbles. The confirmation button appears immediately after.
+The server composes the P1 confirmation document from the canonical question and confirmation metadata. `ConversationChat` may render a persisted `confirmation_doc`, but stage state is authoritative and can hydrate the document for legacy stuck sessions.
 
 ### Teacher review & scoring
 
@@ -160,22 +159,22 @@ When the LLM emits `stage1_confirmed: true` + `snapshot`, `ConversationChat` ins
 
 `normalizeSchema()` in `app/lib/schemaNormalize.ts` (pure, tested) cleans the LLM-produced `data_table_schema` inside `extractStageData` before it's stored: snake_case + deduped keys, empty-title columns dropped, types coerced to `text/number/image`, a `notes` text column guaranteed, `minRows ≥ 3`, `maxRows = 200`.
 
-### Stage 5 auto-generation
+### Stage 5 bootstrap
 
-When entering stage 5 (via confirm button or `/advance`), `ConversationWorkspace.onPhaseConfirm` automatically sends a "开始报告成型" trigger message. The chat route builds `priorSummary` with `buildPriorSummary(stageData)` (`app/lib/reportSummary.ts` — condenses stage 1 确认书/variables, stage 2 schema, stage 3 data rows into text); the phase 5 prompt instructs the LLM to **always** include `report_sections` when `priorSummary` is injected — no student input required. Guest mode builds the same summary client-side.
+Entering P5 hydrates platform-owned report sections deterministically from the confirmed P1 question, frozen P2 plan, locked P3 schema/data, and accepted P4 evidence. Asynchronous AI reference scoring may only apply if the report state revision still matches; it must not overwrite newer student or teacher writes.
 
 ### Report Viewer & Word export/import
 
-`ReportViewer.tsx` (stage 5 panel) wraps the shared `ReportDocument.tsx` renderer (also used read-only in stage 6) showing AI-prefilled sections (purpose/hypothesis/materials/procedure/dataSummary/analysis) + the embedded stage-3 data table, plus student-editable conclusion/reflection fields, teacher score (green ≥6 / red <6 with rewrite notice), and AI reference score.
+`ReportViewer.tsx` treats platform fields as the authoritative submission and shows the embedded data table, accepted analysis evidence, teacher feedback/score, and AI reference score. P5's student reflection field is experiment limitations/discussion; learning reflection and response to feedback belong to P6.
 
 Word round-trip (both routes require ownership via `getConversationForUser`):
 - `POST /api/conversations/[id]/report/export` — builds a `.docx` from stage 5 sections + data table via `buildReportDocx()` (`app/lib/reportDocx.ts`, hand-written WordprocessingML zipped by `app/lib/zip.ts`).
-- `POST /api/conversations/[id]/report/import` (student-only, stage 5 only, ≤10MB `.docx`) — saves the file to `public/uploads/`, extracts text via `extractDocxText()` (`app/lib/docxExtract.ts`), and stores `uploadedDocUrl`/`uploadedText` on `stage5` **without overwriting the AI sections**.
+- `POST /api/conversations/[id]/report/import` (student-only, stage 5 only, ≤10MB `.docx`) stores the upload as an attachment without overwriting platform sections. AI scoring evaluates only platform fields, never extracted attachment text.
 
 ### Safety system
 
 - `checkBlacklistedKeywords()` runs before every chat call (both guest and DB-backed) and returns `400 safety_violation` on hit.
-- The LLM may emit a `safety_quiz` object in stage 2/3 (risks identification). In the DB-backed flow, `POST /api/conversations/[id]/safety-quiz` with `{ passed: true }` sets `Conversation.safetyQuizCompleted = true` (correctness is judged client-side against `safety_quiz.correct` — education MVP). Guest mode passes `needSafetyQuiz` to the prompt builder instead (no persistence).
+- P2 confirmation derives risks and a safety quiz server-side. `POST /api/conversations/[id]/safety-quiz` receives an answer, checks it against the server-held key, and records completion only when correct. The quiz is proactively hydrated on P3 entry. Guest follows the same answer-verification contract without DB persistence.
 
 ### AI reference scoring (stage 5)
 
@@ -187,7 +186,7 @@ Word round-trip (both routes require ownership via `getConversationForUser`):
 
 ### Stage 4 analysis gate
 
-`StageData.stage4.analysisCount` is incremented in the chat route for every student message during phase 4. `canAdvance(4,5)` requires `analysisCount >= 2`. Insufficient analysis shows "请先与AI导师进行至少两轮数据分析讨论".
+`StageData.stage4` stores accepted evidence records containing row index, column key/display name, cited value, and a deterministic fingerprint. Progress requires at least two distinct accepted fingerprints from submitted rows; repeated messages, bare row indices, and invented values do not count.
 
 ### Completion & fireworks
 
@@ -198,13 +197,7 @@ When `StudentAssignment.status === 'COMPLETED'`:
 
 ### Prompt system
 
-All six phase prompts in `app/prompts/phase<N>-<name>.ts` follow a **unified format**:
-- `=== JSON 输出格式（必须严格遵守）===` section with consistent field documentation
-- Clear `next_action_type` rules: `"confirmation"` ONLY at genuine phase completion
-- `hints` guidance: provide thinking paths, not question restatements
-- `options` as supplementary guidance (display-only in UI)
-- Explicit JSON escaping rules (`\\n` for newlines, `\\"` for quotes)
-- `getPromptForPhase(phase, context?)` in `app/prompts/index.ts` injects dynamic context
+The production Tutor uses versioned prompt policies and a stable structured output contract. Execution dispatches by the prompt version pinned to the conversation/model, and GenerationTrace records the stage contract, Prompt/extractor versions, allowed/chosen focus, interaction type, state revision/hash, and server artifacts. The older `app/prompts/phase<N>-<name>.ts` path is compatibility-only and must not silently become the production policy.
 
 ### Response types
 
@@ -247,7 +240,7 @@ source material / generated drafts → TopicCard review and preview
   → training/evaluation results registered in Model Records → staged deployment/rollback
 ```
 
-TopicCard V2 is the compiler input for inquiry scenarios; `caseCompiler.ts` maps it into deterministic P1/P2/P4 student messages and evidence tables without changing the student-facing six-phase contract. Expansion gates and review provenance are defined in `docs/tutor-language-bootstrap-workflow.md`. Data Lab is a data export and result registry, not an in-process training console.
+TopicCard V2 is the compiler input for inquiry scenarios. New `stage-contract-v3` cases are regenerated from approved inputs without deriving from or relabeling old release items. Compiler views strictly separate student-visible state from hidden TopicCard bridges, answer keys, rubrics, and evaluator evidence. Expansion gates and review provenance are defined in `docs/tutor-language-bootstrap-workflow.md`. Data Lab is a data export and result registry, not an in-process training console.
 
 The previous `DatasetBatch` / `AnnotationCampaign` ShareGPT five-style workflow is frozen and retained read-only for history, exports, and audit lineage. Its import/create/start APIs return 410 and must not be presented as the primary workflow.
 
@@ -264,6 +257,8 @@ M9D completes deployment governance. Evaluation imports resolve transcript tags 
 M9E adds terminal annotation-campaign lifecycle governance. Admins may archive an `ACTIVE` campaign, atomically changing unfinished tasks to `CANCELLED`, disabling participants, and preserving assignees, drafts, submissions, work reviews, arbitration, releases, and audit history. Archived work can still be approved, invalidated, selected, merged, or rejected, but it cannot be returned to annotators or reopened. Only an empty `DRAFT` campaign can be permanently deleted. Claim, draft-save, and submit writes all re-check that the campaign is still `ACTIVE` to close archive races.
 
 M10 introduces dataset schema v3 after the six-phase drift audit. The historical 489-record batch is `LEGACY_QUARANTINED` and may only seed scenarios, rejected preferences, or regression cases. P2 persists a complete reviewed plan including repeat count; P3 safety quiz answers are verified server-side before data entry/advance; P4 progress increments only when the current student turn cites values present in submitted rows. New distillation separates student, tutor, and evaluator views, calls the production Tutor prompt/contract path turn by turn, supports resumable runs, and exports one leading system prompt per assistant training turn. See `docs/dataset-v3-runbook.md`.
+
+The current candidate cohort is `stage-contract-v4` with `student-fact-extractor-v3` and candidate Prompt `tutor-language-prompt-v2.3`. Stage 2 requires the student-authored scientific core (hypothesis, independent variable, at least two levels, dependent variable, measurement, controls, and repeats); materials, procedure, and the low-risk safety baseline may be server-composed with field-level provenance and student hash confirmation. Old releases remain immutable. Production Tutor Prompt stays on v1 until the exact v2.3 release cohort passes Data Lab gates; training eligibility must require that one Prompt/contract cohort rather than accepting any generally supported Prompt.
 
 Initialization:
 

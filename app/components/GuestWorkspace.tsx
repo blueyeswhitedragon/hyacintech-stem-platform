@@ -13,10 +13,11 @@ import DataTableEditor from './DataTableEditor';
 import ChartViewer from './ChartViewer';
 import ReportViewer from './ReportViewer';
 import Stage6Panel from './Stage6Panel';
-import SchemaEditor from './SchemaEditor';
+import Stage2PlanPreview from './Stage2PlanPreview';
 import Fireworks from './Fireworks';
-import type { Stage2Column } from '../models/stageData';
 import { buildAssistantTransitionMessage, buildStage4TransitionResult } from '../lib/stageTransition';
+import { limitationsDiscussion } from '../lib/reportFields';
+import { evaluateStage2Readiness } from '../lib/stage2Readiness';
 
 /**
  * 体验模式：无账号、纯内存六阶段。复用正式模式的富组件与纯函数
@@ -100,6 +101,10 @@ export default function GuestWorkspace() {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return data.message || data.error || '方案设计引导生成失败，请重试';
+        if (data.stageData) {
+          stageDataRef.current = data.stageData;
+          setStageData(data.stageData);
+        }
         setInjectedMessage(buildAssistantTransitionMessage(data, uuidv4()));
         setStage(2);
         return null;
@@ -158,7 +163,8 @@ export default function GuestWorkspace() {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return data.message || data.error || '报告框架生成失败，请重试';
-        const { stageData: nextData } = extractStageData(5, data, currentData);
+        const nextData = (data.stageData as StageData | undefined)
+          ?? extractStageData(5, data, currentData).stageData;
         stageDataRef.current = nextData;
         setStageData(nextData);
         setInjectedMessage(buildAssistantTransitionMessage(data, uuidv4()));
@@ -193,26 +199,33 @@ export default function GuestWorkspace() {
 
   const markGuestSafetyPassed = async (selected: number) => {
     const previous = stageDataRef.current;
-    const quiz = previous.stage3?.safetyQuiz;
-    if (!quiz || selected !== quiz.correct) throw new Error('安全问答答案无效');
-    const nextData: StageData = {
-      ...previous,
-      stage3: {
-        ...(previous.stage3 ?? { rows: [] }),
-        safetyQuiz: { ...quiz, selected, passed: true },
-      },
-    };
+    const res = await fetch('/api/guest/safety-quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stageData: previous, answer: selected }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.stageData) throw new Error(data.error || data.message || '安全问答提交失败');
+    const nextData = data.stageData as StageData;
     needQuizRef.current = false;
     stageDataRef.current = nextData;
     setStageData(nextData);
   };
 
-  const saveStage5 = async (conclusion: string, reflection: string) => {
+  const saveStage5 = async (conclusion: string, limitations: string) => {
     const previous = stageDataRef.current;
     if (!previous.stage5) return '报告框架尚未生成';
     const nextData: StageData = {
       ...previous,
-      stage5: { ...previous.stage5, sections: { ...previous.stage5.sections, conclusion, reflection } },
+      stage5: {
+        ...previous.stage5,
+        sections: {
+          ...previous.stage5.sections,
+          conclusion,
+          limitationsDiscussion: limitations,
+          reflection: limitations,
+        },
+      },
     };
     stageDataRef.current = nextData;
     setStageData(nextData);
@@ -222,8 +235,8 @@ export default function GuestWorkspace() {
   // 提交报告（体验）：调 AI 评分 → 写入 → 进阶段6
   const submitStage5 = async (): Promise<string | null> => {
     const sections = stageDataRef.current.stage5?.sections;
-    if (!sections?.conclusion.trim() || !sections?.reflection.trim()) {
-      return '请先填写结论与反思';
+    if (!sections?.conclusion.trim() || !limitationsDiscussion(sections).trim()) {
+      return '请先填写结论与局限讨论';
     }
     try {
       const res = await fetch('/api/guest/score', {
@@ -247,27 +260,38 @@ export default function GuestWorkspace() {
     return null;
   };
 
-  const submitStage2 = async (): Promise<string | null> => {
+  const confirmStage2Plan = async (draftHash: string): Promise<string | null> => {
+    const previous = stageDataRef.current;
+    const res = await fetch('/api/guest/confirm-stage2-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stageData: previous, draftHash }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.stageData) return data.error || data.message || '方案确认失败';
+    const nextData = data.stageData as StageData;
+    stageDataRef.current = nextData;
+    setStageData(nextData);
     needQuizRef.current = true;
-    setStage(3);
+    setInjectedMessage({
+      id: uuidv4(),
+      role: 'assistant',
+      content: '方案已确认，现已进入过程执行。请先完成安全问答，再按冻结的数据表记录实验结果。',
+      messageType: 'stage_transition',
+      actionType: 'info',
+    });
+    setStage(typeof data.currentStage === 'number' ? data.currentStage : 3);
     return null;
   };
 
-  /** 体验模式：本地保存列定义修改 */
-  const saveSchema = async (columns: Stage2Column[]): Promise<string | null> => {
-    const previous = stageDataRef.current;
-    if (!previous.stage2) return '当前没有可编辑的数据表结构';
+  const respondStage6 = async (responseToTeacherFeedback: string, learningReflection: string): Promise<string | null> => {
+    const studentResponse = `回应评价：${responseToTeacherFeedback}\n\n学习反思：${learningReflection}`;
     const nextData: StageData = {
-      ...previous,
-      stage2: { ...previous.stage2, schema: { ...previous.stage2.schema, columns } },
+      ...stageDataRef.current,
+      stage6: { studentResponse, responseToTeacherFeedback, learningReflection, finalReadonly: true },
     };
     stageDataRef.current = nextData;
     setStageData(nextData);
-    return null;
-  };
-
-  const respondStage6 = async (response: string): Promise<string | null> => {
-    setStageData((prev) => ({ ...prev, stage6: { studentResponse: response, finalReadonly: true } }));
     setCompleted(true);
     return null;
   };
@@ -275,29 +299,22 @@ export default function GuestWorkspace() {
   function renderPanel() {
     switch (stage) {
       case 2:
-        if (!stageData.stage2?.schema) return null;
+        const guestStage2 = stageData.stage2;
+        const readiness = guestStage2?.readiness ?? evaluateStage2Readiness(stageData);
+        const planConfirmed = Boolean(guestStage2?.confirmedPlanHash
+          && guestStage2.confirmedPlanHash === guestStage2.draftHash
+          && guestStage2.experimentPlan);
         return (
           <div>
-            <SchemaEditor
-              columns={stageData.stage2.schema.columns}
-              onSave={saveSchema}
+            <Stage2PlanPreview
+              plan={guestStage2?.planDraft}
+              draftHash={guestStage2?.draftHash}
+              readiness={readiness}
+              provenance={guestStage2?.planProvenance}
+              confirmed={planConfirmed}
+              onConfirm={planConfirmed ? undefined : confirmStage2Plan}
+              confirmLabel="确认方案并进入过程执行"
             />
-            {stageData.stage2.aiRiskAnnotations && stageData.stage2.aiRiskAnnotations.length > 0 && (
-              <div className="mx-4 mb-3 bg-amber-50 border border-amber-200 rounded p-2 text-sm">
-                <div className="font-medium text-amber-800 mb-1">⚠️ 安全/风险提示</div>
-                {stageData.stage2.aiRiskAnnotations.map((r, i) => (
-                  <div key={i} className="text-amber-700">· {r.description}（{r.severity}）</div>
-                ))}
-              </div>
-            )}
-            <div className="px-4 pb-4">
-              <button
-                onClick={() => { submitStage2(); }}
-                className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                提交方案（体验模式直接进入下一阶段）
-              </button>
-            </div>
           </div>
         );
       case 3:
@@ -327,7 +344,21 @@ export default function GuestWorkspace() {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <ConversationChat initialMessages={welcome} stage={stage} completed={completed} send={send} onResult={onChatResult} onSafetyPassed={markGuestSafetyPassed} onPhaseConfirm={onPhaseConfirm} injectedMessage={injectedMessage} />
+        <ConversationChat
+          initialMessages={welcome}
+          stage={stage}
+          completed={completed}
+          send={send}
+          onResult={onChatResult}
+          onSafetyPassed={markGuestSafetyPassed}
+          onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
+          phaseConfirmLabel="研究问题无误，进入方案设计"
+          roundCount={stageData.roundCounts?.[stage] ?? 0}
+          injectedMessage={injectedMessage}
+          initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
+            ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
+            : null}
+        />
       </div>
       {panel && <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">{panel}</div>}
       {completed && <Fireworks />}

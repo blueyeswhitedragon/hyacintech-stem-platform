@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
 import ReportDocument from './ReportDocument';
+import { limitationsDiscussion } from '@/app/lib/reportFields';
 
 interface Props {
   stage5?: Stage5Data;
@@ -10,7 +11,7 @@ interface Props {
   schemaColumns?: Stage2Column[];
   /** 阶段3的实验数据 */
   dataRows?: Record<string, unknown>[];
-  onSave: (conclusion: string, reflection: string) => Promise<string | null>;
+  onSave: (conclusion: string, limitationsDiscussion: string) => Promise<string | null>;
   /** 提交报告进入教师审核；为 undefined 时（如已提交待审）隐藏提交按钮。 */
   onSubmit?: () => Promise<string | null>;
   /** 导出报告为 docx（含数据表）。 */
@@ -22,7 +23,7 @@ interface Props {
 export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, onSubmit, onExport, onImport }: Props) {
   const sections = stage5?.sections;
   const [conclusion, setConclusion] = useState(sections?.conclusion ?? '');
-  const [reflection, setReflection] = useState(sections?.reflection ?? '');
+  const [limitations, setLimitations] = useState(sections ? limitationsDiscussion(sections) : '');
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -32,7 +33,7 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
 
   const handleSave = async () => {
     setSaving(true); setMsg(null); setErr(null);
-    const e = await onSave(conclusion, reflection);
+    const e = await onSave(conclusion, limitations);
     setSaving(false);
     if (e) setErr(e); else setMsg('报告已保存');
   };
@@ -41,7 +42,7 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
     if (!onSubmit) return;
     setSubmitting(true); setMsg(null); setErr(null);
     // 先保存再提交
-    const se = await onSave(conclusion, reflection);
+    const se = await onSave(conclusion, limitations);
     if (se) { setSubmitting(false); setErr(se); return; }
     const e = await onSubmit();
     setSubmitting(false);
@@ -104,7 +105,7 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
         </div>
       </div>
 
-      {/* 只读报告主体（六节 + 数据表 + 上传报告），结论/反思在下方用可编辑框 */}
+      {/* 只读报告主体（六节 + 数据表 + 上传报告），结论/局限讨论在下方编辑 */}
       <ReportDocument
         stage5={stage5}
         schemaColumns={schemaColumns}
@@ -119,7 +120,7 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
         </div>
       )}
 
-      {/* 学生填写结论与反思 */}
+      {/* 学生填写结论与局限讨论 */}
       <div>
         <div className="text-sm font-medium text-blue-700 mb-1">✏️ 结论（请你填写）</div>
         <textarea
@@ -131,13 +132,13 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
         />
       </div>
       <div>
-        <div className="text-sm font-medium text-blue-700 mb-1">✏️ 反思（请你填写）</div>
+        <div className="text-sm font-medium text-blue-700 mb-1">局限与讨论（请你填写）</div>
         <textarea
-          value={reflection}
-          onChange={(e) => setReflection(e.target.value)}
+          value={limitations}
+          onChange={(e) => setLimitations(e.target.value)}
           rows={4}
           className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="这次探究有哪些不足？如果重来你会怎样改进？"
+          placeholder="说明实验局限、可能的误差来源，以及下一次可怎样改进。"
         />
       </div>
 

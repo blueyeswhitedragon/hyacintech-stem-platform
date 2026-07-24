@@ -1,14 +1,14 @@
 #!/usr/bin/env tsx
 import type { TopicCard } from '@prisma/client';
-import { buildTutorLanguagePrompt, DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION, parseTutorLanguageResponse, toCompatibleChatResponse, TUTOR_LANGUAGE_PROMPT_V1, TUTOR_LANGUAGE_PROMPT_V2, TUTOR_LANGUAGE_PROMPT_V2_1, tutorSftTarget } from '../app/lib/tutorLanguage';
-import { mergeExtractedFacts, validateExtractedFacts, type ExtractedFact } from '../app/lib/stateExtractor';
-import { attachServerOwnedArtifacts, updateServerAnalysis, visibleDataRows } from '../app/lib/serverTutorState';
+import { buildTutorLanguagePrompt, DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION, parseTutorLanguageResponse, toCompatibleChatResponse, TUTOR_LANGUAGE_PROMPT_V1, TUTOR_LANGUAGE_PROMPT_V2, TUTOR_LANGUAGE_PROMPT_V2_1, TUTOR_LANGUAGE_PROMPT_V2_2, TUTOR_LANGUAGE_PROMPT_V2_3, tutorSftTarget } from '../app/lib/tutorLanguage';
+import { applyDeterministicExtractionFallbacks, buildServerExperimentPlan, ensureExplicitConfirmationFact, mergeExtractedFacts, validateExtractedFacts, type ExtractedFact } from '../app/lib/stateExtractor';
+import { attachServerOwnedArtifacts, tutorFocusPlan, updateServerAnalysis, visibleDataRows } from '../app/lib/serverTutorState';
 import { assertIndependentModelFamilies, buildCaseTutorPrompt, casePromptLeaksPrivate, checkTutorCandidate, tutorTargetContainsServerArtifact, validateTutorCritiqueIssues } from '../app/lib/dataLab/bootstrap/contracts';
 import { assertReleaseItemSource, computeEditMetrics, shingleJaccard, tutorTopicCardDiversityFailures } from '../app/lib/dataLab/bootstrap/service';
 import { isTutorWarningClosed, sanitizeTutorWarningClosures, tutorWarningBlocksFinal } from '../app/lib/dataLab/bootstrap/warningClosure';
 import { evaluateDeploymentGate, evaluateOnlineObservationGate } from '../app/lib/deploymentGate';
 import { resolveChatContractBranch } from '../app/lib/tutorTurn';
-import { CALIBRATION_12_SCENARIOS, compileCases, compileScenarioCases, EVAL_CASE_COUNTS, SMOKE_6_SCENARIOS } from '../app/lib/dataLab/bootstrap/caseCompiler';
+import { CALIBRATION_12_SCENARIOS, compileCases, compileOneCase, compileScenarioCases, EVAL_CASE_COUNTS, SMOKE_6_SCENARIOS } from '../app/lib/dataLab/bootstrap/caseCompiler';
 
 let passed = 0; let failed = 0;
 function check(condition: unknown, label: string) { if (condition) { passed++; console.log(`PASS ${label}`); } else { failed++; console.error(`FAIL ${label}`); } }
@@ -23,9 +23,13 @@ const explicitV1 = buildTutorLanguagePrompt(promptInput, TUTOR_LANGUAGE_PROMPT_V
 const defaultPrompt = buildTutorLanguagePrompt(promptInput);
 const promptV2 = buildTutorLanguagePrompt(promptInput, TUTOR_LANGUAGE_PROMPT_V2);
 const promptV21 = buildTutorLanguagePrompt(promptInput, TUTOR_LANGUAGE_PROMPT_V2_1);
+const promptV22 = buildTutorLanguagePrompt(promptInput, TUTOR_LANGUAGE_PROMPT_V2_2);
+const promptV23 = buildTutorLanguagePrompt(promptInput, TUTOR_LANGUAGE_PROMPT_V2_3);
 check(explicitV1 === defaultPrompt, '生产默认 Prompt 保持 v1 且显式 v1 输出一致');
 check(promptV2 !== explicitV1 && promptV2.includes('唯一事实来源') && promptV2.includes('最多一个问句'), 'Data Lab Prompt v2 版本隔离并包含单任务与事实来源约束');
-check(DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION === TUTOR_LANGUAGE_PROMPT_V2_1 && promptV21.includes('避免了“A 还是 B”式答案菜单'), 'Data Lab 默认升级为独立版本 v2.1 并明确禁止答案菜单');
+check(promptV21 !== promptV2 && promptV21.includes('答案菜单'), 'Data Lab Prompt v2.1 追加答案菜单约束且不改写 v2');
+check(promptV22.includes('阶段边界是硬合同'), 'Data Lab 历史 v2.2 Prompt 保持可重放');
+check(DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION === TUTOR_LANGUAGE_PROMPT_V2_3 && promptV23.includes('已经满足的字段不得重新追问'), 'Data Lab 默认使用独立 v2.3 候选并阻止重复追问');
 const gluedTutorJson = parseTutorLanguageResponse('{"dialogue":"先说说你最想观察什么？","interactionType":"open_questionfocus":"research_question","hints":[]}', ['research_question']);
 check(gluedTutorJson?.interactionType === 'open_question' && gluedTutorJson.focus === 'research_question', 'Tutor parser 可确定性修复 interactionType 与 focus 字段粘连');
 
@@ -59,8 +63,25 @@ check(smokeCases.find((item) => item.challenge === '高概念代理')?.topicCard
 const calibrationCases = compileScenarioCases(smokeCards, CALIBRATION_12_SCENARIOS, 'PILOT');
 check(calibrationCases.length === 12 && [1, 2, 4].every((phase) => calibrationCases.filter((item) => item.phase === phase).length === 4), 'Calibration 12 固定覆盖 P1/P2/P4 各四条');
 check(new Set(calibrationCases.map((item) => item.studentMessage)).size === 12 && calibrationCases.every((item) => item.hardCheck.errors.length === 0), 'Calibration 12 无 exact duplicate 且不泄漏私有规范');
-const variableGapCase = compileCases([compilerCard], { 2: 1 }, 'PILOT')[0];
+const variableGapCase = compileOneCase({ card: compilerCard, phase: 2, challenge: '变量不完整', variant: 0, split: 'PILOT', promptVersion: DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION });
 check((variableGapCase.visibleFacts as { allowedFocusIds?: string[] }).allowedFocusIds?.[0] === 'independent_variable' && variableGapCase.systemPrompt.includes('不补齐测量、控制变量或后续方案'), 'P2 变量不完整映射到 independent_variable 而不是 measurement');
+const p2Coverage = compileCases([compilerCard], { 2: 12 }, 'PILOT');
+check(new Set(p2Coverage.flatMap((item) => (item.visibleFacts as { allowedFocusIds: string[] }).allowedFocusIds)).size === 8, 'P2 编译覆盖七项科学核心和方案确认，操作字段由服务器组装');
+const bridge = {
+  label: '纸桥结构', retainedFeature: '结构影响承重', researchQuestion: '不同折叠结构怎样影响纸桥承重？', factor: '折叠结构', phenomenon: '承重数量',
+  testScaffold: { levels: ['平板', '三角折叠'], measurement: '逐本增加相同课本并记录最大本数', unit: '本', metricKind: 'COUNT', controlledConditions: ['纸张大小', '桥墩距离'] },
+};
+const v2CompilerCard: TopicCard = {
+  ...compilerCard,
+  id: 'topic-v2', schemaVersion: 2, activityMode: 'SCIENTIFIC_INQUIRY', contextModule: 'DAILY_LIFE',
+  authenticNeed: '让纸桥更稳', disciplineAnchorsJson: JSON.stringify(['ENGINEERING_TECHNOLOGY']),
+  inquiryBridgesJson: JSON.stringify([bridge, { ...bridge, label: '桥面层数', researchQuestion: '桥面层数怎样影响纸桥承重？', factor: '桥面层数', testScaffold: { ...bridge.testScaffold, levels: ['一层', '两层'] } }]),
+};
+const p2BridgeCase = compileOneCase({ card: v2CompilerCard, phase: 2, challenge: '变量不完整', variant: 0, split: 'PILOT', promptVersion: DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION });
+const p2BridgeState = JSON.stringify(p2BridgeCase.stageState);
+check(!p2BridgeState.includes('真实需求') && !p2BridgeState.includes('核心机制') && !p2BridgeState.includes('拟改变因素') && !p2BridgeState.includes('关注现象'), 'P2 可见状态不直接泄漏 TopicCard 桥接答案');
+const p2ConfirmationCase = compileOneCase({ card: v2CompilerCard, phase: 2, challenge: '方案确认', variant: 0, split: 'PILOT', promptVersion: DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION });
+check(p2ConfirmationCase.history.length === 2 && (p2ConfirmationCase.visibleFacts as { allowedFocusIds: string[] }).allowedFocusIds[0] === 'plan_confirmation', 'P2 确认案例用历史支撑服务器预览并强制 plan_confirmation');
 
 const facts: ExtractedFact[] = [
   { field: 'stage1.researchQuestion', value: '不同光照时长会不会影响幼苗高度？', sourceQuote: '不同光照时长会不会影响幼苗高度' },
@@ -72,16 +93,59 @@ const facts: ExtractedFact[] = [
 ];
 const studentMessages = ['我想研究不同光照时长会不会影响幼苗高度，我确认按这个问题做。'];
 const validated = validateExtractedFacts(1, facts, studentMessages);
-check(validated.accepted.length === 4, 'Extractor 只接受当前阶段且可逐字定位的学生事实');
+check(validated.accepted.length === 2, 'P1 Extractor 只接受研究问题与显式确认，不接受阶段2方向字段');
 check(validated.rejected.some((item) => item.reason === 'FIELD_NOT_ALLOWED_FOR_STAGE'), 'Extractor 拒绝跨阶段字段');
 check(validated.rejected.some((item) => item.reason === 'SOURCE_QUOTE_NOT_FOUND_IN_STUDENT_MESSAGES'), 'Extractor 不把 Tutor 历史当事实来源');
+const emptyLists = validateExtractedFacts(2, [
+  { field: 'stage2.controlledVariables', value: [], sourceQuote: '没有其他控制条件' },
+  { field: 'stage2.safetyNotes', value: [], sourceQuote: '安全事项还没想好' },
+], ['没有其他控制条件，安全事项还没想好。']);
+check(emptyLists.accepted.length === 1 && emptyLists.accepted[0].field === 'stage2.controlledVariables', 'Extractor 只接受学生明确回答“无”的空列表');
+check(emptyLists.rejected[0]?.reason === 'EMPTY_LIST_NOT_EXPLICIT', 'Extractor 拒绝把未回答误提取为空控制或空安全');
+const deterministicConfirmation = ensureExplicitConfirmationFact(1, validated.accepted.filter((item) => item.field !== 'stage1.confirmed'), '我确认按这个问题做。');
+check(deterministicConfirmation.applied && deterministicConfirmation.accepted.some((item) => item.field === 'stage1.confirmed' && item.sourceQuote === '我确认按这个问题做'), 'Extractor 漏提取时由学生本轮明确确认短语确定性补齐');
+const deterministicPlanConfirmation = ensureExplicitConfirmationFact(2, [], '我同意按这个方案做。');
+check(!deterministicPlanConfirmation.applied && deterministicPlanConfirmation.accepted.length === 0, 'P2 不再从聊天口头确认冻结方案');
+const ambiguousConfirmation = ensureExplicitConfirmationFact(1, [], '这个问题可以研究吗？我还没确定。');
+check(!ambiguousConfirmation.applied, '疑问句和未确定表达不会触发确认兜底');
 const merged = mergeExtractedFacts(1, {}, validated.accepted);
-check(merged.advanceTo === 2 && merged.stageData.stage1?.snapshot.startsWith('《探究问题确认书》'), 'P1 确认书与推进由服务器状态生成');
+check(merged.stageData.stage1?.snapshot.startsWith('《探究问题确认书》') && !('advanceTo' in merged), 'P1 事实提取只生成确认书，不抢先推进阶段');
+const changedQuestion = mergeExtractedFacts(1, merged.stageData, [{ field: 'stage1.researchQuestion', value: '温度是否影响幼苗高度？', sourceQuote: '温度是否影响幼苗高度' }], { currentStudentMessage: '我改成温度是否影响幼苗高度？' });
+check(changedQuestion.stageData.stage1?.confirmed === false && !changedQuestion.stageData.stage1.confirmedQuestionHash, 'P1 研究问题变化会使旧确认失效');
+const confirmedFocus = tutorFocusPlan(1, merged.stageData);
+check(confirmedFocus.allowedFocusIds.length === 1 && confirmedFocus.allowedFocusIds[0] === 'direction_confirmation', 'P1 已确认后只允许确认书交接，不继续追问阶段1或阶段2信息');
 
-const language = parseTutorLanguageResponse('{"dialogue":"你已经说清了想比较光照时长和幼苗高度。请核对这个方向是否准确？","interactionType":"checkpoint","focus":"direction_confirmation","hints":[]}', ['direction_confirmation']);
+const language = parseTutorLanguageResponse('{"dialogue":"请核对确认书中的研究问题是否准确。","interactionType":"checkpoint","focus":"direction_confirmation","hints":[]}', ['direction_confirmation'], 1);
 check(Boolean(language), 'tutor-language-v1 严格解析成功');
+check(!parseTutorLanguageResponse('{"dialogue":"请核对研究问题。","interactionType":"information","focus":"direction_confirmation","hints":[]}', ['direction_confirmation'], 1), 'P1 确认 focus 强制使用 checkpoint');
+check(!parseTutorLanguageResponse('{"dialogue":"接下来准备用什么材料和测量方式？","interactionType":"clarification","focus":"research_question","hints":[]}', ['research_question'], 1), 'P1 解析层拒绝越界追问实验设计');
+check(!parseTutorLanguageResponse('{"dialogue":"你最终要比较哪些光照时长？","interactionType":"clarification","focus":"measurement","hints":[]}', ['measurement'], 2, { completedFocusIds: ['levels'], planReady: false }), 'P2 解析层拒绝 focus 不匹配并重开已完成水平');
+check(!parseTutorLanguageResponse('{"dialogue":"这四组就是你最终要比较的全部条件了吗？","interactionType":"clarification","focus":"measurement","hints":[]}', ['measurement'], 2, { completedFocusIds: ['levels'], planReady: false }), 'P2 解析层拒绝继续确认已经充分的实验组');
+check(!parseTutorLanguageResponse('{"dialogue":"方案还差测量方式，不过现在可以开始实验了。","interactionType":"clarification","focus":"measurement","hints":[]}', ['measurement'], 2, { planReady: false }), 'P2 方案未就绪时拒绝提前宣布开始实验');
 const compatible = toCompatibleChatResponse(language!, { nextActionType: 'confirmation', phaseComplete: true, artifacts: { stage1_confirmed: true, snapshot: merged.stageData.stage1?.snapshot } });
 check(compatible.stage1_confirmed === true && compatible.tutor_language?.focus === 'direction_confirmation', '服务端映射为兼容 ChatResponse 并附加产物');
+
+const completePlanState = {
+  ...merged.stageData,
+  extractedFacts: {
+    ...merged.stageData.extractedFacts,
+    'stage2.hypothesis': { value: '光照越长幼苗越高', sourceQuote: '光照越长幼苗越高' },
+    'stage2.independentVariable.name': { value: '光照时长', sourceQuote: '光照时长' },
+    'stage2.independentVariable.levels': { value: ['4小时', '8小时'], sourceQuote: '4小时和8小时' },
+    'stage2.dependentVariable.name': { value: '幼苗高度', sourceQuote: '幼苗高度' },
+    'stage2.dependentVariable.measurement': { value: '用直尺测量', sourceQuote: '用直尺测量' },
+    'stage2.controlledVariables': { value: [], sourceQuote: '没有其他控制条件' },
+    'stage2.materials': { value: ['幼苗', '直尺'], sourceQuote: '幼苗和直尺' },
+    'stage2.procedure': { value: ['分组照光', '测量高度'], sourceQuote: '分组照光并测量高度' },
+    'stage2.repeatCount': { value: 3, sourceQuote: '重复3次' },
+    'stage2.safetyNotes': { value: [], sourceQuote: '没有特别安全事项' },
+  },
+};
+check(Boolean(buildServerExperimentPlan(completePlanState)), 'P2 显式确认空控制/安全后仍可形成完整方案');
+const numericFallback = applyDeterministicExtractionFallbacks(2, [], '0、8、12、24小时四组');
+check(JSON.stringify(numericFallback.accepted[0]?.value) === JSON.stringify(['0小时', '8小时', '12小时', '24小时']), 'P2 短数字回答确定性识别为带共享单位的实验水平');
+const repeatFallback = applyDeterministicExtractionFallbacks(2, [], '每组10颗取平均值，其他都一样');
+check(repeatFallback.accepted.some((item) => item.field === 'stage2.repeatCount' && item.value === 10) && repeatFallback.accepted.some((item) => item.field === 'stage2.controlledVariables'), 'P2 重复次数和通用控制条件有确定性 fallback');
 check(!tutorTargetContainsServerArtifact(JSON.stringify(tutorSftTarget(compatible))), 'Server artifact 不进入 Tutor SFT target');
 check(tutorTargetContainsServerArtifact(JSON.stringify(compatible)), '完整兼容响应可识别为含 server artifacts');
 

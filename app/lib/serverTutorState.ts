@@ -1,7 +1,9 @@
 import type { ChatResponse, SafetyQuiz } from '@/app/models/types';
 import type { Stage2RiskAnnotation, StageData } from '@/app/models/stageData';
-import { buildDataTableSchema, composeReportSections } from '@/app/lib/stageArtifacts';
+import { composeReportSections } from '@/app/lib/stageArtifacts';
 import type { TutorServerEnvelope } from '@/app/lib/tutorLanguage';
+import { contractHash } from '@/app/lib/stageState';
+import { evaluateStage2Readiness } from '@/app/lib/stage2Readiness';
 
 export interface TutorFocusPlan {
   allowedFocusIds: string[];
@@ -19,28 +21,30 @@ export function tutorFocusPlan(stage: number, stageData: StageData, input: { tri
     return id;
   };
   if (stage === 1) {
+    if (stageData.stage1?.confirmed) {
+      const id = add('direction_confirmation', '确认书已经生成；只请学生核对并使用页面按钮进入方案设计，不再提出新问题或提前讨论变量、水平、测量和控制条件');
+      return { allowedFocusIds: [id], focusDescriptions: descriptions };
+    }
     const ids: string[] = [];
-    if (!fact(stageData, 'stage1.originalInterest')) ids.push(add('interest', '回应学生兴趣并澄清想研究的现象'));
-    if (!fact(stageData, 'stage1.retainedFeature')) ids.push(add('mechanism', '帮助学生说清想保留的真实机制或约束'));
-    if (!fact(stageData, 'stage1.researchQuestion')) ids.push(add('research_question', '帮助学生用自己的话形成可探究问题'));
-    if (!fact(stageData, 'stage1.factorDirection') || !fact(stageData, 'stage1.phenomenonDirection')) ids.push(add('direction', '澄清拟改变因素方向和关注现象方向，不给水平或测量答案'));
-    if (ids.length === 0 || !stageData.stage1?.confirmed) ids.push(add('direction_confirmation', '请学生核对服务器已掌握的方向是否准确'));
+    if (!fact(stageData, 'stage1.researchQuestion')) ids.push(add('research_question', '帮助学生用自己的话形成一个清楚、可探究的核心问题；不追问机制、变量、水平、测量或实验细节'));
+    if (ids.length === 0) ids.push(add('direction_confirmation', '只请学生核对当前研究问题是否准确；不得询问机制、变量方向、水平、测量、材料或步骤'));
     return { allowedFocusIds: [...new Set(ids)], focusDescriptions: descriptions };
   }
   if (stage === 2) {
-    const fields: Array<[string, string, string]> = [
-      ['stage2.hypothesis', 'hypothesis', '澄清学生自己的假设'],
-      ['stage2.independentVariable.name', 'independent_variable', '澄清要改变的一个因素'],
-      ['stage2.independentVariable.levels', 'levels', '澄清学生选择的至少两个水平'],
-      ['stage2.dependentVariable.measurement', 'measurement', '澄清怎样观察或测量结果'],
-      ['stage2.controlledVariables', 'controls', '澄清需要保持一致的条件'],
-      ['stage2.procedure', 'procedure', '澄清可执行步骤'],
-      ['stage2.repeatCount', 'repeats', '澄清每个水平的重复次数'],
-      ['stage2.safetyNotes', 'safety', '澄清学生已识别的安全注意事项'],
-    ];
-    const ids = fields.filter(([field]) => fact(stageData, field) === undefined).slice(0, 2).map(([, id, desc]) => add(id, desc));
-    if (ids.length === 0 || !stageData.stage2?.factsConfirmed) ids.push(add('plan_confirmation', '请学生核对由其事实组装的方案，不代替教师审批'));
-    return { allowedFocusIds: [...new Set(ids)], focusDescriptions: descriptions };
+    const readiness = evaluateStage2Readiness(stageData);
+    const focusDescriptions: Record<string, string> = {
+      hypothesis: '只澄清学生自己的预测；不继续追问变量水平或操作细节',
+      independent_variable: '只澄清学生准备主动改变的一个因素',
+      levels: '只澄清至少两个可比较水平；已有两个以上水平即视为充分，不追问为何还要增加组别',
+      dependent_variable: '只澄清学生准备观察的结果名称',
+      measurement: '只澄清一种可重复的观察或测量方式',
+      controls: '只澄清需要保持一致的关键条件；学生说明其他条件相同即可收敛',
+      repeats: '只澄清每个水平的重复次数',
+      plan_confirmation: '科学核心已完整；只请学生核对服务器组装的方案预览并使用页面按钮确认，不再提出新问题',
+    };
+    const id = readiness.nextFocusId;
+    add(id, focusDescriptions[id]);
+    return { allowedFocusIds: [id], focusDescriptions: descriptions };
   }
   if (stage === 3) {
     const id = input.triggerType === 'STAGE_ENTER'
@@ -63,8 +67,8 @@ export function tutorFocusPlan(stage: number, stageData: StageData, input: { tri
   return { allowedFocusIds: [add('reflection_coaching', '提供可选反思辅导，保留学生原文和决定权')], focusDescriptions: descriptions };
 }
 
-function deterministicRisks(stageData: StageData): Stage2RiskAnnotation[] {
-  const plan = stageData.stage2?.experimentPlan;
+export function deterministicRisks(stageData: StageData): Stage2RiskAnnotation[] {
+  const plan = stageData.stage2?.experimentPlan ?? stageData.stage2?.planDraft;
   if (!plan) return [];
   const text = [...plan.materials, ...plan.procedure, ...plan.safetyNotes].join('');
   const risks: Stage2RiskAnnotation[] = [];
@@ -75,7 +79,7 @@ function deterministicRisks(stageData: StageData): Stage2RiskAnnotation[] {
   return risks;
 }
 
-function deterministicSafetyQuiz(stageData: StageData): SafetyQuiz {
+export function deterministicSafetyQuiz(stageData: StageData): SafetyQuiz & { correct: number } {
   const risks = deterministicRisks(stageData);
   const main = risks[0]?.description ?? '异常时立即停止并告知教师';
   return {
@@ -85,19 +89,96 @@ function deterministicSafetyQuiz(stageData: StageData): SafetyQuiz {
   };
 }
 
-function dataValues(stageData: StageData): string[] {
-  return (stageData.stage3?.rows ?? []).flatMap((row) => Object.values(row)).filter((value) => typeof value === 'number' || (typeof value === 'string' && value.trim())).map(String);
+function normalizedCellValue(value: unknown): string {
+  return String(value ?? '').replace(/\s+/g, '').trim();
 }
 
-export function updateServerAnalysis(stageData: StageData, studentMessage: string): { stageData: StageData; accepted: boolean; matchedValues: string[] } {
-  const values = [...new Set(dataValues(stageData))];
-  const matchedValues = values.filter((value) => studentMessage.includes(value));
+function isIndexColumn(key: string, title: string): boolean {
+  return /^(?:trial|repeat|repeat_index|index|row_index)$/i.test(key)
+    || /(?:重复|试验|实验)?序号|编号/.test(title);
+}
+
+function containsCellValue(message: string, value: string): boolean {
+  if (!value) return false;
+  if (!/^-?\d+(?:\.\d+)?$/.test(value)) return message.includes(value);
+  const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^0-9.])${escaped}([^0-9.]|$)`).test(message);
+}
+
+function chineseRowNumber(index: number): string {
+  const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+  if (index < 10) return digits[index];
+  if (index === 10) return '十';
+  if (index < 20) return `十${digits[index - 10]}`;
+  if (index === 20) return '二十';
+  return String(index);
+}
+
+interface AnalysisCellEvidence {
+  rowIndex: number;
+  columnKey: string;
+  columnName: string;
+  citedValue: string;
+  fingerprint: string;
+}
+
+function evidenceCells(stageData: StageData, studentMessage: string): AnalysisCellEvidence[] {
+  const rows = stageData.stage3?.rows ?? [];
+  const columns = (stageData.stage2?.schema.columns ?? []).filter((column) => !isIndexColumn(column.key, column.title));
+  const candidates = rows.flatMap((row, rowIndex) => columns.flatMap((column) => {
+    const citedValue = normalizedCellValue(row[column.key]);
+    if (!citedValue || !containsCellValue(studentMessage, citedValue)) return [];
+    return [{ rowIndex, column, citedValue, row }];
+  }));
+  const valueFrequency = new Map<string, number>();
+  for (const candidate of candidates) valueFrequency.set(candidate.citedValue, (valueFrequency.get(candidate.citedValue) ?? 0) + 1);
+
+  return candidates.flatMap(({ rowIndex, column, citedValue, row }) => {
+    const oneBased = rowIndex + 1;
+    const rowMentioned = new RegExp(`第\\s*(?:${oneBased}|${chineseRowNumber(oneBased)})\\s*行`).test(studentMessage);
+    const columnMentioned = studentMessage.includes(column.title) || studentMessage.includes(column.key);
+    const rowLabelMentioned = Object.entries(row).some(([key, value]) => (
+      key !== column.key
+      && !isIndexColumn(key, stageData.stage2?.schema.columns.find((item) => item.key === key)?.title ?? key)
+      && normalizedCellValue(value).length > 0
+      && normalizedCellValue(value).length <= 30
+      && studentMessage.includes(normalizedCellValue(value))
+    ));
+    if ((valueFrequency.get(citedValue) ?? 0) > 1 && !rowMentioned && !columnMentioned && !rowLabelMentioned) return [];
+    return [{
+      rowIndex,
+      columnKey: column.key,
+      columnName: column.title,
+      citedValue,
+      fingerprint: contractHash('stage-contract-v3/evidence-cell/v1', {
+        rowIndex,
+        columnKey: column.key,
+        citedValue,
+      }),
+    }];
+  });
+}
+
+export function updateServerAnalysis(stageData: StageData, studentMessage: string): {
+  stageData: StageData;
+  accepted: boolean;
+  duplicate: boolean;
+  matchedValues: string[];
+} {
+  const evidence = evidenceCells(stageData, studentMessage);
+  const matchedValues = [...new Set(evidence.map((item) => item.citedValue))];
   const comparison = /比|相比|高于|低于|增加|减少|上升|下降|最多|最少|差|相同|不同/.test(studentMessage);
-  const accepted = matchedValues.length >= 2 && comparison;
-  if (!accepted) return { stageData, accepted, matchedValues };
+  const roundFingerprint = contractHash(
+    'stage-contract-v3/evidence-round/v1',
+    evidence.map((item) => item.fingerprint).sort(),
+  );
   const previous = stageData.stage4 ?? { analysisCount: 0 };
+  const duplicate = (previous.evidenceRounds ?? []).some((round) => round.roundFingerprint === roundFingerprint);
+  const accepted = evidence.length >= 2 && comparison && !duplicate;
+  if (!accepted) return { stageData, accepted, duplicate, matchedValues };
   return {
     accepted,
+    duplicate,
     matchedValues,
     stageData: {
       ...stageData,
@@ -108,8 +189,10 @@ export function updateServerAnalysis(stageData: StageData, studentMessage: strin
         evidenceCitations: [...(previous.evidenceCitations ?? []), ...matchedValues],
         evidenceRounds: [...(previous.evidenceRounds ?? []), {
           observation: studentMessage,
-          citations: matchedValues,
+          citations: evidence.map((item) => `第${item.rowIndex + 1}行「${item.columnName}」=${item.citedValue}`),
           matchedValues,
+          evidence,
+          roundFingerprint,
         }],
       },
     },
@@ -131,29 +214,17 @@ export function attachServerOwnedArtifacts(input: {
     artifacts.stage1_confirmed = true;
     artifacts.snapshot = stageData.stage1.snapshot;
     artifacts.theme_mapping = stageData.stage1.themeMapping;
-    artifacts.topic_direction = {
-      factor: stageData.stage1.factorDirection ?? stageData.stage1.variables.independent,
-      phenomenon: stageData.stage1.phenomenonDirection ?? '',
-    };
     nextActionType = 'confirmation';
     phaseComplete = true;
   }
 
-  if (input.stage === 2 && stageData.stage2?.experimentPlan && stageData.stage2.factsConfirmed) {
-    const plan = stageData.stage2.experimentPlan;
-    const schema = buildDataTableSchema(plan);
-    if (!schema) throw new Error('服务器无法根据已确认方案生成数据表');
-    const risks = deterministicRisks(stageData);
-    stageData = {
-      ...stageData,
-      stage2: { ...stageData.stage2, schema, aiRiskAnnotations: risks },
-    };
+  if (input.stage === 2 && stageData.stage2?.planDraft && stageData.stage2.draftHash) {
+    const plan = stageData.stage2.planDraft;
     artifacts.experiment_plan = plan;
-    artifacts.data_table_schema = schema;
-    artifacts.risks = risks;
-    artifacts.artifact_provenance = { data_table_schema: 'server_composed' };
+    artifacts.stage2_plan_preview = { plan, draftHash: stageData.stage2.draftHash };
+    artifacts.artifact_provenance = { experiment_plan: 'server_composed' };
     nextActionType = 'confirmation';
-    phaseComplete = true;
+    phaseComplete = false;
   }
 
   if (input.stage === 3 && !input.safetyQuizCompleted && input.triggerType === 'STAGE_ENTER') {
@@ -163,12 +234,13 @@ export function attachServerOwnedArtifacts(input: {
       stage3: {
         ...(stageData.stage3 ?? { rows: [] }),
         safetyQuiz: {
-          ...quiz,
+          question: quiz.question,
+          options: quiz.options,
           passed: stageData.stage3?.safetyQuiz?.passed ?? false,
         },
       },
     };
-    artifacts.safety_quiz = quiz;
+    artifacts.safety_quiz = { question: quiz.question, options: quiz.options };
     nextActionType = 'info';
   }
 
@@ -184,7 +256,8 @@ export function attachServerOwnedArtifacts(input: {
           sections: {
             ...sections,
             conclusion: stageData.stage5?.sections?.conclusion ?? '',
-            reflection: stageData.stage5?.sections?.reflection ?? '',
+            limitationsDiscussion: stageData.stage5?.sections?.limitationsDiscussion ?? stageData.stage5?.sections?.reflection ?? '',
+            reflection: stageData.stage5?.sections?.limitationsDiscussion ?? stageData.stage5?.sections?.reflection ?? '',
           },
         },
       };

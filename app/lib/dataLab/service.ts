@@ -4,8 +4,7 @@ import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
 import type { SessionUser } from '@/app/lib/session';
 import type { UserRole } from '@/app/lib/roles';
-import { TUTOR_LANGUAGE_CONTRACT_VERSION, TUTOR_LANGUAGE_PROMPT_VERSIONS, type TutorLanguagePromptVersion } from '@/app/lib/tutorLanguage';
-import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
+import { caseStageContractVersion, tutorCohortReasons } from '@/app/lib/dataLab/trainingCohort';
 import {
   STYLE_FAMILIES,
   type AutoCheckResult,
@@ -1364,10 +1363,14 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
     const candidate = sample.productionCandidate;
     const leakage = candidate ? parseJson<{ blocked?: boolean }>(candidate.leakageCheckJson, {}) : {};
     const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(revision.transformationMetricsJson, {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
+    const releaseRecord = parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord);
     const result = evaluateTrainingEligibility({
       sourceKind: sample.sourceKind,
       batchStatus: sample.batch.status,
-      stageContractVersion: parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord).meta?.stageContractVersion as string | undefined,
+      stageContractVersion: releaseRecord.meta?.stageContractVersion as string | undefined,
+      contractVersion: releaseRecord.meta?.contractVersion as string | undefined,
+      promptVersion: (releaseRecord.meta?.promptVersion ?? releaseRecord.meta?.promptPolicyVersion) as string | undefined,
+      extractorVersion: releaseRecord.meta?.extractorVersion as string | undefined,
       candidateStatus: candidate?.status,
       consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus,
       leakageBlocked: leakage.blocked,
@@ -1548,9 +1551,12 @@ export async function createTrainingRun(input: {
       const reasons: string[] = [];
       if (item.finalizedTutorTurn.trainingEligibility !== 'SFT_ALLOWED') reasons.push('FINALIZED_TURN_NOT_ELIGIBLE');
       if (item.finalizedTutorTurn.case.split !== 'TRAIN') reasons.push('NON_TRAIN_SPLIT_BLOCKED');
-      if (item.finalizedTutorTurn.case.contractVersion !== TUTOR_LANGUAGE_CONTRACT_VERSION) reasons.push('TUTOR_CONTRACT_STALE');
-      if (!TUTOR_LANGUAGE_PROMPT_VERSIONS.includes(item.finalizedTutorTurn.case.promptVersion as TutorLanguagePromptVersion)) reasons.push('TUTOR_PROMPT_UNSUPPORTED');
-      if (item.finalizedTutorTurn.case.extractorVersion !== EXTRACTOR_VERSION) reasons.push('EXTRACTOR_VERSION_STALE');
+      reasons.push(...tutorCohortReasons({
+        contractVersion: item.finalizedTutorTurn.case.contractVersion,
+        stageContractVersion: caseStageContractVersion(item.finalizedTutorTurn.case.hardCheckJson),
+        extractorVersion: item.finalizedTutorTurn.case.extractorVersion,
+        promptVersion: item.finalizedTutorTurn.case.promptVersion,
+      }));
       return { eligibility: reasons.length ? 'BLOCKED' as const : 'SFT_ALLOWED' as const, reasons };
     }
     if (!item.sample) return { eligibility: 'BLOCKED' as const, reasons: ['RELEASE_ITEM_SOURCE_XOR_INVALID'] };
@@ -1558,7 +1564,7 @@ export async function createTrainingRun(input: {
     const leakage = candidate ? parseJson<{ blocked?: boolean }>(candidate.leakageCheckJson, {}) : {};
     const metrics = parseJson<import('@/app/lib/trainingEligibility').TransformationMetrics>(item.revision?.transformationMetricsJson ?? '{}', {} as import('@/app/lib/trainingEligibility').TransformationMetrics);
     const record = parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord);
-    return evaluateTrainingEligibility({ sourceKind: item.sample.sourceKind, batchStatus: item.sample.batch.status, stageContractVersion: record.meta?.stageContractVersion as string | undefined, candidateStatus: candidate?.status, consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus, leakageBlocked: leakage.blocked, transformationType: item.revision?.transformationType, metrics, workReviewApproved: item.revision?.workReview?.status === 'APPROVED' || Boolean(candidate), finallySelected: true });
+    return evaluateTrainingEligibility({ sourceKind: item.sample.sourceKind, batchStatus: item.sample.batch.status, stageContractVersion: record.meta?.stageContractVersion as string | undefined, contractVersion: record.meta?.contractVersion as string | undefined, promptVersion: (record.meta?.promptVersion ?? record.meta?.promptPolicyVersion) as string | undefined, extractorVersion: record.meta?.extractorVersion as string | undefined, candidateStatus: candidate?.status, consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus, leakageBlocked: leakage.blocked, transformationType: item.revision?.transformationType, metrics, workReviewApproved: item.revision?.workReview?.status === 'APPROVED' || Boolean(candidate), finallySelected: true });
   });
   const report = { policyVersion: TRAINING_POLICY_VERSION, checkedAt: new Date().toISOString(), parentModelVersionId: input.parentModelVersionId ?? null, sftAllowed: results.filter((result) => result.eligibility === 'SFT_ALLOWED').length, monitoringOnly: results.filter((result) => result.eligibility === 'MONITORING_ONLY').length, blocked: results.filter((result) => result.eligibility === 'BLOCKED').length, reasons: [...new Set(results.flatMap((result) => result.reasons))] };
   if (requestedStatus !== 'DRAFT' && (report.blocked > 0 || report.sftAllowed === 0)) throw new Error(`训练资格检查未通过：可训练 ${report.sftAllowed}，阻断 ${report.blocked}；${report.reasons.join('、')}`);

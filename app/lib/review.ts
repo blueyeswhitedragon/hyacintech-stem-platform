@@ -19,12 +19,9 @@ export interface ReviewOpts {
  * 纯函数：教师对阶段2/3/5 的审核动作 → 新的 stageData / currentStage / status。
  * 无副作用、不读 DB —— 便于单测。调用方负责落库。
  *
- * 第三阶段为「可选 / 非阻塞 / 有界回滚」：
+ * 第三阶段为「可选 / 非阻塞」：
  *  - approve：仅背书（approved=true），不改阶段（学生本就已自助推进）。
- *  - reject：按学生当前阶段 fromStage 有界回滚——
- *      fromStage===3 → 留 3 写反馈；
- *      fromStage===4 → 回退到 3，并清零 stage4.analysisCount（旧分析失效）；
- *      fromStage>=5  → 拒绝打回（交由第五阶段审核处理）。
+ *  - reject：只记录反馈，不回滚阶段、不清空学生数据或分析。
  */
 export function applyReview(
   action: ReviewAction,
@@ -48,7 +45,6 @@ export function applyReview(
       };
       return { ok: true, stageData, status: 'IN_PROGRESS' };
     }
-    // reject：有界回滚
     if (fromStage >= 5) {
       return {
         ok: false,
@@ -57,17 +53,13 @@ export function applyReview(
         status: 'IN_PROGRESS',
       };
     }
+    // reject：非阻塞反馈，不改变当前阶段或既有分析。
     stageData.stage3 = {
       ...prev.stage3,
       approved: false,
-      submitted: false,
       teacherFeedback: opts.feedback,
     };
-    if (fromStage === 4) {
-      // 回退到第三阶段：旧分析基于旧表已失效，清零分析轮次
-      stageData.stage4 = { analysisCount: 0 };
-    }
-    return { ok: true, stageData, currentStage: 3, status: 'IN_PROGRESS' };
+    return { ok: true, stageData, status: 'IN_PROGRESS' };
   }
 
   if (stage === 2) {
@@ -92,9 +84,15 @@ export function applyReview(
   if (!prev.stage5) {
     return { ok: false, error: '该报告尚未提交', stageData: prev, status: 'PENDING_STAGE5' };
   }
+  if (opts.score !== undefined && (!Number.isFinite(opts.score) || opts.score < 0 || opts.score > 10)) {
+    return { ok: false, error: '教师评分必须是 0–10 的有效数字', stageData: prev, status: 'PENDING_STAGE5' };
+  }
   if (action === 'approve') {
+    if (opts.score === undefined) {
+      return { ok: false, error: '通过报告前必须填写 0–10 分的教师评分', stageData: prev, status: 'PENDING_STAGE5' };
+    }
     // 教师评分低于 6 分 → 需要学生重写报告，重新提交
-    if (opts.score !== undefined && opts.score < 6) {
+    if (opts.score < 6) {
       stageData.stage5 = {
         ...prev.stage5,
         approved: false,

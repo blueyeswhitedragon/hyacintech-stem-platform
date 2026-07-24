@@ -1,5 +1,6 @@
 /** Deterministic structured prior-summary tests. */
 import { buildPriorSummary } from '../app/lib/reportSummary';
+import { isCurrentStage5Submission, stage5SubmissionHash } from '../app/lib/reportFields';
 import type { StageData } from '../app/models/stageData';
 
 let passed = 0, failed = 0;
@@ -98,6 +99,20 @@ const structured: StageData = {
 }
 
 check('空数据兜底', buildPriorSummary({}).includes('暂无结构化摘要'));
+
+{
+  const sections = {
+    purpose: '比较光照时长与株高', hypothesis: '光照更长时株高可能增加', materials: '绿豆、花盆、直尺', procedure: '控制水量并测量',
+    dataSummary: '4小时组与8小时组各记录3次', analysis: '8小时组数值整体更高', conclusion: '本次记录支持假设',
+    limitationsDiscussion: '样本较少，后续增加重复次数', reflection: '样本较少，后续增加重复次数',
+  };
+  const hash = stage5SubmissionHash(sections);
+  const submitted = { submitted: true, approved: null, sections, submittedSectionsHash: hash };
+  check('AI 评分只匹配当前已提交报告哈希', isCurrentStage5Submission(submitted, hash));
+  check('报告字段变化后拒绝写入旧 AI 评分', !isCurrentStage5Submission({ ...submitted, sections: { ...sections, conclusion: '已修改结论' } }, hash));
+  check('提交哈希不一致时拒绝写入 AI 评分', !isCurrentStage5Submission({ ...submitted, submittedSectionsHash: 'stale' }, hash));
+  check('报告退回编辑状态后拒绝写入 AI 评分', !isCurrentStage5Submission({ ...submitted, submitted: false }, hash));
+}
 
 console.log(`\n结果: ${passed} 通过, ${failed} 失败`);
 process.exit(failed > 0 ? 1 : 0);

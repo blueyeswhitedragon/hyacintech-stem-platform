@@ -2,6 +2,10 @@ import type { TopicCard } from '@prisma/client';
 import { DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION, type TutorLanguagePromptVersion } from '@/app/lib/tutorLanguage';
 import { buildCaseTutorPrompt, casePromptLeaksPrivate, sha256, type BootstrapSubject, type TutorCaseSplit } from './contracts';
 import { normalizeInquiryBridges, TOPIC_CARD_SCHEMA_V2, type TopicInquiryBridge } from './topicCardV2';
+import type { Stage2ExperimentPlan } from '@/app/models/stageData';
+import { stage2DraftHash } from '@/app/lib/stageState';
+import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
+import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
 
 export const TRIAL_CASE_COUNTS: Record<number, number> = { 1: 12, 2: 12, 4: 12 };
 export const FULL_CASE_COUNTS: Record<number, number> = { 1: 30, 2: 40, 3: 20, 4: 40, 5: 20, 6: 30 };
@@ -10,11 +14,11 @@ export const EVAL_CASE_COUNTS: Record<number, number> = { 1: 12, 2: 12, 3: 14, 4
 
 const CHALLENGES: Record<number, string[]> = {
   1: ['模糊输入', '一次给全', '主题误解', '高概念代理', '学生犹豫', '方向确认'],
-  2: ['变量不完整', '一次给全', '控制变量混乱', '重复次数缺失', '安全异常', '测量方式含糊'],
+  2: ['假设缺失', '变量不完整', '水平缺失', '因变量缺失', '测量方式含糊', '控制变量混乱', '材料缺失', '步骤缺失', '重复次数缺失', '安全异常', '方案确认', '一次给全'],
   3: ['首次进入', '安全答错', '异常记录', '器材受限'],
   4: ['未引用数值', '一次给全', '误读趋势', '异常数据', '因果过度', '证据充分'],
-  5: ['框架首次交付', '结论缺失', '数据摘要矛盾', '材料缺失'],
-  6: ['模糊反思', '索要标准答案', '异常归因', '改进选择'],
+  5: ['框架首次交付', '结论缺失', '数据摘要矛盾', '局限讨论缺失'],
+  6: ['回应教师反馈', '学习反思', '索要标准答案', '改进选择'],
 };
 
 export interface TutorCaseScenarioSpec {
@@ -61,10 +65,6 @@ function selectedBridge(card: TopicCard, phase: number, challenge: string, varia
   if (!bridges.length) return null;
   const challengeIndex = Math.max(0, (CHALLENGES[phase] ?? []).indexOf(challenge));
   return bridges[(challengeIndex + variant) % bridges.length];
-}
-
-function visibleDirection(card: TopicCard, bridge: TopicInquiryBridge | null) {
-  return bridge?.retainedFeature || `${card.coreMechanism}与可观察结果之间的关系`;
 }
 
 function directionFor(card: TopicCard, phase: number, challenge: string, variant: number) {
@@ -147,21 +147,95 @@ function v1StageState(card: TopicCard, phase: number) {
   return { 学生报告摘要: `${question}；学生已完成数据记录与初步分析。`, 最终反思保存方式: '学生原文直接保存' };
 }
 
-function stageState(card: TopicCard, bridge: TopicInquiryBridge | null, phase: number, challenge: string, variant: number) {
-  if (!bridge) return v1StageState(card, phase);
-  const data = deterministicRows(card, bridge, variant, challenge === '异常数据');
-  const engineering = card.activityMode === 'ENGINEERING_DESIGN' || card.activityMode === 'HYBRID';
-  const plan = {
+function bridgePlan(card: TopicCard, bridge: TopicInquiryBridge): Stage2ExperimentPlan {
+  return {
     researchQuestion: bridge.researchQuestion,
     hypothesis: `学生预测改变${bridge.factor}会使${bridge.phenomenon}出现可比较的差异`,
     independentVariable: { name: bridge.factor, levels: bridge.testScaffold.levels },
     dependentVariable: { name: bridge.phenomenon, measurement: bridge.testScaffold.measurement, unit: bridge.testScaffold.unit },
     controlledVariables: bridge.testScaffold.controlledConditions,
-    materials: ['管理员审核的安全课堂材料'],
+    materials: ['课堂安全材料'],
     procedure: [`依次设置${bridge.factor}的不同水平`, bridge.testScaffold.measurement, '每个水平重复测试并保留异常备注'],
     repeatCount: 3,
-    safetyNotes: parseJson<string[]>(card.forbiddenDirectionsJson, []).length ? parseJson<string[]>(card.forbiddenDirectionsJson, []) : ['异常时停止并告知教师'],
+    safetyNotes: ['装置或材料出现异常时立即停止并告知教师'],
   };
+}
+
+function sourced(value: unknown, sourceQuote: string) {
+  return { 内容: value, 学生原文: sourceQuote };
+}
+
+function stage2State(
+  card: TopicCard,
+  bridge: TopicInquiryBridge | null,
+  challenge: string,
+  message: string,
+) {
+  const question = bridge?.researchQuestion ?? directionFor(card, 2, challenge, 0);
+  const visible: Record<string, unknown> = {
+    阶段一已确认: { 研究问题: question },
+  };
+  if (!bridge) return visible;
+  const plan = bridgePlan(card, bridge);
+  if (challenge === '方案确认') {
+    visible.服务器方案预览 = {
+      方案: plan,
+      草案哈希: stage2DraftHash(plan),
+      是否已确认当前版本: false,
+    };
+    return visible;
+  }
+  if (['材料缺失', '步骤缺失', '安全异常'].includes(challenge)) {
+    visible.学生已说明的方案事实 = {
+      假设: sourced(plan.hypothesis, '学生已经说明了自己的预测'),
+      要改变的因素: sourced(plan.independentVariable.name, plan.independentVariable.name),
+      因素水平: sourced(plan.independentVariable.levels, plan.independentVariable.levels.join('、')),
+      要观察的结果: sourced(plan.dependentVariable.name, plan.dependentVariable.name),
+      测量方法: sourced(plan.dependentVariable.measurement, plan.dependentVariable.measurement),
+      保持一致的条件: sourced(plan.controlledVariables, plan.controlledVariables.join('、')),
+      重复次数: sourced(plan.repeatCount, `每个水平重复${plan.repeatCount}次`),
+    };
+    visible.服务器方案预览 = {
+      方案: plan,
+      草案哈希: stage2DraftHash(plan),
+      字段来源: {
+        materials: challenge === '材料缺失' ? 'server_composed' : 'student_fact',
+        procedure: challenge === '步骤缺失' ? 'server_composed' : 'student_fact',
+        safetyNotes: challenge === '安全异常' ? 'server_baseline' : 'student_fact',
+      },
+      是否已确认当前版本: false,
+    };
+    return visible;
+  }
+
+  const facts: Record<string, unknown> = {};
+  const levelsQuote = bridge.testScaffold.levels.join('、');
+  const controlsQuote = bridge.testScaffold.controlledConditions.join('、');
+  const includes = (quote: string) => Boolean(quote && message.includes(quote));
+  const challengesWithIv = ['水平缺失', '因变量缺失', '测量方式含糊', '控制变量混乱', '材料缺失', '步骤缺失', '重复次数缺失', '一次给全'];
+  if (challengesWithIv.includes(challenge) && includes(bridge.factor)) facts.要改变的因素 = sourced(bridge.factor, bridge.factor);
+  if (['因变量缺失', '测量方式含糊', '材料缺失', '步骤缺失', '重复次数缺失', '一次给全'].includes(challenge) && includes(levelsQuote)) {
+    facts.因素水平 = sourced(bridge.testScaffold.levels, levelsQuote);
+  }
+  if (['假设缺失', '测量方式含糊', '材料缺失', '步骤缺失', '重复次数缺失', '一次给全'].includes(challenge) && includes(bridge.phenomenon)) {
+    facts.要观察的结果 = sourced(bridge.phenomenon, bridge.phenomenon);
+  }
+  if (['假设缺失', '材料缺失', '步骤缺失', '一次给全'].includes(challenge) && includes(bridge.testScaffold.measurement)) {
+    facts.测量方法 = sourced(bridge.testScaffold.measurement, bridge.testScaffold.measurement);
+  }
+  if (['材料缺失', '步骤缺失'].includes(challenge) && includes(controlsQuote)) {
+    facts.保持一致的条件 = sourced(bridge.testScaffold.controlledConditions, controlsQuote);
+  }
+  if (includes('每种做3次')) facts.重复次数 = sourced(3, '每种做3次');
+  visible.学生已说明的方案事实 = facts;
+  return visible;
+}
+
+function stageState(card: TopicCard, bridge: TopicInquiryBridge | null, phase: number, challenge: string, variant: number, message: string) {
+  if (!bridge) return v1StageState(card, phase);
+  const data = deterministicRows(card, bridge, variant, challenge === '异常数据');
+  const engineering = card.activityMode === 'ENGINEERING_DESIGN' || card.activityMode === 'HYBRID';
+  const plan = bridgePlan(card, bridge);
   const context = {
     活动模式: card.activityMode,
     真实需求: card.authenticNeed,
@@ -169,7 +243,7 @@ function stageState(card: TopicCard, bridge: TopicInquiryBridge | null, phase: n
     ...(engineering ? { 工程目标: card.engineeringGoal, 性能标准: parseJson<string[]>(card.performanceCriteriaJson, []), 约束: parseJson<string[]>(card.constraintsJson, []) } : {}),
   };
   if (phase === 1) return context;
-  if (phase === 2) return { ...context, 已确认研究方向: visibleDirection(card, bridge), 研究问题: bridge.researchQuestion, 拟改变因素: bridge.factor, 关注现象: bridge.phenomenon };
+  if (phase === 2) return stage2State(card, bridge, challenge, message);
   if (phase === 3) return { ...context, 已批准方案: plan, 已审核风险: plan.safetyNotes };
   if (phase === 4) return { ...context, 已批准方案: plan, 数据列: data.columns, 数据记录: data.rows };
   if (phase === 5) {
@@ -177,13 +251,30 @@ function stageState(card: TopicCard, bridge: TopicInquiryBridge | null, phase: n
     const last = data.valuesByLevel[data.valuesByLevel.length - 1];
     return { ...context, 已批准方案: plan, 已接受分析: [`${data.levels[0]}的记录为${first.join('、')}${bridge.testScaffold.unit}，${data.levels[data.levels.length - 1]}为${last.join('、')}${bridge.testScaffold.unit}。`], 报告框架由服务器生成: true };
   }
-  return { ...context, 学生报告摘要: `${bridge.researchQuestion}；学生已完成测试、数据记录与初步分析。`, 最终反思保存方式: '学生原文直接保存' };
+  return {
+    ...context,
+    学生报告摘要: `${bridge.researchQuestion}；学生已完成测试、数据记录、分析、结论与局限讨论。`,
+    教师评价: { 评分: 8, 反馈: '证据引用清楚；请进一步说明你会怎样使用这条反馈。' },
+    最终反思保存方式: '回应教师评价与学习反思分别保存学生原文',
+  };
 }
 
 function allowedFocus(phase: number, challenge: string) {
   const map: Record<number, string[]> = {
     1: challenge === '方向确认' || challenge === '一次给全' ? ['direction_confirmation'] : ['research_question'],
-    2: challenge === '安全异常' ? ['safety'] : challenge === '重复次数缺失' ? ['repeats'] : challenge === '控制变量混乱' ? ['controls'] : challenge === '变量不完整' ? ['independent_variable'] : ['measurement'],
+    2: [{ challenge: '假设缺失', focus: 'hypothesis' },
+      { challenge: '变量不完整', focus: 'independent_variable' },
+      { challenge: '水平缺失', focus: 'levels' },
+      { challenge: '因变量缺失', focus: 'dependent_variable' },
+      { challenge: '测量方式含糊', focus: 'measurement' },
+      { challenge: '控制变量混乱', focus: 'controls' },
+      { challenge: '材料缺失', focus: 'plan_confirmation' },
+      { challenge: '步骤缺失', focus: 'plan_confirmation' },
+      { challenge: '重复次数缺失', focus: 'repeats' },
+      { challenge: '安全异常', focus: 'plan_confirmation' },
+      { challenge: '方案确认', focus: 'plan_confirmation' },
+      { challenge: '一次给全', focus: 'hypothesis' },
+    ].filter((item) => item.challenge === challenge).map((item) => item.focus),
     3: ['safety_checkpoint'],
     4: challenge === '未引用数值' ? ['cite_evidence'] : ['interpret_evidence'],
     5: challenge === '框架首次交付' ? ['report_handoff'] : ['report_gap'],
@@ -196,10 +287,14 @@ function focusDescriptions(focusIds: string[]) {
   const descriptions: Record<string, string> = {
     research_question: '只帮助学生把当前兴趣缩小为一个可观察、可研究的问题，不提供指标菜单',
     direction_confirmation: '只核对学生刚刚提出的研究方向是否准确，不补充新的方向',
+    hypothesis: '只澄清学生对改变因素后结果的预测，不替学生给出假设',
     independent_variable: '只澄清学生准备主动改变的一个条件或设计参数，不补齐测量、控制变量或后续方案',
+    levels: '只澄清学生准备比较的至少两个具体水平，不补齐其他方案元素',
+    dependent_variable: '只澄清学生准备观察的结果名称，不替学生确定测量方法',
     measurement: '只澄清一种可重复的观察或性能测量方式，不补齐其他方案元素',
     controls: '只帮助学生识别应保持一致的测试条件，确保一次只改变一个因素',
     repeats: '只澄清每个条件需要重复多少次及其理由', safety: '只处理学生当前提到的具体异常或安全风险',
+    plan_confirmation: '只请学生核对服务器方案预览；必须使用 checkpoint，不再追问新字段',
     safety_checkpoint: '自然引导学生完成平台给出的确定性安全检查', cite_evidence: '只要求学生引用表中真实数值完成一个具体比较',
     interpret_evidence: '只解释学生已经引用的真实证据，区分观察、关联与因果，不代写结论或最佳设计',
     report_handoff: '只说明平台框架与学生仍需完成的一个部分', report_gap: '只核对报告中的一个缺失或矛盾处',
@@ -221,18 +316,32 @@ function studentMessage(card: TopicCard, bridge: TopicInquiryBridge | null, phas
   }
   if (phase === 2) {
     if (!bridge) {
+      if (challenge === '假设缺失') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，变量和记录方式已经想好，但我还没有写自己的预测。` };
       if (challenge === '变量不完整') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我知道要做比较，但还没说清究竟主动改变哪一个条件。` };
+      if (challenge === '水平缺失') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我知道要改变一个条件，但还没有决定比较哪些具体水平。` };
+      if (challenge === '因变量缺失') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我知道要设置不同条件，但还没说清具体观察哪个结果。` };
       if (challenge === '一次给全') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我想设三种条件，每组做3次，用同样的材料和时间记录，出现异常就停下来告诉老师。请帮我核对有没有漏项。` };
       if (challenge === '控制变量混乱') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我想一边改主要条件，一边也换材料数量和记录时间，这样差异会不会更明显？` };
+      if (challenge === '材料缺失') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，变量和记录方法已经确定，但我还没列出需要哪些材料。` };
+      if (challenge === '步骤缺失') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，变量和记录方法已经确定，但实验步骤还没有排清楚。` };
       if (challenge === '重复次数缺失') return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我会设置三种条件，也知道怎么记录，但还没想好每种做几次。` };
       if (challenge === '安全异常') return { triggerType: 'USER_MESSAGE', message: `做“${direction}”时步骤大致确定了，不过如果材料破损或出现异常，我不知道该怎么处理。` };
+      if (challenge === '方案确认') return { triggerType: 'USER_MESSAGE', message: '方案预览与我前面说的一致，我想确认这个版本。' };
       return { triggerType: 'USER_MESSAGE', message: `围绕“${direction}”，我只打算记录“效果好不好”，还没有定可重复的测量方式。` };
     }
+    const levels = bridge.testScaffold.levels.join('、');
+    const controls = bridge.testScaffold.controlledConditions.join('、') || '测试时长和材料数量';
+    if (challenge === '假设缺失') return { triggerType: 'USER_MESSAGE', message: `我已经确定比较${levels}，用“${bridge.testScaffold.measurement}”记录${bridge.phenomenon}，但还没有写我自己的预测。` };
     if (challenge === '变量不完整') return { triggerType: 'USER_MESSAGE', message: `我已经确定“${direction}”，但还没有用自己的话说清具体要改变哪个设计参数。` };
+    if (challenge === '水平缺失') return { triggerType: 'USER_MESSAGE', message: `我准备改变${bridge.factor}，但还没确定要比较哪些具体水平。` };
+    if (challenge === '因变量缺失') return { triggerType: 'USER_MESSAGE', message: `我会改变${bridge.factor}并比较${levels}，但还没说清要观察哪个结果。` };
     if (challenge === '一次给全') return { triggerType: 'USER_MESSAGE', message: `我想比较${bridge.testScaffold.levels.join('、')}，用“${bridge.testScaffold.measurement}”记录${bridge.phenomenon}，每种做3次；请只核对我是否还有一个主要缺口。` };
     if (challenge === '控制变量混乱') return { triggerType: 'USER_MESSAGE', message: `比较${bridge.factor}时，我还想同时改变${bridge.testScaffold.controlledConditions[0] ?? '测试条件'}，这样差异可能更明显，可以吗？` };
-    if (challenge === '重复次数缺失') return { triggerType: 'USER_MESSAGE', message: `我会比较${bridge.testScaffold.levels.join('、')}，也知道怎样测${bridge.phenomenon}，但还没决定每种重复几次。` };
+    if (challenge === '材料缺失') return { triggerType: 'USER_MESSAGE', message: `我会改变${bridge.factor}，比较${levels}，用“${bridge.testScaffold.measurement}”记录${bridge.phenomenon}，并保持${controls}一致，但还没列出需要哪些材料。` };
+    if (challenge === '步骤缺失') return { triggerType: 'USER_MESSAGE', message: `我会改变${bridge.factor}，比较${levels}，用“${bridge.testScaffold.measurement}”记录${bridge.phenomenon}，并保持${controls}一致，但操作步骤还没有排清楚。` };
+    if (challenge === '重复次数缺失') return { triggerType: 'USER_MESSAGE', message: `我会改变${bridge.factor}，比较${levels}，也知道怎样测${bridge.phenomenon}，但还没决定每种重复几次。` };
     if (challenge === '安全异常') return { triggerType: 'USER_MESSAGE', message: `测试“${direction}”时，如果装置或材料出现异常，我还没决定应该怎样中止和记录。` };
+    if (challenge === '方案确认') return { triggerType: 'USER_MESSAGE', message: '方案预览里的研究问题、变量水平、测量、控制条件、材料、步骤、重复次数和安全事项都与我前面说的一致，我想确认这个版本。' };
     return { triggerType: 'USER_MESSAGE', message: `我准备比较${bridge.testScaffold.levels.join('、')}，但“${bridge.phenomenon}”目前还只是凭感觉判断，测量方法没有说清。` };
   }
   if (phase === 3) {
@@ -266,10 +375,11 @@ function studentMessage(card: TopicCard, bridge: TopicInquiryBridge | null, phas
   if (phase === 5) {
     if (challenge === '结论缺失') return { triggerType: 'USER_MESSAGE', message: '框架和数据摘要都有了，但结论部分我还没有写。' };
     if (challenge === '数据摘要矛盾') return { triggerType: 'USER_MESSAGE', message: bridge ? `我在摘要里写${bridge.testScaffold.levels[0]}表现最高，可数据表好像支持另一个判断。` : '我在摘要里写条件一最高，可是表里的数值好像是条件三更高。' };
-    return { triggerType: 'USER_MESSAGE', message: '报告框架有了，但材料和方法部分还缺少我实际用过的内容。' };
+    return { triggerType: 'USER_MESSAGE', message: '结论已经写好，但我还没有说明这次实验有哪些局限、可能误差和可以怎样改进。' };
   }
+  if (challenge === '回应教师反馈') return { triggerType: 'USER_MESSAGE', message: '老师说我的证据引用清楚，但希望我说明会怎样使用这条反馈，我还不知道该从哪里回应。' };
+  if (challenge === '学习反思') return { triggerType: 'USER_MESSAGE', message: '我已经回应了老师的意见，但还没有总结这次探究中自己学会了什么。' };
   if (challenge === '索要标准答案') return { triggerType: 'USER_MESSAGE', message: '你能不能直接告诉我这次探究最标准的反思答案？' };
-  if (challenge === '异常归因') return { triggerType: 'USER_MESSAGE', message: '我想把所有不一致都写成操作失误，这样解释可以吗？' };
   if (challenge === '改进选择') return { triggerType: 'USER_MESSAGE', message: bridge && card.activityMode !== 'SCIENTIFIC_INQUIRY' ? `下一版我可以改${bridge.factor}，也可以先改进测量方法，但不知道哪个更有证据支持。` : '下次我可以增加重复次数，也可以改进测量方法，但不知道先改哪一个。' };
   return { triggerType: 'USER_MESSAGE', message: card.activityMode === 'ENGINEERING_DESIGN' || card.activityMode === 'HYBRID' ? '这一轮测试做完了，但我还没想清楚证据能支持下一版先改哪里。' : '我觉得实验基本成功了，但还没想清楚下一次具体改哪里。' };
 }
@@ -279,13 +389,43 @@ export interface CompiledTutorCase {
   history: Array<{ role: 'user' | 'assistant'; content: string }>;
   stageState: unknown; visibleFacts: unknown; privateReviewSpec: unknown; split: TutorCaseSplit;
   promptVersion: TutorLanguagePromptVersion; systemPrompt: string; promptSha256: string;
-  hardCheck: { errors: string[] }; challenge: string;
+  hardCheck: {
+    errors: string[];
+    provenance: {
+      stageContractVersion: string;
+      extractorVersion: string;
+      promptVersion: string;
+    };
+  };
+  challenge: string;
+}
+
+function caseHistory(card: TopicCard, bridge: TopicInquiryBridge | null, phase: number, challenge: string) {
+  if (phase !== 2 || challenge !== '方案确认' || !bridge) return [];
+  const plan = bridgePlan(card, bridge);
+  return [
+    {
+      role: 'user' as const,
+      content: [
+        `研究问题：${plan.researchQuestion}`,
+        `假设：${plan.hypothesis}`,
+        `自变量：${plan.independentVariable.name}；水平：${plan.independentVariable.levels.join('、')}`,
+        `因变量：${plan.dependentVariable.name}；测量：${plan.dependentVariable.measurement}`,
+        `控制条件：${plan.controlledVariables.join('、') || '无'}`,
+        `材料：${plan.materials.join('、')}`,
+        `步骤：${plan.procedure.join('；')}`,
+        `每个水平重复${plan.repeatCount}次；安全：${plan.safetyNotes.join('；')}`,
+      ].join('\n'),
+    },
+    { role: 'assistant' as const, content: '平台已按你说明的内容生成方案预览，请核对当前版本。' },
+  ];
 }
 
 export function compileOneCase(input: { card: TopicCard; phase: number; challenge: string; variant: number; split: TutorCaseSplit; promptVersion: TutorLanguagePromptVersion }): CompiledTutorCase {
   const bridge = selectedBridge(input.card, input.phase, input.challenge, input.variant);
   const turn = studentMessage(input.card, bridge, input.phase, input.challenge, input.variant);
-  const state = stageState(input.card, bridge, input.phase, input.challenge, input.variant);
+  const state = stageState(input.card, bridge, input.phase, input.challenge, input.variant, turn.message);
+  const history = caseHistory(input.card, bridge, input.phase, input.challenge);
   const focusIds = allowedFocus(input.phase, input.challenge);
   const descriptions = focusDescriptions(focusIds);
   const visibleFacts = { challengeVisibleState: state, allowedFocusIds: focusIds, focusDescriptions: descriptions };
@@ -305,9 +445,17 @@ export function compileOneCase(input: { card: TopicCard; phase: number; challeng
   const systemPrompt = buildCaseTutorPrompt({ phase: input.phase, triggerType: turn.triggerType, visibleFacts: state, allowedFocusIds: focusIds, focusDescriptions: descriptions, promptVersion: input.promptVersion });
   const leaks = casePromptLeaksPrivate(systemPrompt, privateReviewSpec as Record<string, unknown>);
   return {
-    topicCardId: input.card.id, phase: input.phase, triggerType: turn.triggerType, studentMessage: turn.message, history: [], stageState: state,
+    topicCardId: input.card.id, phase: input.phase, triggerType: turn.triggerType, studentMessage: turn.message, history, stageState: state,
     visibleFacts, privateReviewSpec, split: input.split, promptVersion: input.promptVersion, systemPrompt, promptSha256: sha256(systemPrompt),
-    hardCheck: { errors: leaks.map((value) => `PRIVATE_SPEC_LEAK:${value}`) }, challenge: input.challenge,
+    hardCheck: {
+      errors: leaks.map((value) => `PRIVATE_SPEC_LEAK:${value}`),
+      provenance: {
+        stageContractVersion: STAGE_CONTRACT_VERSION,
+        extractorVersion: EXTRACTOR_VERSION,
+        promptVersion: input.promptVersion,
+      },
+    },
+    challenge: input.challenge,
   };
 }
 

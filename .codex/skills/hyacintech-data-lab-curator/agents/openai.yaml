@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hyacintech Data Lab Curator"
+  short_description: "Curate TopicCards, A/B batches, and auditable AI reviews"
+  default_prompt: "Use $hyacintech-data-lab-curator to inspect Data Lab coverage and prepare the next safe curation step."
