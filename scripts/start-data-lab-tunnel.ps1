@@ -1,6 +1,10 @@
 [CmdletBinding()]
 param(
   [int]$Port = 3000,
+  [string]$BindHost = '127.0.0.1',
+  [string]$NgrokApiBase = '',
+  [string]$NodeExecutable = '',
+  [string]$NpmExecutable = '',
   [string]$PolicyPath = "$env:LOCALAPPDATA\ngrok\hyacintech-policy.yml",
   [switch]$SkipBuild,
   [switch]$ReuseExistingService
@@ -10,15 +14,19 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $runtimeDir = Join-Path $repoRoot 'backups\tunnel-runtime'
 $runtimePath = Join-Path $runtimeDir 'runtime.json'
-$nodePath = 'C:\Program Files\nodejs\node.exe'
-$npmCli = 'C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js'
-
-if (-not (Test-Path -LiteralPath $nodePath)) {
-  throw "找不到 Node.js：$nodePath"
+if (-not $NodeExecutable) {
+  $NodeExecutable = (Get-Command node -ErrorAction Stop).Source
 }
-if (-not (Test-Path -LiteralPath $npmCli)) {
-  throw "找不到 npm CLI：$npmCli"
+if (-not $NpmExecutable) {
+  $npmCommand = Get-Command npm.cmd -ErrorAction SilentlyContinue
+  if (-not $npmCommand) { $npmCommand = Get-Command npm -ErrorAction Stop }
+  $NpmExecutable = $npmCommand.Source
 }
+if (-not $NgrokApiBase) {
+  $NgrokApiBase = if ($env:NGROK_API_BASE) { $env:NGROK_API_BASE } else { 'http://127.0.0.1:4040' }
+}
+$NgrokApiBase = $NgrokApiBase.TrimEnd('/')
+$serviceBase = "http://${BindHost}:$Port"
 if (-not (Test-Path -LiteralPath $PolicyPath)) {
   throw "找不到 ngrok Traffic Policy：$PolicyPath"
 }
@@ -40,13 +48,13 @@ try {
     $nextPid = $listener.OwningProcess
   } else {
     if (-not $SkipBuild) {
-      & $nodePath $npmCli run build
+      & $NpmExecutable run build
       if ($LASTEXITCODE -ne 0) { throw 'Next.js 生产构建失败' }
     }
 
     $env:NODE_ENV = 'production'
-    $nextProcess = Start-Process -FilePath $nodePath `
-      -ArgumentList @('node_modules\next\dist\bin\next', 'start', '-H', '127.0.0.1', '-p', "$Port") `
+    $nextProcess = Start-Process -FilePath $NodeExecutable `
+      -ArgumentList @('node_modules\next\dist\bin\next', 'start', '-H', $BindHost, '-p', "$Port") `
       -WorkingDirectory $repoRoot `
       -RedirectStandardOutput (Join-Path $runtimeDir 'next.out.log') `
       -RedirectStandardError (Join-Path $runtimeDir 'next.err.log') `
@@ -59,7 +67,7 @@ try {
     foreach ($attempt in 1..30) {
       Start-Sleep -Milliseconds 500
       try {
-        $response = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/" -UseBasicParsing -TimeoutSec 3
+        $response = Invoke-WebRequest -Uri "$serviceBase/" -UseBasicParsing -TimeoutSec 3
         if ($response.StatusCode -eq 200) { $ready = $true; break }
       } catch {
         if ($nextProcess.HasExited) { break }
@@ -72,7 +80,7 @@ try {
 
   $tunnel = $null
   try {
-    $tunnel = (Invoke-RestMethod -Uri 'http://127.0.0.1:4040/api/tunnels' -TimeoutSec 3).tunnels |
+    $tunnel = (Invoke-RestMethod -Uri "$NgrokApiBase/api/tunnels" -TimeoutSec 3).tunnels |
       Where-Object { $_.config.addr -match ":$Port$" } |
       Select-Object -First 1
   } catch { }
@@ -93,7 +101,7 @@ try {
     foreach ($attempt in 1..30) {
       Start-Sleep -Milliseconds 500
       try {
-        $tunnel = (Invoke-RestMethod -Uri 'http://127.0.0.1:4040/api/tunnels' -TimeoutSec 3).tunnels |
+        $tunnel = (Invoke-RestMethod -Uri "$NgrokApiBase/api/tunnels" -TimeoutSec 3).tunnels |
           Where-Object { $_.config.addr -match ":$Port$" } |
           Select-Object -First 1
         if ($tunnel) { break }
@@ -118,6 +126,8 @@ try {
     ownsNext = $ownsNext
     ownsNgrok = $ownsNgrok
     policyPath = $PolicyPath
+    bindHost = $BindHost
+    ngrokApiBase = $NgrokApiBase
   }
   $runtime | ConvertTo-Json | Set-Content -LiteralPath $runtimePath -Encoding UTF8
 

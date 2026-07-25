@@ -70,6 +70,33 @@ interface ReviewPayload {
     revisionOfId?: string | null;
     reviewPolicy: 'HUMAN_ANNOTATOR_REQUIRED' | 'AI_DIRECT_TO_REVIEWER';
   };
+  trainingContext: {
+    targetPromptPolicy: {
+      id: string | null;
+      version: string;
+      displayName: string;
+      manifestSha256: string | null;
+    };
+    tutorContractVersion: string;
+    stageContractVersion: string;
+    extractorVersion: string;
+    actualPrompt: {
+      promptVersion: string;
+      sha256: string;
+      systemPrompt: string;
+    };
+    sourcePrompt: {
+      promptVersion?: string | null;
+      sha256?: string | null;
+      systemPrompt?: string | null;
+      contractVersion?: string | null;
+      stageContractVersion?: string | null;
+      extractorVersion?: string | null;
+    } | null;
+    candidateA: RuntimeContextCandidate | null;
+    candidateB: RuntimeContextCandidate | null;
+    firstReviewMode: string;
+  };
   candidates: CandidateView[];
   firstReview?: {
     draft: { finalOutput?: unknown };
@@ -82,6 +109,15 @@ interface ReviewPayload {
     reviewerProposedOutput?: unknown;
   };
   warnings: WarningView[];
+}
+
+interface RuntimeContextCandidate {
+  runtimeBundleId: string;
+  runtimeBundleName: string;
+  modelVersionTag: string;
+  modelFamily: string;
+  endpoint: string;
+  promptPolicyVersion: string;
 }
 
 interface WarningClosureDraft {
@@ -419,6 +455,44 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
         {history.length > 0 && <details className="mt-3 rounded border p-3 text-sm"><summary className="cursor-pointer font-medium">查看此前对话（{history.length} 条）</summary><div className="mt-3 space-y-2">{history.map((entry, index) => <div key={`${entry.role}-${index}`} className={`rounded p-3 ${entry.role === 'assistant' || entry.role === 'gpt' ? 'bg-blue-50' : 'bg-gray-50'}`}><div className="text-xs font-medium text-gray-500">{entry.role === 'assistant' || entry.role === 'gpt' ? '导师' : entry.role === 'system' ? '平台状态' : '学生'}</div><p className="mt-1 whitespace-pre-wrap leading-6">{entry.content}</p></div>)}</div></details>}
         <details className="mt-3 text-xs"><summary className="cursor-pointer font-medium">学生可见事实</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{pretty(payload.case.visibleFacts)}</pre></details>
         {type === 'EDIT' && <details className="mt-2 text-xs"><summary className="cursor-pointer font-medium text-amber-800">私有审核规范（不会进入导师模型提示词）</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap rounded bg-amber-50 p-3">{pretty(payload.case.privateReviewSpec)}</pre></details>}
+      </section>
+
+      <section className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+        <div className="grid gap-3 text-sm md:grid-cols-4">
+          <div><div className="text-xs text-blue-700">训练目标</div><b>{payload.trainingContext.targetPromptPolicy.version}</b></div>
+          <div><div className="text-xs text-blue-700">Tutor 合同</div><b>{payload.trainingContext.tutorContractVersion}</b></div>
+          <div><div className="text-xs text-blue-700">候选 A</div><b>{payload.trainingContext.candidateA?.modelVersionTag ?? '历史配置'}</b><div className="text-xs text-blue-700">{payload.trainingContext.candidateA?.modelFamily ?? '未登记运行组合'}</div></div>
+          <div><div className="text-xs text-blue-700">候选 B</div><b>{payload.trainingContext.candidateB?.modelVersionTag ?? '历史配置'}</b><div className="text-xs text-blue-700">{payload.trainingContext.candidateB?.modelFamily ?? '未登记运行组合'}</div></div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <details className="rounded border border-blue-200 bg-white px-3 py-2 text-xs">
+            <summary className="cursor-pointer font-medium">查看训练合同</summary>
+            <dl className="mt-2 grid gap-1 text-gray-700">
+              <div>Tutor：{payload.trainingContext.tutorContractVersion}</div>
+              <div>Stage：{payload.trainingContext.stageContractVersion}</div>
+              <div>Extractor：{payload.trainingContext.extractorVersion}</div>
+              <div>初审执行方式：{payload.trainingContext.firstReviewMode}</div>
+            </dl>
+          </details>
+          <details className="rounded border border-blue-200 bg-white px-3 py-2 text-xs">
+            <summary className="cursor-pointer font-medium">查看本案例实际 Prompt</summary>
+            <div className="mt-2 text-gray-600">版本：{payload.trainingContext.actualPrompt.promptVersion} · SHA256：{payload.trainingContext.actualPrompt.sha256}</div>
+            <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{payload.trainingContext.actualPrompt.systemPrompt}</pre>
+          </details>
+          <details className="rounded border border-blue-200 bg-white px-3 py-2 text-xs">
+            <summary className="cursor-pointer font-medium">查看来源 Prompt 血缘</summary>
+            {payload.trainingContext.sourcePrompt ? (
+              <div className="mt-2 space-y-1 text-gray-700">
+                <div>来源版本：{payload.trainingContext.sourcePrompt.promptVersion ?? '未知'}</div>
+                <div>来源 SHA256：{payload.trainingContext.sourcePrompt.sha256 ?? '未知'}</div>
+                <div>来源合同：{payload.trainingContext.sourcePrompt.contractVersion ?? '未知'}</div>
+                <div>来源 Stage：{payload.trainingContext.sourcePrompt.stageContractVersion ?? '未知'}</div>
+                <div>来源 Extractor：{payload.trainingContext.sourcePrompt.extractorVersion ?? '未知'}</div>
+                {payload.trainingContext.sourcePrompt.systemPrompt && <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{payload.trainingContext.sourcePrompt.systemPrompt}</pre>}
+              </div>
+            ) : <p className="mt-2 text-gray-600">这是平台编译案例，没有独立的历史来源 Prompt；训练目标与实际 Prompt 如上。</p>}
+          </details>
+        </div>
       </section>
 
       {type === 'EDIT' ? candidateSection : <details className="rounded-xl border bg-white p-4"><summary className="cursor-pointer font-medium">查看两个原始候选、交叉检查和确定性检查</summary><div className="mt-4">{candidateSection}</div></details>}

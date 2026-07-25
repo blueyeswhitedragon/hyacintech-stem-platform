@@ -1,5 +1,6 @@
 import type { StageData } from '@/app/models/stageData';
 import { researchQuestionHash } from '@/app/lib/stageState';
+import { evaluateStage4Readiness } from '@/app/lib/stage4Readiness';
 
 export interface AdvanceCheck {
   ok: boolean;
@@ -58,12 +59,9 @@ export function canAdvance(
   }
 
   if (from === 4 && to === 5) {
-    const rounds = stageData.stage4?.evidenceRounds ?? [];
-    const count = ['stage-contract-v3', 'stage-contract-v4'].includes(stageData.contractMeta?.stageContractVersion ?? '')
-      ? new Set(rounds.map((round) => round.roundFingerprint).filter(Boolean)).size
-      : (stageData.stage4?.analysisCount ?? 0);
-    if (count < 2) {
-      return { ok: false, error: '请先与AI导师进行至少两轮数据分析讨论，再进入报告成型阶段' };
+    const readiness = evaluateStage4Readiness(stageData);
+    if (!readiness.ready) {
+      return { ok: false, error: readiness.message };
     }
     return { ok: true };
   }

@@ -86,6 +86,11 @@ export interface EligibilityInput {
   contractVersion?: string | null;
   promptVersion?: string | null;
   extractorVersion?: string | null;
+  /** Historical source provenance is audit-only; cohort matching uses target fields above. */
+  sourceContractVersion?: string | null;
+  sourceStageContractVersion?: string | null;
+  sourcePromptVersion?: string | null;
+  sourceExtractorVersion?: string | null;
   candidateStatus?: string | null;
   consentStatus?: string | null;
   leakageBlocked?: boolean;

@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import type { ChatResponse, Message } from '@/app/models/types';
 import type { StageData } from '@/app/models/stageData';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
-import { createLLMProvider } from '@/app/lib/llm/provider';
+import { createConfiguredLLMProvider, createLLMProvider } from '@/app/lib/llm/provider';
 import type { LLMCompletion, LLMRuntimeOverride } from '@/app/lib/llm/types';
 
 export const TUTOR_LANGUAGE_CONTRACT_VERSION = 'tutor-language-v1';
@@ -121,6 +121,16 @@ function questionTargets(text: string): string[] {
   ));
 }
 
+const STAGE2_TARGET_SECTION: Record<string, string> = {
+  hypothesis: 'expected_result',
+  independent_variable: 'variable_design',
+  levels: 'variable_design',
+  dependent_variable: 'variable_design',
+  measurement: 'data_recording',
+  controls: 'experiment_process',
+  repeats: 'experiment_process',
+};
+
 function violatesTutorSemanticContract(
   response: TutorLanguageResponse,
   phase?: number,
@@ -146,8 +156,7 @@ function violatesTutorSemanticContract(
     const text = [response.dialogue, ...response.hints].join('\n');
     if (context.planReady === false && /(?:可以|就能|现在|正式)?(?:开始实验|进入实验|进入过程执行)/.test(text)) return true;
     const targets = questionTargets(text);
-    if (targets.some((target) => target !== response.focus)) return true;
-    if (targets.some((target) => context.completedFocusIds?.includes(target) && target !== response.focus)) return true;
+    if (targets.some((target) => target !== response.focus && STAGE2_TARGET_SECTION[target] !== response.focus)) return true;
     if (response.focus === 'plan_confirmation' && /(?:水平|测量|材料|步骤|重复|控制|安全)[^。！\n]*[？?]/.test(text)) return true;
   }
   return false;
@@ -383,6 +392,30 @@ export function buildTutorLanguagePrompt(
   return buildTutorLanguagePromptV1(input);
 }
 
+/**
+ * Recover the visible-facts JSON from a rendered, already-redacted Tutor prompt.
+ * Production traces keep this exact prompt for provenance; conversion uses only
+ * the facts between stable section markers when rebuilding the Data Lab target
+ * prompt under a newer version.
+ */
+export function extractTutorVisibleFactsFromPrompt(prompt: string): unknown | null {
+  const marker = '可见事实：';
+  const start = prompt.indexOf(marker);
+  if (start < 0) return null;
+  const valueStart = start + marker.length;
+  const endMarkers = ['\n\n【本回合】', '\n允许 focus（必须精确选择一个）：'];
+  const ends = endMarkers
+    .map((endMarker) => prompt.indexOf(endMarker, valueStart))
+    .filter((index) => index >= 0);
+  const valueEnd = ends.length > 0 ? Math.min(...ends) : -1;
+  if (valueEnd < 0) return null;
+  try {
+    return JSON.parse(prompt.slice(valueStart, valueEnd).trim());
+  } catch {
+    return null;
+  }
+}
+
 function interactionToAction(type: TutorInteractionType): ChatResponse['next_action_type'] {
   if (type === 'checkpoint') return 'confirmation';
   if (type === 'information' || type === 'explanation') return 'info';
@@ -423,6 +456,10 @@ function deterministicTutorFallback(input: TutorVisibleContext): TutorLanguageRe
   const dialogueByFocus: Record<string, string> = {
     research_question: '请先用一句话说清楚，你最想研究的具体问题是什么？',
     direction_confirmation: '研究问题已经整理好，请核对页面上的问题；确认无误后使用按钮进入方案设计。',
+    variable_design: '先完成变量设计：请说明实验中唯一要改变什么、比较哪些水平，以及观察什么指标。',
+    data_recording: '再思考数据记录：请说明用什么工具、在什么时间读数，以及记录哪些原始数据。',
+    experiment_process: '请规划实验过程：列出操作步骤、保持不变的条件和独立重复轮数；样本数与重复轮数要分开说明。',
+    expected_result: '最后请说出你的预测：自变量变化时，你认为观测指标可能呈现什么趋势？',
     hypothesis: '请先说出你的预测：改变研究条件后，你认为观察结果会怎样变化？',
     independent_variable: '为了形成可比较的方案，请说清楚你准备主动改变哪一个条件。',
     levels: '请列出你准备比较的至少两个具体水平。',
@@ -458,7 +495,9 @@ export async function callTutorLanguageWithTrace(
   }
   const systemPrompt = buildTutorLanguagePrompt(input, promptVersion);
   const promptSha256 = createHash('sha256').update(systemPrompt).digest('hex');
-  const provider = createLLMProvider({ ...runtimeModel, role: 'TUTOR' });
+  const provider = runtimeModel.configured
+    ? createConfiguredLLMProvider(runtimeModel.configured)
+    : createLLMProvider({ ...runtimeModel, role: 'TUTOR' });
   const attempts: TutorLanguageTrace['attempts'] = [];
   let repair: string | undefined;
   let completion: LLMCompletion | null = null;
@@ -583,6 +622,8 @@ export function buildTutorVisibleState(stage: number, stageData: StageData, extr
   } else if (stage === 5) {
     visible = { 已确认研究方向: stageData.stage1?.snapshot, 已批准实验方案: planForTutor, 数据记录行数: stageData.stage3?.rows.length ?? 0, 已接受分析: stageData.stage4?.evidenceRounds, 报告框架是否已由服务器生成: Boolean(stageData.stage5?.sections) };
   } else if (stage === 6) {
+    const hasTeacherEvaluation = typeof stageData.stage5?.teacherScore === 'number'
+      || Boolean(stageData.stage5?.teacherFeedback?.trim());
     visible = {
       研究问题: stageData.stage1?.researchQuestion ?? stageData.stage1?.themeMapping?.researchQuestion,
       已接受分析: stageData.stage4?.evidenceRounds,
@@ -596,10 +637,17 @@ export function buildTutorVisibleState(stage: number, stageData: StageData, extr
         结论: stageData.stage5.sections.conclusion,
         局限与讨论: stageData.stage5.sections.limitationsDiscussion ?? stageData.stage5.sections.reflection,
       } : undefined,
-      教师评价: stageData.stage5 ? {
-        评分: stageData.stage5.teacherScore,
-        反馈: stageData.stage5.teacherFeedback,
+      评价来源: hasTeacherEvaluation ? '正式模式教师评价' : '体验模式，无教师反馈',
+      教师评价: hasTeacherEvaluation ? {
+        评分: stageData.stage5?.teacherScore,
+        反馈: stageData.stage5?.teacherFeedback,
       } : undefined,
+      体验模式AI参考评价: !hasTeacherEvaluation && stageData.stage5?.aiReferenceScore ? {
+        综合评分: stageData.stage5.aiReferenceScore.overall,
+        亮点: stageData.stage5.aiReferenceScore.highlights,
+        建议: stageData.stage5.aiReferenceScore.suggestions,
+      } : undefined,
+      阶段边界: 'P4 数据分析已经完成；只能把已接受分析作为反思背景，不得要求学生重新做 P4、重新引用单元格或重做数据比较。',
       学生是否已回应教师评价: Boolean(stageData.stage6?.responseToTeacherFeedback),
       学生是否已完成学习反思: Boolean(stageData.stage6?.learningReflection),
     };

@@ -1,10 +1,14 @@
 /**
  * 确定性单测：buildReportDocx 生成合法 .docx，且含各节文字与数据表。
  * 运行: npx tsx scripts/test-report-docx.ts
- * 产物写到 /tmp 供 python-docx 二次校验（见 test 运行脚本）。
+ * 产物写到系统临时目录供 python-docx 二次校验（见 test 运行脚本）。
  */
 import { writeFileSync } from 'fs';
+import path from 'path';
+import os from 'os';
 import { buildReportDocx } from '../app/lib/reportDocx';
+import { extractDocxText } from '../app/lib/docxExtract';
+import { parseReportSections } from '../app/lib/reportDocxImport';
 import { unzip } from '../app/lib/zip';
 import type { Stage5Sections, Stage2Column } from '../app/models/stageData';
 
@@ -68,10 +72,21 @@ const buf3 = buildReportDocx({ sections, schemaColumns: columns, dataRows: [] })
 const xml3 = unzip(buf3).get('word/document.xml')!.toString('utf8');
 check('无数据行时不渲染表格', !xml3.includes('<w:tbl>'));
 
-// 写到 /tmp 供 python-docx 二次校验
+const parsed = parseReportSections(extractDocxText(buf));
+check('导出 Word 可按八个章节回读', parsed.complete && parsed.detectedFields.length === 8);
+check('数据表不会串入数据分析章节', parsed.sections.analysis === sections.analysis);
+check('局限与讨论映射到权威字段', parsed.sections.limitationsDiscussion === sections.reflection);
+
+const inlineParsed = parseReportSections('一、研究目的：比较温度影响\n二、假设\n温度升高会加快反应\n8. 局限与讨论：样本偏少');
+check('支持编号标题与行内正文', inlineParsed.sections.purpose === '比较温度影响'
+  && inlineParsed.sections.hypothesis === '温度升高会加快反应'
+  && inlineParsed.sections.limitationsDiscussion === '样本偏少');
+
+// 写到系统临时目录供 python-docx 二次校验
 try {
-  writeFileSync('/tmp/test-report.docx', buf);
-  console.log('  · 已写出 /tmp/test-report.docx');
+  const output = path.join(os.tmpdir(), 'test-report.docx');
+  writeFileSync(output, buf);
+  console.log(`  · 已写出 ${output}`);
 } catch { /* 非关键 */ }
 
 console.log(`\n结果: ${passed} 通过, ${failed} 失败`);

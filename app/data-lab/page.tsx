@@ -10,6 +10,10 @@ import {
 import { listEvaluations, listReleases, listTrainingRuns } from '@/app/lib/dataLab/service';
 import { listModelDeployments, listModelVersions } from '@/app/lib/modelRegistry';
 import BackupControls from '@/app/components/dataLab/BackupControls';
+import {
+  dataLabModelIterationOverview,
+  ensureDataLabRuntimeRegistry,
+} from '@/app/lib/dataLab/runtimeRegistry';
 
 type PipelineStatus = 'not_started' | 'in_progress' | 'waiting' | 'blocked' | 'complete';
 
@@ -38,9 +42,10 @@ export default async function DataLabPage() {
     </div>;
   }
 
-  const [stats, smoke, calibration, trial, releases, trainingRuns, evaluations, models, deployments] = await Promise.all([
+  await ensureDataLabRuntimeRegistry(user);
+  const [stats, smoke, calibration, trial, releases, trainingRuns, evaluations, models, deployments, modelIteration] = await Promise.all([
     tutorWorkflowCounts(), smokeQualityReport(), calibrationQualityReport(), trialQualityReport(),
-    listReleases(), listTrainingRuns(), listEvaluations(), listModelVersions(), listModelDeployments(),
+    listReleases(), listTrainingRuns(), listEvaluations(), listModelVersions(), listModelDeployments(), dataLabModelIterationOverview(),
   ]);
   const frozenReleases = releases.filter((release) => release.status === 'FROZEN');
   const passingEvaluations = evaluations.filter((evaluation) => evaluation.gateResult === 'PASS');
@@ -81,7 +86,7 @@ export default async function DataLabPage() {
       next: passingEvaluations.length ? '评测已通过，登记部署' : trainingRuns.length ? '等待外部训练并回填评测' : frozenReleases.length ? '下载交付并登记外部训练' : '等待冻结数据版本',
     },
     {
-      label: '部署', href: '/data-lab/models',
+      label: '部署', href: '/data-lab/evaluations',
       status: activeDeployment?.rolloutPercent === 100 ? 'complete' : activeDeployment ? 'in_progress' : eligibleModels.length ? 'in_progress' : 'not_started',
       next: activeDeployment ? `当前灰度 ${activeDeployment.rolloutPercent}%` : eligibleModels.length ? '从 10% 开始灰度部署' : '等待模型通过评测门禁',
     },
@@ -105,7 +110,15 @@ export default async function DataLabPage() {
       <div className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">{pipeline.map((stage, index) => { const meta = statusMeta[stage.status]; return <Link key={stage.label} href={stage.href} className={`relative min-h-36 border p-4 ${meta.className} hover:border-gray-500`}><div className="flex items-center justify-between gap-2"><span className="text-xs text-gray-500">{index + 1}/6</span><span className="flex items-center gap-1 text-xs"><span className={`size-2 rounded-full ${meta.dot}`} />{meta.label}</span></div><h2 className="mt-4 font-semibold">{stage.label}</h2><p className="mt-2 text-xs leading-5 text-gray-600">{stage.next}</p><span className="absolute bottom-3 right-3 text-sm" aria-hidden="true">→</span></Link>; })}</div>
     </section>
 
-    <section><div className="mb-3 flex items-end justify-between gap-3"><div><h2 className="font-semibold">当前工作量</h2><p className="mt-1 text-xs text-gray-500">点击数字直达对应处理页。</p></div></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([label, value, href]) => <Link key={label} href={href} className="border bg-white p-4 hover:border-gray-500"><div className="text-2xl font-semibold tabular-nums">{value}</div><div className="mt-1 text-sm text-gray-500">{label}</div></Link>)}</div></section>
+    <section><div className="mb-3 flex items-end justify-between gap-3"><div><h2 className="font-semibold">当前工作量</h2><p className="mt-1 text-xs text-gray-500">各项工作量可直接进入对应处理页。</p></div></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([label, value, href]) => <Link key={label} href={href} className="border bg-white p-4 hover:border-gray-500"><div className="text-2xl font-semibold tabular-nums">{value}</div><div className="mt-1 text-sm text-gray-500">{label}</div></Link>)}</div></section>
+
+    <section><div className="mb-3"><h2 className="font-semibold">模型迭代状态</h2><p className="mt-1 text-xs text-gray-500">从服务可用性到生产运行组合的独立状态，不再把 Base URL、权重和 Prompt 混成一个“模型版本”。</p></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <Link href="/data-lab/ai-services" className={`border p-4 ${modelIteration.serviceErrors ? 'border-red-200 bg-red-50' : 'bg-white'}`}><div className="text-2xl font-semibold">{modelIteration.serviceAvailable}</div><div className="mt-1 text-sm text-gray-600">可用 AI 服务</div>{modelIteration.serviceErrors > 0 && <p className="mt-1 text-xs text-red-700">{modelIteration.serviceErrors} 个连接异常</p>}</Link>
+      <Link href="/data-lab/prompt-policies" className="border bg-white p-4"><div className="font-mono text-sm font-semibold">{modelIteration.prompt ?? '未设置'}</div><div className="mt-2 text-sm text-gray-600">当前数据生产 Prompt</div></Link>
+      <Link href="/data-lab/models" className="border bg-white p-4"><div className="text-2xl font-semibold">{modelIteration.pendingTrainingOutputs}</div><div className="mt-1 text-sm text-gray-600">待登记训练产物</div></Link>
+      <Link href="/data-lab/runtime-bundles" className="border bg-white p-4"><div className="text-2xl font-semibold">{modelIteration.pendingCompatibility}</div><div className="mt-1 text-sm text-gray-600">待完成兼容性评测</div></Link>
+      <Link href="/data-lab/evaluations" className="border bg-white p-4"><div className="text-sm font-semibold">{modelIteration.activeDeployment?.runtimeBundle ? `${modelIteration.activeDeployment.runtimeBundle.name} v${modelIteration.activeDeployment.runtimeBundle.version}` : modelIteration.activeDeployment?.modelVersion.tag ?? '尚未部署'}</div><div className="mt-2 text-sm text-gray-600">当前生产运行组合</div></Link>
+    </div></section>
 
     <section className="border-y bg-white py-5"><h2 className="font-semibold">完整交接路径</h2><div className="mt-4 grid gap-x-6 gap-y-4 md:grid-cols-2 xl:grid-cols-4">{[
       ['/data-lab/topic-cards', '1. 话题审核', '情境真实、路线可测、边界安全'],
@@ -114,8 +127,8 @@ export default async function DataLabPage() {
       ['/data-lab/final-confirmation', '4. 定稿', '正式人工质量门'],
       ['/data-lab/releases', '5. 数据交付', '冻结并下载给外部算力平台'],
       ['/data-lab/models', '6. 训练登记', '外部训练完成后回填模型'],
-      ['/data-lab/models', '7. 评测回填', '导入产物并检查部署资格'],
-      ['/data-lab/models', '8. 灰度部署', '10% → 30% → 100%'],
+      ['/data-lab/evaluations', '7. 评测回填', '导入产物并检查运行组合资格'],
+      ['/data-lab/evaluations', '8. 灰度部署', '10% → 30% → 100%'],
     ].map(([href, label, text]) => <Link key={label} href={href} className="border-l-2 border-gray-300 pl-3 hover:border-gray-900"><h3 className="text-sm font-medium">{label}</h3><p className="mt-1 text-xs leading-5 text-gray-500">{text}</p></Link>)}</div></section>
 
     <BackupControls />

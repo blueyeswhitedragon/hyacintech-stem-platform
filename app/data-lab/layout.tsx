@@ -35,7 +35,13 @@ export default async function DataLabLayout({ children }: { children: React.Reac
       { href: '/data-lab/case-quality', label: '案例退回处理', count: workflow.caseQualityPending },
     ] },
     { label: '数据交付', items: [{ href: '/data-lab/releases', label: '数据版本' }] },
-    { label: '模型迭代', items: [{ href: '/data-lab/models', label: '模型档案' }] },
+    { label: '模型迭代', items: [
+      { href: '/data-lab/ai-services', label: 'AI 服务' },
+      { href: '/data-lab/prompt-policies', label: 'Prompt 策略' },
+      { href: '/data-lab/models', label: '模型与训练' },
+      { href: '/data-lab/runtime-bundles', label: '运行组合' },
+      { href: '/data-lab/evaluations', label: '评测与部署' },
+    ] },
     { label: '后台', items: [
       { href: '/data-lab/users', label: '后台账号' },
       { href: '/data-lab/history', label: '历史数据' },
@@ -50,10 +56,16 @@ export default async function DataLabLayout({ children }: { children: React.Reac
     ] },
   ];
 
+  const navigationGroups = user.role === 'admin' ? adminGroups : personalGroups;
+
   return <main className="min-h-screen bg-gray-50 text-gray-900">
-    <header className="border-b bg-white"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-3 lg:px-6"><div className="min-w-0"><Link href="/data-lab" className="text-lg font-semibold text-gray-950">Hyacintech Data Lab</Link><p className="text-xs text-gray-500">教学数据生产、交付与模型迭代登记</p></div><AuthNav /></div></header>
+    <header className="border-b bg-white"><div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3 lg:px-6"><div className="min-w-0"><Link href="/data-lab" className="text-lg font-semibold text-gray-950">Hyacintech Data Lab</Link><p className="text-xs text-gray-500">教学数据生产、交付与模型迭代登记</p></div><AuthNav /></div></header>
+    <details className="border-b bg-white px-4 py-2 lg:hidden">
+      <summary className="cursor-pointer py-1 text-sm font-medium text-gray-800">Data Lab 导航</summary>
+      <nav className="pb-3 pt-1">{navigationGroups.map((group) => <NavigationGroup key={group.label} {...group} />)}</nav>
+    </details>
     <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[230px_minmax(0,1fr)]">
-      <aside className="border-r bg-white px-3 py-3 lg:min-h-[calc(100vh-65px)]"><nav className="space-y-1">{(user.role === 'admin' ? adminGroups : personalGroups).map((group) => <NavigationGroup key={group.label} {...group} />)}</nav></aside>
+      <aside className="hidden border-r bg-white px-3 py-3 lg:block lg:min-h-[calc(100vh-65px)]"><nav className="space-y-1">{navigationGroups.map((group) => <NavigationGroup key={group.label} {...group} />)}</nav></aside>
       <section className="min-w-0 p-4 lg:p-6">{children}</section>
     </div>
   </main>;

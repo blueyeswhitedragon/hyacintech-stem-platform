@@ -63,6 +63,7 @@ export interface CandidateModelConfig {
   model: string;
   family?: string;
   tag?: string;
+  runtimeBundleId?: string;
 }
 
 export interface DeterministicIssue {

@@ -29,26 +29,33 @@ model User {
   studentAssignments StudentAssignment[]
   conversations      Conversation[]
 
-  importedDatasetBatches DatasetBatch[]         @relation("DatasetBatchImporter")
-  createdCampaigns       AnnotationCampaign[]   @relation("CampaignCreator")
-  campaignParticipations CampaignParticipant[]
-  annotationTasks        AnnotationTask[]       @relation("TaskAssignee")
-  annotationRevisions    AnnotationRevision[]   @relation("RevisionAuthor")
-  completedWorkReviews   AnnotationWorkReview[] @relation("WorkReviewReviewer")
-  assignedReviewCases    ReviewCase[]           @relation("ReviewCaseAssignee")
-  reviewDecisions        ReviewDecision[]       @relation("DecisionReviewer")
-  createdDatasetReleases DatasetRelease[]       @relation("ReleaseCreator")
-  createdTrainingRuns    TrainingRun[]          @relation("TrainingRunCreator")
-  createdEvaluationRuns  EvaluationRun[]        @relation("EvaluationRunCreator")
-  createdModelVersions   ModelVersion[]         @relation("ModelVersionCreator")
-  createdDeployments     ModelDeployment[]      @relation("ModelDeploymentCreator")
-  nominatedCandidates    ProductionCandidate[]  @relation("CandidateNominator")
-  processedCandidates    ProductionCandidate[]  @relation("CandidateProcessor")
-  dataLabAuditLogs       DataLabAuditLog[]      @relation("AuditActor")
+  importedDatasetBatches     DatasetBatch[]         @relation("DatasetBatchImporter")
+  createdCampaigns           AnnotationCampaign[]   @relation("CampaignCreator")
+  campaignParticipations     CampaignParticipant[]
+  annotationTasks            AnnotationTask[]       @relation("TaskAssignee")
+  annotationRevisions        AnnotationRevision[]   @relation("RevisionAuthor")
+  completedWorkReviews       AnnotationWorkReview[] @relation("WorkReviewReviewer")
+  assignedReviewCases        ReviewCase[]           @relation("ReviewCaseAssignee")
+  reviewDecisions            ReviewDecision[]       @relation("DecisionReviewer")
+  createdDatasetReleases     DatasetRelease[]       @relation("ReleaseCreator")
+  createdTrainingRuns        TrainingRun[]          @relation("TrainingRunCreator")
+  createdEvaluationRuns      EvaluationRun[]        @relation("EvaluationRunCreator")
+  createdModelVersions       ModelVersion[]         @relation("ModelVersionCreator")
+  createdDeployments         ModelDeployment[]      @relation("ModelDeploymentCreator")
+  createdProviderConnections ProviderConnection[]   @relation("ProviderConnectionCreator")
+  updatedProviderCredentials ProviderCredential[]   @relation("ProviderCredentialUpdater")
+  createdModelEndpoints      ModelEndpoint[]        @relation("ModelEndpointCreator")
+  createdPromptPolicies      PromptPolicyVersion[]  @relation("PromptPolicyCreator")
+  approvedPromptPolicies     PromptPolicyVersion[]  @relation("PromptPolicyApprover")
+  createdRuntimeBundles      RuntimeBundle[]        @relation("RuntimeBundleCreator")
+  updatedRuntimeRoleBindings RuntimeRoleBinding[]   @relation("RuntimeRoleBindingUpdater")
+  nominatedCandidates        ProductionCandidate[]  @relation("CandidateNominator")
+  processedCandidates        ProductionCandidate[]  @relation("CandidateProcessor")
+  dataLabAuditLogs           DataLabAuditLog[]      @relation("AuditActor")
 
   createdTopicCards      TopicCard[]              @relation("TopicCardCreator")
   approvedTopicCards     TopicCard[]              @relation("TopicCardApprover")
-  createdTopicSources    TopicSourceCandidate[]    @relation("TopicSourceCreator")
+  createdTopicSources    TopicSourceCandidate[]   @relation("TopicSourceCreator")
   createdBootstrapRuns   BootstrapGenerationRun[] @relation("BootstrapRunCreator")
   assignedTutorReviews   TutorReviewTask[]        @relation("TutorReviewAssignee")
   operatedTutorReviews   TutorReviewTask[]        @relation("TutorReviewOperator")
@@ -124,14 +131,15 @@ model Conversation {
   id     String @id @default(uuid())
   userId String
 
-  messages               String  @default("[]") // JSON 数组，存储完整的对话历史
-  stageData              String  @default("{}") // JSON 对象，存储所有阶段快照
-  safetyQuizCompleted    Boolean @default(false) // 阶段3安全问答是否已完成（正式模式）
-  resolvedStyleFamily    String  @default("classroom_coach")
-  stylePolicyVersion     String  @default("style-v1")
-  traceCoverage          String  @default("LEGACY_UNVERIFIED")
-  deployedModelVersionId String?
-  contractVersion        String  @default("stage-contract-v2")
+  messages                String  @default("[]") // JSON 数组，存储完整的对话历史
+  stageData               String  @default("{}") // JSON 对象，存储所有阶段快照
+  safetyQuizCompleted     Boolean @default(false) // 阶段3安全问答是否已完成（正式模式）
+  resolvedStyleFamily     String  @default("classroom_coach")
+  stylePolicyVersion      String  @default("style-v1")
+  traceCoverage           String  @default("LEGACY_UNVERIFIED")
+  deployedModelVersionId  String?
+  deployedRuntimeBundleId String?
+  contractVersion         String  @default("stage-contract-v2")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -142,6 +150,7 @@ model Conversation {
   studentAssignment     StudentAssignment?
   generationTraces      GenerationTrace[]
   deployedModelVersion  ModelVersion?          @relation("ConversationDeployedModel", fields: [deployedModelVersionId], references: [id], onDelete: SetNull)
+  deployedRuntimeBundle RuntimeBundle?         @relation("ConversationDeployedRuntimeBundle", fields: [deployedRuntimeBundleId], references: [id], onDelete: SetNull)
   stateExtractionTraces StateExtractionTrace[]
 }
 
@@ -362,6 +371,7 @@ model DatasetRelease {
   preferencePath        String?
   preferenceSha256      String?
   eligibilityReportJson String    @default("{}")
+  trainingCohortJson    String    @default("{}")
   manifestPath          String?
   manifestSha256        String?
   createdById           String
@@ -410,6 +420,7 @@ model TrainingRun {
   status                String   @default("DRAFT")
   modelTag              String?
   parentModelVersionId  String?
+  promptPolicyVersionId String?
   eligibilityReportJson String   @default("{}")
   policyVersion         String   @default("training-policy-v1")
   notes                 String   @default("")
@@ -417,10 +428,11 @@ model TrainingRun {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  release            DatasetRelease @relation(fields: [releaseId], references: [id])
-  createdBy          User           @relation("TrainingRunCreator", fields: [createdById], references: [id])
-  outputModelVersion ModelVersion?
-  parentModelVersion ModelVersion?  @relation("TrainingParent", fields: [parentModelVersionId], references: [id], onDelete: SetNull)
+  release             DatasetRelease       @relation(fields: [releaseId], references: [id])
+  createdBy           User                 @relation("TrainingRunCreator", fields: [createdById], references: [id])
+  outputModelVersion  ModelVersion?
+  parentModelVersion  ModelVersion?        @relation("TrainingParent", fields: [parentModelVersionId], references: [id], onDelete: SetNull)
+  promptPolicyVersion PromptPolicyVersion? @relation("TrainingPromptPolicy", fields: [promptPolicyVersionId], references: [id], onDelete: SetNull)
 }
 
 model EvaluationRun {
@@ -435,73 +447,98 @@ model EvaluationRun {
   stylePolicyVersion String?
   modelAVersionId    String?
   modelBVersionId    String?
+  runtimeBundleAId   String?
+  runtimeBundleBId   String?
   gateResult         String   @default("NOT_EVALUATED")
   gateReportJson     String   @default("{}")
   createdById        String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  createdBy     User                 @relation("EvaluationRunCreator", fields: [createdById], references: [id])
-  artifacts     EvaluationArtifact[]
-  deployments   ModelDeployment[]
-  modelAVersion ModelVersion?        @relation("EvaluationModelA", fields: [modelAVersionId], references: [id], onDelete: SetNull)
-  modelBVersion ModelVersion?        @relation("EvaluationModelB", fields: [modelBVersionId], references: [id], onDelete: SetNull)
+  createdBy             User                  @relation("EvaluationRunCreator", fields: [createdById], references: [id])
+  artifacts             EvaluationArtifact[]
+  deployments           ModelDeployment[]
+  modelAVersion         ModelVersion?         @relation("EvaluationModelA", fields: [modelAVersionId], references: [id], onDelete: SetNull)
+  modelBVersion         ModelVersion?         @relation("EvaluationModelB", fields: [modelBVersionId], references: [id], onDelete: SetNull)
+  runtimeBundleA        RuntimeBundle?        @relation("EvaluationRuntimeBundleA", fields: [runtimeBundleAId], references: [id], onDelete: SetNull)
+  runtimeBundleB        RuntimeBundle?        @relation("EvaluationRuntimeBundleB", fields: [runtimeBundleBId], references: [id], onDelete: SetNull)
+  promptCompatibilities PromptCompatibility[]
 }
 
 model ModelVersion {
-  id                   String   @id @default(uuid())
-  tag                  String   @unique
-  provider             String
-  externalModelId      String
-  parentModelVersionId String?
-  trainingRunId        String?  @unique
-  promptPolicyVersion  String   @default("stem-six-phase-v2")
-  contractVersion      String   @default("stage-contract-v2")
-  status               String   @default("DRAFT")
-  createdById          String?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                           String   @id @default(uuid())
+  tag                          String   @unique
+  provider                     String
+  externalModelId              String
+  parentModelVersionId         String?
+  trainingRunId                String?  @unique
+  trainedPromptPolicyVersionId String?
+  promptPolicyVersion          String   @default("stem-six-phase-v2")
+  contractVersion              String   @default("stage-contract-v2")
+  artifactKind                 String   @default("LEGACY")
+  modelFamily                  String   @default("")
+  checkpointId                 String   @default("")
+  weightsSha256                String   @default("")
+  parameterScale               String   @default("")
+  architecture                 String   @default("")
+  verificationStatus           String   @default("LEGACY_UNVERIFIED")
+  metadataJson                 String   @default("{}")
+  status                       String   @default("DRAFT")
+  createdById                  String?
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
 
-  parent                ModelVersion?     @relation("ModelLineage", fields: [parentModelVersionId], references: [id], onDelete: SetNull)
-  children              ModelVersion[]    @relation("ModelLineage")
-  trainingRun           TrainingRun?      @relation(fields: [trainingRunId], references: [id], onDelete: SetNull)
-  createdBy             User?             @relation("ModelVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  parent                ModelVersion?         @relation("ModelLineage", fields: [parentModelVersionId], references: [id], onDelete: SetNull)
+  children              ModelVersion[]        @relation("ModelLineage")
+  trainingRun           TrainingRun?          @relation(fields: [trainingRunId], references: [id], onDelete: SetNull)
+  trainedPromptPolicy   PromptPolicyVersion?  @relation("ModelTrainedPromptPolicy", fields: [trainedPromptPolicyVersionId], references: [id], onDelete: SetNull)
+  createdBy             User?                 @relation("ModelVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  endpoints             ModelEndpoint[]       @relation("EndpointModelArtifact")
+  runtimeBundles        RuntimeBundle[]
+  promptCompatibilities PromptCompatibility[]
   generationTraces      GenerationTrace[]
-  deployments           ModelDeployment[] @relation("DeploymentModel")
-  previousDeployments   ModelDeployment[] @relation("PreviousDeploymentModel")
-  childTrainingRuns     TrainingRun[]     @relation("TrainingParent")
-  deployedConversations Conversation[]    @relation("ConversationDeployedModel")
-  evaluationsAsA        EvaluationRun[]   @relation("EvaluationModelA")
-  evaluationsAsB        EvaluationRun[]   @relation("EvaluationModelB")
+  deployments           ModelDeployment[]     @relation("DeploymentModel")
+  previousDeployments   ModelDeployment[]     @relation("PreviousDeploymentModel")
+  childTrainingRuns     TrainingRun[]         @relation("TrainingParent")
+  deployedConversations Conversation[]        @relation("ConversationDeployedModel")
+  evaluationsAsA        EvaluationRun[]       @relation("EvaluationModelA")
+  evaluationsAsB        EvaluationRun[]       @relation("EvaluationModelB")
 
   @@index([provider, externalModelId])
   @@index([parentModelVersionId])
   @@index([status])
+  @@index([modelFamily, verificationStatus])
+  @@index([trainedPromptPolicyVersionId])
 }
 
 model ModelDeployment {
-  id                     String    @id @default(uuid())
-  modelVersionId         String
-  previousModelVersionId String?
-  environment            String    @default("PRODUCTION")
-  rolloutPercent         Int       @default(100)
-  status                 String    @default("DRAFT")
-  evaluationRunId        String?
-  createdById            String?
-  startedAt              DateTime?
-  endedAt                DateTime?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-  gateReportJson         String    @default("{}")
-  observationJson        String    @default("{}")
+  id                      String    @id @default(uuid())
+  modelVersionId          String
+  previousModelVersionId  String?
+  runtimeBundleId         String?
+  previousRuntimeBundleId String?
+  environment             String    @default("PRODUCTION")
+  rolloutPercent          Int       @default(100)
+  status                  String    @default("DRAFT")
+  evaluationRunId         String?
+  createdById             String?
+  startedAt               DateTime?
+  endedAt                 DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  gateReportJson          String    @default("{}")
+  observationJson         String    @default("{}")
 
-  modelVersion         ModelVersion   @relation("DeploymentModel", fields: [modelVersionId], references: [id])
-  previousModelVersion ModelVersion?  @relation("PreviousDeploymentModel", fields: [previousModelVersionId], references: [id], onDelete: SetNull)
-  evaluationRun        EvaluationRun? @relation(fields: [evaluationRunId], references: [id], onDelete: SetNull)
-  createdBy            User?          @relation("ModelDeploymentCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  modelVersion          ModelVersion   @relation("DeploymentModel", fields: [modelVersionId], references: [id])
+  previousModelVersion  ModelVersion?  @relation("PreviousDeploymentModel", fields: [previousModelVersionId], references: [id], onDelete: SetNull)
+  runtimeBundle         RuntimeBundle? @relation("DeploymentRuntimeBundle", fields: [runtimeBundleId], references: [id], onDelete: SetNull)
+  previousRuntimeBundle RuntimeBundle? @relation("PreviousDeploymentRuntimeBundle", fields: [previousRuntimeBundleId], references: [id], onDelete: SetNull)
+  evaluationRun         EvaluationRun? @relation(fields: [evaluationRunId], references: [id], onDelete: SetNull)
+  createdBy             User?          @relation("ModelDeploymentCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
   @@index([environment, status])
   @@index([modelVersionId])
+  @@index([runtimeBundleId])
 }
 
 model GenerationTrace {
@@ -512,6 +549,7 @@ model GenerationTrace {
   triggerType                  String   @default("USER_MESSAGE")
   stage                        Int
   modelVersionId               String
+  runtimeBundleId              String?
   modelTagSnapshot             String
   providerSnapshot             String
   externalModelSnapshot        String
@@ -533,10 +571,12 @@ model GenerationTrace {
 
   conversation        Conversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   modelVersion        ModelVersion         @relation(fields: [modelVersionId], references: [id])
+  runtimeBundle       RuntimeBundle?       @relation(fields: [runtimeBundleId], references: [id], onDelete: SetNull)
   productionCandidate ProductionCandidate?
 
   @@index([conversationId, createdAt])
   @@index([modelVersionId, createdAt])
+  @@index([runtimeBundleId, createdAt])
   @@index([stage])
   @@index([triggerType, createdAt])
 }
@@ -654,62 +694,79 @@ model TopicCard {
 }
 
 model BootstrapGenerationRun {
-  id                     String    @id @default(uuid())
-  kind                   String
-  status                 String    @default("PENDING")
-  modelConfigJson        String    @default("{}")
-  promptHashesJson       String    @default("{}")
-  parametersJson         String    @default("{}")
-  reviewPolicy           String    @default("HUMAN_ANNOTATOR_REQUIRED")
-  aiDirectAuthorizedById String?
-  aiDirectAuthorizedAt   DateTime?
-  totalItems             Int       @default(0)
-  completedItems         Int       @default(0)
-  failedItems            Int       @default(0)
-  failureReason          String    @default("")
-  parentRunId            String?
-  createdById            String?
-  createdAt              DateTime  @default(now())
-  startedAt              DateTime?
-  completedAt            DateTime?
+  id                        String    @id @default(uuid())
+  kind                      String
+  status                    String    @default("PENDING")
+  modelConfigJson           String    @default("{}")
+  promptHashesJson          String    @default("{}")
+  parametersJson            String    @default("{}")
+  reviewPolicy              String    @default("HUMAN_ANNOTATOR_REQUIRED")
+  aiDirectAuthorizedById    String?
+  aiDirectAuthorizedAt      DateTime?
+  totalItems                Int       @default(0)
+  completedItems            Int       @default(0)
+  failedItems               Int       @default(0)
+  failureReason             String    @default("")
+  parentRunId               String?
+  candidateARuntimeBundleId String?
+  candidateBRuntimeBundleId String?
+  promptPolicyVersionId     String?
+  firstReviewMode           String    @default("HUMAN")
+  createdById               String?
+  createdAt                 DateTime  @default(now())
+  startedAt                 DateTime?
+  completedAt               DateTime?
 
-  parent     BootstrapGenerationRun?  @relation("BootstrapRunChain", fields: [parentRunId], references: [id], onDelete: SetNull)
-  children   BootstrapGenerationRun[] @relation("BootstrapRunChain")
-  createdBy  User?                    @relation("BootstrapRunCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  cases      TutorTurnCase[]
-  candidates TutorCandidate[]
+  parent                  BootstrapGenerationRun?  @relation("BootstrapRunChain", fields: [parentRunId], references: [id], onDelete: SetNull)
+  children                BootstrapGenerationRun[] @relation("BootstrapRunChain")
+  createdBy               User?                    @relation("BootstrapRunCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  candidateARuntimeBundle RuntimeBundle?           @relation("BootstrapCandidateARuntimeBundle", fields: [candidateARuntimeBundleId], references: [id], onDelete: SetNull)
+  candidateBRuntimeBundle RuntimeBundle?           @relation("BootstrapCandidateBRuntimeBundle", fields: [candidateBRuntimeBundleId], references: [id], onDelete: SetNull)
+  promptPolicyVersion     PromptPolicyVersion?     @relation("BootstrapPromptPolicy", fields: [promptPolicyVersionId], references: [id], onDelete: SetNull)
+  cases                   TutorTurnCase[]
+  candidates              TutorCandidate[]
 
   @@index([kind, status, createdAt])
   @@index([reviewPolicy, status, createdAt])
 }
 
 model TutorTurnCase {
-  id                    String   @id @default(uuid())
-  topicCardId           String?
-  generationRunId       String?
-  revisionOfId          String?
-  revision              Int      @default(1)
-  phase                 Int
-  triggerType           String   @default("USER_MESSAGE")
-  studentMessage        String   @default("")
-  historyJson           String   @default("[]")
-  stageStateJson        String   @default("{}")
-  visibleFactsJson      String   @default("{}")
-  privateReviewSpecJson String   @default("{}")
-  dataSource            String   @default("BOOTSTRAP")
-  split                 String   @default("TRAIN")
-  contractVersion       String   @default("tutor-language-v1")
-  extractorVersion      String   @default("student-fact-extractor-v1")
-  promptVersion         String   @default("tutor-language-prompt-v1")
-  systemPrompt          String
-  promptSha256          String
-  hardCheckJson         String   @default("{}")
-  status                String   @default("READY")
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                         String   @id @default(uuid())
+  topicCardId                String?
+  generationRunId            String?
+  revisionOfId               String?
+  revision                   Int      @default(1)
+  phase                      Int
+  triggerType                String   @default("USER_MESSAGE")
+  studentMessage             String   @default("")
+  historyJson                String   @default("[]")
+  stageStateJson             String   @default("{}")
+  visibleFactsJson           String   @default("{}")
+  privateReviewSpecJson      String   @default("{}")
+  dataSource                 String   @default("BOOTSTRAP")
+  split                      String   @default("TRAIN")
+  contractVersion            String   @default("tutor-language-v1")
+  extractorVersion           String   @default("student-fact-extractor-v1")
+  promptVersion              String   @default("tutor-language-prompt-v1")
+  promptPolicyVersionId      String?
+  systemPrompt               String
+  promptSha256               String
+  // Training-target fields above describe the contract reviewers must satisfy.
+  // These source fields preserve the redacted production trace without relabeling history.
+  sourceContractVersion      String?
+  sourceStageContractVersion String?
+  sourceExtractorVersion     String?
+  sourcePromptVersion        String?
+  sourcePromptSha256         String?
+  sourceSystemPrompt         String?
+  hardCheckJson              String   @default("{}")
+  status                     String   @default("READY")
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 
   topicCard           TopicCard?              @relation(fields: [topicCardId], references: [id], onDelete: SetNull)
   generationRun       BootstrapGenerationRun? @relation(fields: [generationRunId], references: [id], onDelete: SetNull)
+  promptPolicyVersion PromptPolicyVersion?    @relation("TutorCasePromptPolicy", fields: [promptPolicyVersionId], references: [id], onDelete: SetNull)
   candidates          TutorCandidate[]
   reviewTasks         TutorReviewTask[]
   finalizedTurn       FinalizedTutorTurn?
@@ -718,12 +775,14 @@ model TutorTurnCase {
   @@index([status, split, phase])
   @@index([topicCardId, phase])
   @@index([revisionOfId, revision])
+  @@index([promptPolicyVersionId])
 }
 
 model TutorCandidate {
   id                     String   @id @default(uuid())
   caseId                 String
   generationRunId        String?
+  runtimeBundleId        String?
   slot                   String
   attempt                Int      @default(1)
   provider               String
@@ -741,6 +800,7 @@ model TutorCandidate {
 
   case                TutorTurnCase           @relation(fields: [caseId], references: [id], onDelete: Cascade)
   generationRun       BootstrapGenerationRun? @relation(fields: [generationRunId], references: [id], onDelete: SetNull)
+  runtimeBundle       RuntimeBundle?          @relation(fields: [runtimeBundleId], references: [id], onDelete: SetNull)
   selectedBy          TutorReviewTask[]       @relation("ReviewSelectedCandidate")
   rejectedBy          TutorReviewTask[]       @relation("ReviewRejectedCandidate")
   finalizedAsSelected FinalizedTutorTurn[]    @relation("FinalizedSelectedCandidate")
@@ -748,6 +808,197 @@ model TutorCandidate {
 
   @@unique([caseId, generationRunId, slot])
   @@index([modelFamily, externalModelId])
+  @@index([runtimeBundleId])
+}
+
+model ProviderConnection {
+  id               String    @id @default(uuid())
+  name             String    @unique
+  protocol         String    @default("OPENAI_COMPATIBLE")
+  baseUrl          String
+  status           String    @default("DRAFT")
+  capabilitiesJson String    @default("{}")
+  lastTestedAt     DateTime?
+  lastTestStatus   String    @default("NOT_TESTED")
+  lastLatencyMs    Int?
+  lastErrorCode    String    @default("")
+  lastErrorMessage String    @default("")
+  createdById      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  createdBy  User?               @relation("ProviderConnectionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  credential ProviderCredential?
+  endpoints  ModelEndpoint[]
+
+  @@index([status, updatedAt])
+}
+
+model ProviderCredential {
+  id                String   @id @default(uuid())
+  connectionId      String   @unique
+  sourceType        String
+  envVarName        String   @default("")
+  encryptedValue    String   @default("")
+  encryptionIv      String   @default("")
+  encryptionAuthTag String   @default("")
+  keyLastFour       String   @default("")
+  updatedById       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  connection ProviderConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  updatedBy  User?              @relation("ProviderCredentialUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+model ModelEndpoint {
+  id               String    @id @default(uuid())
+  connectionId     String
+  displayName      String
+  remoteModelId    String
+  modelVersionId   String?
+  status           String    @default("DRAFT")
+  capabilitiesJson String    @default("{}")
+  lastTestedAt     DateTime?
+  lastTestStatus   String    @default("NOT_TESTED")
+  lastLatencyMs    Int?
+  lastErrorCode    String    @default("")
+  lastErrorMessage String    @default("")
+  createdById      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  connection     ProviderConnection @relation(fields: [connectionId], references: [id], onDelete: Restrict)
+  modelVersion   ModelVersion?      @relation("EndpointModelArtifact", fields: [modelVersionId], references: [id], onDelete: SetNull)
+  createdBy      User?              @relation("ModelEndpointCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  runtimeBundles RuntimeBundle[]
+
+  @@unique([connectionId, remoteModelId])
+  @@index([status, updatedAt])
+  @@index([modelVersionId])
+}
+
+model PromptPolicyVersion {
+  id                       String    @id @default(uuid())
+  version                  String    @unique
+  displayName              String
+  status                   String    @default("DRAFT")
+  revision                 Int       @default(1)
+  revisionOfId             String?
+  rendererVersion          String
+  visibleStateVersion      String
+  focusPlannerVersion      String
+  semanticValidatorVersion String
+  fallbackVersion          String
+  tutorContractVersion     String
+  stageContractVersion     String
+  extractorVersion         String
+  extractorPromptVersion   String
+  sourceCommit             String    @default("")
+  manifestJson             String
+  manifestSha256           String
+  compatibilityJson        String    @default("{}")
+  builtIn                  Boolean   @default(false)
+  defaultForDataLab        Boolean   @default(false)
+  approvedAt               DateTime?
+  createdById              String?
+  approvedById             String?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  revisionOf            PromptPolicyVersion?     @relation("PromptPolicyRevisions", fields: [revisionOfId], references: [id], onDelete: SetNull)
+  revisions             PromptPolicyVersion[]    @relation("PromptPolicyRevisions")
+  createdBy             User?                    @relation("PromptPolicyCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  approvedBy            User?                    @relation("PromptPolicyApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  cases                 TutorTurnCase[]          @relation("TutorCasePromptPolicy")
+  trainingRuns          TrainingRun[]            @relation("TrainingPromptPolicy")
+  trainedModels         ModelVersion[]           @relation("ModelTrainedPromptPolicy")
+  runtimeBundles        RuntimeBundle[]
+  promptCompatibilities PromptCompatibility[]
+  bootstrapRuns         BootstrapGenerationRun[] @relation("BootstrapPromptPolicy")
+
+  @@index([status, updatedAt])
+  @@index([revisionOfId, revision])
+  @@index([defaultForDataLab])
+}
+
+model PromptCompatibility {
+  id                    String    @id @default(uuid())
+  promptPolicyVersionId String
+  modelVersionId        String
+  runtimeBundleId       String?
+  evaluationRunId       String?
+  status                String    @default("PENDING")
+  evidenceJson          String    @default("{}")
+  checkedAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  promptPolicyVersion PromptPolicyVersion @relation(fields: [promptPolicyVersionId], references: [id], onDelete: Restrict)
+  modelVersion        ModelVersion        @relation(fields: [modelVersionId], references: [id], onDelete: Restrict)
+  runtimeBundle       RuntimeBundle?      @relation(fields: [runtimeBundleId], references: [id], onDelete: SetNull)
+  evaluationRun       EvaluationRun?      @relation(fields: [evaluationRunId], references: [id], onDelete: SetNull)
+
+  @@unique([promptPolicyVersionId, modelVersionId])
+  @@index([status, updatedAt])
+}
+
+model RuntimeBundle {
+  id                      String   @id @default(uuid())
+  name                    String
+  version                 Int      @default(1)
+  status                  String   @default("DRAFT")
+  roleKey                 String
+  modelVersionId          String
+  endpointId              String
+  promptPolicyVersionId   String
+  tutorContractVersion    String
+  stageContractVersion    String
+  extractorVersion        String
+  generationParamsJson    String   @default("{}")
+  compatibilityReportJson String   @default("{}")
+  legacy                  Boolean  @default(false)
+  createdById             String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  modelVersion          ModelVersion             @relation(fields: [modelVersionId], references: [id], onDelete: Restrict)
+  endpoint              ModelEndpoint            @relation(fields: [endpointId], references: [id], onDelete: Restrict)
+  promptPolicyVersion   PromptPolicyVersion      @relation(fields: [promptPolicyVersionId], references: [id], onDelete: Restrict)
+  createdBy             User?                    @relation("RuntimeBundleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  roleBindings          RuntimeRoleBinding[]
+  evaluationsAsA        EvaluationRun[]          @relation("EvaluationRuntimeBundleA")
+  evaluationsAsB        EvaluationRun[]          @relation("EvaluationRuntimeBundleB")
+  deployments           ModelDeployment[]        @relation("DeploymentRuntimeBundle")
+  previousDeployments   ModelDeployment[]        @relation("PreviousDeploymentRuntimeBundle")
+  generationTraces      GenerationTrace[]
+  conversations         Conversation[]           @relation("ConversationDeployedRuntimeBundle")
+  promptCompatibilities PromptCompatibility[]
+  tutorCandidates       TutorCandidate[]
+  bootstrapRunsAsA      BootstrapGenerationRun[] @relation("BootstrapCandidateARuntimeBundle")
+  bootstrapRunsAsB      BootstrapGenerationRun[] @relation("BootstrapCandidateBRuntimeBundle")
+
+  @@unique([name, version])
+  @@index([roleKey, status])
+  @@index([modelVersionId, promptPolicyVersionId])
+  @@index([endpointId])
+}
+
+model RuntimeRoleBinding {
+  id                     String   @id @default(uuid())
+  roleKey                String   @unique
+  displayName            String
+  description            String   @default("")
+  defaultRuntimeBundleId String?
+  enabled                Boolean  @default(true)
+  updatedById            String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  defaultRuntimeBundle RuntimeBundle? @relation(fields: [defaultRuntimeBundleId], references: [id], onDelete: SetNull)
+  updatedBy            User?          @relation("RuntimeRoleBindingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([enabled, displayName])
 }
 
 model TutorReviewTask {

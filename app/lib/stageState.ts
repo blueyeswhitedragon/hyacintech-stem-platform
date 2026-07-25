@@ -33,7 +33,10 @@ export function researchQuestionHash(question: string): string {
 }
 
 export function stage2DraftHash(plan: Stage2ExperimentPlan): string {
-  return contractHash('stage-contract-v3/stage2-plan/v1', plan);
+  const namespace = plan.contractVersion === 'stage2-plan-v2'
+    ? 'stage-contract-v4/stage2-plan/v2'
+    : 'stage-contract-v3/stage2-plan/v1';
+  return contractHash(namespace, plan);
 }
 
 function statePayload(stageData: StageData): Omit<StageData, 'contractMeta'> {

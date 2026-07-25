@@ -218,6 +218,18 @@ export default function ConversationWorkspace({
     }
   };
 
+  const confirmReportImport = async (previewHash: string): Promise<string | null> => {
+    const res = await fetch(`/api/conversations/${conversationId}/report/import/confirm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ previewHash }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return data.error || '导入失败，请重新上传后重试。';
+    if (data.stageData) setStageData(data.stageData);
+    return null;
+  };
+
   /** 阶段完成后的确认推进；/advance 会原子生成并返回助手主动过渡消息。 */
   const onPhaseConfirm = async (): Promise<string | null> => {
     return advanceTo(stage + 1);
@@ -261,7 +273,7 @@ export default function ConversationWorkspace({
     switch (stage) {
       case 2:
         const formalStage2 = stageData.stage2;
-        const readiness = formalStage2?.readiness ?? evaluateStage2Readiness(stageData);
+        const readiness = evaluateStage2Readiness(stageData);
         const planConfirmed = Boolean(formalStage2?.confirmedPlanHash
           && formalStage2.confirmedPlanHash === formalStage2.draftHash
           && formalStage2.experimentPlan);
@@ -327,6 +339,7 @@ export default function ConversationWorkspace({
           <ChartViewer
             schema={stageData.stage2?.schema}
             stage3={stageData.stage3}
+            stage4={stageData.stage4}
             onComplete={advanceToStage5}
           />
         );
@@ -335,6 +348,7 @@ export default function ConversationWorkspace({
           <div>
             {banner}
             <ReportViewer
+              key={stageData.stage5?.lastConfirmedImport?.previewHash ?? 'stage5-report'}
               stage5={stageData.stage5}
               schemaColumns={stageData.stage2?.schema?.columns}
               dataRows={stageData.stage3?.rows}
@@ -342,6 +356,7 @@ export default function ConversationWorkspace({
               onSubmit={pendingStage5 ? undefined : submitStage5}
               onExport={exportReportDocx}
               onImport={pendingStage5 ? undefined : importReportDocx}
+              onConfirmImport={pendingStage5 ? undefined : confirmReportImport}
             />
           </div>
         );
@@ -361,6 +376,28 @@ export default function ConversationWorkspace({
     }
   }
 
+  const chat = (
+    <ConversationChat
+      initialMessages={hydratedMessages}
+      stage={stage}
+      completed={completed}
+      send={sendChat}
+      onResult={onChatResult}
+      onSafetyPassed={markSafetyPassed}
+      onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
+      phaseConfirmLabel="研究问题无误，进入方案设计"
+      roundCount={stageData.roundCounts?.[stage] ?? 0}
+      injectedMessage={injectedMessage}
+      initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
+        ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
+        : null}
+      readOnlyReason={readOnlyReason}
+    />
+  );
+  const documentStage = stage === 5 || stage === 6;
+  const chatWidth = stage === 4 ? 'lg:w-2/5' : 'lg:w-1/2';
+  const panelWidth = stage === 4 ? 'lg:w-3/5' : 'lg:w-1/2';
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       {overdue && !completed && (
@@ -368,34 +405,36 @@ export default function ConversationWorkspace({
           已超过截止时间，仍可继续完成；后续里程碑提交会记录为迟交{lateRecorded ? '（已记录）' : ''}。
         </div>
       )}
-      <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-      <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <div className="min-h-0 flex-1">
-          <ConversationChat
-            initialMessages={hydratedMessages}
-            stage={stage}
-            completed={completed}
-            send={sendChat}
-            onResult={onChatResult}
-            onSafetyPassed={markSafetyPassed}
-            onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
-            phaseConfirmLabel="研究问题无误，进入方案设计"
-            roundCount={stageData.roundCounts?.[stage] ?? 0}
-            injectedMessage={injectedMessage}
-            initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
-              ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
-              : null}
-            readOnlyReason={readOnlyReason}
-          />
+      {documentStage && panel ? (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+          <main className="order-1 min-h-fit min-w-0 shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:flex-1 lg:shrink lg:overflow-y-auto">
+            {panel}
+          </main>
+          <aside className="order-2 shrink-0 lg:w-80">
+            <details className="rounded-lg bg-white shadow-sm">
+              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-gray-800">
+                AI 导师（可选辅导）
+                <span className="ml-2 text-xs font-normal text-gray-500">点击展开</span>
+              </summary>
+              <div className="h-[32rem] min-h-0 border-t border-gray-100">
+                {chat}
+              </div>
+            </details>
+          </aside>
         </div>
-      </div>
-      {panel && (
-        <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">
-          {panel}
+      ) : (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+          <div className={`flex h-[38rem] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg bg-white shadow-sm lg:h-auto lg:shrink ${panel ? chatWidth : 'w-full'}`}>
+            <div className="min-h-0 flex-1">{chat}</div>
+          </div>
+          {panel && (
+            <div className={`min-h-fit shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:shrink lg:overflow-y-auto ${panelWidth}`}>
+              {panel}
+            </div>
+          )}
         </div>
       )}
       {completed && <Fireworks />}
-      </div>
     </div>
   );
 }

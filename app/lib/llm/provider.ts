@@ -8,6 +8,7 @@ import {
   type LLMRuntimeOverride,
 } from './types';
 import { LLMError } from './errors';
+import { resolveProviderApiBase } from './endpoints';
 
 class OpenAICompatibleProvider implements LLMProvider {
   private config: LLMProviderConfig;
@@ -103,6 +104,16 @@ class OpenAICompatibleProvider implements LLMProvider {
   async chat(messages: LLMMessage[], options?: ChatOptions): Promise<string> {
     return (await this.complete(messages, options)).content;
   }
+}
+
+export function createConfiguredLLMProvider(config: LLMProviderConfig): LLMProvider {
+  if (!config.apiKey?.trim()) throw new LLMError('bad_config', '运行组合缺少有效访问密钥', 500);
+  if (!config.baseURL?.trim()) throw new LLMError('bad_config', '运行组合缺少 Base URL', 500);
+  if (!config.model?.trim()) throw new LLMError('bad_config', '运行组合缺少远程 model ID', 500);
+  return new OpenAICompatibleProvider({
+    ...config,
+    baseURL: config.baseURL.trim().replace(/\/+$/, ''),
+  });
 }
 
 // ---- Placeholder key detection ----
@@ -205,7 +216,7 @@ export function createLLMProvider(override?: LLMRuntimeOverride): LLMProvider {
     if (!apiKey || isPlaceholderKey(apiKey)) throw new LLMError('bad_config', '所选部署缺少有效 OPENAI_API_KEY', 500);
     return new OpenAICompatibleProvider({
       apiKey,
-      baseURL: process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1',
+      baseURL: resolveProviderApiBase('openai'),
       model,
       provider: 'openai',
       maxTokens,
@@ -218,7 +229,7 @@ export function createLLMProvider(override?: LLMRuntimeOverride): LLMProvider {
     if (!apiKey || isPlaceholderKey(apiKey)) throw new LLMError('bad_config', '所选部署缺少有效 DEEPSEEK_API_KEY', 500);
     return new OpenAICompatibleProvider({
       apiKey,
-      baseURL: process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com',
+      baseURL: resolveProviderApiBase('deepseek'),
       model,
       provider: 'deepseek',
       maxTokens,

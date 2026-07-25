@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import bcrypt from 'bcryptjs';
 import { db } from '../app/lib/db';
 
-const BASE_URL = process.env.TEST_BASE_URL ?? 'http://127.0.0.1:3000';
+const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 
 async function main() {
   const suffix = randomUUID().slice(0, 8);

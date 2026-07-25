@@ -9,7 +9,6 @@ export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/tu
   const { id } = await ctx.params;
   try {
     const body = await request.json() as { modelA?: CandidateModelConfig; modelB?: CandidateModelConfig };
-    if (!body.modelA || !body.modelB) return NextResponse.json({ error: 'modelA 和 modelB 必填' }, { status: 400 });
     const result = await generateTutorCandidates({ caseId: id, modelA: body.modelA, modelB: body.modelB, user: auth.user });
     return NextResponse.json(result, { status: result.status === 'COMPLETED' ? 201 : 202 });
   } catch (error) {

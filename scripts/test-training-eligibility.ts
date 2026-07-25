@@ -48,6 +48,20 @@ check(evaluateTrainingEligibility({ sourceKind: 'production_trace', ...current, 
 check(evaluateTrainingEligibility({ sourceKind: 'production_trace', ...current, candidateStatus: 'CONVERTED', consentStatus: 'GRANTED', leakageBlocked: true, transformationType: 'MATERIAL_CORRECTION', metrics: material, workReviewApproved: true, finallySelected: true }).eligibility === 'BLOCKED', '泄漏命中阻断训练');
 check(evaluateTrainingEligibility({ sourceKind: 'stage_contract_rollout', batchStatus: 'LEGACY_QUARANTINED', stageContractVersion: STAGE_CONTRACT_VERSION, workReviewApproved: true, finallySelected: true }).eligibility === 'BLOCKED', '已隔离批次永远不能导出训练集');
 check((evaluateTrainingEligibility({ sourceKind: 'stage_contract_rollout', ...current, promptVersion: 'tutor-language-prompt-v1', workReviewApproved: true, finallySelected: true }).reasons as string[]).includes('PROMPT_VERSION_MISMATCH'), 'v3 数据使用 Prompt v1 时仍被精确 cohort 门禁阻断');
+check(evaluateTrainingEligibility({
+  sourceKind: 'production_trace',
+  ...current,
+  sourceContractVersion: 'tutor-language-v1',
+  sourceStageContractVersion: 'stage-contract-v2',
+  sourcePromptVersion: 'tutor-language-prompt-v1',
+  sourceExtractorVersion: 'student-fact-extractor-v1',
+  candidateStatus: 'CONVERTED',
+  consentStatus: 'GRANTED',
+  transformationType: 'MATERIAL_CORRECTION',
+  metrics: material,
+  workReviewApproved: true,
+  finallySelected: true,
+}).eligibility === 'SFT_ALLOWED', '来源为 Prompt v1 的生产轨迹在转换成当前目标 cohort 后由目标版本判定资格');
 check(resolveImportedBatchStatus({ name: '换了名字', sourceFileName: 'new.json', recordIds: ['stem-distill-dsv4-p1-a', 'stem-distill-dsv4-p2-b'], requestedStatus: 'ACTIVE' }).status === 'LEGACY_QUARANTINED', '旧 489 衍生记录换名导入仍自动隔离');
 
 console.log(`\nTraining eligibility tests: ${passed} passed, ${failed} failed`);

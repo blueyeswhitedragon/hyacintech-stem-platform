@@ -3,6 +3,8 @@ import { randomUUID } from 'crypto';
 import bcrypt from 'bcryptjs';
 import { db } from '../app/lib/db';
 
+const BASE_URL = (process.env.TEST_BASE_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
+
 let passed = 0;
 let failed = 0;
 function check(name: string, condition: boolean) {
@@ -15,18 +17,18 @@ async function main() {
   const password = 'session-test-password';
   const user = await db.user.create({ data: { username, displayName: '会话验证测试', role: 'annotator', passwordHash: await bcrypt.hash(password, 4) } });
   try {
-    const login = await fetch('http://127.0.0.1:3000/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+    const login = await fetch(`${BASE_URL}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
     const cookie = login.headers.get('set-cookie')?.split(';')[0] ?? '';
     check('启用账户可以登录', login.status === 200 && cookie.includes('hyacintech_session='));
-    const before = await fetch('http://127.0.0.1:3000/api/auth/me', { headers: { Cookie: cookie } });
+    const before = await fetch(`${BASE_URL}/api/auth/me`, { headers: { Cookie: cookie } });
     check('新会话可以读取当前账户', before.status === 200);
 
     await db.user.update({ where: { id: user.id }, data: { sessionVersion: { increment: 1 } } });
-    const stale = await fetch('http://127.0.0.1:3000/api/auth/me', { headers: { Cookie: cookie } });
+    const stale = await fetch(`${BASE_URL}/api/auth/me`, { headers: { Cookie: cookie } });
     check('会话版本变化后旧登录立即失效', stale.status === 401);
 
     await db.user.update({ where: { id: user.id }, data: { isActive: false } });
-    const disabledLogin = await fetch('http://127.0.0.1:3000/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+    const disabledLogin = await fetch(`${BASE_URL}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
     check('停用账户不能重新登录', disabledLogin.status === 401);
   } finally {
     await db.user.delete({ where: { id: user.id } });

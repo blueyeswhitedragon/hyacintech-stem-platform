@@ -8,6 +8,7 @@
  * 若返回「支持」，可考虑在 provider.ts 第一次尝试时改用 json_schema strict，
  * 从源头减少掉格式；若「不支持」，保持现有 json_object（Layer 2/3 仍独立生效）。
  */
+import { resolveProviderApiBase } from '../app/lib/llm/endpoints';
 
 const openaiKey = process.env.OPENAI_API_KEY;
 const deepseekKey = process.env.DEEPSEEK_API_KEY;
@@ -17,11 +18,12 @@ if (!provider) {
   console.error('未检测到 API Key（OPENAI_API_KEY / DEEPSEEK_API_KEY）。');
   process.exit(2);
 }
+if (provider !== 'openai' && provider !== 'deepseek') {
+  console.error('LLM_PROVIDER 只支持 openai 或 deepseek。');
+  process.exit(2);
+}
 const apiKey = (provider === 'openai' ? openaiKey : deepseekKey)!;
-const baseURL =
-  provider === 'openai'
-    ? process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1'
-    : process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com/v1';
+const baseURL = resolveProviderApiBase(provider);
 const model = process.env.LLM_MODEL ?? (provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o');
 
 const schema = {

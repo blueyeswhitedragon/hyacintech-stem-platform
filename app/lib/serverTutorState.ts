@@ -33,13 +33,10 @@ export function tutorFocusPlan(stage: number, stageData: StageData, input: { tri
   if (stage === 2) {
     const readiness = evaluateStage2Readiness(stageData);
     const focusDescriptions: Record<string, string> = {
-      hypothesis: '只澄清学生自己的预测；不继续追问变量水平或操作细节',
-      independent_variable: '只澄清学生准备主动改变的一个因素',
-      levels: '只澄清至少两个可比较水平；已有两个以上水平即视为充分，不追问为何还要增加组别',
-      dependent_variable: '只澄清学生准备观察的结果名称',
-      measurement: '只澄清一种可重复的观察或测量方式',
-      controls: '只澄清需要保持一致的关键条件；学生说明其他条件相同即可收敛',
-      repeats: '只澄清每个水平的重复次数',
+      variable_design: '环节一：帮助学生明确唯一自变量、至少两个不同且可比较的水平，以及一个观测指标。一次回复中已经说清的内容全部接收，不逐项重复追问',
+      data_recording: '环节二：帮助学生明确测量工具、读数时间点和要记录的原始数据，并让记录表结构能够由这些信息确定',
+      experiment_process: '环节三：帮助学生列出具体操作步骤、保持不变的条件和独立重复轮数。严格区分每组样本数与独立重复次数',
+      expected_result: '环节四：最后请学生基于已有知识预测自变量变化时观测指标可能呈现的趋势，不替学生虚构结果或数值',
       plan_confirmation: '科学核心已完整；只请学生核对服务器组装的方案预览并使用页面按钮确认，不再提出新问题',
     };
     const id = readiness.nextFocusId;
@@ -64,7 +61,18 @@ export function tutorFocusPlan(stage: number, stageData: StageData, input: { tri
       : add('report_gap', '只核对一个缺失或不一致处，不代写最终结论');
     return { allowedFocusIds: [id], focusDescriptions: descriptions };
   }
-  return { allowedFocusIds: [add('reflection_coaching', '提供可选反思辅导，保留学生原文和决定权')], focusDescriptions: descriptions };
+  const hasTeacherEvaluation = typeof stageData.stage5?.teacherScore === 'number'
+    || Boolean(stageData.stage5?.teacherFeedback?.trim());
+  const evaluationSource = hasTeacherEvaluation
+    ? '只围绕已注入的教师评分与反馈'
+    : '体验模式没有教师反馈，只围绕已注入的 AI 参考评价并明确其来源';
+  return {
+    allowedFocusIds: [add(
+      'reflection_coaching',
+      `${evaluationSource}或本次探究的学习收获，按学生当前问题一次只辅导一个反思任务。P4 已完成，现有分析只作为背景；不得要求重新引用单元格、重做数据比较或返回数据分析阶段`,
+    )],
+    focusDescriptions: descriptions,
+  };
 }
 
 export function deterministicRisks(stageData: StageData): Stage2RiskAnnotation[] {
@@ -122,6 +130,14 @@ interface AnalysisCellEvidence {
   fingerprint: string;
 }
 
+function columnAliases(key: string, title: string): string[] {
+  return [...new Set([
+    key,
+    title,
+    ...title.split(/[：:（(）)、/\s]+/).map((item) => item.trim()).filter((item) => item.length >= 2),
+  ])];
+}
+
 function evidenceCells(stageData: StageData, studentMessage: string): AnalysisCellEvidence[] {
   const rows = stageData.stage3?.rows ?? [];
   const columns = (stageData.stage2?.schema.columns ?? []).filter((column) => !isIndexColumn(column.key, column.title));
@@ -135,8 +151,11 @@ function evidenceCells(stageData: StageData, studentMessage: string): AnalysisCe
 
   return candidates.flatMap(({ rowIndex, column, citedValue, row }) => {
     const oneBased = rowIndex + 1;
-    const rowMentioned = new RegExp(`第\\s*(?:${oneBased}|${chineseRowNumber(oneBased)})\\s*行`).test(studentMessage);
-    const columnMentioned = studentMessage.includes(column.title) || studentMessage.includes(column.key);
+    const rowNumber = `(?:${oneBased}|${chineseRowNumber(oneBased)})`;
+    const rowMentioned = new RegExp(
+      `(?:第\\s*${rowNumber}\\s*(?:行|次(?:记录)?|轮)|重复\\s*${rowNumber}(?:\\s*(?:次|轮))?)`,
+    ).test(studentMessage);
+    const columnMentioned = columnAliases(column.key, column.title).some((alias) => studentMessage.includes(alias));
     const rowLabelMentioned = Object.entries(row).some(([key, value]) => (
       key !== column.key
       && !isIndexColumn(key, stageData.stage2?.schema.columns.find((item) => item.key === key)?.title ?? key)

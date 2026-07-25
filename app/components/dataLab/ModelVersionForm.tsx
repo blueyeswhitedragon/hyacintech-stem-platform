@@ -34,6 +34,12 @@ export default function ModelVersionForm({
           parentModelVersionId: String(formData.get('parentModelVersionId') ?? ''),
           trainingRunId: String(formData.get('trainingRunId') ?? ''),
           status: String(formData.get('status') ?? 'DRAFT'),
+          artifactKind: String(formData.get('artifactKind') ?? 'BASE'),
+          modelFamily: String(formData.get('modelFamily') ?? ''),
+          checkpointId: String(formData.get('checkpointId') ?? ''),
+          weightsSha256: String(formData.get('weightsSha256') ?? ''),
+          parameterScale: String(formData.get('parameterScale') ?? ''),
+          architecture: String(formData.get('architecture') ?? ''),
         }),
       });
       const data = await response.json();
@@ -61,7 +67,7 @@ export default function ModelVersionForm({
         />
       </label>
       <label className="text-sm">
-        服务商
+        来源/兼容协议
         <input
           name="provider"
           required
@@ -70,7 +76,7 @@ export default function ModelVersionForm({
         />
       </label>
       <label className="text-sm">
-        外部模型 ID
+        外部模型 ID（兼容快照）
         <input
           name="externalModelId"
           required
@@ -78,6 +84,12 @@ export default function ModelVersionForm({
           className="mt-1 w-full border px-3 py-2"
         />
       </label>
+      <label className="text-sm">产物类型<select name="artifactKind" className="mt-1 w-full border px-3 py-2"><option value="BASE">基础模型</option><option value="FINE_TUNED">训练产物</option><option value="EXTERNAL">外部产物</option></select></label>
+      <label className="text-sm">模型家族<input name="modelFamily" placeholder="qwen" className="mt-1 w-full border px-3 py-2" /></label>
+      <label className="text-sm">参数规模<input name="parameterScale" placeholder="35B-A3B" className="mt-1 w-full border px-3 py-2" /></label>
+      <label className="text-sm">架构<input name="architecture" placeholder="MoE / Dense" className="mt-1 w-full border px-3 py-2" /></label>
+      <label className="text-sm">Checkpoint ID<input name="checkpointId" placeholder="组织/仓库@revision" className="mt-1 w-full border px-3 py-2" /></label>
+      <label className="text-sm md:col-span-2">权重 SHA-256（可选）<input name="weightsSha256" placeholder="64 位十六进制；不知道时留空并标记待核验" className="mt-1 w-full border px-3 py-2 font-mono text-xs" /></label>
       <label className="text-sm">
         父模型版本
         <select name="parentModelVersionId" className="mt-1 w-full border px-3 py-2">

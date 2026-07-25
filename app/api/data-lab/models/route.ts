@@ -22,6 +22,14 @@ export async function POST(request: Request) {
       externalModelId?: string;
       parentModelVersionId?: string;
       trainingRunId?: string;
+      artifactKind?: string;
+      modelFamily?: string;
+      checkpointId?: string;
+      weightsSha256?: string;
+      parameterScale?: string;
+      architecture?: string;
+      verificationStatus?: string;
+      metadata?: unknown;
       status?: string;
     };
     const model = await registerModelVersion({
@@ -30,6 +38,14 @@ export async function POST(request: Request) {
       externalModelId: body.externalModelId ?? '',
       parentModelVersionId: body.parentModelVersionId,
       trainingRunId: body.trainingRunId,
+      artifactKind: body.artifactKind,
+      modelFamily: body.modelFamily,
+      checkpointId: body.checkpointId,
+      weightsSha256: body.weightsSha256,
+      parameterScale: body.parameterScale,
+      architecture: body.architecture,
+      verificationStatus: body.verificationStatus,
+      metadata: body.metadata,
       status: body.status,
       createdById: auth.user.id,
     });

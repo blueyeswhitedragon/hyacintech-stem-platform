@@ -742,7 +742,10 @@ export function validateStageResponseBehavior(
     if (response.report_sections && hasAffirmativeMatch(response.report_sections.analysis, /结论是|证明了|由此可见|因此可以确定/)) {
       issues.push(issue('P5_ANALYSIS_CONCLUSION_LEAK', 'error', 'analysis 不能代写学生最终结论', response.report_sections.analysis));
     }
-    const unseenNumbers = [...numericTokens(text)].filter((token) => !facts.numericTokens.includes(token));
+    const numericCheckText = response.artifact_provenance?.report_sections === 'server_composed'
+      ? responseText({ ...response, report_sections: undefined })
+      : text;
+    const unseenNumbers = [...numericTokens(numericCheckText)].filter((token) => !facts.numericTokens.includes(token));
     if (unseenNumbers.length > 0) {
       issues.push(issue('P5_UNSEEN_NUMBER', 'error', `报告框架包含前序摘要中未出现的数字：${unseenNumbers.join('、')}`, text));
     }

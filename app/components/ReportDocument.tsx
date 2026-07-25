@@ -3,6 +3,7 @@
 import React from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
 import { limitationsDiscussion } from '@/app/lib/reportFields';
+import ReadonlyDataTable from './ReadonlyDataTable';
 
 interface Props {
   stage5?: Stage5Data;
@@ -50,37 +51,7 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
       {hasTable && (
         <div>
           <div className="text-sm font-medium text-gray-600 mb-1">📊 实验数据记录</div>
-          <div className="overflow-x-auto border rounded">
-            <table className="w-full text-xs">
-              <thead className="bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="p-1.5 border text-center w-8">#</th>
-                  {schemaColumns!.map((c) => (
-                    <th key={c.key} className="p-1.5 border text-left whitespace-nowrap">
-                      {c.title}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {dataRows!.map((row, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-1.5 border text-center text-gray-400">{i + 1}</td>
-                    {schemaColumns!.map((c) => (
-                      <td key={c.key} className="p-1.5 border text-gray-800">
-                        {c.type === 'image' && row[c.key] ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={String(row[c.key])} alt="" className="h-8 w-8 object-cover rounded" />
-                        ) : (
-                          String(row[c.key] ?? '—')
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ReadonlyDataTable columns={schemaColumns!} rows={dataRows!} />
         </div>
       )}
 
@@ -102,10 +73,10 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
         </>
       )}
 
-      {/* 学生上传的报告（docx 轻量导入，留存 + 文本提取，独立展示，不覆盖 AI 框架） */}
+      {/* 上传原文作为附件留存；章节只有在学生确认预览后才写入权威字段。 */}
       {(stage5?.uploadedText || stage5?.uploadedDocUrl) && (
-        <div>
-          <div className="text-sm font-medium text-gray-600 mb-1">
+        <details>
+          <summary className="cursor-pointer text-sm font-medium text-gray-600 mb-1">
             📎 学生上传的报告
             {stage5?.uploadedDocUrl && (
               <a
@@ -117,13 +88,13 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
                 下载原文件
               </a>
             )}
-          </div>
+          </summary>
           {stage5?.uploadedText && (
             <div className="text-sm text-gray-800 whitespace-pre-wrap bg-amber-50 border border-amber-200 rounded p-2 max-h-64 overflow-y-auto">
               {stage5.uploadedText}
             </div>
           )}
-        </div>
+        </details>
       )}
     </div>
   );

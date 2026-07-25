@@ -300,7 +300,7 @@ export default function GuestWorkspace() {
     switch (stage) {
       case 2:
         const guestStage2 = stageData.stage2;
-        const readiness = guestStage2?.readiness ?? evaluateStage2Readiness(stageData);
+        const readiness = evaluateStage2Readiness(stageData);
         const planConfirmed = Boolean(guestStage2?.confirmedPlanHash
           && guestStage2.confirmedPlanHash === guestStage2.draftHash
           && guestStage2.experimentPlan);
@@ -329,9 +329,9 @@ export default function GuestWorkspace() {
           />
         );
       case 4:
-        return <ChartViewer schema={stageData.stage2?.schema} stage3={stageData.stage3} onComplete={advanceToStage5} />;
+        return <ChartViewer schema={stageData.stage2?.schema} stage3={stageData.stage3} stage4={stageData.stage4} onComplete={advanceToStage5} />;
       case 5:
-        return <ReportViewer stage5={stageData.stage5} schemaColumns={stageData.stage2?.schema?.columns} dataRows={stageData.stage3?.rows} onSave={saveStage5} onSubmit={submitStage5} />;
+        return <ReportViewer stage5={stageData.stage5} schemaColumns={stageData.stage2?.schema?.columns} dataRows={stageData.stage3?.rows} onSave={saveStage5} onSubmit={submitStage5} submitLabel="提交" />;
       case 6:
         return <Stage6Panel stage5={stageData.stage5} stage6={stageData.stage6} completed={completed} onSubmit={respondStage6} guestMode />;
       default:
@@ -340,27 +340,48 @@ export default function GuestWorkspace() {
   }
 
   const panel = renderPanel();
+  const chat = (
+    <ConversationChat
+      initialMessages={welcome}
+      stage={stage}
+      completed={completed}
+      send={send}
+      onResult={onChatResult}
+      onSafetyPassed={markGuestSafetyPassed}
+      onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
+      phaseConfirmLabel="研究问题无误，进入方案设计"
+      roundCount={stageData.roundCounts?.[stage] ?? 0}
+      injectedMessage={injectedMessage}
+      initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
+        ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
+        : null}
+    />
+  );
+  const documentStage = stage === 5 || stage === 6;
+  const chatWidth = stage === 4 ? 'lg:w-2/5' : 'lg:w-1/2';
+  const panelWidth = stage === 4 ? 'lg:w-3/5' : 'lg:w-1/2';
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-full">
-      <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${panel ? 'lg:w-1/2' : 'w-full'} min-h-0 flex flex-col`}>
-        <ConversationChat
-          initialMessages={welcome}
-          stage={stage}
-          completed={completed}
-          send={send}
-          onResult={onChatResult}
-          onSafetyPassed={markGuestSafetyPassed}
-          onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
-          phaseConfirmLabel="研究问题无误，进入方案设计"
-          roundCount={stageData.roundCounts?.[stage] ?? 0}
-          injectedMessage={injectedMessage}
-          initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
-            ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
-            : null}
-        />
-      </div>
-      {panel && <div className="bg-white rounded-lg shadow-sm overflow-y-auto lg:w-1/2 min-h-0">{panel}</div>}
+    <div className="flex h-full min-h-0 flex-col">
+      {documentStage && panel ? (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+          <main className="order-1 min-h-fit min-w-0 shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:flex-1 lg:shrink lg:overflow-y-auto">{panel}</main>
+          <aside className="order-2 shrink-0 lg:w-80">
+            <details className="rounded-lg bg-white shadow-sm">
+              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-gray-800">
+                AI 导师（可选辅导）
+                <span className="ml-2 text-xs font-normal text-gray-500">点击展开</span>
+              </summary>
+              <div className="h-[32rem] min-h-0 border-t border-gray-100">{chat}</div>
+            </details>
+          </aside>
+        </div>
+      ) : (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+          <div className={`flex h-[38rem] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg bg-white shadow-sm lg:h-auto lg:shrink ${panel ? chatWidth : 'w-full'}`}>{chat}</div>
+          {panel && <div className={`min-h-fit shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:shrink lg:overflow-y-auto ${panelWidth}`}>{panel}</div>}
+        </div>
+      )}
       {completed && <Fireworks />}
     </div>
   );

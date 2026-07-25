@@ -8,6 +8,9 @@ export async function POST(request: Request) {
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const form = await request.formData();
   const name = String(form.get('name') ?? '').trim();
+  const evaluationRunId = String(form.get('evaluationRunId') ?? '').trim();
+  const runtimeBundleAId = String(form.get('runtimeBundleAId') ?? '').trim();
+  const runtimeBundleBId = String(form.get('runtimeBundleBId') ?? '').trim();
   const files = form.getAll('artifacts').filter((item): item is File => item instanceof File);
   if (!name) return NextResponse.json({ error: '请填写评测名称' }, { status: 400 });
   if (files.length === 0) return NextResponse.json({ error: '请选择 transcript 或 verdict JSON' }, { status: 400 });
@@ -15,6 +18,9 @@ export async function POST(request: Request) {
   try {
     const run = await importEvaluation({
       name,
+      evaluationRunId: evaluationRunId || undefined,
+      runtimeBundleAId: runtimeBundleAId || undefined,
+      runtimeBundleBId: runtimeBundleBId || undefined,
       files: await Promise.all(files.map(async (file) => ({ fileName: file.name, raw: await file.text() }))),
       user: auth.user,
     });

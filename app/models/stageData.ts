@@ -54,33 +54,53 @@ export interface Stage2RiskAnnotation {
 }
 
 export interface Stage2ExperimentPlan {
+  /** 新方案显式标记合同版本；缺失时按历史 v1 方案处理。 */
+  contractVersion?: 'stage2-plan-v2';
   researchQuestion?: string;
   hypothesis?: string;
   independentVariable: { name: string; levels: string[] };
   dependentVariable: { name: string; measurement: string; unit?: string };
+  dataRecording?: {
+    tool: string;
+    timing: string;
+    recordedFields: string[];
+  };
   controlledVariables: string[];
   materials: string[];
   procedure: string[];
-  /** 每个自变量水平至少重复多少次；用于区分“组别数”和“重复测量次数”。 */
+  /** 每个自变量水平包含的实验对象数量；与独立重复轮次严格区分。 */
+  sampleSizePerLevel?: number;
+  /** 每个自变量水平至少独立重复多少轮。 */
   repeatCount: number;
   safetyNotes: string[];
 }
 
 export type Stage2CoreField =
-  | 'hypothesis'
   | 'independent_variable'
   | 'levels'
   | 'dependent_variable'
-  | 'measurement'
+  | 'measurement_tool'
+  | 'measurement_timing'
+  | 'recorded_fields'
+  | 'procedure'
   | 'controls'
-  | 'repeats';
+  | 'repeats'
+  | 'hypothesis';
+
+export type Stage2SectionId =
+  | 'variable_design'
+  | 'data_recording'
+  | 'experiment_process'
+  | 'expected_result';
 
 export interface Stage2Readiness {
-  policyVersion: 'stage2-readiness-v1';
+  policyVersion: 'stage2-readiness-v1' | 'stage2-readiness-v2';
   complete: boolean;
   completedFields: Stage2CoreField[];
   missingFields: Stage2CoreField[];
-  nextFocusId: Stage2CoreField | 'plan_confirmation';
+  completedSections: Stage2SectionId[];
+  missingSections: Stage2SectionId[];
+  nextFocusId: Stage2SectionId | 'plan_confirmation';
 }
 
 export type Stage2PlanProvenanceSource = 'student_fact' | 'server_composed' | 'server_baseline';
@@ -97,9 +117,11 @@ export type Stage2PlanProvenance = Partial<Record<
   | 'levels'
   | 'dependentVariable'
   | 'measurement'
+  | 'dataRecording'
   | 'controlledVariables'
   | 'materials'
   | 'procedure'
+  | 'sampleSizePerLevel'
   | 'repeatCount'
   | 'safetyNotes',
   Stage2PlanProvenanceEntry
@@ -209,6 +231,17 @@ export interface Stage5ReferenceScore {
   safetyCompliance: boolean;
 }
 
+export type Stage5ImportField = Exclude<keyof Stage5Sections, 'reflection'>;
+
+export interface Stage5ImportPreview {
+  previewHash: string;
+  originalFileName: string;
+  sections: Partial<Stage5Sections>;
+  detectedFields: Stage5ImportField[];
+  missingFields: Stage5ImportField[];
+  complete: boolean;
+}
+
 export interface Stage5Data {
   submitted: boolean;
   approved: boolean | null;
@@ -224,6 +257,13 @@ export interface Stage5Data {
   uploadedDocUrl?: string;
   /** docx 轻量导入：从上传报告提取的纯文本（供学生/教师参考，不覆盖 AI 框架）。 */
   uploadedText?: string;
+  /** 待学生核对的服务器章节识别结果；确认前不覆盖权威报告字段。 */
+  importPreview?: Stage5ImportPreview;
+  lastConfirmedImport?: {
+    previewHash: string;
+    importedFields: Stage5ImportField[];
+    confirmedAt: string;
+  };
 }
 
 export interface Stage6Data {

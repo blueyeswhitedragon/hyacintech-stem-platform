@@ -3,6 +3,8 @@ param(
   [ValidateSet('menu', 'setup', 'local', 'public', 'status', 'backup', 'stop')]
   [string]$Action = 'menu',
   [int]$Port = 3000,
+  [string]$BindHost = '127.0.0.1',
+  [string]$NgrokApiBase = '',
   [switch]$ForceBuild
 )
 
@@ -12,6 +14,11 @@ $runtimeDir = Join-Path $repoRoot 'backups\launcher-runtime'
 $runtimePath = Join-Path $runtimeDir 'runtime.json'
 $logOut = Join-Path $runtimeDir 'next.out.log'
 $logErr = Join-Path $runtimeDir 'next.err.log'
+if (-not $NgrokApiBase) {
+  $NgrokApiBase = if ($env:NGROK_API_BASE) { $env:NGROK_API_BASE } else { 'http://127.0.0.1:4040' }
+}
+$NgrokApiBase = $NgrokApiBase.TrimEnd('/')
+$serviceBase = "http://${BindHost}:$Port"
 
 function Write-Title([string]$Text) {
   Write-Host ''
@@ -123,7 +130,7 @@ function Start-LocalPlatform {
   Write-Title '本机运行'
   $listener = Get-Listener
   if ($listener) {
-    Write-Host "服务已在 http://127.0.0.1:$Port 运行（PID $($listener.OwningProcess)）。" -ForegroundColor Green
+    Write-Host "服务已在 $serviceBase 运行（PID $($listener.OwningProcess)）。" -ForegroundColor Green
     return
   }
   Require-Command 'node' | Out-Null
@@ -134,17 +141,17 @@ function Start-LocalPlatform {
     else { Write-Host '生产构建仍然有效，跳过 build。' }
     New-Item -ItemType Directory -Force -Path $runtimeDir | Out-Null
     $node = (Get-Command node).Source
-    $process = Start-Process -FilePath $node -ArgumentList @('node_modules\next\dist\bin\next', 'start', '-H', '127.0.0.1', '-p', "$Port") -WorkingDirectory $repoRoot -RedirectStandardOutput $logOut -RedirectStandardError $logErr -WindowStyle Hidden -PassThru
+    $process = Start-Process -FilePath $node -ArgumentList @('node_modules\next\dist\bin\next', 'start', '-H', $BindHost, '-p', "$Port") -WorkingDirectory $repoRoot -RedirectStandardOutput $logOut -RedirectStandardError $logErr -WindowStyle Hidden -PassThru
     $ready = $false
     foreach ($attempt in 1..30) {
       Start-Sleep -Milliseconds 500
-      try { if ((Invoke-WebRequest -Uri "http://127.0.0.1:$Port/" -UseBasicParsing -TimeoutSec 3).StatusCode -eq 200) { $ready = $true; break } } catch { if ($process.HasExited) { break } }
+      try { if ((Invoke-WebRequest -Uri "$serviceBase/" -UseBasicParsing -TimeoutSec 3).StatusCode -eq 200) { $ready = $true; break } } catch { if ($process.HasExited) { break } }
     }
     if (-not $ready) { throw "服务启动失败，请查看 $logErr" }
     @{ startedAt = (Get-Date).ToString('o'); port = $Port; nextPid = $process.Id; ownsNext = $true } | ConvertTo-Json | Set-Content -LiteralPath $runtimePath -Encoding UTF8
-    Write-Host "服务已启动：http://127.0.0.1:$Port" -ForegroundColor Green
+    Write-Host "服务已启动：$serviceBase" -ForegroundColor Green
     try {
-      $health = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/api/health" -UseBasicParsing -TimeoutSec 10
+      $health = Invoke-WebRequest -Uri "$serviceBase/api/health" -UseBasicParsing -TimeoutSec 10
       if ($health.StatusCode -ne 200) { Write-Host '服务已启动，但 AI 健康检查未通过。请检查 .env 中的 API Key。' -ForegroundColor Yellow }
     } catch { Write-Host '服务已启动，但 AI 健康检查未通过。请检查 .env 中的 API Key。' -ForegroundColor Yellow }
   } finally { Pop-Location }
@@ -154,16 +161,16 @@ function Start-PublicPlatform {
   Write-Title '公网审核模式'
   Start-LocalPlatform
   $script = Join-Path $repoRoot 'scripts\start-data-lab-tunnel.ps1'
-  & $script -Port $Port -ReuseExistingService -SkipBuild
+  & $script -Port $Port -BindHost $BindHost -NgrokApiBase $NgrokApiBase -ReuseExistingService -SkipBuild
 }
 
 function Show-PlatformStatus {
   Write-Title '运行状态'
   $listener = Get-Listener
-  if ($listener) { Write-Host "本机服务：http://127.0.0.1:$Port（PID $($listener.OwningProcess)）" -ForegroundColor Green }
+  if ($listener) { Write-Host "本机服务：$serviceBase（PID $($listener.OwningProcess)）" -ForegroundColor Green }
   else { Write-Host '本机服务未运行。' -ForegroundColor Yellow }
   try {
-    $tunnel = (Invoke-RestMethod -Uri 'http://127.0.0.1:4040/api/tunnels' -TimeoutSec 3).tunnels | Where-Object { $_.config.addr -match ":$Port$" } | Select-Object -First 1
+    $tunnel = (Invoke-RestMethod -Uri "$NgrokApiBase/api/tunnels" -TimeoutSec 3).tunnels | Where-Object { $_.config.addr -match ":$Port$" } | Select-Object -First 1
     if ($tunnel) { Write-Host "公网地址：$($tunnel.public_url)" -ForegroundColor Cyan }
     else { Write-Host 'ngrok 未建立当前端口的隧道。' }
   } catch { Write-Host 'ngrok 未运行。' }

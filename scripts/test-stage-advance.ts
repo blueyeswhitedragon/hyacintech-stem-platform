@@ -8,6 +8,7 @@ import type { StageData } from '../app/models/stageData';
 import { recoverStageDataV3, researchQuestionHash } from '../app/lib/stageState';
 import { updateServerAnalysis } from '../app/lib/serverTutorState';
 import { validateStage3Rows } from '../app/lib/stage3Rows';
+import { evaluateStage4Readiness } from '../app/lib/stage4Readiness';
 
 let passed = 0;
 let failed = 0;
@@ -175,6 +176,60 @@ check('紧凑确认状态只保留研究问题正文', confirmationDocumentBody(
   const repeated = updateServerAnalysis(first.stageData, '第1行低水平结果2比高水平结果7低');
   check('P4 真实单元格证据可接受', first.accepted && first.stageData.stage4?.analysisCount === 1);
   check('P4 相同证据轮次去重', !repeated.accepted && repeated.duplicate && repeated.stageData.stage4?.analysisCount === 1);
+}
+
+// P4 浏览器实测话术：支持“第N次记录”和水平简称，并与推进门禁共享进度
+{
+  const state: StageData = {
+    contractMeta: {
+      stageContractVersion: 'stage-contract-v4',
+      extractorVersion: 'student-fact-extractor-v4',
+      revision: 1,
+      stateHash: 'test',
+      lastMutation: 'test',
+    },
+    stage2: { submitted: true, approved: true, schema: { columns: [
+      { key: 'trial', title: '重复序号', type: 'number', required: true },
+      { key: 'result_a', title: '4小时：豆苗高度（厘米）', type: 'number', required: true },
+      { key: 'result_b', title: '8小时：豆苗高度（厘米）', type: 'number', required: true },
+    ], minRows: 5, maxRows: 200 } },
+    stage3: { rows: [
+      { trial: 1, result_a: 12, result_b: 8 },
+      { trial: 2, result_a: 12.4, result_b: 8.4 },
+      { trial: 3, result_a: 12.8, result_b: 8.6 },
+      { trial: 4, result_a: 13.2, result_b: 8.8 },
+      { trial: 5, result_a: 13.6, result_b: 9.2 },
+    ] },
+  };
+  const first = updateServerAnalysis(state, '第5次记录中，4小时为13.6，8小时为9.2，前者比后者高4.4。');
+  const second = updateServerAnalysis(first.stageData, '第1次记录4小时12比8小时8高，第3次记录12.8比8.6高，趋势相同。');
+  const readiness = evaluateStage4Readiness(second.stageData);
+  check('P4 第N次记录与水平简称可形成第一轮证据', first.accepted);
+  check('P4 不同单元格证据可形成第二轮', second.accepted);
+  check('P4 前后端共享就绪度达到2/2', readiness.ready && readiness.acceptedRoundCount === 2);
+  check('P4 两轮不同证据可进入P5', canAdvance(4, 5, second.stageData).ok);
+}
+
+// 旧 evidenceRounds 缺指纹时，从引用内容确定性恢复，而不是误判为0轮
+{
+  const legacyFingerprintState: StageData = {
+    contractMeta: {
+      stageContractVersion: 'stage-contract-v4',
+      extractorVersion: 'student-fact-extractor-v3',
+      revision: 1,
+      stateHash: 'legacy',
+      lastMutation: 'test',
+    },
+    stage4: {
+      analysisCount: 2,
+      evidenceRounds: [
+        { observation: 'a', citations: ['第1行A=1', '第1行B=2'], matchedValues: ['1', '2'] },
+        { observation: 'b', citations: ['第2行A=3', '第2行B=4'], matchedValues: ['3', '4'] },
+      ],
+    },
+  };
+  check('P4 旧轮次缺指纹可确定性恢复', evaluateStage4Readiness(legacyFingerprintState).acceptedRoundCount === 2);
+  check('P4 旧轮次恢复后可推进', canAdvance(4, 5, legacyFingerprintState).ok);
 }
 
 console.log(`\n结果: ${passed} 通过, ${failed} 失败`);
