@@ -11,6 +11,12 @@ import {
 import { redactProductionRecord } from '../app/lib/redaction';
 import type { ShareGPTRecord } from '../app/lib/dataLab/types';
 import type { SessionUser } from '../app/lib/session';
+import {
+  buildTutorLanguagePrompt,
+  TUTOR_LANGUAGE_PROMPT_V1,
+} from '../app/lib/tutorLanguage';
+import { TUTOR_TRAINING_COHORT } from '../app/lib/dataLab/trainingCohort';
+import { sha256 } from '../app/lib/dataLab/validation';
 
 let passed = 0;
 let failed = 0;
@@ -46,10 +52,17 @@ async function main() {
   const userMessageId = randomUUID();
   const assistantMessageId = randomUUID();
   const response = { dialogue: `你好${student.displayName}，请访问 https://example.com/file.png`, next_action_type: 'text_input', phase_complete: false };
+  const sourceVisibleFacts = { 学生提出的研究问题: `不同光照是否影响${student.displayName}的豆苗生长` };
+  const sourceSystemPrompt = buildTutorLanguagePrompt({
+    phase: 1,
+    triggerType: 'USER_MESSAGE',
+    visibleFacts: sourceVisibleFacts,
+    allowedFocusIds: ['research_question'],
+  }, TUTOR_LANGUAGE_PROMPT_V1);
   const conversation = await db.conversation.create({ data: { userId: student.id, traceCoverage: 'COMPLETE', messages: JSON.stringify([{ id: randomUUID(), role: 'assistant', content: `欢迎${student.displayName}开始探究` }, { id: randomUUID(), role: 'user', content: '我先观察了第一组。' }, { id: randomUUID(), role: 'assistant', content: '请说说你记录到了什么。' }, { id: userMessageId, role: 'user', content: `我是${student.displayName}，电话13812345678` }, { id: assistantMessageId, role: 'assistant', content: response.dialogue }]) } });
   const studentAssignment = await db.studentAssignment.create({ data: { assignmentId: assignment.id, studentId: student.id, conversationId: conversation.id, status: 'IN_PROGRESS', currentStage: 1, dataConsentStatus: 'GRANTED', dataConsentPolicyVersion: 'student-data-policy-v1' } });
   const model = await db.modelVersion.create({ data: { tag: `candidate-test-${suffix}`, provider: 'test', externalModelId: 'test-model' } });
-  const trace = await db.generationTrace.create({ data: { conversationId: conversation.id, assistantMessageId, userMessageId, stage: 1, modelVersionId: model.id, modelTagSnapshot: model.tag, providerSnapshot: 'test', externalModelSnapshot: 'test-model', promptVersion: 'p1', promptSha256: 'a'.repeat(64), trainingSystemPromptSnapshot: `阶段1完整上下文：${student.displayName}`, styleFamily: 'classroom_coach', stylePolicyVersion: 'style-v1', requestMessageSha256: 'b'.repeat(64), responseJson: JSON.stringify(response), responseSha256: 'c'.repeat(64), contractVersion: 'c1', contractCheckJson: JSON.stringify({ stageContractVersion: 'stage-contract-v2', extractorVersion: 'student-fact-extractor-v1', promptPolicyVersion: 'p1' }) } });
+  const trace = await db.generationTrace.create({ data: { conversationId: conversation.id, assistantMessageId, userMessageId, stage: 1, modelVersionId: model.id, modelTagSnapshot: model.tag, providerSnapshot: 'test', externalModelSnapshot: 'test-model', promptVersion: TUTOR_LANGUAGE_PROMPT_V1, promptSha256: sha256(sourceSystemPrompt), trainingSystemPromptSnapshot: sourceSystemPrompt, styleFamily: 'classroom_coach', stylePolicyVersion: 'style-v1', requestMessageSha256: 'b'.repeat(64), responseJson: JSON.stringify(response), responseSha256: 'c'.repeat(64), contractVersion: 'tutor-language-v1', contractCheckJson: JSON.stringify({ stageContractVersion: 'stage-contract-v2', extractorVersion: 'student-fact-extractor-v1', promptPolicyVersion: TUTOR_LANGUAGE_PROMPT_V1, chosenFocus: 'research_question', allowedFocusIds: ['research_question'] }) } });
   const systemAssistantMessageId = randomUUID();
   const systemTrace = await db.generationTrace.create({
     data: {
@@ -116,20 +129,27 @@ async function main() {
   check(candidate.status === 'NOMINATED', '教师提名进入隔离候选池');
   check(!candidate.redactedRecordJson.includes(student.displayName), '候选快照不含学生显示名');
   check(!candidate.redactedRecordJson.includes(klass.name), '候选快照不含班级名');
-  check(candidate.redactedRecordJson.includes('阶段1完整上下文'), '候选快照保留模型当轮实际可见上下文');
+  check(candidate.redactedRecordJson.includes('可见事实'), '候选快照保留模型当轮实际可见上下文');
   check(candidate.redactedRecordJson.includes('我先观察了第一组'), '候选快照保留脱敏后的模型可见对话历史');
   const candidateRecord = JSON.parse(candidate.redactedRecordJson) as ShareGPTRecord;
-  check(candidateRecord.meta?.stageContractVersion === 'stage-contract-v2' && candidateRecord.meta?.promptVersion === 'p1' && candidateRecord.meta?.extractorVersion === 'student-fact-extractor-v1', '生产候选保留轨迹实际 Prompt、Extractor 和阶段合同版本');
+  check(candidateRecord.meta?.stageContractVersion === 'stage-contract-v2' && candidateRecord.meta?.promptVersion === TUTOR_LANGUAGE_PROMPT_V1 && candidateRecord.meta?.extractorVersion === 'student-fact-extractor-v1', '生产候选保留轨迹实际 Prompt、Extractor 和阶段合同版本');
   await reviewProductionCandidate({ id: candidate.id, action: 'APPROVE', adminId: admin.id });
   const converted = await convertProductionCandidates({ ids: [candidate.id], batchName: `production-trace-${suffix}`, adminId: admin.id });
   const convertedCandidate = await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id }, include: { convertedTutorTurnCase: true } });
   check(converted.cases.length === 1 && converted.cases[0].dataSource === 'PRODUCTION_TRACE', '通过候选转换为独立 TutorTurnCase');
   check(convertedCandidate.status === 'CONVERTED' && convertedCandidate.convertedTutorTurnCase?.dataSource === 'PRODUCTION_TRACE', '转换后候选与 TutorTurnCase 双向追溯');
-  check(convertedCandidate.convertedTutorTurnCase?.promptVersion === 'p1' && convertedCandidate.convertedTutorTurnCase?.extractorVersion === 'student-fact-extractor-v1', '生产轨迹转换不使用全局当前常量重标历史版本');
+  check(convertedCandidate.convertedTutorTurnCase?.promptVersion === TUTOR_TRAINING_COHORT.promptVersion
+    && convertedCandidate.convertedTutorTurnCase?.extractorVersion === TUTOR_TRAINING_COHORT.extractorVersion
+    && convertedCandidate.convertedTutorTurnCase?.status === 'READY', '生产轨迹按当前训练目标合同生成可审核案例');
+  check(convertedCandidate.convertedTutorTurnCase?.sourcePromptVersion === TUTOR_LANGUAGE_PROMPT_V1
+    && convertedCandidate.convertedTutorTurnCase?.sourceExtractorVersion === 'student-fact-extractor-v1'
+    && convertedCandidate.convertedTutorTurnCase?.sourceStageContractVersion === 'stage-contract-v2', '来源版本独立留存且不伪装为训练目标版本');
+  check(convertedCandidate.convertedTutorTurnCase?.sourceSystemPrompt?.includes(student.displayName) === false
+    && convertedCandidate.convertedTutorTurnCase?.systemPrompt.includes(TUTOR_TRAINING_COHORT.promptVersion) === true, '来源 Prompt 脱敏留存并重建目标 Prompt');
 
   await setStudentDataConsent({ studentAssignmentId: studentAssignment.id, studentId: student.id, decision: 'WITHDRAW' });
   check((await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id } })).status === 'WITHDRAWN', '撤回授权使已转换候选停止使用');
-  check((await db.tutorTurnCase.findUniqueOrThrow({ where: { id: converted.cases[0].id } })).status === 'BLOCKED', '旧合同生产轨迹只能进入阻断/重生成路径');
+  check((await db.tutorTurnCase.findUniqueOrThrow({ where: { id: converted.cases[0].id } })).status === 'BLOCKED', '撤回授权同步阻断已转换 TutorTurnCase');
 
   await db.dataLabAuditLog.deleteMany({ where: { actorId: { in: [teacher.id, student.id, admin.id] } } });
   await db.productionCandidate.delete({ where: { id: candidate.id } });

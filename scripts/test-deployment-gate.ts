@@ -60,7 +60,7 @@ async function main() {
   check((await resolveConversationModel(baselineConversation.id)).id === baseline.id, '灰度晋级后已有会话仍保持原模型黏性');
   const rollback = await rollbackDeployment({ deploymentId: hundred.id, adminId: admin.id });
   check(rollback.modelVersionId === baseline.id && rollback.rolloutPercent === 100, '一键回滚恢复上一生产模型');
-  check((await resolveConversationModel(candidateConversation.id)).id === baseline.id, '紧急回滚会把候选模型会话切回安全基线');
+  check((await resolveConversationModel(candidateConversation.id)).id === candidate.id, '回滚只改变新会话路由，已固定候选会话不被静默切换');
 
   await db.conversation.deleteMany({ where: { id: { in: [candidateConversation.id, baselineConversation.id] } } });
   const createdDeployments = await db.modelDeployment.findMany({ where: { OR: [{ modelVersionId: candidate.id }, { previousModelVersionId: candidate.id }], id: { not: baselineDeployment.id } }, select: { id: true } });

@@ -64,9 +64,9 @@ const calibrationCases = compileScenarioCases(smokeCards, CALIBRATION_12_SCENARI
 check(calibrationCases.length === 12 && [1, 2, 4].every((phase) => calibrationCases.filter((item) => item.phase === phase).length === 4), 'Calibration 12 固定覆盖 P1/P2/P4 各四条');
 check(new Set(calibrationCases.map((item) => item.studentMessage)).size === 12 && calibrationCases.every((item) => item.hardCheck.errors.length === 0), 'Calibration 12 无 exact duplicate 且不泄漏私有规范');
 const variableGapCase = compileOneCase({ card: compilerCard, phase: 2, challenge: '变量不完整', variant: 0, split: 'PILOT', promptVersion: DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION });
-check((variableGapCase.visibleFacts as { allowedFocusIds?: string[] }).allowedFocusIds?.[0] === 'independent_variable' && variableGapCase.systemPrompt.includes('不补齐测量、控制变量或后续方案'), 'P2 变量不完整映射到 independent_variable 而不是 measurement');
+check((variableGapCase.visibleFacts as { allowedFocusIds?: string[] }).allowedFocusIds?.[0] === 'variable_design' && variableGapCase.systemPrompt.includes('唯一自变量'), 'P2 变量不完整映射到变量设计环节');
 const p2Coverage = compileCases([compilerCard], { 2: 12 }, 'PILOT');
-check(new Set(p2Coverage.flatMap((item) => (item.visibleFacts as { allowedFocusIds: string[] }).allowedFocusIds)).size === 8, 'P2 编译覆盖七项科学核心和方案确认，操作字段由服务器组装');
+check(new Set(p2Coverage.flatMap((item) => (item.visibleFacts as { allowedFocusIds: string[] }).allowedFocusIds)).size === 5, 'P2 编译覆盖四个思考环节和方案确认');
 const bridge = {
   label: '纸桥结构', retainedFeature: '结构影响承重', researchQuestion: '不同折叠结构怎样影响纸桥承重？', factor: '折叠结构', phenomenon: '承重数量',
   testScaffold: { levels: ['平板', '三角折叠'], measurement: '逐本增加相同课本并记录最大本数', unit: '本', metricKind: 'COUNT', controlledConditions: ['纸张大小', '桥墩距离'] },
@@ -133,7 +133,10 @@ const completePlanState = {
     'stage2.independentVariable.name': { value: '光照时长', sourceQuote: '光照时长' },
     'stage2.independentVariable.levels': { value: ['4小时', '8小时'], sourceQuote: '4小时和8小时' },
     'stage2.dependentVariable.name': { value: '幼苗高度', sourceQuote: '幼苗高度' },
-    'stage2.dependentVariable.measurement': { value: '用直尺测量', sourceQuote: '用直尺测量' },
+    'stage2.dependentVariable.measurement': { value: '第7天用直尺测量', sourceQuote: '第7天用直尺测量' },
+    'stage2.measurement.tool': { value: '直尺', sourceQuote: '直尺' },
+    'stage2.measurement.timing': { value: '第7天', sourceQuote: '第7天' },
+    'stage2.recordedFields': { value: ['幼苗高度'], sourceQuote: '幼苗高度' },
     'stage2.controlledVariables': { value: [], sourceQuote: '没有其他控制条件' },
     'stage2.materials': { value: ['幼苗', '直尺'], sourceQuote: '幼苗和直尺' },
     'stage2.procedure': { value: ['分组照光', '测量高度'], sourceQuote: '分组照光并测量高度' },
@@ -145,7 +148,7 @@ check(Boolean(buildServerExperimentPlan(completePlanState)), 'P2 显式确认空
 const numericFallback = applyDeterministicExtractionFallbacks(2, [], '0、8、12、24小时四组');
 check(JSON.stringify(numericFallback.accepted[0]?.value) === JSON.stringify(['0小时', '8小时', '12小时', '24小时']), 'P2 短数字回答确定性识别为带共享单位的实验水平');
 const repeatFallback = applyDeterministicExtractionFallbacks(2, [], '每组10颗取平均值，其他都一样');
-check(repeatFallback.accepted.some((item) => item.field === 'stage2.repeatCount' && item.value === 10) && repeatFallback.accepted.some((item) => item.field === 'stage2.controlledVariables'), 'P2 重复次数和通用控制条件有确定性 fallback');
+check(repeatFallback.accepted.some((item) => item.field === 'stage2.sampleSizePerLevel' && item.value === 10) && repeatFallback.accepted.some((item) => item.field === 'stage2.controlledVariables') && !repeatFallback.accepted.some((item) => item.field === 'stage2.repeatCount'), 'P2 样本数与通用控制条件有确定性 fallback，且不冒充独立重复');
 check(!tutorTargetContainsServerArtifact(JSON.stringify(tutorSftTarget(compatible))), 'Server artifact 不进入 Tutor SFT target');
 check(tutorTargetContainsServerArtifact(JSON.stringify(compatible)), '完整兼容响应可识别为含 server artifacts');
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { HealthResponse, LLMMessage } from '../../lib/llm/types';
 import { validateConfig } from '../../lib/llm/provider';
 import { classifyError } from '../../lib/llm/errors';
+import { resolveProviderApiBase } from '../../lib/llm/endpoints';
 
 export async function GET() {
   const result: HealthResponse = {
@@ -30,9 +31,7 @@ export async function GET() {
   result.checks.config = { ok: true };
 
   // ---- Step 2: connectivity test ----
-  const baseURL = config.provider === 'deepseek'
-    ? (process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com/v1')
-    : (process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1');
+  const baseURL = resolveProviderApiBase(config.provider === 'deepseek' ? 'deepseek' : 'openai');
 
   try {
     const start = Date.now();

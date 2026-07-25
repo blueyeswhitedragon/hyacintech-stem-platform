@@ -249,6 +249,7 @@ export async function runNewTutorTurn(input: {
   const tutor = await callTutorLanguageWithTrace(tutorInput, {
     provider: input.modelIdentity.provider,
     model: input.modelIdentity.externalModelId,
+    configured: input.modelIdentity.runtimeConfig,
   }, promptVersion);
   const response = toCompatibleChatResponse(tutor.response, server.envelope);
   const assistantMessage: Message = {
@@ -340,6 +341,7 @@ export async function runNewTutorSystemTurn(input: {
   const tutor = await callTutorLanguageWithTrace(tutorInput, {
     provider: input.modelIdentity.provider,
     model: input.modelIdentity.externalModelId,
+    configured: input.modelIdentity.runtimeConfig,
   }, promptVersion);
   return {
     response: toCompatibleChatResponse(tutor.response, server.envelope),

@@ -12,7 +12,13 @@ import {
   researchQuestionHash,
   stage2DraftHash,
 } from '@/app/lib/stageState';
-import { composeStage2Plan, evaluateStage2Readiness } from '@/app/lib/stage2Readiness';
+import {
+  composeStage2Plan,
+  distinctExperimentLevels,
+  evaluateStage2Readiness,
+  inferMeasurementTiming,
+  inferMeasurementTool,
+} from '@/app/lib/stage2Readiness';
 
 export const EXTRACTOR_VERSION = STUDENT_FACT_EXTRACTOR_VERSION;
 export const EXTRACTOR_PROMPT_VERSION = STUDENT_FACT_EXTRACTOR_PROMPT_VERSION;
@@ -82,9 +88,13 @@ const ALLOWED_FIELDS: Record<number, Record<string, 'string' | 'string[]' | 'num
     'stage2.dependentVariable.name': 'string',
     'stage2.dependentVariable.measurement': 'string',
     'stage2.dependentVariable.unit': 'string',
+    'stage2.measurement.tool': 'string',
+    'stage2.measurement.timing': 'string',
+    'stage2.recordedFields': 'string[]',
     'stage2.controlledVariables': 'string[]',
     'stage2.materials': 'string[]',
     'stage2.procedure': 'string[]',
+    'stage2.sampleSizePerLevel': 'number',
     'stage2.repeatCount': 'number',
     'stage2.safetyNotes': 'string[]',
   },
@@ -176,6 +186,8 @@ export function buildExtractorPrompt(stage: number): string {
 只允许当前阶段字段：${JSON.stringify(allowed)}
 每条事实必须包含能在学生消息中逐字定位的非空 sourceQuote。信息不足就不输出，不得推测、补全常识或改写引文。
 只有学生明确表达确认时，confirmed 才能为 true。
+阶段2按四个环节提取：变量设计、数据记录、实验过程、结果趋势。同一条消息中明确出现的多个字段都应提取，expectedFocusId 只表示导师当前关注环节，不限制其他明确事实。
+必须区分：自变量水平、读数时间点、每组样本数和独立重复轮数。不得把“第7天”识别成实验水平，不得把“每组5株”识别成重复5次。
 阶段2的 controlledVariables 和 safetyNotes 可以是空数组，但只有学生明确说“没有/无”时才能输出空数组；未回答时不要输出该字段。
 只输出 JSON：{"facts":[{"field":"...","value":...,"sourceQuote":"学生原文"}]}`;
 }
@@ -193,28 +205,44 @@ function appendFallback(
   fallbacks.push(fallback);
 }
 
+const LEVEL_UNIT_PATTERN = '(?:小时|分钟|秒|天|周|℃|°C|摄氏度|%|毫克\\/升|mg\\/L|毫升|升|克|千克|厘米|毫米|米)';
+
 function numericLevels(message: string): { values: string[]; sourceQuote: string } | null {
-  const levelContext = /(?:水平|组别|各组|四组|三组|两组|档|梯度|时长|温度|浓度|剂量)/.test(message);
-  const mostlyNumeric = message.replace(/[\d.\s、,，;；/|小时分钟秒天厘米毫米米克毫升升℃°C%组档个种]/g, '').length <= 4;
-  if (!levelContext && !mostlyNumeric) return null;
-  const matches = [...message.matchAll(/-?\d+(?:\.\d+)?\s*(?:小时|分钟|秒|天|厘米|毫米|米|克|毫升|升|℃|°C|%)?/g)]
-    .map((match) => match[0].replace(/\s+/g, '').trim())
+  const clauses = message
+    .replace(/(第\s*\d+\s*(?:天|小时|分钟|周)(?:后)?(?:测量|读数|记录|观察))/g, '，$1')
+    .split(/[，,。；;\n]/)
+    .map((clause) => clause.trim())
     .filter(Boolean);
-  const values = [...new Set(matches)];
-  if (values.length < 2 || values.length > 12) return null;
-  const sharedUnit = values.map((value) => value.match(/[^\d.\-]+$/)?.[0]).find(Boolean);
-  return {
-    values: sharedUnit ? values.map((value) => /[^\d.\-]+$/.test(value) ? value : `${value}${sharedUnit}`) : values,
-    sourceQuote: message.trim(),
-  };
+
+  for (const clause of clauses) {
+    const hasLevelContext = /(?:自变量|水平|梯度|设置|分为|分成|组别|(?:两|三|四|五|六|七|八|九|\d+)?组|光照|温度|浓度|剂量|酸碱|pH|时长|速度|距离)/i.test(clause);
+    const isReadingTiming = /第\s*\d+\s*(?:天|小时|分钟|周)(?:后)?.{0,8}(?:测量|读数|记录|观察)/.test(clause);
+    if (!hasLevelContext || isReadingTiming) continue;
+
+    const matches = [...clause.matchAll(new RegExp(`-?\\d+(?:\\.\\d+)?\\s*${LEVEL_UNIT_PATTERN}?`, 'gi'))]
+      .map((match) => match[0].replace(/\s+/g, '').trim())
+      .filter(Boolean);
+    if (matches.length < 2 || matches.length > 12) continue;
+
+    const explicitUnits = matches
+      .map((value) => value.match(/[^\d.\-]+$/)?.[0])
+      .filter((unit): unit is string => Boolean(unit));
+    const sharedUnit = explicitUnits[0];
+    if (!sharedUnit || explicitUnits.some((unit) => unit.toLowerCase() !== sharedUnit.toLowerCase())) continue;
+
+    const values = distinctExperimentLevels(
+      matches.map((value) => /[^\d.\-]+$/.test(value) ? value : `${value}${sharedUnit}`),
+    );
+    if (values.length >= 2) return { values, sourceQuote: clause };
+  }
+  return null;
 }
 
 function repeatCount(message: string): { value: number; sourceQuote: string } | null {
   const patterns = [
-    /每(?:组|个水平|种条件)[^\d]{0,8}(\d+)\s*(?:个|颗|株|份|次|轮)/,
-    /(?:各|每种)[^\d]{0,8}(\d+)\s*(?:个|颗|株|份|次|轮)/,
-    /重复\s*(\d+)\s*次/,
-    /(\d+)\s*(?:个|颗|株|份|次)\s*(?:取|求|算)平均/,
+    /(?:整个实验|实验|每组|每个水平|各组)?[^，。；\n]{0,10}?重复\s*(\d+)\s*(?:次|轮)/,
+    /(?:独立\s*)?(?:做|进行)\s*(\d+)\s*(?:次|轮)(?:\s*重复)?/,
+    /(\d+)\s*(?:次|轮)\s*(?:独立)?重复/,
   ];
   for (const pattern of patterns) {
     const match = message.match(pattern);
@@ -226,13 +254,95 @@ function repeatCount(message: string): { value: number; sourceQuote: string } | 
   return null;
 }
 
+function sampleSizePerLevel(message: string): { value: number; sourceQuote: string } | null {
+  const match = message.match(/每(?:组|个水平|种条件)[^\d]{0,8}(\d+)\s*(?:个|颗|株|份)(?!\s*(?:次|轮))/);
+  const value = Number(match?.[1]);
+  return match && Number.isInteger(value) && value >= 1 && value <= 200
+    ? { value, sourceQuote: match[0].trim() }
+    : null;
+}
+
+function dependentResult(message: string): { value: string; sourceQuote: string } | null {
+  const explicit = message.match(/((?:豆苗|幼苗|植株|茎|根|叶片|豆)(?:的)?[^，。；\n]{0,8}(?:高度|长度|数量|质量))/)?.[1]
+    ?? message.match(/(?:测量|记录|观察)(?:第\s*\d+\s*天)?[^，。；\n]{0,8}?((?:豆苗|幼苗|植株|茎|根|叶片|豆)?(?:的)?(?:高度|长度|数量|质量|温度|浊度|萌发率|生长量))/)?.[1]
+    ?? message.match(/(?:测量|记录|观察)[^，。；\n]{0,12}?((?:高度|长度|数量|质量|温度|浊度|萌发率|生长量))/)?.[1];
+  return explicit ? { value: explicit, sourceQuote: explicit } : null;
+}
+
+function independentVariable(message: string): { value: string; sourceQuote: string } | null {
+  const explicitPatterns = [
+    /(?:我)?只(?:改变|调整|控制)\s*([^，。；\n]{1,24}?)(?=，|。|；|设置|并|$)/,
+    /(?:唯一(?:改变|调整|控制)的变量|自变量)(?:是|为|：|:)\s*([^，。；\n]{1,24})/,
+  ];
+  for (const pattern of explicitPatterns) {
+    const match = message.match(pattern);
+    const value = match?.[1]?.trim();
+    if (match && value) return { value, sourceQuote: match[0].trim() };
+  }
+
+  const contextual = message.match(/((?:每天)?(?:光照时长|光照|温度|浓度|剂量|酸碱度|pH值|水量|盐度|湿度))[^，。；\n]{0,12}?\d/iu);
+  const value = contextual?.[1]?.trim();
+  return contextual && value ? { value, sourceQuote: contextual[0].trim() } : null;
+}
+
+function controlledVariables(message: string): { values: string[]; sourceQuote: string } | null {
+  const clauses = message.split(/[。；;\n]/).map((item) => item.trim()).filter(Boolean);
+  for (const clause of clauses) {
+    const match = clause.match(/(.{1,80}?)(?:保持不变|保持一致|维持不变|均相同|都相同|一样)(?=，|,|$)/);
+    if (!match) continue;
+    const raw = match[1]
+      .replace(/^(?:并|同时|确保|让|使|将)\s*/, '')
+      .replace(/^(?:其他(?:的)?条件)(?:都|均|全部)?\s*/, '')
+      .trim();
+    if (!raw || /^(?:其他|其余)$/.test(raw)) {
+      return { values: ['其他条件保持一致'], sourceQuote: match[0].trim() };
+    }
+    const values = raw
+      .split(/[、，,]|和|与|及/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (values.length > 0) return { values, sourceQuote: match[0].trim() };
+  }
+  const generic = message.match(/其他(?:的|条件)?(?:都|均|全部)?(?:一样|相同|保持不变|保持一致)/)?.[0];
+  return generic ? { values: ['其他条件保持一致'], sourceQuote: generic } : null;
+}
+
+function statedProcedure(message: string): { values: string[]; sourceQuote: string } | null {
+  const explicit = message.match(/(?:具体)?步骤(?:是|为|如下|：|:)\s*([^。；\n]{2,160})/);
+  const sequence = explicit
+    ?? message.match(/((?:先|首先)[^。；\n]{2,160}(?:然后|接着|再|最后)[^。；\n]{1,120})/);
+  if (!sequence) return null;
+  const sourceQuote = sequence[0].trim();
+  const body = (sequence[1] ?? sourceQuote).trim();
+  const values = body
+    .split(/，|,|(?:然后|接着|随后|最后|再)/)
+    .map((item) => item.replace(/^(?:先|首先)\s*/, '').trim())
+    .filter(Boolean);
+  return values.length > 0 ? { values, sourceQuote } : null;
+}
+
+function statedHypothesis(message: string): { value: string; sourceQuote: string } | null {
+  const match = message.match(/((?:我)?(?:推测|预测|预计|假设|认为)[^。；\n]{2,120})/);
+  if (!match) return null;
+  const sourceQuote = match[1].trim();
+  const value = sourceQuote.replace(/^(?:我)?(?:推测|预测|预计|假设|认为)(?:是|为|：|:)?\s*/, '').trim();
+  return value ? { value, sourceQuote } : null;
+}
+
+function measurementPhrase(message: string): string {
+  return message.match(/(?:使用|用)[^，。；\n]{0,30}(?:测量|记录|观察|读数)[^，。；\n]{0,24}/)?.[0]?.trim()
+    ?? message.match(/(?:第\s*\d+\s*(?:天|小时|分钟|周)|\d+\s*(?:天|小时|分钟|周)后|每天(?:固定|同一)?时间)[^，。；\n]{0,30}(?:测量|记录|观察|读数)[^，。；\n]{0,20}/)?.[0]?.trim()
+    ?? '';
+}
+
 export function applyDeterministicExtractionFallbacks(
   stage: number,
   acceptedInput: ExtractedFact[],
   currentStudentMessage: string,
   context: { expectedFocusId?: string } = {},
 ): { accepted: ExtractedFact[]; fallbacks: string[] } {
-  const accepted = [...acceptedInput];
+  void context;
+  let accepted = [...acceptedInput];
   const fallbacks: string[] = [];
   if (stage === 1) {
     const confirmed = ensureExplicitConfirmationFact(stage, accepted, currentStudentMessage);
@@ -244,27 +354,81 @@ export function applyDeterministicExtractionFallbacks(
   if (stage !== 2) return { accepted, fallbacks };
 
   const levels = numericLevels(currentStudentMessage);
-  if (levels) appendFallback(accepted, 'stage2.independentVariable.levels', levels.values, levels.sourceQuote, 'numeric_levels', fallbacks);
+  if (levels) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.independentVariable.levels');
+    appendFallback(accepted, 'stage2.independentVariable.levels', levels.values, levels.sourceQuote, 'semantic_numeric_levels', fallbacks);
+  }
+  const independent = independentVariable(currentStudentMessage);
+  if (independent) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.independentVariable.name');
+    appendFallback(accepted, 'stage2.independentVariable.name', independent.value, independent.sourceQuote, 'independent_variable_name', fallbacks);
+  }
   const repeats = repeatCount(currentStudentMessage);
-  if (repeats) appendFallback(accepted, 'stage2.repeatCount', repeats.value, repeats.sourceQuote, 'repeat_count', fallbacks);
-  const controls = currentStudentMessage.match(/其他(?:的|条件)?(?:都|均|全部)?(?:一样|相同|保持不变)/)?.[0];
-  if (controls) appendFallback(accepted, 'stage2.controlledVariables', ['其他条件保持一致'], controls, 'generic_controls', fallbacks);
-  if (context.expectedFocusId === 'dependent_variable') {
-    const explicitResult = currentStudentMessage.match(/((?:豆苗|幼苗|植株|茎|豆)(?:的)?[^，。；\n]{0,6}(?:高度|长度))/)?.[1]
-      ?? currentStudentMessage.match(/(?:测量|记录|观察)[^，。；\n]{0,10}?((?:高度|长度))/)?.[1];
-    const endpoints = currentStudentMessage.match(/从\s*([^，。；\s]{1,10})\s*(?:量)?到\s*([^，。；\s]{1,10})/);
-    if (endpoints) {
-      appendFallback(
-        accepted,
-        'stage2.dependentVariable.name',
-        `${endpoints[1]}到${endpoints[2]}的长度`,
-        endpoints[0],
-        'dependent_endpoint_length',
-        fallbacks,
-      );
-    } else if (explicitResult) {
-      appendFallback(accepted, 'stage2.dependentVariable.name', explicitResult, explicitResult, 'dependent_result_phrase', fallbacks);
-    }
+  if (repeats) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.repeatCount');
+    appendFallback(accepted, 'stage2.repeatCount', repeats.value, repeats.sourceQuote, 'independent_repeat_count', fallbacks);
+  } else {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.repeatCount'
+      || !/(?:个|颗|株|份)/.test(fact.sourceQuote)
+      || /重复/.test(fact.sourceQuote));
+  }
+  const sampleSize = sampleSizePerLevel(currentStudentMessage);
+  if (sampleSize) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.sampleSizePerLevel');
+    appendFallback(accepted, 'stage2.sampleSizePerLevel', sampleSize.value, sampleSize.sourceQuote, 'sample_size_per_level', fallbacks);
+  }
+  const controls = controlledVariables(currentStudentMessage);
+  if (controls) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.controlledVariables');
+    appendFallback(accepted, 'stage2.controlledVariables', controls.values, controls.sourceQuote, 'controlled_variables', fallbacks);
+  }
+  const explicitResult = dependentResult(currentStudentMessage);
+  const endpoints = currentStudentMessage.match(/从\s*([^，。；\s]{1,10})\s*(?:量|测量|测)\s*到\s*([^，。；\s]{1,10})/);
+  if (endpoints) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.dependentVariable.name');
+    appendFallback(
+      accepted,
+      'stage2.dependentVariable.name',
+      `${endpoints[1]}到${endpoints[2]}的长度`,
+      endpoints[0],
+      'dependent_endpoint_length',
+      fallbacks,
+    );
+  } else if (explicitResult) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.dependentVariable.name');
+    appendFallback(accepted, 'stage2.dependentVariable.name', explicitResult.value, explicitResult.sourceQuote, 'dependent_result_phrase', fallbacks);
+  }
+
+  const phrase = measurementPhrase(currentStudentMessage)
+    || accepted.find((fact) => fact.field === 'stage2.dependentVariable.measurement')?.sourceQuote
+    || '';
+  const tool = inferMeasurementTool(currentStudentMessage) || inferMeasurementTool(phrase);
+  const timing = inferMeasurementTiming(currentStudentMessage) || inferMeasurementTiming(phrase);
+  if (tool) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.measurement.tool');
+    appendFallback(accepted, 'stage2.measurement.tool', tool, tool, 'measurement_tool', fallbacks);
+  }
+  if (timing) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.measurement.timing');
+    appendFallback(accepted, 'stage2.measurement.timing', timing, timing, 'measurement_timing', fallbacks);
+  }
+  if (explicitResult) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.recordedFields');
+    appendFallback(accepted, 'stage2.recordedFields', [explicitResult.value], explicitResult.sourceQuote, 'recorded_fields', fallbacks);
+  }
+  if (phrase) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.dependentVariable.measurement');
+    appendFallback(accepted, 'stage2.dependentVariable.measurement', phrase, phrase, 'measurement_phrase', fallbacks);
+  }
+  const procedure = statedProcedure(currentStudentMessage);
+  if (procedure) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.procedure');
+    appendFallback(accepted, 'stage2.procedure', procedure.values, procedure.sourceQuote, 'procedure_sequence', fallbacks);
+  }
+  const hypothesis = statedHypothesis(currentStudentMessage);
+  if (hypothesis) {
+    accepted = accepted.filter((fact) => fact.field !== 'stage2.hypothesis');
+    appendFallback(accepted, 'stage2.hypothesis', hypothesis.value, hypothesis.sourceQuote, 'hypothesis_trend', fallbacks);
   }
   return { accepted, fallbacks };
 }
@@ -321,16 +485,14 @@ export async function callStudentFactExtractor(input: {
   };
 }
 
-const CORE_FIELD_FOCUS: Record<string, string> = {
-  'stage2.hypothesis': 'hypothesis',
-  'stage2.independentVariable.name': 'independent_variable',
-  'stage2.independentVariable.levels': 'levels',
-  'stage2.dependentVariable.name': 'dependent_variable',
-  'stage2.dependentVariable.measurement': 'measurement',
-  'stage2.dependentVariable.unit': 'measurement',
-  'stage2.controlledVariables': 'controls',
-  'stage2.repeatCount': 'repeats',
-};
+const MERGEABLE_LIST_FIELDS = new Set([
+  'stage2.independentVariable.levels',
+  'stage2.recordedFields',
+  'stage2.controlledVariables',
+  'stage2.materials',
+  'stage2.procedure',
+  'stage2.safetyNotes',
+]);
 
 function factMap(
   prev: StageData,
@@ -340,9 +502,17 @@ function factMap(
   const facts = { ...(prev.extractedFacts ?? {}) };
   const explicitRevision = /(?:改成|改为|调整为|换成|重新|修改|更正|不是.{0,12}而是)/.test(context.currentStudentMessage ?? '');
   for (const fact of accepted) {
-    const focus = CORE_FIELD_FOCUS[fact.field];
-    const locked = focus && Object.hasOwn(facts, fact.field) && focus !== context.expectedFocusId && !explicitRevision;
-    if (!locked) facts[fact.field] = { value: fact.value, sourceQuote: fact.sourceQuote };
+    const previous = facts[fact.field];
+    if (!previous || explicitRevision) {
+      facts[fact.field] = { value: fact.value, sourceQuote: fact.sourceQuote };
+      continue;
+    }
+    if (MERGEABLE_LIST_FIELDS.has(fact.field) && Array.isArray(previous.value) && Array.isArray(fact.value)) {
+      facts[fact.field] = {
+        value: [...new Set([...previous.value, ...fact.value].map(String).map((item) => item.trim()).filter(Boolean))],
+        sourceQuote: `${previous.sourceQuote}；${fact.sourceQuote}`,
+      };
+    }
   }
   return facts;
 }

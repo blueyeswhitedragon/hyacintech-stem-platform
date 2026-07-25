@@ -57,6 +57,8 @@ export interface LLMRuntimeOverride {
   provider?: string;
   model?: string;
   role?: LLMRuntimeRole;
+  /** Server-resolved RuntimeBundle connection. Never persist or return this object to clients. */
+  configured?: LLMProviderConfig;
 }
 
 // ---- Error classification ----

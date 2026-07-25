@@ -34,23 +34,6 @@ export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guest
 
   return (
     <div className="p-4 space-y-4">
-      {/* 完整报告 + 数据表在反思阶段继续可见（只读），消除「进入下一阶段后表格消失」的观感 */}
-      {stage5?.sections && (
-        <details className="border rounded" open>
-          <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50">
-            📄 实验报告（含数据表）
-          </summary>
-          <div className="p-3">
-            <ReportDocument
-              stage5={stage5}
-              schemaColumns={schemaColumns}
-              dataRows={dataRows}
-              showStudentFields={true}
-            />
-          </div>
-        </details>
-      )}
-
       <h3 className="font-medium">结果反思</h3>
 
       {guestMode ? (
@@ -130,6 +113,23 @@ export default function Stage6Panel({ stage5, stage6, completed, onSubmit, guest
             {err && <span className="text-sm text-red-600">{err}</span>}
           </div>
         </div>
+      )}
+
+      {/* 报告仍可查阅，但默认折叠，避免把教师反馈和反思表单推到长文档之后。 */}
+      {stage5?.sections && (
+        <details className="border rounded">
+          <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50">
+            📄 查看完整实验报告（含数据表）
+          </summary>
+          <div className="p-3">
+            <ReportDocument
+              stage5={stage5}
+              schemaColumns={schemaColumns}
+              dataRows={dataRows}
+              showStudentFields={true}
+            />
+          </div>
+        </details>
       )}
     </div>
   );

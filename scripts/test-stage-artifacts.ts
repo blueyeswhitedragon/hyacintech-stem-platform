@@ -1,4 +1,4 @@
-import { attachDeterministicArtifacts, buildDataTableSchema } from '../app/lib/stageArtifacts';
+import { attachDeterministicArtifacts, buildDataTableSchema, composeReportSections } from '../app/lib/stageArtifacts';
 import { attachServerOwnedArtifacts } from '../app/lib/serverTutorState';
 import { validateStageResponseBehavior } from '../app/lib/stageContract';
 import { studentVisibleStageData } from '../app/lib/stageState';
@@ -86,6 +86,13 @@ const p5Issues = validateStageResponseBehavior(5, p5Response, {
   triggerType: 'REPORT_BOOTSTRAP', visibleContext: JSON.stringify({ businessContext: p5Context }),
 });
 check('P5 确定性报告不受同义词词面门禁误杀', !p5Issues.some((item) => item.severity === 'error'));
+
+const sections = composeReportSections({ stageData });
+check('P5 数据概述只给行数和结果组数', Boolean(sections?.dataSummary.includes('共3行真实记录') && sections.dataSummary.includes('3个数值结果组')));
+check('P5 数据概述计算范围和均值', Boolean(sections?.dataSummary.includes('范围45–50') && sections.dataSummary.includes('范围60–65，均值62.67')));
+check('P5 数据概述不再逐行展开', !sections?.dataSummary.includes('第1行'));
+check('P5 数据分析压缩复用已接受观察与证据', Boolean(sections?.analysis.includes('第1轮观察') && sections.analysis.includes('证据：')));
+check('P5 自动字段遵守固定长度上限', (sections?.dataSummary.length ?? 0) <= 600 && (sections?.analysis.length ?? 0) <= 800);
 
 console.log(`\nstage-artifacts: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

@@ -39,14 +39,16 @@ export default async function StudentConversationPage(
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
       <header className="bg-white border-b p-4 flex-shrink-0">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/student/assignments" className="text-blue-600 hover:underline text-sm">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link href="/student/assignments" className="shrink-0 text-sm text-blue-600 hover:underline">
               ← 我的作业
             </Link>
-            <h1 className="text-lg font-bold text-blue-600">{assignment?.title ?? '科学探究'}</h1>
+            <h1 className="min-w-0 text-lg font-bold text-blue-600">{assignment?.title ?? '科学探究'}</h1>
           </div>
-          <AuthNav />
+          <div className="self-end sm:self-auto">
+            <AuthNav />
+          </div>
         </div>
       </header>
 

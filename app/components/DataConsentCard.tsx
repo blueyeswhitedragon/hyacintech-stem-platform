@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
+
+const CONSENT_STORAGE_EVENT = 'hyacintech:data-consent-storage';
 
 export default function DataConsentCard({
   studentAssignmentId,
@@ -12,6 +14,36 @@ export default function DataConsentCard({
   const [status, setStatus] = useState(initialStatus);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const storageKey = `hyacintech:data-consent-dismissed:${studentAssignmentId}`;
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === storageKey) onStoreChange();
+    };
+    window.addEventListener('storage', onStorage);
+    window.addEventListener(CONSENT_STORAGE_EVENT, onStoreChange);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener(CONSENT_STORAGE_EVENT, onStoreChange);
+    };
+  }, [storageKey]);
+  const getSnapshot = useCallback(() => {
+    try {
+      return window.localStorage.getItem(storageKey) === '1';
+    } catch {
+      return false;
+    }
+  }, [storageKey]);
+  const dismissed = useSyncExternalStore(subscribe, getSnapshot, () => false);
+
+  function setReminderDismissed(value: boolean) {
+    try {
+      if (value) window.localStorage.setItem(storageKey, '1');
+      else window.localStorage.removeItem(storageKey);
+    } catch {
+      // 浏览器禁用存储时仍允许本次页面内关闭或重新打开。
+    }
+    window.dispatchEvent(new Event(CONSENT_STORAGE_EVENT));
+  }
 
   async function decide(decision: 'GRANT' | 'DECLINE' | 'WITHDRAW') {
     setPending(true);
@@ -33,9 +65,32 @@ export default function DataConsentCard({
     }
   }
 
+  if (dismissed) {
+    return (
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setReminderDismissed(false)}
+          className="rounded border border-blue-200 bg-white px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-50"
+        >
+          数据授权设置
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
-      <div className="font-medium">自愿参与模型改进（不影响作业成绩）</div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="font-medium">自愿参与模型改进（不影响作业成绩）</div>
+        <button
+          type="button"
+          onClick={() => setReminderDismissed(true)}
+          className="shrink-0 text-xs text-blue-700 underline hover:text-blue-900"
+        >
+          本次作业不再提醒
+        </button>
+      </div>
       <p className="mt-1 text-xs leading-5 text-blue-800">
         只有教师提名的导师回复片段会在本机删除姓名、账号、班级、联系方式、链接和附件后交给管理员审核。拒绝或撤回不会影响学习；已完成训练的模型参数无法直接撤销。
       </p>

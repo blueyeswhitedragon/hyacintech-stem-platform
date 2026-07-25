@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import type { Prisma, TopicCard } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import type { SessionUser } from '@/app/lib/session';
-import { createLLMProvider } from '@/app/lib/llm/provider';
+import { createConfiguredLLMProvider, createLLMProvider } from '@/app/lib/llm/provider';
 import type { LLMCompletion } from '@/app/lib/llm/types';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
 import { CALIBRATION_12_SCENARIOS, compileCases, compileScenarioCases, EVAL_CASE_COUNTS, FULL_CASE_COUNTS, SMOKE_6_SCENARIOS, TRIAL_CASE_COUNTS } from './caseCompiler';
@@ -46,6 +46,11 @@ function parseJson<T>(raw: string, fallback: T): T {
 
 function audit(actorId: string, action: string, entityType: string, entityId: string, payload: unknown = {}) {
   return db.dataLabAuditLog.create({ data: { actorId, action, entityType, entityId, payloadJson: JSON.stringify(payload) } });
+}
+
+async function resolveRuntimeBundleConfig(bundleId: string) {
+  const { resolveRuntimeBundleCallConfig } = await import('@/app/lib/dataLab/runtimeRegistry');
+  return resolveRuntimeBundleCallConfig(bundleId);
 }
 
 function cleanStrings(values: unknown): string[] {
@@ -636,13 +641,42 @@ export async function compileTutorTurnCases(input: {
   split: TutorCaseSplit;
   topicCardIds?: string[];
   promptVersion?: TutorLanguagePromptVersion;
+  promptPolicyVersionId?: string;
+  candidateARuntimeBundleId?: string;
+  candidateBRuntimeBundleId?: string;
+  firstReviewMode?: 'HUMAN' | 'PLATFORM_AI' | 'AUTHORIZED_AGENT';
   reviewPolicy?: TutorReviewPolicy;
   allowExistingRun?: boolean;
   user: SessionUser;
 }) {
   if (!TUTOR_CASE_SPLITS.includes(input.split)) throw new Error('split 无效');
-  const promptVersion = input.promptVersion ?? DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION;
+  const promptPolicy = input.promptPolicyVersionId
+    ? await db.promptPolicyVersion.findUnique({ where: { id: input.promptPolicyVersionId } })
+    : null;
+  if (input.promptPolicyVersionId && !promptPolicy) throw new Error('训练目标 Prompt 策略不存在');
+  if (promptPolicy && promptPolicy.status !== 'APPROVED') throw new Error('训练目标 Prompt 尚未批准用于新数据批次');
+  const promptVersion = (promptPolicy?.version ?? input.promptVersion ?? DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION) as TutorLanguagePromptVersion;
   if (!TUTOR_LANGUAGE_PROMPT_VERSIONS.includes(promptVersion)) throw new Error('promptVersion 无效');
+  let frozenCandidateConfigs: { A: CandidateModelConfig; B: CandidateModelConfig; families: { familyA: string; familyB: string } } | null = null;
+  if (input.candidateARuntimeBundleId || input.candidateBRuntimeBundleId) {
+    if (!input.candidateARuntimeBundleId || !input.candidateBRuntimeBundleId) throw new Error('候选 A/B 运行组合必须同时选择');
+    const [runtimeA, runtimeB] = await Promise.all([
+      resolveRuntimeBundleConfig(input.candidateARuntimeBundleId),
+      resolveRuntimeBundleConfig(input.candidateBRuntimeBundleId),
+    ]);
+    if (![runtimeA.status, runtimeB.status].every((status) => ['AVAILABLE', 'DEPLOYED'].includes(status))) {
+      throw new Error('候选 A/B 运行组合必须先通过兼容性评测并标记为可用');
+    }
+    if (promptPolicy && [runtimeA.promptPolicyVersionId, runtimeB.promptPolicyVersionId].some((id) => id !== promptPolicy.id)) {
+      throw new Error('候选 A/B 运行组合的 Prompt 必须与训练目标 Prompt 策略一致');
+    }
+    if ([runtimeA.tutorContractVersion, runtimeB.tutorContractVersion].some((version) => version !== TUTOR_LANGUAGE_CONTRACT_VERSION)) {
+      throw new Error('候选 A/B 运行组合的 Tutor 合同与当前案例合同不一致');
+    }
+    const A: CandidateModelConfig = { provider: runtimeA.provider, model: runtimeA.model, family: runtimeA.family, tag: runtimeA.tag, runtimeBundleId: runtimeA.runtimeBundleId };
+    const B: CandidateModelConfig = { provider: runtimeB.provider, model: runtimeB.model, family: runtimeB.family, tag: runtimeB.tag, runtimeBundleId: runtimeB.runtimeBundleId };
+    frozenCandidateConfigs = { A, B, families: assertIndependentModelFamilies(A, B) };
+  }
   const reviewPolicy = input.reviewPolicy ?? 'HUMAN_ANNOTATOR_REQUIRED';
   if (!TUTOR_REVIEW_POLICIES.includes(reviewPolicy)) throw new Error('reviewPolicy 无效');
   if (input.profile !== 'CUSTOM' && !input.allowExistingRun) {
@@ -696,12 +730,30 @@ export async function compileTutorTurnCases(input: {
     counts: fixedScenarios ? undefined : counts,
     split: input.split,
     promptVersion,
+    promptPolicyVersionId: promptPolicy?.id ?? null,
+    candidateARuntimeBundleId: input.candidateARuntimeBundleId ?? null,
+    candidateBRuntimeBundleId: input.candidateBRuntimeBundleId ?? null,
+    candidateFamilies: frozenCandidateConfigs?.families ?? null,
+    firstReviewMode: input.firstReviewMode ?? 'HUMAN',
     reviewPolicy,
     topicCoverage,
     trainingCohort: TUTOR_TRAINING_COHORT,
   };
   const run = await db.bootstrapGenerationRun.create({
-    data: { kind: 'CASE_COMPILATION', status: 'RUNNING', totalItems: total, parametersJson: JSON.stringify(parameters), reviewPolicy, ...(reviewPolicy === 'AI_DIRECT_TO_REVIEWER' ? { aiDirectAuthorizedById: input.user.id, aiDirectAuthorizedAt: new Date() } : {}), createdById: input.user.id, startedAt: new Date() },
+    data: {
+      kind: 'CASE_COMPILATION',
+      status: 'RUNNING',
+      totalItems: total,
+      parametersJson: JSON.stringify(parameters),
+      reviewPolicy,
+      candidateARuntimeBundleId: input.candidateARuntimeBundleId ?? null,
+      candidateBRuntimeBundleId: input.candidateBRuntimeBundleId ?? null,
+      promptPolicyVersionId: promptPolicy?.id ?? null,
+      firstReviewMode: input.firstReviewMode ?? 'HUMAN',
+      ...(reviewPolicy === 'AI_DIRECT_TO_REVIEWER' ? { aiDirectAuthorizedById: input.user.id, aiDirectAuthorizedAt: new Date() } : {}),
+      createdById: input.user.id,
+      startedAt: new Date(),
+    },
   });
   try {
     const compiled = fixedScenarios
@@ -722,6 +774,7 @@ export async function compileTutorTurnCases(input: {
         contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
         extractorVersion: EXTRACTOR_VERSION,
         promptVersion: item.promptVersion,
+        promptPolicyVersionId: promptPolicy?.id ?? null,
         systemPrompt: item.systemPrompt,
         promptSha256: item.promptSha256,
         hardCheckJson: JSON.stringify(item.hardCheck),
@@ -729,7 +782,7 @@ export async function compileTutorTurnCases(input: {
       },
     })));
     await db.bootstrapGenerationRun.update({ where: { id: run.id }, data: { status: 'COMPLETED', completedItems: created.length, completedAt: new Date(), promptHashesJson: JSON.stringify([...new Set(created.map((item) => item.promptSha256))]) } });
-    await audit(input.user.id, 'TUTOR_CASES_COMPILED', 'BootstrapGenerationRun', run.id, { profile: input.profile, count: created.length, split: input.split, promptVersion, reviewPolicy, aiDirectAuthorized: reviewPolicy === 'AI_DIRECT_TO_REVIEWER' });
+    await audit(input.user.id, 'TUTOR_CASES_COMPILED', 'BootstrapGenerationRun', run.id, { profile: input.profile, count: created.length, split: input.split, promptVersion, promptPolicyVersionId: promptPolicy?.id ?? null, candidateARuntimeBundleId: input.candidateARuntimeBundleId ?? null, candidateBRuntimeBundleId: input.candidateBRuntimeBundleId ?? null, reviewPolicy, firstReviewMode: input.firstReviewMode ?? 'HUMAN', aiDirectAuthorized: reviewPolicy === 'AI_DIRECT_TO_REVIEWER' });
     return { runId: run.id, cases: created, promptVersion, topicCoverage, coverageWarnings: input.profile === 'FULL_180' ? [] : tutorTopicCardDiversityFailures(cards) };
   } catch (error) {
     await db.bootstrapGenerationRun.update({ where: { id: run.id }, data: { status: 'FAILED', failedItems: total, failureReason: error instanceof Error ? error.message : String(error), completedAt: new Date() } });
@@ -780,7 +833,15 @@ export interface CandidateGenerationDeps {
 }
 
 async function generateOne(caseItem: { systemPrompt: string; historyJson: string; triggerType: string; studentMessage: string }, config: CandidateModelConfig) {
-  const provider = createLLMProvider({ provider: config.provider, model: config.model, role: 'TUTOR' });
+  const runtime = config.runtimeBundleId ? await resolveRuntimeBundleConfig(config.runtimeBundleId) : null;
+  const provider = runtime
+    ? createConfiguredLLMProvider({
+      apiKey: runtime.apiKey,
+      baseURL: runtime.baseURL,
+      model: runtime.model,
+      provider: runtime.provider,
+    })
+    : createLLMProvider({ provider: config.provider, model: config.model, role: 'TUTOR' });
   const history = parseJson<Array<{ role: 'user' | 'assistant'; content: string }>>(caseItem.historyJson, []);
   const completion = await provider.complete([
     { role: 'system', content: caseItem.systemPrompt },
@@ -791,7 +852,15 @@ async function generateOne(caseItem: { systemPrompt: string; historyJson: string
 }
 
 async function critiqueCandidate(input: CritiqueInput): Promise<CritiquePayload> {
-  const provider = createLLMProvider({ provider: input.config.provider, model: input.config.model, role: 'EVALUATOR' });
+  const runtime = input.config.runtimeBundleId ? await resolveRuntimeBundleConfig(input.config.runtimeBundleId) : null;
+  const provider = runtime
+    ? createConfiguredLLMProvider({
+      apiKey: runtime.apiKey,
+      baseURL: runtime.baseURL,
+      model: runtime.model,
+      provider: runtime.provider,
+    })
+    : createLLMProvider({ provider: input.config.provider, model: input.config.model, role: 'EVALUATOR' });
   const system = `你是交叉 Critic。只定位候选原文中可验证的问题，不评分、不改写、不判断训练资格。
 私有审核规范只能用于识别风险和 forbidden move，绝不能作为 Tutor 可见事实、答案来源或要求候选必须提及的内容。
 allowed focus 和 focusDescriptions 是本回合权威教学任务；当学生表达控制变量、因果或安全误解时，候选直接解释并纠正该误解是合适行为，不得因此指责其剥夺探索。
@@ -853,6 +922,7 @@ function candidateCreateData(input: {
   return {
     caseId: input.caseId,
     generationRunId: input.runId,
+    runtimeBundleId: input.config.runtimeBundleId ?? null,
     slot: input.slot,
     attempt: input.attempt,
     provider: input.config.provider,
@@ -884,28 +954,63 @@ async function completeCandidateReviewFlow(caseId: string, runId: string, actorI
 }
 
 export async function generateTutorCandidates(
-  input: { caseId: string; modelA: CandidateModelConfig; modelB: CandidateModelConfig; user: SessionUser },
+  input: { caseId: string; modelA?: CandidateModelConfig; modelB?: CandidateModelConfig; user: SessionUser },
   deps: CandidateGenerationDeps = {},
 ) {
   const generate = deps.generateOne ?? generateOne;
   const critique = deps.critiqueCandidate ?? critiqueCandidate;
-  const families = assertIndependentModelFamilies(input.modelA, input.modelB);
-  const caseItem = await db.tutorTurnCase.findUnique({ where: { id: input.caseId } });
+  const caseItem = await db.tutorTurnCase.findUnique({
+    where: { id: input.caseId },
+    include: {
+      generationRun: {
+        select: { candidateARuntimeBundleId: true, candidateBRuntimeBundleId: true },
+      },
+    },
+  });
   if (!caseItem || !['READY', 'NEEDS_REGEN', 'IN_REVIEW'].includes(caseItem.status)) throw new Error('案例不存在或当前状态不可生成');
+  let modelA = input.modelA;
+  let modelB = input.modelB;
+  const frozenA = caseItem.generationRun?.candidateARuntimeBundleId;
+  const frozenB = caseItem.generationRun?.candidateBRuntimeBundleId;
+  if (frozenA || frozenB) {
+    if (!frozenA || !frozenB) throw new Error('案例批次的候选运行组合引用不完整');
+    if ((modelA?.runtimeBundleId && modelA.runtimeBundleId !== frozenA) || (modelB?.runtimeBundleId && modelB.runtimeBundleId !== frozenB)) {
+      throw new Error('案例批次已经冻结候选运行组合，不能在生成时替换');
+    }
+    const [runtimeA, runtimeB] = await Promise.all([
+      resolveRuntimeBundleConfig(frozenA),
+      resolveRuntimeBundleConfig(frozenB),
+    ]);
+    modelA = { provider: runtimeA.provider, model: runtimeA.model, family: runtimeA.family, tag: runtimeA.tag, runtimeBundleId: runtimeA.runtimeBundleId };
+    modelB = { provider: runtimeB.provider, model: runtimeB.model, family: runtimeB.family, tag: runtimeB.tag, runtimeBundleId: runtimeB.runtimeBundleId };
+  }
+  if (!modelA || !modelB) throw new Error('案例未冻结运行组合，modelA 和 modelB 必填');
+  const families = assertIndependentModelFamilies(modelA, modelB);
   const hard = parseJson<{ errors?: string[] }>(caseItem.hardCheckJson, {});
   if (hard.errors?.length) throw new Error(`案例硬门禁未通过：${hard.errors.join('；')}`);
   const attempt = ((await db.tutorCandidate.aggregate({ where: { caseId: caseItem.id }, _max: { attempt: true } }))._max.attempt ?? 0) + 1;
   const run = await db.bootstrapGenerationRun.create({
-    data: { kind: 'CANDIDATE_GENERATION', status: 'RUNNING', totalItems: 4, modelConfigJson: JSON.stringify({ A: input.modelA, B: input.modelB, families }), parametersJson: JSON.stringify({ caseId: caseItem.id, attempt }), createdById: input.user.id, startedAt: new Date() },
+    data: {
+      kind: 'CANDIDATE_GENERATION',
+      status: 'RUNNING',
+      totalItems: 4,
+      modelConfigJson: JSON.stringify({ A: modelA, B: modelB, families }),
+      parametersJson: JSON.stringify({ caseId: caseItem.id, attempt }),
+      candidateARuntimeBundleId: modelA.runtimeBundleId ?? null,
+      candidateBRuntimeBundleId: modelB.runtimeBundleId ?? null,
+      promptPolicyVersionId: caseItem.promptPolicyVersionId,
+      createdById: input.user.id,
+      startedAt: new Date(),
+    },
   });
   try {
-    const generated = await Promise.allSettled([generate(caseItem, input.modelA), generate(caseItem, input.modelB)]);
+    const generated = await Promise.allSettled([generate(caseItem, modelA), generate(caseItem, modelB)]);
     const focuses = allowedFocus(caseItem);
     const successful: Array<{ slot: 'A' | 'B'; config: CandidateModelConfig; family: string; generated: GeneratedCandidatePayload; checked: ReturnType<typeof checkTutorCandidate> }> = [];
     const failedStages: Array<{ stage: string; error: string }> = [];
     for (const [index, result] of generated.entries()) {
       const slot = index === 0 ? 'A' as const : 'B' as const;
-      const config = slot === 'A' ? input.modelA : input.modelB;
+      const config = slot === 'A' ? modelA : modelB;
       const family = slot === 'A' ? families.familyA : families.familyB;
       if (result.status === 'rejected') {
         failedStages.push({ stage: `TUTOR_${slot}`, error: errorText(result.reason) });
@@ -932,8 +1037,8 @@ export async function generateTutorCandidates(
     const checkedA = successful.find((item) => item.slot === 'A')!.checked;
     const checkedB = successful.find((item) => item.slot === 'B')!.checked;
     const critiques = await Promise.allSettled([
-      critique({ target: checkedB.normalized, targetRaw: candidateB.rawOutput, caseItem, config: input.modelA }),
-      critique({ target: checkedA.normalized, targetRaw: candidateA.rawOutput, caseItem, config: input.modelB }),
+      critique({ target: checkedB.normalized, targetRaw: candidateB.rawOutput, caseItem, config: modelA }),
+      critique({ target: checkedA.normalized, targetRaw: candidateA.rawOutput, caseItem, config: modelB }),
     ]);
     const critiqueTargets = [candidateB, candidateA];
     const critiqueFailures: Array<{ stage: string; error: string }> = [];
@@ -1055,10 +1160,13 @@ export async function listTutorCases() {
       studentMessage: true,
       split: true,
       status: true,
+      contractVersion: true,
       promptVersion: true,
+      sourceContractVersion: true,
+      sourcePromptVersion: true,
       hardCheckJson: true,
       topicCard: { select: { displayTitle: true, subject: true, status: true } },
-      generationRun: { select: { id: true, status: true, reviewPolicy: true, parametersJson: true, createdAt: true, completedAt: true, failureReason: true } },
+      generationRun: { select: { id: true, status: true, reviewPolicy: true, firstReviewMode: true, candidateARuntimeBundleId: true, candidateBRuntimeBundleId: true, promptPolicyVersionId: true, parametersJson: true, createdAt: true, completedAt: true, failureReason: true } },
       _count: { select: { candidates: true, reviewTasks: true } },
       finalizedTurn: { select: { id: true, trainingEligibility: true } },
     },
@@ -1213,7 +1321,26 @@ export async function claimTutorReviewTask(type: 'EDIT' | 'CONFIRM', user: Sessi
     return tx.tutorReviewTask.update({ where: { id: task.id }, data: { assignedToId: user.id, leaseExpiresAt: lease, status: 'IN_PROGRESS' } });
   });
   if (!claimed) return null;
-  const caseItem = await db.tutorTurnCase.findUniqueOrThrow({ where: { id: claimed.caseId }, include: { topicCard: true, reviewTasks: true, finalizedTurn: true } });
+  const caseItem = await db.tutorTurnCase.findUniqueOrThrow({
+    where: { id: claimed.caseId },
+    include: {
+      topicCard: true,
+      reviewTasks: true,
+      finalizedTurn: true,
+      promptPolicyVersion: true,
+      generationRun: {
+        include: {
+          promptPolicyVersion: true,
+          candidateARuntimeBundle: {
+            include: { modelVersion: true, promptPolicyVersion: true, endpoint: true },
+          },
+          candidateBRuntimeBundle: {
+            include: { modelVersion: true, promptPolicyVersion: true, endpoint: true },
+          },
+        },
+      },
+    },
+  });
   const candidates = await latestPair(claimed.caseId);
   const editTask = caseItem.reviewTasks.find((item) => item.type === 'EDIT');
   const confirmTask = caseItem.reviewTasks.find((item) => item.type === 'CONFIRM');
@@ -1232,6 +1359,60 @@ export async function claimTutorReviewTask(type: 'EDIT' | 'CONFIRM', user: Sessi
       revision: caseItem.revision,
       revisionOfId: caseItem.revisionOfId,
       reviewPolicy: reviewPolicy.policy,
+    },
+    trainingContext: {
+      targetPromptPolicy: caseItem.promptPolicyVersion
+        ? {
+            id: caseItem.promptPolicyVersion.id,
+            version: caseItem.promptPolicyVersion.version,
+            displayName: caseItem.promptPolicyVersion.displayName,
+            manifestSha256: caseItem.promptPolicyVersion.manifestSha256,
+          }
+        : {
+            id: null,
+            version: caseItem.promptVersion,
+            displayName: caseItem.promptVersion,
+            manifestSha256: null,
+          },
+      tutorContractVersion: caseItem.contractVersion,
+      stageContractVersion: caseStageContractVersion(caseItem.hardCheckJson),
+      extractorVersion: caseItem.extractorVersion,
+      actualPrompt: {
+        promptVersion: caseItem.promptVersion,
+        sha256: caseItem.promptSha256,
+        systemPrompt: caseItem.systemPrompt,
+      },
+      sourcePrompt: caseItem.dataSource === 'PRODUCTION_TRACE'
+        ? {
+            promptVersion: caseItem.sourcePromptVersion,
+            sha256: caseItem.sourcePromptSha256,
+            systemPrompt: caseItem.sourceSystemPrompt,
+            contractVersion: caseItem.sourceContractVersion,
+            stageContractVersion: caseItem.sourceStageContractVersion,
+            extractorVersion: caseItem.sourceExtractorVersion,
+          }
+        : null,
+      candidateA: caseItem.generationRun?.candidateARuntimeBundle
+        ? {
+            runtimeBundleId: caseItem.generationRun.candidateARuntimeBundle.id,
+            runtimeBundleName: `${caseItem.generationRun.candidateARuntimeBundle.name} v${caseItem.generationRun.candidateARuntimeBundle.version}`,
+            modelVersionTag: caseItem.generationRun.candidateARuntimeBundle.modelVersion.tag,
+            modelFamily: caseItem.generationRun.candidateARuntimeBundle.modelVersion.modelFamily || caseItem.generationRun.candidateARuntimeBundle.modelVersion.provider,
+            endpoint: caseItem.generationRun.candidateARuntimeBundle.endpoint.displayName,
+            promptPolicyVersion: caseItem.generationRun.candidateARuntimeBundle.promptPolicyVersion.version,
+          }
+        : null,
+      candidateB: caseItem.generationRun?.candidateBRuntimeBundle
+        ? {
+            runtimeBundleId: caseItem.generationRun.candidateBRuntimeBundle.id,
+            runtimeBundleName: `${caseItem.generationRun.candidateBRuntimeBundle.name} v${caseItem.generationRun.candidateBRuntimeBundle.version}`,
+            modelVersionTag: caseItem.generationRun.candidateBRuntimeBundle.modelVersion.tag,
+            modelFamily: caseItem.generationRun.candidateBRuntimeBundle.modelVersion.modelFamily || caseItem.generationRun.candidateBRuntimeBundle.modelVersion.provider,
+            endpoint: caseItem.generationRun.candidateBRuntimeBundle.endpoint.displayName,
+            promptPolicyVersion: caseItem.generationRun.candidateBRuntimeBundle.promptPolicyVersion.version,
+          }
+        : null,
+      firstReviewMode: caseItem.generationRun?.firstReviewMode ?? 'HUMAN',
     },
     candidates: candidates.map((candidate) => type === 'CONFIRM'
       ? { id: candidate.id, slot: candidate.slot, normalizedOutput: candidate.normalizedOutput, deterministicCheck: parseJson(candidate.deterministicCheckJson, {}), critique: parseJson(candidate.critiqueJson, {}) }
@@ -2056,15 +2237,20 @@ export async function createTutorTurnRelease(input: { version: string; finalized
     },
   });
   if (turns.length !== ids.length) throw new Error('部分已定稿导师回合不存在，请刷新后重新选择');
-  const blocked = turns.filter((turn) => turn.trainingEligibility !== 'SFT_ALLOWED'
-    || turn.case.split !== 'TRAIN'
-    || tutorCohortReasons({
+  const blocked = turns.map((turn) => ({
+    id: turn.id,
+    reasons: [
+      ...(turn.trainingEligibility === 'SFT_ALLOWED' ? [] : ['FINALIZED_TURN_NOT_ELIGIBLE']),
+      ...(turn.case.split === 'TRAIN' ? [] : ['NON_TRAIN_SPLIT_BLOCKED']),
+      ...tutorCohortReasons({
       contractVersion: turn.case.contractVersion,
       stageContractVersion: caseStageContractVersion(turn.case.hardCheckJson),
       extractorVersion: turn.case.extractorVersion,
       promptVersion: turn.case.promptVersion,
-    }).length > 0);
-  if (blocked.length) throw new Error(`所选数据中有 ${blocked.length} 条不具备正式训练集发布资格`);
+      }),
+    ],
+  })).filter((item) => item.reasons.length > 0);
+  if (blocked.length) throw new Error(`所选数据中有 ${blocked.length} 条不具备正式训练集发布资格：${blocked.map((item) => `${item.id}(${item.reasons.join('|')})`).join('、')}`);
   for (const turn of turns) {
     if (!turn.preferenceRejectedCandidate) continue;
     const rejectedCheck = parseJson<CandidateCheck>(turn.preferenceRejectedCandidate.deterministicCheckJson, { ok: false, hardErrorCount: 1, warningCount: 0, issues: [] });
@@ -2103,6 +2289,15 @@ export async function createTutorTurnRelease(input: { version: string; finalized
         split: turn.case.split,
         draftProvenance: turn.draftProvenance,
         reviewerEditType: parseJson<{ type?: string }>(turn.reviewerEditMetricsJson, {}).type ?? 'UNKNOWN',
+        ...(turn.case.dataSource === 'PRODUCTION_TRACE' ? {
+          sourceProvenance: {
+            contractVersion: turn.case.sourceContractVersion,
+            stageContractVersion: turn.case.sourceStageContractVersion,
+            extractorVersion: turn.case.sourceExtractorVersion,
+            promptVersion: turn.case.sourcePromptVersion,
+            promptSha256: turn.case.sourcePromptSha256,
+          },
+        } : {}),
       },
     };
   });
@@ -2182,6 +2377,7 @@ export async function createTutorTurnRelease(input: { version: string; finalized
       cleanPath: files.cleanPath, cleanSha256: sha256(cleanText), goldPath: files.goldPath, goldSha256: sha256(emptyText), silverPath: files.silverPath, silverSha256: sha256(emptyText),
       trainingPath: files.trainingPath, trainingSha256: sha256(trainingText), preferencePath: files.preferencePath, preferenceSha256: sha256(preferenceText),
       eligibilityReportJson: JSON.stringify({ policyVersion: 'tutor-training-eligibility-v2', cohort: TUTOR_TRAINING_COHORT, sftAllowed: turns.length, monitoringOnly: 0, blocked: 0 }),
+      trainingCohortJson: JSON.stringify(TUTOR_TRAINING_COHORT),
       manifestPath: files.manifestPath, manifestSha256: sha256(manifestText),
     } });
   });

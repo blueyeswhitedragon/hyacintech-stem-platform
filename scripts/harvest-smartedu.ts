@@ -11,11 +11,13 @@
 import { writeFile } from 'fs/promises';
 import path from 'path';
 
-const APP_ID = 'e5649925-441d-4a53-b525-51a2f1c4e0a8';
-const SEARCH_URL = 'https://x-search.ykt.eduyun.cn/v1/resources/combine/search';
-const CHANNEL_ID = '3303d351-a43f-4580-9a43-58a929595fda';
-const SECTION_HASH = '229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc';
-const CHANNEL_BASE = `https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/${APP_ID}/auxo_channel_api/v2/channels/${CHANNEL_ID}/sections/${SECTION_HASH}`;
+const APP_ID = process.env.SMARTEDU_APP_ID ?? 'e5649925-441d-4a53-b525-51a2f1c4e0a8';
+const SEARCH_URL = process.env.SMARTEDU_SEARCH_URL ?? 'https://x-search.ykt.eduyun.cn/v1/resources/combine/search';
+const CHANNEL_ID = process.env.SMARTEDU_CHANNEL_ID ?? '3303d351-a43f-4580-9a43-58a929595fda';
+const SECTION_HASH = process.env.SMARTEDU_SECTION_HASH ?? '229c170fd24d459901894ffdd2a5c350f1246827be6f541ba6caf641133168cc';
+const CHANNEL_BASE = (process.env.SMARTEDU_CHANNEL_BASE
+  ?? `https://s-file-1.ykt.cbern.com.cn/zxx/api/zh-CN/${APP_ID}/auxo_channel_api/v2/channels/${CHANNEL_ID}/sections/${SECTION_HASH}`)
+  .replace(/\/+$/, '');
 
 const SEARCH_KEYWORDS = [
   '初中科学实验探究',

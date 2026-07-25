@@ -4,7 +4,7 @@ import type { ChatResponse, Message } from '@/app/models/types';
 import { validateChatContract } from './chatContract';
 import { LLMError } from './errors';
 import { parseChatResponseStrict } from './parser';
-import { createLLMProvider } from './provider';
+import { createConfiguredLLMProvider, createLLMProvider } from './provider';
 import type { LLMCompletion, LLMMessage, LLMRuntimeOverride } from './types';
 
 export interface LLMRuntimeContract {
@@ -162,7 +162,9 @@ export async function callLLMWithTrace(
         }),
       }
     : undefined;
-  const provider = createLLMProvider(runtimeModel);
+  const provider = runtimeModel?.configured
+    ? createConfiguredLLMProvider(runtimeModel.configured)
+    : createLLMProvider(runtimeModel);
   const artifactContext = parseVisibleContext(contract?.visibleContext);
   const attempts: AttemptDiagnostic[] = [];
   let repair: string | undefined;

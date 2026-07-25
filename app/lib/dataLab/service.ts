@@ -45,7 +45,7 @@ import {
   evaluateTrainingEligibility,
   TRAINING_POLICY_VERSION,
 } from '@/app/lib/trainingEligibility';
-import { refreshModelDeploymentGate } from '@/app/lib/deployment';
+import { refreshModelDeploymentGate, refreshRuntimeBundleDeploymentGate } from '@/app/lib/deployment';
 import {
   DATASET_BATCH_STATUSES,
   isTrainableBatchStatus,
@@ -1420,7 +1420,7 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
   const byStyle = summarizeStyles(selected.map((item) => ({ styleFamily: item.styleFamily, stylePolicyVersion: item.stylePolicyVersion })));
   const stylePolicyVersions = [...new Set(selected.map((item) => item.stylePolicyVersion))].sort();
   const manifest = {
-    schemaVersion: 3,
+    schemaVersion: 4,
     version: release.version,
     frozenAt: new Date().toISOString(),
     recipe,
@@ -1429,6 +1429,20 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
       description: '每条记录首条 system 消息包含与在线推理一致的版本化导师风格指令。',
     },
     preferenceExport: { format: 'chosen-rejected-v1', records: preference.length },
+    trainingCohort: (() => {
+      const cohorts = eligibleSelected.map(({ item }) => {
+        const record = parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord);
+        return {
+          contractVersion: record.meta?.contractVersion,
+          stageContractVersion: record.meta?.stageContractVersion,
+          extractorVersion: record.meta?.extractorVersion,
+          promptVersion: record.meta?.promptVersion ?? record.meta?.promptPolicyVersion,
+        };
+      });
+      const unique = [...new Set(cohorts.map((cohort) => JSON.stringify(cohort)))];
+      if (unique.length > 1) throw new Error(`训练导出混合了 ${unique.length} 个 Prompt/合同 cohort，请拆分为独立 Release`);
+      return cohorts[0] ?? {};
+    })(),
     eligibility: {
       policyVersion: TRAINING_POLICY_VERSION,
       sftAllowed: eligibilityItems.filter((item) => item.eligibility === 'SFT_ALLOWED').length,
@@ -1491,6 +1505,7 @@ export async function freezeDatasetRelease(releaseId: string, user: SessionUser)
         preferencePath,
         preferenceSha256: sha256(preferenceText),
         eligibilityReportJson: JSON.stringify(manifest.eligibility),
+        trainingCohortJson: JSON.stringify(manifest.trainingCohort),
         manifestPath,
         manifestSha256: sha256(manifestText),
       },
@@ -1534,6 +1549,8 @@ export async function createTrainingRun(input: {
   parentModelVersionId?: string;
   user: SessionUser;
 }) {
+  const { ensureDataLabRuntimeRegistry } = await import('./runtimeRegistry');
+  await ensureDataLabRuntimeRegistry(input.user);
   const requestedStatus = input.status ?? 'DRAFT';
   const release = await db.datasetRelease.findUnique({
     where: { id: input.releaseId },
@@ -1546,6 +1563,15 @@ export async function createTrainingRun(input: {
   if (!release || release.status !== 'FROZEN') throw new Error('训练只能使用已冻结数据版本');
   if (requestedStatus !== 'DRAFT' && !input.parentModelVersionId) throw new Error('提交或运行训练前必须选择父模型版本');
   if (input.parentModelVersionId && !(await db.modelVersion.findUnique({ where: { id: input.parentModelVersionId } }))) throw new Error('父模型版本不存在');
+  const releaseCohort = parseJson<{
+    contractVersion?: string;
+    stageContractVersion?: string;
+    extractorVersion?: string;
+    promptVersion?: string;
+  }>(release.trainingCohortJson, {});
+  const promptPolicy = releaseCohort.promptVersion
+    ? await db.promptPolicyVersion.findUnique({ where: { version: releaseCohort.promptVersion } })
+    : null;
   const results = release.items.map((item) => {
     if (item.finalizedTutorTurn) {
       const reasons: string[] = [];
@@ -1566,7 +1592,8 @@ export async function createTrainingRun(input: {
     const record = parseJson<ShareGPTRecord>(item.recordJson, {} as ShareGPTRecord);
     return evaluateTrainingEligibility({ sourceKind: item.sample.sourceKind, batchStatus: item.sample.batch.status, stageContractVersion: record.meta?.stageContractVersion as string | undefined, contractVersion: record.meta?.contractVersion as string | undefined, promptVersion: (record.meta?.promptVersion ?? record.meta?.promptPolicyVersion) as string | undefined, extractorVersion: record.meta?.extractorVersion as string | undefined, candidateStatus: candidate?.status, consentStatus: candidate?.generationTrace.conversation.studentAssignment?.dataConsentStatus, leakageBlocked: leakage.blocked, transformationType: item.revision?.transformationType, metrics, workReviewApproved: item.revision?.workReview?.status === 'APPROVED' || Boolean(candidate), finallySelected: true });
   });
-  const report = { policyVersion: TRAINING_POLICY_VERSION, checkedAt: new Date().toISOString(), parentModelVersionId: input.parentModelVersionId ?? null, sftAllowed: results.filter((result) => result.eligibility === 'SFT_ALLOWED').length, monitoringOnly: results.filter((result) => result.eligibility === 'MONITORING_ONLY').length, blocked: results.filter((result) => result.eligibility === 'BLOCKED').length, reasons: [...new Set(results.flatMap((result) => result.reasons))] };
+  const report = { policyVersion: TRAINING_POLICY_VERSION, checkedAt: new Date().toISOString(), parentModelVersionId: input.parentModelVersionId ?? null, trainingCohort: releaseCohort, promptPolicyVersionId: promptPolicy?.id ?? null, sftAllowed: results.filter((result) => result.eligibility === 'SFT_ALLOWED').length, monitoringOnly: results.filter((result) => result.eligibility === 'MONITORING_ONLY').length, blocked: results.filter((result) => result.eligibility === 'BLOCKED').length, reasons: [...new Set(results.flatMap((result) => result.reasons))] };
+  if (requestedStatus !== 'DRAFT' && releaseCohort.promptVersion && !promptPolicy) throw new Error(`Release 使用的 Prompt ${releaseCohort.promptVersion} 尚未登记，不能提交训练`);
   if (requestedStatus !== 'DRAFT' && (report.blocked > 0 || report.sftAllowed === 0)) throw new Error(`训练资格检查未通过：可训练 ${report.sftAllowed}，阻断 ${report.blocked}；${report.reasons.join('、')}`);
   const run = await db.trainingRun.create({
     data: {
@@ -1579,6 +1606,7 @@ export async function createTrainingRun(input: {
       modelTag: input.modelTag,
       notes: input.notes ?? '',
       parentModelVersionId: input.parentModelVersionId || null,
+      promptPolicyVersionId: promptPolicy?.id ?? null,
       eligibilityReportJson: JSON.stringify(report),
       policyVersion: TRAINING_POLICY_VERSION,
       createdById: input.user.id,
@@ -1589,7 +1617,39 @@ export async function createTrainingRun(input: {
 }
 
 export async function listTrainingRuns() {
-  return db.trainingRun.findMany({ orderBy: { createdAt: 'desc' }, include: { release: { select: { version: true } }, parentModelVersion: { select: { tag: true } }, createdBy: { select: { displayName: true } } } });
+  return db.trainingRun.findMany({ orderBy: { createdAt: 'desc' }, include: { release: { select: { version: true, trainingCohortJson: true } }, promptPolicyVersion: { select: { id: true, version: true, displayName: true } }, parentModelVersion: { select: { tag: true } }, createdBy: { select: { displayName: true } } } });
+}
+
+export async function updateTrainingRunStatus(input: {
+  id: string;
+  status: 'DRAFT' | 'SUBMITTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED';
+  externalTaskId?: string;
+  notes?: string;
+  user: SessionUser;
+}) {
+  const allowed = ['DRAFT', 'SUBMITTED', 'RUNNING', 'SUCCEEDED', 'FAILED', 'CANCELLED'];
+  if (!allowed.includes(input.status)) throw new Error('训练状态无效');
+  const run = await db.trainingRun.findUnique({ where: { id: input.id }, include: { outputModelVersion: true } });
+  if (!run) throw new Error('训练任务不存在');
+  if (run.outputModelVersion && input.status !== 'SUCCEEDED') throw new Error('已登记输出模型的训练任务必须保持成功状态');
+  const externalTaskId = input.externalTaskId?.trim() || run.externalTaskId;
+  if (['SUBMITTED', 'RUNNING', 'SUCCEEDED'].includes(input.status) && !externalTaskId) {
+    throw new Error('提交、运行或成功状态必须填写外部任务 ID');
+  }
+  const updated = await db.trainingRun.update({
+    where: { id: run.id },
+    data: {
+      status: input.status,
+      externalTaskId,
+      ...(input.notes === undefined ? {} : { notes: input.notes.trim() }),
+    },
+  });
+  await audit(input.user.id, 'TRAINING_RUN_STATUS_UPDATED', 'TrainingRun', run.id, {
+    from: run.status,
+    to: input.status,
+    externalTaskId,
+  });
+  return updated;
 }
 
 interface ImportedArtifact {
@@ -1605,6 +1665,9 @@ interface ImportedArtifact {
 export async function importEvaluation(input: {
   name: string;
   files: Array<{ fileName: string; raw: string }>;
+  evaluationRunId?: string;
+  runtimeBundleAId?: string;
+  runtimeBundleBId?: string;
   user: SessionUser;
 }) {
   if (input.files.length === 0) throw new Error('至少导入一个 transcript 或 verdict 文件');
@@ -1617,13 +1680,28 @@ export async function importEvaluation(input: {
   const stylePolicyVersions = [...new Set(parsed.map((file) => file.json.stylePolicyVersion).filter((value): value is string => typeof value === 'string' && !!value.trim()))];
   if (styleFamilies.length > 1) throw new Error('同一次导入不能混合不同目标风格的评测产物');
   if (stylePolicyVersions.length > 1) throw new Error('同一次导入不能混合不同风格规范版本的评测产物');
+  const [runtimeBundleA, runtimeBundleB, plannedRun] = await Promise.all([
+    input.runtimeBundleAId ? db.runtimeBundle.findUnique({ where: { id: input.runtimeBundleAId }, include: { modelVersion: true } }) : null,
+    input.runtimeBundleBId ? db.runtimeBundle.findUnique({ where: { id: input.runtimeBundleBId }, include: { modelVersion: true } }) : null,
+    input.evaluationRunId ? db.evaluationRun.findUnique({ where: { id: input.evaluationRunId } }) : null,
+  ]);
+  if (Boolean(input.runtimeBundleAId) !== Boolean(input.runtimeBundleBId)) throw new Error('运行组合 A/B 必须同时提供');
+  if (input.runtimeBundleAId && (!runtimeBundleA || !runtimeBundleB)) throw new Error('选择的运行组合不存在');
+  if (plannedRun && plannedRun.status !== 'PLANNED') throw new Error('只有待导入的离线评测任务可以接收产物');
+  if (plannedRun && (plannedRun.runtimeBundleAId !== runtimeBundleA?.id || plannedRun.runtimeBundleBId !== runtimeBundleB?.id)) {
+    throw new Error('导入选择与已冻结的离线评测 A/B 运行组合不一致');
+  }
   const verdict = parsed.find((file) => file.json.tags?.A && file.json.tags?.B);
   const transcripts = parsed.filter((file) => typeof file.json.tag === 'string');
-  const modelATag = verdict?.json.tags?.A ?? transcripts[0]?.json.tag ?? 'A';
-  const modelBTag = verdict?.json.tags?.B ?? transcripts[1]?.json.tag ?? 'B';
+  const runtimeTag = (bundle: NonNullable<typeof runtimeBundleA>) => `${bundle.name}:v${bundle.version}`;
+  const modelATag = runtimeBundleA ? runtimeTag(runtimeBundleA) : verdict?.json.tags?.A ?? transcripts[0]?.json.tag ?? 'A';
+  const modelBTag = runtimeBundleB ? runtimeTag(runtimeBundleB) : verdict?.json.tags?.B ?? transcripts[1]?.json.tag ?? 'B';
+  if (runtimeBundleA && verdict && (verdict.json.tags?.A !== modelATag || verdict.json.tags?.B !== modelBTag)) {
+    throw new Error(`评测产物身份不匹配：应为 A=${modelATag}、B=${modelBTag}`);
+  }
   const [modelAVersion, modelBVersion] = await Promise.all([
-    db.modelVersion.findUnique({ where: { tag: modelATag }, select: { id: true } }),
-    db.modelVersion.findUnique({ where: { tag: modelBTag }, select: { id: true } }),
+    runtimeBundleA ? Promise.resolve({ id: runtimeBundleA.modelVersionId }) : db.modelVersion.findUnique({ where: { tag: modelATag }, select: { id: true } }),
+    runtimeBundleB ? Promise.resolve({ id: runtimeBundleB.modelVersionId }) : db.modelVersion.findUnique({ where: { tag: modelBTag }, select: { id: true } }),
   ]);
   if (!verdict || transcripts.length < 2) throw new Error('评测导入必须同时包含完整 verdict 和两个模型 transcript');
   if (!modelAVersion || !modelBVersion) throw new Error('评测产物中的 A/B 模型身份必须能解析到 ModelVersion');
@@ -1641,9 +1719,9 @@ export async function importEvaluation(input: {
   const summary = { ...rawSummary, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true, scenarioCount: scenarioIds.length } };
   const scope = verdict?.json.scope ?? transcripts[0]?.json.scope ?? 'unknown';
   const run = await db.$transaction(async (tx) => {
-    const created = await tx.evaluationRun.create({
-      data: {
+    const data = {
         name: input.name,
+        status: 'IMPORTED',
         modelATag,
         modelBTag,
         scope,
@@ -1652,9 +1730,13 @@ export async function importEvaluation(input: {
         stylePolicyVersion: stylePolicyVersions[0],
         modelAVersionId: modelAVersion?.id,
         modelBVersionId: modelBVersion?.id,
+        runtimeBundleAId: runtimeBundleA?.id,
+        runtimeBundleBId: runtimeBundleB?.id,
         createdById: input.user.id,
-      },
-    });
+      };
+    const created = plannedRun
+      ? await tx.evaluationRun.update({ where: { id: plannedRun.id }, data })
+      : await tx.evaluationRun.create({ data });
     for (const file of parsed) {
       const kind = file.json.tags ? 'verdict' : 'transcript';
       const tag = file.json.tag ?? `${file.json.tags?.A}-vs-${file.json.tags?.B}`;
@@ -1665,12 +1747,58 @@ export async function importEvaluation(input: {
     return created;
   });
   await audit(input.user.id, 'EVALUATION_IMPORTED', 'EvaluationRun', run.id, { files: input.files.map((file) => file.fileName) });
-  if (modelBVersion) await refreshModelDeploymentGate(modelBVersion.id);
+  if (runtimeBundleB) await refreshRuntimeBundleDeploymentGate(runtimeBundleB.id);
+  else if (modelBVersion) await refreshModelDeploymentGate(modelBVersion.id);
   return run;
 }
 
 export async function listEvaluations() {
-  return db.evaluationRun.findMany({ orderBy: { createdAt: 'desc' }, include: { modelAVersion: { select: { tag: true } }, modelBVersion: { select: { tag: true } }, _count: { select: { artifacts: true } }, createdBy: { select: { displayName: true } } } });
+  return db.evaluationRun.findMany({ orderBy: { createdAt: 'desc' }, include: {
+    modelAVersion: { select: { tag: true } },
+    modelBVersion: { select: { tag: true } },
+    runtimeBundleA: { include: { modelVersion: true, promptPolicyVersion: true, endpoint: true } },
+    runtimeBundleB: { include: { modelVersion: true, promptPolicyVersion: true, endpoint: true } },
+    _count: { select: { artifacts: true } },
+    createdBy: { select: { displayName: true } },
+  } });
+}
+
+export async function createOfflineEvaluation(input: {
+  name: string;
+  runtimeBundleAId: string;
+  runtimeBundleBId: string;
+  user: SessionUser;
+}) {
+  if (!input.name.trim()) throw new Error('请填写离线评测名称');
+  if (input.runtimeBundleAId === input.runtimeBundleBId) throw new Error('基线和候选必须是不同运行组合');
+  const [a, b] = await Promise.all([
+    db.runtimeBundle.findUnique({ where: { id: input.runtimeBundleAId }, include: { modelVersion: true } }),
+    db.runtimeBundle.findUnique({ where: { id: input.runtimeBundleBId }, include: { modelVersion: true } }),
+  ]);
+  if (!a || !b) throw new Error('选择的运行组合不存在');
+  if (![a.status, b.status].every((status) => ['AVAILABLE', 'DEPLOYED'].includes(status))) {
+    throw new Error('基线和候选都必须先通过兼容性检查并标记为可用');
+  }
+  const run = await db.evaluationRun.create({
+    data: {
+      name: input.name.trim(),
+      status: 'PLANNED',
+      modelATag: `${a.name}:v${a.version}`,
+      modelBTag: `${b.name}:v${b.version}`,
+      scope: 'six-phase',
+      modelAVersionId: a.modelVersionId,
+      modelBVersionId: b.modelVersionId,
+      runtimeBundleAId: a.id,
+      runtimeBundleBId: b.id,
+      createdById: input.user.id,
+    },
+  });
+  await audit(input.user.id, 'OFFLINE_EVALUATION_CREATED', 'EvaluationRun', run.id, {
+    runtimeBundleAId: a.id,
+    runtimeBundleBId: b.id,
+    expectedTags: { A: run.modelATag, B: run.modelBTag },
+  });
+  return run;
 }
 
 export async function evaluationDetail(id: string) {

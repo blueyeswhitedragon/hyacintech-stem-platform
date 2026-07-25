@@ -67,7 +67,7 @@ npm run build
 npm run start
 ```
 
-生产数据库不要与测试共用。可用临时 SQLite URL 完成回归，例如先对 `DATABASE_URL="file:/tmp/hyacintech-verify.db"` 运行 `db:deploy`、`db:seed`、`data-lab:init`、`data-lab:test:setup` 和 `data-lab:test`。自托管时建议由 systemd 等进程管理器守护 `npm run start`，并在前面配置 Nginx/Caddy 反向代理、HTTPS、请求大小限制和限流；`public/uploads/`、SQLite 数据库及 `backups/` 需要独立持久化和备份。
+生产数据库不要与测试共用。可用仓库内临时 SQLite URL 完成跨平台回归，例如先对 `DATABASE_URL="file:./hyacintech-verify.db"` 运行 `db:deploy`、`db:seed`、`data-lab:init`、`data-lab:test:setup` 和 `data-lab:test`，结束后再移除该临时库。自托管时建议由进程管理器守护 `npm run start`，并在前面配置反向代理、HTTPS、请求大小限制和限流；`public/uploads/`、SQLite 数据库及 `backups/` 需要独立持久化和备份。
 
 ## 种子演示账号
 

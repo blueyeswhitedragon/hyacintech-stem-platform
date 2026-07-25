@@ -8,6 +8,7 @@ import {
   generateTutorCandidates,
   retryTutorCandidateCritics,
 } from '../app/lib/dataLab/bootstrap/service';
+import { resolveProviderApiBase } from '../app/lib/llm/endpoints';
 
 function arg(name: string) {
   const index = process.argv.indexOf(name);
@@ -16,10 +17,6 @@ function arg(name: string) {
 
 function has(name: string) {
   return process.argv.includes(name);
-}
-
-function normalizedBase(value: string | undefined, fallback: string) {
-  return (value?.trim() || fallback).replace(/\/+$/, '');
 }
 
 async function probeProvider(label: string, baseURL: string, apiKey: string | undefined) {
@@ -87,8 +84,8 @@ async function main() {
 
   const modelA = { provider: process.env.DATA_LAB_MODEL_A_PROVIDER ?? 'openai', model: process.env.DATA_LAB_MODEL_A ?? 'Qwen3.5-35B-A3B' };
   const modelB = { provider: process.env.DATA_LAB_MODEL_B_PROVIDER ?? 'deepseek', model: process.env.DATA_LAB_MODEL_B ?? 'deepseek-v4-pro' };
-  await probeProvider(`候选 A (${modelA.model})`, normalizedBase(process.env.OPENAI_API_BASE, 'https://api.openai.com/v1'), process.env.OPENAI_API_KEY);
-  await probeProvider(`候选 B (${modelB.model})`, normalizedBase(process.env.DEEPSEEK_API_BASE, 'https://api.deepseek.com'), process.env.DEEPSEEK_API_KEY);
+  await probeProvider(`候选 A (${modelA.model})`, resolveProviderApiBase('openai'), process.env.OPENAI_API_KEY);
+  await probeProvider(`候选 B (${modelB.model})`, resolveProviderApiBase('deepseek'), process.env.DEEPSEEK_API_KEY);
   const results: Array<{ caseId: string; phase: number; challenge: string; status: string; detail?: unknown }> = [];
 
   for (const [index, caseItem] of run.cases.entries()) {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
 import ReportDocument from './ReportDocument';
 import { limitationsDiscussion } from '@/app/lib/reportFields';
+import { REPORT_IMPORT_FIELDS } from '@/app/lib/reportDocxImport';
 
 interface Props {
   stage5?: Stage5Data;
@@ -18,9 +19,22 @@ interface Props {
   onExport?: () => Promise<string | null>;
   /** 上传学生自己的 docx 报告（轻量留存 + 文本提取）。 */
   onImport?: (file: File) => Promise<string | null>;
+  /** 确认服务器识别出的章节映射并写入权威报告字段。 */
+  onConfirmImport?: (previewHash: string) => Promise<string | null>;
+  submitLabel?: string;
 }
 
-export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, onSubmit, onExport, onImport }: Props) {
+export default function ReportViewer({
+  stage5,
+  schemaColumns,
+  dataRows,
+  onSave,
+  onSubmit,
+  onExport,
+  onImport,
+  onConfirmImport,
+  submitLabel = '提交报告，等待教师审核',
+}: Props) {
   const sections = stage5?.sections;
   const [conclusion, setConclusion] = useState(sections?.conclusion ?? '');
   const [limitations, setLimitations] = useState(sections ? limitationsDiscussion(sections) : '');
@@ -28,6 +42,7 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
   const [submitting, setSubmitting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [confirmingImport, setConfirmingImport] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -64,7 +79,16 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
     setImporting(true); setMsg(null); setErr(null);
     const err2 = await onImport(file);
     setImporting(false);
-    if (err2) setErr(err2); else setMsg('已上传你的报告');
+    if (err2) setErr(err2); else setMsg('已识别 Word 章节，请核对下方导入预览');
+  };
+
+  const handleConfirmImport = async () => {
+    const preview = stage5?.importPreview;
+    if (!preview || !onConfirmImport) return;
+    setConfirmingImport(true); setMsg(null); setErr(null);
+    const error = await onConfirmImport(preview.previewHash);
+    setConfirmingImport(false);
+    if (error) setErr(error); else setMsg('章节已导入平台报告字段');
   };
 
   if (!sections) {
@@ -112,6 +136,42 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
         dataRows={dataRows}
         showStudentFields={false}
       />
+
+      {stage5?.importPreview && (
+        <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm">
+          <div className="font-medium text-amber-900">Word 章节导入预览</div>
+          <div className="mt-1 text-xs text-amber-800">
+            已识别 {stage5.importPreview.detectedFields.length}/8 节。确认后仅用下列识别内容覆盖对应平台字段，原 Word 仍作为附件保留。
+          </div>
+          <div className="mt-2 space-y-2">
+            {REPORT_IMPORT_FIELDS.filter(({ key }) => stage5.importPreview?.detectedFields.includes(key)).map(({ key, label }) => (
+              <div key={key} className="rounded border border-amber-200 bg-white p-2">
+                <div className="text-xs font-medium text-gray-700">识别为：{label}</div>
+                <div className="mt-1 max-h-20 overflow-y-auto whitespace-pre-wrap text-xs text-gray-600">
+                  {stage5.importPreview?.sections[key]}
+                </div>
+              </div>
+            ))}
+          </div>
+          {stage5.importPreview.missingFields.length > 0 && (
+            <div className="mt-2 text-xs text-amber-800">
+              未识别：{REPORT_IMPORT_FIELDS.filter(({ key }) => stage5.importPreview?.missingFields.includes(key)).map(({ label }) => label).join('、')}。这些字段将保留平台当前内容。
+            </div>
+          )}
+          {stage5.importPreview.complete && (
+            <div className="mt-2 text-xs text-green-700">全部必需章节均已识别；导入后可按现有提交门禁直接提交。</div>
+          )}
+          {onConfirmImport && (
+            <button
+              onClick={handleConfirmImport}
+              disabled={confirmingImport}
+              className="mt-3 rounded bg-amber-600 px-3 py-1.5 text-xs text-white hover:bg-amber-700 disabled:opacity-50"
+            >
+              {confirmingImport ? '导入中…' : '确认映射并导入'}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* 简单图表提示（阶段4的分析在数据概述中体现） */}
       {dataRows && dataRows.length > 0 && (
@@ -182,7 +242,7 @@ export default function ReportViewer({ stage5, schemaColumns, dataRows, onSave, 
             disabled={saving || submitting}
             className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
           >
-            {submitting ? '提交中…' : '提交报告，等待教师审核'}
+            {submitting ? '提交中…' : submitLabel}
           </button>
         )}
         {msg && <span className="text-sm text-green-600">{msg}</span>}

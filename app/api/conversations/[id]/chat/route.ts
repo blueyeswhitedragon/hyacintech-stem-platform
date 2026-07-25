@@ -118,6 +118,8 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       externalModelId: modelVersion.externalModelId,
       promptPolicyVersion: modelVersion.promptPolicyVersion,
       contractVersion: modelVersion.contractVersion,
+      runtimeBundleId: 'runtimeBundleId' in modelVersion ? modelVersion.runtimeBundleId : undefined,
+      runtimeConfig: 'runtimeConfig' in modelVersion ? modelVersion.runtimeConfig : undefined,
     };
 
     const contractBranch = resolveChatContractBranch(conv.contractVersion, modelVersion.contractVersion);
@@ -181,7 +183,11 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       hasStage2Schema: (conv.stageData.stage2?.schema.columns.length ?? 0) > 0,
       triggerType: context?.triggerType ?? 'USER_MESSAGE',
       visibleContext,
-    }, { provider: modelVersion.provider, model: modelVersion.externalModelId });
+    }, {
+      provider: modelVersion.provider,
+      model: modelVersion.externalModelId,
+      configured: 'runtimeConfig' in modelVersion ? modelVersion.runtimeConfig : undefined,
+    });
     const response = llmResult.response;
     const { stageData, advanceTo } = extractStageData(conv.currentStage, response, conv.stageData, {
       studentMessage: message,

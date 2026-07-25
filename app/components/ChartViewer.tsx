@@ -4,22 +4,26 @@ import React, { useState } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import type { Stage2Data, Stage3Data } from '@/app/models/stageData';
+import type { Stage2Data, Stage3Data, Stage4Data } from '@/app/models/stageData';
+import ReadonlyDataTable from './ReadonlyDataTable';
+import { evaluateStage4Readiness } from '@/app/lib/stage4Readiness';
 
 interface Props {
   schema?: Stage2Data['schema'];
   stage3?: Stage3Data;
+  stage4?: Stage4Data;
   onComplete: () => Promise<string | null>;
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-export default function ChartViewer({ schema, stage3, onComplete }: Props) {
+export default function ChartViewer({ schema, stage3, stage4, onComplete }: Props) {
   const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const rows = stage3?.rows ?? [];
+  const readiness = evaluateStage4Readiness({ stage4 });
 
   if (rows.length === 0) {
     return <div className="text-sm text-gray-500 p-4">还没有可分析的数据。请先在「过程执行」阶段录入实验数据。</div>;
@@ -91,10 +95,29 @@ export default function ChartViewer({ schema, stage3, onComplete }: Props) {
         </ResponsiveContainer>
       )}
 
+      {columns.length > 0 && (
+        <div className="mt-4">
+          <div className="text-sm font-medium text-gray-700 mb-2">原始数据表（只读）</div>
+          <ReadonlyDataTable columns={columns} rows={rows} />
+        </div>
+      )}
+
+      <div className={`mt-4 rounded-md border px-3 py-2 text-sm ${
+        readiness.ready
+          ? 'border-green-200 bg-green-50 text-green-900'
+          : 'border-amber-200 bg-amber-50 text-amber-900'
+      }`}>
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-medium">有效分析进度</span>
+          <span>{readiness.acceptedRoundCount}/{readiness.requiredRoundCount}</span>
+        </div>
+        <p className="mt-1 text-xs">{readiness.message}</p>
+      </div>
+
       <div className="flex items-center gap-2 mt-3">
         <button
           onClick={handleComplete}
-          disabled={busy}
+          disabled={busy || !readiness.ready}
           className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
         >
           {busy ? '推进中…' : '完成分析，进入报告'}

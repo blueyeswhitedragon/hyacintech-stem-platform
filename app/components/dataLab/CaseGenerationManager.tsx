@@ -26,7 +26,10 @@ interface CaseView {
   studentMessage: string;
   split: string;
   status: string;
+  contractVersion: string;
   promptVersion: string;
+  sourceContractVersion: string | null;
+  sourcePromptVersion: string | null;
   hardCheckJson: string;
   topicCard: { displayTitle: string; subject: string; status: string } | null;
   generationRun: {
@@ -37,6 +40,10 @@ interface CaseView {
     createdAt: string | Date;
     completedAt: string | Date | null;
     failureReason: string;
+    firstReviewMode: string;
+    candidateARuntimeBundleId: string | null;
+    candidateBRuntimeBundleId: string | null;
+    promptPolicyVersionId: string | null;
   } | null;
   _count: { candidates: number; reviewTasks: number };
   finalizedTurn: { id: string; trainingEligibility: string } | null;
@@ -71,7 +78,29 @@ interface RunGroup {
   createdAt: string | Date | null;
   completedAt: string | Date | null;
   failureReason: string;
+  firstReviewMode: string;
+  candidateARuntimeBundleId: string | null;
+  candidateBRuntimeBundleId: string | null;
+  promptPolicyVersionId: string | null;
   cases: CaseView[];
+}
+
+interface RuntimeBundleOption {
+  id: string;
+  name: string;
+  version: number;
+  roleKey: string;
+  modelTag: string;
+  family: string;
+  endpointName: string;
+  promptVersion: string;
+}
+
+interface PromptPolicyOption {
+  id: string;
+  version: string;
+  displayName: string;
+  defaultForDataLab: boolean;
 }
 
 const profileOrder: Profile[] = ['SMOKE_6', 'CALIBRATION_12', 'TRIAL_36', 'FULL_180', 'EVAL_80'];
@@ -129,7 +158,8 @@ export default function CaseGenerationManager({
   trial,
   topicCoverage,
   topicRequirements,
-  defaultModels,
+  runtimeBundles,
+  promptPolicies,
 }: {
   cases: CaseView[];
   smoke: QualityView;
@@ -137,16 +167,18 @@ export default function CaseGenerationManager({
   trial: QualityView & { signedOff: boolean };
   topicCoverage: TopicCoverageView;
   topicRequirements: Record<string, { total: number; description: string }>;
-  defaultModels: { A: { provider: string; model: string }; B: { provider: string; model: string } };
+  runtimeBundles: RuntimeBundleOption[];
+  promptPolicies: PromptPolicyOption[];
 }) {
   const router = useRouter();
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [autofillProgress, setAutofillProgress] = useState<{ profile: Profile; current: number; total: number } | null>(null);
   const [generationProgress, setGenerationProgress] = useState<{ runId: string; current: number; total: number } | null>(null);
   const [feedback, setFeedback] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null);
-  const [modelA, setModelA] = useState(defaultModels.A);
-  const [modelB, setModelB] = useState(defaultModels.B);
-  const [reviewPolicy, setReviewPolicy] = useState<'HUMAN_ANNOTATOR_REQUIRED' | 'AI_DIRECT_TO_REVIEWER'>('HUMAN_ANNOTATOR_REQUIRED');
+  const [candidateARuntimeBundleId, setCandidateARuntimeBundleId] = useState(runtimeBundles.find((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_A')?.id ?? '');
+  const [candidateBRuntimeBundleId, setCandidateBRuntimeBundleId] = useState(runtimeBundles.find((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_B')?.id ?? '');
+  const [promptPolicyVersionId, setPromptPolicyVersionId] = useState(promptPolicies.find((policy) => policy.defaultForDataLab)?.id ?? promptPolicies[0]?.id ?? '');
+  const [firstReviewMode, setFirstReviewMode] = useState<'HUMAN' | 'PLATFORM_AI' | 'AUTHORIZED_AGENT'>('HUMAN');
   const [compileConfirmation, setCompileConfirmation] = useState<Profile | null>(null);
   const [generationConfirmation, setGenerationConfirmation] = useState<string | null>(null);
   const [supersedeConfirmation, setSupersedeConfirmation] = useState<string | null>(null);
@@ -158,6 +190,14 @@ export default function CaseGenerationManager({
   const [deleteRunId, setDeleteRunId] = useState<string | null>(null);
   const [signoff, setSignoff] = useState({ drift: '', studentVoice: '', signer: '', confirmed: false });
   const pending = pendingAction !== null;
+  const candidateA = runtimeBundles.find((bundle) => bundle.id === candidateARuntimeBundleId);
+  const candidateB = runtimeBundles.find((bundle) => bundle.id === candidateBRuntimeBundleId);
+  const targetPrompt = promptPolicies.find((policy) => policy.id === promptPolicyVersionId);
+  const runtimeSelectionReady = Boolean(candidateA && candidateB && targetPrompt
+    && candidateA.family && candidateB.family
+    && candidateA.family !== candidateB.family
+    && candidateA.promptVersion === targetPrompt.version
+    && candidateB.promptVersion === targetPrompt.version);
 
   const groupedRuns = useMemo(() => {
     const groups = new Map<string, RunGroup>();
@@ -171,6 +211,10 @@ export default function CaseGenerationManager({
         createdAt: item.generationRun?.createdAt ?? null,
         completedAt: item.generationRun?.completedAt ?? null,
         failureReason: item.generationRun?.failureReason ?? '',
+        firstReviewMode: item.generationRun?.firstReviewMode ?? 'HUMAN',
+        candidateARuntimeBundleId: item.generationRun?.candidateARuntimeBundleId ?? null,
+        candidateBRuntimeBundleId: item.generationRun?.candidateBRuntimeBundleId ?? null,
+        promptPolicyVersionId: item.generationRun?.promptPolicyVersionId ?? null,
         cases: [],
       };
       group.cases.push(item);
@@ -226,7 +270,11 @@ export default function CaseGenerationManager({
         body: JSON.stringify({
           profile,
           split: ['SMOKE_6', 'CALIBRATION_12', 'TRIAL_36'].includes(profile) ? 'PILOT' : profile === 'EVAL_80' ? 'EVAL' : 'TRAIN',
-          reviewPolicy,
+          reviewPolicy: firstReviewMode === 'PLATFORM_AI' ? 'AI_DIRECT_TO_REVIEWER' : 'HUMAN_ANNOTATOR_REQUIRED',
+          firstReviewMode,
+          candidateARuntimeBundleId,
+          candidateBRuntimeBundleId,
+          promptPolicyVersionId,
           allowExistingRun,
         }),
       });
@@ -282,7 +330,7 @@ export default function CaseGenerationManager({
     let completed = 0;
     try {
       for (const item of targets) {
-        const response = await fetch(`/api/data-lab/tutor-cases/${item.id}/candidates`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ modelA, modelB }) });
+        const response = await fetch(`/api/data-lab/tutor-cases/${item.id}/candidates`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
         const data = await response.json();
         if (!response.ok) throw new Error(`阶段 ${item.phase}“${item.topicCard?.displayTitle ?? '生产回流案例'}”：${data.error ?? '候选生成失败'}`);
         if (data.status === 'PARTIAL_FAILED') throw new Error(`阶段 ${item.phase}“${item.topicCard?.displayTitle ?? '生产回流案例'}”的部分交叉检查失败`);
@@ -469,21 +517,15 @@ export default function CaseGenerationManager({
     <section className="border-y bg-white py-5">
       <div className="px-4 sm:px-5">
         <h2 className="font-semibold">批次设置</h2>
-        <p className="mt-1 text-xs text-gray-500">编译只创建确定性案例；模型配置仅在第二步生成双候选时使用。</p>
-        <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(240px,0.7fr)_minmax(0,1fr)]">
-          <label className="block text-sm font-medium">初审方式
-            <select value={reviewPolicy} onChange={(event) => setReviewPolicy(event.target.value as typeof reviewPolicy)} className="mt-1 block w-full border bg-white px-3 py-2 font-normal">
-              <option value="HUMAN_ANNOTATOR_REQUIRED">{REVIEW_POLICY_LABELS.HUMAN_ANNOTATOR_REQUIRED}</option>
-              <option value="AI_DIRECT_TO_REVIEWER">{REVIEW_POLICY_LABELS.AI_DIRECT_TO_REVIEWER}</option>
-            </select>
-            <span className="mt-1 block text-xs font-normal leading-5 text-gray-500">AI 初审仍需独立人工定稿，并会记录授权来源。</span>
-          </label>
-          <div className="grid gap-3 sm:grid-cols-2">{[[modelA, setModelA, 'A'], [modelB, setModelB, 'B']].map(([model, setter, slot]) => {
-            const item = model as typeof modelA;
-            const set = setter as typeof setModelA;
-            return <fieldset key={String(slot)} className="border p-3"><legend className="px-1 text-sm font-medium">候选 {String(slot)}</legend><label className="block text-xs font-medium">模型服务商<input value={item.provider} onChange={(event) => set({ ...item, provider: event.target.value })} className="mt-1 w-full border px-2 py-1.5 font-normal" /></label><label className="mt-2 block text-xs font-medium">外部模型标识<input value={item.model} onChange={(event) => set({ ...item, model: event.target.value })} className="mt-1 w-full border px-2 py-1.5 font-normal" /></label></fieldset>;
-          })}</div>
+        <p className="mt-1 text-xs text-gray-500">编译时冻结候选 A/B 运行组合、训练目标 Prompt 和初审方式。之后修改系统默认不会影响已创建案例。</p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          <label className="block text-sm font-medium">候选 A 运行组合<select value={candidateARuntimeBundleId} onChange={(event) => setCandidateARuntimeBundleId(event.target.value)} className="mt-1 block w-full border bg-white px-3 py-2 font-normal"><option value="">请选择已通过兼容性评测的组合</option>{runtimeBundles.filter((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_A').map((bundle) => <option key={bundle.id} value={bundle.id}>{bundle.name} v{bundle.version} · {bundle.modelTag}</option>)}</select>{candidateA && <span className="mt-1 block text-xs font-normal text-gray-500">{candidateA.family} · {candidateA.endpointName} · {candidateA.promptVersion}</span>}</label>
+          <label className="block text-sm font-medium">候选 B 运行组合<select value={candidateBRuntimeBundleId} onChange={(event) => setCandidateBRuntimeBundleId(event.target.value)} className="mt-1 block w-full border bg-white px-3 py-2 font-normal"><option value="">请选择已通过兼容性评测的组合</option>{runtimeBundles.filter((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_B').map((bundle) => <option key={bundle.id} value={bundle.id}>{bundle.name} v{bundle.version} · {bundle.modelTag}</option>)}</select>{candidateB && <span className="mt-1 block text-xs font-normal text-gray-500">{candidateB.family} · {candidateB.endpointName} · {candidateB.promptVersion}</span>}</label>
+          <label className="block text-sm font-medium">训练目标 Prompt 策略<select value={promptPolicyVersionId} onChange={(event) => setPromptPolicyVersionId(event.target.value)} className="mt-1 block w-full border bg-white px-3 py-2 font-normal"><option value="">请选择已批准策略</option>{promptPolicies.map((policy) => <option key={policy.id} value={policy.id}>{policy.displayName} · {policy.version}{policy.defaultForDataLab ? ' · 默认' : ''}</option>)}</select><span className="mt-1 block text-xs font-normal text-gray-500">来源 Prompt 另存血缘；这里决定新案例和训练监督目标。</span></label>
+          <label className="block text-sm font-medium">初审执行方式<select value={firstReviewMode} onChange={(event) => setFirstReviewMode(event.target.value as typeof firstReviewMode)} className="mt-1 block w-full border bg-white px-3 py-2 font-normal"><option value="HUMAN">人工初审</option><option value="PLATFORM_AI">运行平台 AI 初审</option><option value="AUTHORIZED_AGENT">导出授权代理初审包</option></select><span className="mt-1 block text-xs font-normal text-gray-500">无论哪种方式，正式定稿都保留独立人工质量门。</span></label>
         </div>
+        {!runtimeSelectionReady && <div className="mt-4 border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"><b>为什么不能编译：</b>{!candidateA || !candidateB ? '请选择候选 A/B 运行组合。' : candidateA.family === candidateB.family ? '两个候选属于同一模型家族，不能形成独立对照。' : !targetPrompt ? '请选择训练目标 Prompt。' : '候选运行组合的 Prompt 与训练目标不一致。'}<p className="mt-1 text-xs">修复路径：在“运行组合”准备两个来自不同模型家族、使用同一目标 Prompt 且已通过兼容性评测的候选组合。</p></div>}
+        {runtimeSelectionReady && <div className="mt-4 grid gap-2 text-xs sm:grid-cols-4"><div className="border bg-green-50 p-2">模型家族独立：是</div><div className="border bg-green-50 p-2">Endpoint 可用：是</div><div className="border bg-green-50 p-2">Prompt/合同一致：是</div><div className="border bg-green-50 p-2">当前批次资格：具备</div></div>}
       </div>
     </section>
 
@@ -513,7 +555,7 @@ export default function CaseGenerationManager({
 
           <div className="divide-y">
             <section className="p-4">
-              <div className="flex items-start gap-3"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs text-white">1</span><div className="min-w-0 flex-1"><h4 className="text-sm font-semibold">编译案例</h4><p className={`mt-1 text-xs ${topicReady ? 'text-green-700' : 'text-red-700'}`}>{topicReady ? `话题卡充足（${topicCoverage.coverage.total}/${requirement.total} 张）` : `话题卡不足或覆盖未达标（${topicCoverage.coverage.total}/${requirement.total} 张）`} · {requirement.description}</p>{group && <p className="mt-2 text-sm">已编译 {group.cases.length} 条（{counts.ready} 待生成、{counts.blocked} 阻断）</p>}<div className="mt-3 flex flex-wrap gap-2"><button type="button" disabled={pending || !step.unlocked || !topicReady} onClick={() => requestCompile(step.profile)} className="border border-gray-900 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-35">{pendingAction === `compile-${step.profile}` ? '编译中…' : `编译 ${meta.target} 条${meta.shortLabel}案例`}</button>{!topicReady && <button type="button" disabled={pending} onClick={() => autofillTopicGaps(step.profile)} className="border border-amber-700 bg-white px-3 py-2 text-sm text-amber-900 disabled:opacity-40">{autofillProgress?.profile === step.profile ? `生成中 ${autofillProgress.current}/${autofillProgress.total}` : `一键补全 ${Math.min(Math.max(requirement.total - topicCoverage.coverage.total, 1), 5)} 张`}</button>}</div>{!step.unlocked && <p className="mt-2 text-xs text-red-700">{step.reason}</p>}
+              <div className="flex items-start gap-3"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs text-white">1</span><div className="min-w-0 flex-1"><h4 className="text-sm font-semibold">编译案例</h4><p className={`mt-1 text-xs ${topicReady ? 'text-green-700' : 'text-red-700'}`}>{topicReady ? `话题卡充足（${topicCoverage.coverage.total}/${requirement.total} 张）` : `话题卡不足或覆盖未达标（${topicCoverage.coverage.total}/${requirement.total} 张）`} · {requirement.description}</p>{group && <p className="mt-2 text-sm">已编译 {group.cases.length} 条（{counts.ready} 待生成、{counts.blocked} 阻断）</p>}<div className="mt-3 flex flex-wrap gap-2"><button type="button" disabled={pending || !step.unlocked || !topicReady || !runtimeSelectionReady} onClick={() => requestCompile(step.profile)} className="border border-gray-900 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-35">{pendingAction === `compile-${step.profile}` ? '编译中…' : `编译 ${meta.target} 条${meta.shortLabel}案例`}</button>{!topicReady && <button type="button" disabled={pending} onClick={() => autofillTopicGaps(step.profile)} className="border border-amber-700 bg-white px-3 py-2 text-sm text-amber-900 disabled:opacity-40">{autofillProgress?.profile === step.profile ? `生成中 ${autofillProgress.current}/${autofillProgress.total}` : `一键补全 ${Math.min(Math.max(requirement.total - topicCoverage.coverage.total, 1), 5)} 张`}</button>}</div>{!step.unlocked && <p className="mt-2 text-xs text-red-700">{step.reason}</p>}
                 {blockedCases.length > 0 && <details className="mt-3 border-l-2 border-amber-500 pl-3"><summary className="cursor-pointer text-sm font-medium text-amber-900">查看 {blockedCases.length} 条阻断案例</summary><div className="mt-3 space-y-3">{blockedCases.map((item) => <div key={item.id} className="text-xs leading-5"><div className="font-medium text-gray-900">{item.topicCard?.displayTitle ?? '未命名话题'}（{item.id.slice(0, 8)}）</div>{hardCheckErrors(item).map((error) => <div key={error} className="mt-1 text-red-800">{hardCheckErrorLabel(error)}</div>)}</div>)}<div className="bg-amber-50 p-3 text-xs leading-5 text-amber-950">实际上这些 &quot;泄漏&quot; 出现在给 AI 导师的系统提示词中，学生看不到。如果确认不影响案例质量，可以忽略阻断直接解锁。<div className="mt-2 flex flex-wrap gap-2"><button type="button" disabled={pending} onClick={() => { if (group) setOverrideRunId(group.id); }} className="border border-amber-800 bg-white px-3 py-1.5 text-xs text-amber-900 disabled:opacity-40">忽略阻断并解锁为待生成</button><Link href="/data-lab/topic-cards" className="border px-3 py-1.5 text-xs text-blue-700">或前往话题库修改</Link></div></div></div></details>}
               </div></div>
             </section>
@@ -544,7 +586,7 @@ export default function CaseGenerationManager({
       {historyRuns.map((group) => {
         const counts = countStatuses(group.cases);
         const label = group.profile === 'CUSTOM' ? '自定义或生产回流批次' : `${profileMeta[group.profile].label} · ${profileMeta[group.profile].target} 条`;
-        return <article key={group.id} className="border bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium">{label}</h3><span className="bg-gray-100 px-2 py-1 text-xs">{dataLabStatusLabel(group.status)}</span></div><p className="mt-1 text-xs text-gray-500">run: {group.id.slice(0, 8)} · {formatDate(group.createdAt)} · {REVIEW_POLICY_LABELS[group.reviewPolicy] ?? '初审方式待确认'}</p></div><div className="flex flex-wrap gap-3 text-xs"><span>待生成 <b>{counts.ready}</b></span><span>初审中 <b>{counts.editing}</b></span><span>待定稿 <b>{counts.confirming}</b></span><span>已定稿 <b>{counts.finalized}</b></span>{group.status !== 'SUPERSEDED' && group.profile !== 'CUSTOM' && <button type="button" disabled={pending} onClick={() => setSupersedeConfirmation(group.id)} className="border border-red-300 px-2 py-1 text-red-700 disabled:opacity-40">标记为已替代</button>}{(counts.ready + counts.blocked === group.cases.length || group.status === 'SUPERSEDED') && <button type="button" disabled={pending} onClick={() => setDeleteRunId(group.id)} className="border border-red-300 px-2 py-1 text-red-700 disabled:opacity-40">删除</button>}</div></div><details className="mt-3"><summary className="cursor-pointer text-sm text-blue-700">查看 {group.cases.length} 条案例</summary><div className="mt-3 space-y-2">{group.cases.map((item) => <div key={item.id} className="border-t pt-3 text-sm"><div className="flex flex-wrap items-start justify-between gap-2"><div><div className="text-xs text-gray-500">阶段 {item.phase} · {TUTOR_SPLIT_LABELS[item.split] ?? '用途待确认'} · {TRIGGER_TYPE_LABELS[item.triggerType] ?? '触发方式待确认'} · {TOPIC_DISCIPLINE_LABELS[item.topicCard?.subject ?? ''] ?? '生产回流'}</div><h4 className="mt-1 font-medium">{item.topicCard?.displayTitle ?? '生产授权会话回流'}</h4></div><span className="bg-gray-100 px-2 py-1 text-xs">{dataLabStatusLabel(item.status)}</span></div><p className="mt-2 bg-gray-50 p-2 text-xs leading-5">{item.studentMessage || '平台状态触发，本回合没有学生发言。'}</p><div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500"><span>候选 {item._count.candidates}</span><span>审核任务 {item._count.reviewTasks}</span>{item.finalizedTurn && <span>{TRAINING_ELIGIBILITY_LABELS[item.finalizedTurn.trainingEligibility] ?? '训练资格待确认'}</span>}</div></div>)}</div></details></article>;
+        return <article key={group.id} className="border bg-white p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium">{label}</h3><span className="bg-gray-100 px-2 py-1 text-xs">{dataLabStatusLabel(group.status)}</span></div><p className="mt-1 text-xs text-gray-500">run: {group.id.slice(0, 8)} · {formatDate(group.createdAt)} · {REVIEW_POLICY_LABELS[group.reviewPolicy] ?? '初审方式待确认'}</p></div><div className="flex flex-wrap gap-3 text-xs"><span>待生成 <b>{counts.ready}</b></span><span>初审中 <b>{counts.editing}</b></span><span>待定稿 <b>{counts.confirming}</b></span><span>已定稿 <b>{counts.finalized}</b></span>{group.status !== 'SUPERSEDED' && group.profile !== 'CUSTOM' && <button type="button" disabled={pending} onClick={() => setSupersedeConfirmation(group.id)} className="border border-red-300 px-2 py-1 text-red-700 disabled:opacity-40">标记为已替代</button>}{(counts.ready + counts.blocked === group.cases.length || group.status === 'SUPERSEDED') && <button type="button" disabled={pending} onClick={() => setDeleteRunId(group.id)} className="border border-red-300 px-2 py-1 text-red-700 disabled:opacity-40">删除</button>}</div></div><details className="mt-3"><summary className="cursor-pointer text-sm text-blue-700">查看 {group.cases.length} 条案例</summary><div className="mt-3 space-y-2">{group.cases.map((item) => <div key={item.id} className="border-t pt-3 text-sm"><div className="flex flex-wrap items-start justify-between gap-2"><div><div className="text-xs text-gray-500">阶段 {item.phase} · {TUTOR_SPLIT_LABELS[item.split] ?? '用途待确认'} · {TRIGGER_TYPE_LABELS[item.triggerType] ?? '触发方式待确认'} · {TOPIC_DISCIPLINE_LABELS[item.topicCard?.subject ?? ''] ?? '生产回流'}</div><h4 className="mt-1 font-medium">{item.topicCard?.displayTitle ?? '生产授权会话回流'}</h4></div><span className="bg-gray-100 px-2 py-1 text-xs">{dataLabStatusLabel(item.status)}</span></div><p className="mt-2 bg-gray-50 p-2 text-xs leading-5">{item.studentMessage || '平台状态触发，本回合没有学生发言。'}</p>{item.sourcePromptVersion && <p className="mt-2 border border-blue-100 bg-blue-50 p-2 text-xs text-blue-950">来源 Prompt {item.sourcePromptVersion} / 合同 {item.sourceContractVersion ?? '未知'} → 训练目标 Prompt {item.promptVersion} / 合同 {item.contractVersion}</p>}<div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500"><span>候选 {item._count.candidates}</span><span>审核任务 {item._count.reviewTasks}</span>{item.finalizedTurn && <span>{TRAINING_ELIGIBILITY_LABELS[item.finalizedTurn.trainingEligibility] ?? '训练资格待确认'}</span>}</div></div>)}</div></details></article>;
       })}
       {historyRuns.length === 0 && <p className="border bg-white p-6 text-sm text-gray-500">暂无历史批次。</p>}
     </section>

@@ -35,6 +35,8 @@ async function generateTransition(input: {
     externalModelId: string;
     promptPolicyVersion: string;
     contractVersion: string;
+    runtimeBundleId?: string;
+    runtimeConfig?: import('@/app/lib/llm/types').LLMProviderConfig;
   };
   legacySystemPrompt: string;
   visibleContext: string;
@@ -46,6 +48,8 @@ async function generateTransition(input: {
     externalModelId: input.modelVersion.externalModelId,
     promptPolicyVersion: input.modelVersion.promptPolicyVersion,
     contractVersion: input.modelVersion.contractVersion,
+    runtimeBundleId: input.modelVersion.runtimeBundleId,
+    runtimeConfig: input.modelVersion.runtimeConfig,
   };
   const contractBranch = resolveChatContractBranch(input.conv.contractVersion, input.modelVersion.contractVersion);
   if (contractBranch === 'TUTOR_LANGUAGE_V1') {
@@ -64,7 +68,11 @@ async function generateTransition(input: {
     stage: input.stage,
     triggerType: input.triggerType,
     visibleContext: input.visibleContext,
-  }, { provider: input.modelVersion.provider, model: input.modelVersion.externalModelId });
+  }, {
+    provider: input.modelVersion.provider,
+    model: input.modelVersion.externalModelId,
+    configured: input.modelVersion.runtimeConfig,
+  });
   return {
     response: legacy.response,
     stageData: input.conv.stageData,

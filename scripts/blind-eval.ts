@@ -2,7 +2,7 @@
  * 双盲成对偏好评测（LLM-as-judge pairwise blind eval）
  *
  * collect:
- *   MODEL_TAG=qwen-smoke OPENAI_API_KEY=... OPENAI_API_BASE=https://llm.wtsht.cn/v1/v1 \
+ *   MODEL_TAG=qwen-smoke OPENAI_API_KEY=... OPENAI_API_BASE=https://gateway.example.com/v1 \
  *     LLM_PROVIDER=openai LLM_MODEL=Qwen3.5-35B-A3B LLM_TIMEOUT_MS=180000 LLM_MAX_TOKENS=1600 \
  *     npx tsx scripts/blind-eval.ts collect --scope smoke
  *   MODEL_TAG=dsv4-smoke DEEPSEEK_API_KEY=... DEEPSEEK_API_BASE=https://api.deepseek.com \
@@ -24,6 +24,7 @@ import { shouldNudgeConvergence } from '../app/lib/pacing';
 import { createLLMProvider, validateConfig } from '../app/lib/llm/provider';
 import { PhaseEnum, type ChatResponse } from '../app/models/types';
 import type { LLMMessage } from '../app/lib/llm/types';
+import { resolveProviderApiBase } from '../app/lib/llm/endpoints';
 import {
   DEFAULT_STYLE_FAMILY,
   DEFAULT_STYLE_POLICY_VERSION,
@@ -1002,11 +1003,9 @@ function collectSummary(scenarios: ScenarioRecord[]): Transcript['summary'] {
 function collectModelConfig(): Transcript['modelConfig'] {
   const config = validateConfig();
   const provider = config.provider;
-  const baseURL = provider === 'deepseek'
-    ? (process.env.DEEPSEEK_API_BASE ?? 'https://api.deepseek.com')
-    : provider === 'openai'
-      ? (process.env.OPENAI_API_BASE ?? 'https://api.openai.com/v1')
-      : null;
+  const baseURL = provider === 'deepseek' || provider === 'openai'
+    ? resolveProviderApiBase(provider)
+    : null;
   return {
     provider,
     model: config.model,

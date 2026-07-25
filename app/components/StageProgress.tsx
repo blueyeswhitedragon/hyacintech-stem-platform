@@ -20,8 +20,8 @@ interface Props {
 
 export default function StageProgress({ currentStage, completed }: Props) {
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between relative">
+    <div className="w-full overflow-x-auto pb-1">
+      <div className="relative flex min-w-[34rem] items-center justify-between px-1">
         <div className={`absolute h-1 left-0 right-0 top-4 -translate-y-1/2 z-0 ${completed ? 'bg-green-300' : 'bg-gray-200'}`} />
         {Object.entries(STAGE_NAMES).map(([num, name]) => {
           const stage = parseInt(num, 10);

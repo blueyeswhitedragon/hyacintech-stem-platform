@@ -14,8 +14,8 @@ export async function POST(request: Request) {
   const auth = await requireAnyRole(['admin']);
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
   try {
-    const body = await request.json() as { profile?: TutorCaseProfile; counts?: Record<number, number>; split?: TutorCaseSplit; topicCardIds?: string[]; promptVersion?: TutorLanguagePromptVersion; reviewPolicy?: TutorReviewPolicy; allowExistingRun?: boolean };
-    return NextResponse.json(await compileTutorTurnCases({ profile: body.profile ?? 'TRIAL_36', counts: body.counts, split: body.split ?? 'PILOT', topicCardIds: body.topicCardIds, promptVersion: body.promptVersion, reviewPolicy: body.reviewPolicy, allowExistingRun: body.allowExistingRun === true, user: auth.user }), { status: 201 });
+    const body = await request.json() as { profile?: TutorCaseProfile; counts?: Record<number, number>; split?: TutorCaseSplit; topicCardIds?: string[]; promptVersion?: TutorLanguagePromptVersion; promptPolicyVersionId?: string; candidateARuntimeBundleId?: string; candidateBRuntimeBundleId?: string; firstReviewMode?: 'HUMAN' | 'PLATFORM_AI' | 'AUTHORIZED_AGENT'; reviewPolicy?: TutorReviewPolicy; allowExistingRun?: boolean };
+    return NextResponse.json(await compileTutorTurnCases({ profile: body.profile ?? 'TRIAL_36', counts: body.counts, split: body.split ?? 'PILOT', topicCardIds: body.topicCardIds, promptVersion: body.promptVersion, promptPolicyVersionId: body.promptPolicyVersionId, candidateARuntimeBundleId: body.candidateARuntimeBundleId, candidateBRuntimeBundleId: body.candidateBRuntimeBundleId, firstReviewMode: body.firstReviewMode, reviewPolicy: body.reviewPolicy, allowExistingRun: body.allowExistingRun === true, user: auth.user }), { status: 201 });
   } catch (error) {
     if (error instanceof ExistingTutorCaseRunError) {
       return NextResponse.json({ error: error.message, code: error.code, existingRun: error.existingRun }, { status: 409 });

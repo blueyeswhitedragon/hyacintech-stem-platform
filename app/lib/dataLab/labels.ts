@@ -27,6 +27,7 @@ export const DATA_LAB_STATUS_LABELS: Record<string, string> = {
   ACTIVE: '进行中',
   PAUSED: '已暂停',
   ARCHIVED: '已归档',
+  LEGACY_QUARANTINED: '历史待核验',
   COMPLETED: '已完成',
   CANCELLED: '已取消',
   IMPORTED: '已导入',
@@ -278,6 +279,10 @@ export const TUTOR_INTERACTION_META = {
 export const TUTOR_FOCUS_LABELS: Record<string, string> = {
   research_question: '聚焦研究问题',
   direction_confirmation: '确认研究方向',
+  variable_design: '明确变量设计',
+  data_recording: '思考数据记录',
+  experiment_process: '规划实验过程',
+  expected_result: '推测实验结果',
   independent_variable: '明确主动改变的条件',
   controls: '明确控制条件',
   measurement: '明确测量或记录方式',

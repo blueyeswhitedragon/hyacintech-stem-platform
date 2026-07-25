@@ -51,6 +51,7 @@ export function buildGenerationTraceData(input: GenerationTraceInput) {
     triggerType: input.triggerType ?? 'USER_MESSAGE',
     stage: input.traceStage ?? input.currentStage,
     modelVersionId: input.modelVersionId,
+    runtimeBundleId: input.modelIdentity.runtimeBundleId,
     modelTagSnapshot: input.modelIdentity.tag,
     providerSnapshot: input.modelIdentity.provider,
     externalModelSnapshot: input.modelIdentity.externalModelId,

@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server';
-import { unlink, writeFile } from 'fs/promises';
+import { mkdir, unlink, writeFile } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
 import { requireRole } from '@/app/lib/auth';
 import { getConversationForUser, parseStageData } from '@/app/lib/conversation';
 import { extractDocxText } from '@/app/lib/docxExtract';
+import { parseReportSections } from '@/app/lib/reportDocxImport';
 import type { StageData } from '@/app/models/stageData';
-import { finalizeStageData, recoverStageDataV3, studentVisibleStageData } from '@/app/lib/stageState';
+import { contractHash, finalizeStageData, recoverStageDataV3, studentVisibleStageData } from '@/app/lib/stageState';
 
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 const DOCX_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-// POST /api/conversations/[id]/report/import —— 学生上传自己的 Word 报告（轻量：留存 + 文本提取，不覆盖 AI 框架）
+// POST /api/conversations/[id]/report/import —— 留存 Word 并生成章节映射预览；确认前不覆盖权威字段。
 export async function POST(request: Request, ctx: RouteContext<'/api/conversations/[id]/report/import'>) {
   const auth = await requireRole('student');
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -58,11 +59,25 @@ export async function POST(request: Request, ctx: RouteContext<'/api/conversatio
   } catch {
     return NextResponse.json({ error: '无法解析该 Word 文档，请确认是有效的 .docx 文件' }, { status: 400 });
   }
+  const parsed = parseReportSections(text);
+  if (parsed.detectedFields.length === 0) {
+    return NextResponse.json({
+      error: '没有识别到报告章节。请使用“研究目的、假设、实验材料、实验步骤、数据概述、数据分析、结论、局限与讨论”等标题。',
+    }, { status: 400 });
+  }
 
   // 留存原文件
   const filename = `${randomUUID()}.docx`;
-  const dest = path.join(process.cwd(), 'public', 'uploads', filename);
+  const uploadDirectory = path.join(process.cwd(), 'public', 'uploads');
+  const dest = path.join(uploadDirectory, filename);
+  await mkdir(uploadDirectory, { recursive: true });
   await writeFile(dest, buffer);
+  const uploadedDocUrl = `/uploads/${filename}`;
+  const previewHash = contractHash('stage-contract-v4/report-import-preview/v1', {
+    uploadedDocUrl,
+    originalFileName: file.name,
+    sections: parsed.sections,
+  });
 
   // 重新读取并合并最新 JSON，避免覆盖同时发生的报告字段保存。
   const result = await db.$transaction(async (tx) => {
@@ -79,8 +94,13 @@ export async function POST(request: Request, ctx: RouteContext<'/api/conversatio
       ...previous,
       stage5: {
         ...previous.stage5,
-        uploadedDocUrl: `/uploads/${filename}`,
+        uploadedDocUrl,
         uploadedText: text,
+        importPreview: {
+          previewHash,
+          originalFileName: file.name,
+          ...parsed,
+        },
       },
     }, { mutation: 'STAGE5_REPORT_IMPORTED' });
     await tx.conversation.update({
