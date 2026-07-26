@@ -10,6 +10,7 @@ import {
   TOPIC_DISCIPLINE_LABELS,
   TRAINING_ELIGIBILITY_LABELS,
   TRIGGER_TYPE_LABELS,
+  TUTOR_FOCUS_LABELS,
   TUTOR_SPLIT_LABELS,
   dataLabStatusLabel,
   formatGateMetric,
@@ -64,6 +65,20 @@ interface TopicCoverageView {
     duplicateFamilies: Array<{ familyKey: string; count: number }>;
   };
   fullFailures: string[];
+}
+
+interface CaseCoverageView {
+  expectedCells: number;
+  generatedCells: number;
+  finalizedCells: number;
+  gaps: number;
+  cells: Array<{
+    phase: number;
+    triggerType: string;
+    focus: string;
+    generated: number;
+    finalized: number;
+  }>;
 }
 
 interface QualityView {
@@ -160,8 +175,10 @@ export default function CaseGenerationManager({
   calibration,
   trial,
   topicCoverage,
+  caseCoverage,
   topicRequirements,
   runtimeBundles,
+  runtimeDefaults,
   promptPolicies,
 }: {
   cases: CaseView[];
@@ -169,8 +186,10 @@ export default function CaseGenerationManager({
   calibration: QualityView;
   trial: QualityView & { signedOff: boolean };
   topicCoverage: TopicCoverageView;
+  caseCoverage: CaseCoverageView;
   topicRequirements: Record<string, { total: number; description: string }>;
   runtimeBundles: RuntimeBundleOption[];
+  runtimeDefaults: { candidateA: string | null; candidateB: string | null };
   promptPolicies: PromptPolicyOption[];
 }) {
   const router = useRouter();
@@ -178,8 +197,16 @@ export default function CaseGenerationManager({
   const [autofillProgress, setAutofillProgress] = useState<{ profile: Profile; current: number; total: number } | null>(null);
   const [generationProgress, setGenerationProgress] = useState<{ runId: string; current: number; total: number } | null>(null);
   const [feedback, setFeedback] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null);
-  const [candidateARuntimeBundleId, setCandidateARuntimeBundleId] = useState(runtimeBundles.find((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_A')?.id ?? '');
-  const [candidateBRuntimeBundleId, setCandidateBRuntimeBundleId] = useState(runtimeBundles.find((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_B')?.id ?? '');
+  const [candidateARuntimeBundleId, setCandidateARuntimeBundleId] = useState(
+    runtimeBundles.some((bundle) => bundle.id === runtimeDefaults.candidateA)
+      ? runtimeDefaults.candidateA ?? ''
+      : runtimeBundles.find((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_A')?.id ?? '',
+  );
+  const [candidateBRuntimeBundleId, setCandidateBRuntimeBundleId] = useState(
+    runtimeBundles.some((bundle) => bundle.id === runtimeDefaults.candidateB)
+      ? runtimeDefaults.candidateB ?? ''
+      : runtimeBundles.find((bundle) => bundle.roleKey === 'DATA_LAB_CANDIDATE_B')?.id ?? '',
+  );
   const [promptPolicyVersionId, setPromptPolicyVersionId] = useState(promptPolicies.find((policy) => policy.defaultForDataLab)?.id ?? promptPolicies[0]?.id ?? '');
   const [firstReviewMode, setFirstReviewMode] = useState<'HUMAN' | 'PLATFORM_AI'>('PLATFORM_AI');
   const [compileConfirmation, setCompileConfirmation] = useState<Profile | null>(null);
@@ -574,6 +601,29 @@ export default function CaseGenerationManager({
         <div><b>旧版学科分类（兼容统计）</b>{Object.entries(topicCoverage.coverage.subjects).map(([key, value]) => <div key={key} className="mt-1">{TOPIC_DISCIPLINE_LABELS[key] ?? '其他学科'}：{value} 张</div>)}</div>
       </div>
       {topicCoverage.fullFailures.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-[#8a6a0f]">{topicCoverage.fullFailures.map((failure, index) => <li key={`${failure}-${index}`}>{gateFailureLabel(failure)}</li>)}</ul>}
+    </details>
+
+    <details className={`border border-hairline p-4 ${caseCoverage.gaps ? 'border-error/40 bg-error/8' : 'border-success/40 bg-success/8'}`}>
+      <summary className="cursor-pointer font-semibold">结构决策覆盖</summary>
+      <p className="mt-2 text-sm text-muted">
+        应覆盖 <b>{caseCoverage.expectedCells}</b> 格 · 已生成 <b>{caseCoverage.generatedCells}</b> 格 · 已定稿 <b>{caseCoverage.finalizedCells}</b> 格 · 缺口 <b className={caseCoverage.gaps ? 'text-error' : 'text-body-strong'}>{caseCoverage.gaps}</b> 格
+      </p>
+      <div className="mt-3 grid gap-3 xl:grid-cols-2">
+        {[1, 2, 3, 4, 5, 6].map((phase) => {
+          const cells = caseCoverage.cells.filter((cell) => cell.phase === phase);
+          return <section key={phase} className="border border-hairline bg-canvas p-3">
+            <h3 className="text-sm font-semibold">阶段 {phase}</h3>
+            <div className="mt-2 space-y-2">{cells.map((cell) => {
+              const missing = cell.generated === 0;
+              const finalized = cell.finalized > 0;
+              return <div key={`${cell.triggerType}:${cell.focus}`} className={`border p-2 text-xs ${missing ? 'border-error/40 bg-error/8 text-error' : finalized ? 'border-success/40 bg-success/8 text-body-strong' : 'border-info/40 bg-info/8 text-body-strong'}`}>
+                <div className="font-medium">{TRIGGER_TYPE_LABELS[cell.triggerType] ?? cell.triggerType} · {TUTOR_FOCUS_LABELS[cell.focus] ?? cell.focus}</div>
+                <div className="mt-1">{missing ? '缺口：尚未生成' : `已生成 ${cell.generated} 条 · 已定稿 ${cell.finalized} 条`}</div>
+              </div>;
+            })}</div>
+          </section>;
+        })}
+      </div>
     </details>
 
     <section className="border-y bg-canvas py-5">

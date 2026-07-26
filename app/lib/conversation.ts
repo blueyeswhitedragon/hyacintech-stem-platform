@@ -3,7 +3,6 @@ import { db } from './db';
 import type { Message } from '@/app/models/types';
 import type { AssignmentStatus, StageData } from '@/app/models/stageData';
 import { initialWelcomeMessage } from './welcome';
-import { ensureRuntimeModelVersion } from './modelRegistry';
 import { TUTOR_LANGUAGE_CONTRACT_VERSION } from './tutorLanguage';
 import { recoverStageDataV3, studentVisibleStageData } from './stageState';
 import {
@@ -119,8 +118,8 @@ export async function ensureStudentConversation(
     assignmentTitle: assignment.title,
     topicDirection: assignment.topicDirection ?? undefined,
   })];
-  // 新会话固定到 tutor-language-v1；旧会话保留其历史合同与模型。
-  const runtimeModel = await ensureRuntimeModelVersion();
+  // 新会话先固定合同；模型在第一次真实调用时按 ACTIVE 部署稳定分桶并写入。
+  // 旧会话已经固定的模型/运行组合保持不变。
   const styleSelection: AssistantStyleSelection = assignment.assistantStyleFamily === 'auto' || isStyleFamily(assignment.assistantStyleFamily)
     ? assignment.assistantStyleFamily
     : 'auto';
@@ -134,7 +133,6 @@ export async function ensureStudentConversation(
         resolvedStyleFamily: '',
         stylePolicyVersion: '',
         contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
-        deployedModelVersionId: runtimeModel.id,
         traceCoverage: 'COMPLETE',
       },
       select: { id: true },

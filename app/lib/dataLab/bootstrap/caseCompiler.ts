@@ -7,16 +7,16 @@ import { stage2DraftHash } from '@/app/lib/stageState';
 import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
 import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
 
-export const TRIAL_CASE_COUNTS: Record<number, number> = { 1: 12, 2: 12, 4: 12 };
+export const TRIAL_CASE_COUNTS: Record<number, number> = { 1: 8, 2: 8, 3: 4, 4: 8, 5: 4, 6: 4 };
 export const FULL_CASE_COUNTS: Record<number, number> = { 1: 30, 2: 40, 3: 20, 4: 40, 5: 20, 6: 30 };
 /** 每阶段至少10个，额外20个集中覆盖安全、grounding、主体性和异常数据。 */
 export const EVAL_CASE_COUNTS: Record<number, number> = { 1: 12, 2: 12, 3: 14, 4: 16, 5: 12, 6: 14 };
 
 const CHALLENGES: Record<number, string[]> = {
   1: ['模糊输入', '一次给全', '主题误解', '高概念代理', '学生犹豫', '方向确认'],
-  2: ['假设缺失', '变量不完整', '水平缺失', '因变量缺失', '测量方式含糊', '控制变量混乱', '材料缺失', '步骤缺失', '重复次数缺失', '安全异常', '方案确认', '一次给全'],
+  2: ['阶段首次进入', '假设缺失', '变量不完整', '测量方式含糊', '控制变量混乱', '方案确认', '水平缺失', '一次给全', '因变量缺失', '材料缺失', '步骤缺失', '重复次数缺失', '安全异常'],
   3: ['首次进入', '安全答错', '异常记录', '器材受限'],
-  4: ['未引用数值', '一次给全', '误读趋势', '异常数据', '因果过度', '证据充分'],
+  4: ['阶段首次进入', '未引用数值', '一次给全', '误读趋势', '异常数据', '因果过度', '证据充分'],
   5: ['框架首次交付', '结论缺失', '数据摘要矛盾', '局限讨论缺失'],
   6: ['回应教师反馈', '学习反思', '索要标准答案', '改进选择'],
 };
@@ -262,7 +262,8 @@ function stageState(card: TopicCard, bridge: TopicInquiryBridge | null, phase: n
 function allowedFocus(phase: number, challenge: string) {
   const map: Record<number, string[]> = {
     1: challenge === '方向确认' || challenge === '一次给全' ? ['direction_confirmation'] : ['research_question'],
-    2: [{ challenge: '假设缺失', focus: 'expected_result' },
+    2: [{ challenge: '阶段首次进入', focus: 'variable_design' },
+      { challenge: '假设缺失', focus: 'expected_result' },
       { challenge: '变量不完整', focus: 'variable_design' },
       { challenge: '水平缺失', focus: 'variable_design' },
       { challenge: '因变量缺失', focus: 'variable_design' },
@@ -276,11 +277,62 @@ function allowedFocus(phase: number, challenge: string) {
       { challenge: '一次给全', focus: 'plan_confirmation' },
     ].filter((item) => item.challenge === challenge).map((item) => item.focus),
     3: ['safety_checkpoint'],
-    4: challenge === '未引用数值' ? ['cite_evidence'] : ['interpret_evidence'],
+    4: ['阶段首次进入', '未引用数值'].includes(challenge) ? ['cite_evidence'] : ['interpret_evidence'],
     5: challenge === '框架首次交付' ? ['report_handoff'] : ['report_gap'],
     6: ['reflection_coaching'],
   };
   return map[phase] ?? ['clarification'];
+}
+
+function triggerTypeForScenario(phase: number, challenge: string): string {
+  if (phase === 3 && challenge === '首次进入') return 'STAGE_ENTER';
+  if (phase === 5 && challenge === '框架首次交付') return 'REPORT_BOOTSTRAP';
+  if ([2, 4].includes(phase) && challenge === '阶段首次进入') return 'STAGE_TRANSITION';
+  return 'USER_MESSAGE';
+}
+
+interface CaseSpec {
+  phase: number;
+  challenge: string;
+  variant: number;
+  fallbackIndex: number;
+}
+
+function caseSpecs(counts: Record<number, number>): CaseSpec[] {
+  const specs: CaseSpec[] = [];
+  let cursor = 0;
+  for (const [phaseText, count] of Object.entries(counts)) {
+    const phase = Number(phaseText);
+    const challenges = CHALLENGES[phase] ?? ['一般澄清'];
+    for (let index = 0; index < count; index += 1) {
+      specs.push({
+        phase,
+        challenge: challenges[index % challenges.length],
+        variant: Math.floor(index / challenges.length),
+        fallbackIndex: cursor,
+      });
+      cursor += 1;
+    }
+  }
+  return specs;
+}
+
+export interface CoverageCell {
+  phase: number;
+  triggerType: string;
+  focus: string;
+}
+
+export function expectedCoverageCells(counts: Record<number, number>): CoverageCell[] {
+  const cells = new Map<string, CoverageCell>();
+  for (const spec of caseSpecs(counts)) {
+    const triggerType = triggerTypeForScenario(spec.phase, spec.challenge);
+    for (const focus of allowedFocus(spec.phase, spec.challenge)) {
+      const cell = { phase: spec.phase, triggerType, focus };
+      cells.set(JSON.stringify(cell), cell);
+    }
+  }
+  return [...cells.values()];
 }
 
 function focusDescriptions(focusIds: string[]) {
@@ -301,7 +353,8 @@ function focusDescriptions(focusIds: string[]) {
 }
 
 function studentMessage(card: TopicCard, bridge: TopicInquiryBridge | null, phase: number, challenge: string, variant: number): { triggerType: string; message: string } {
-  if ((phase === 3 && challenge === '首次进入') || (phase === 5 && challenge === '框架首次交付')) return { triggerType: 'SYSTEM_TRIGGER', message: '' };
+  const triggerType = triggerTypeForScenario(phase, challenge);
+  if (triggerType !== 'USER_MESSAGE') return { triggerType, message: '' };
   const direction = bridge?.researchQuestion ?? directionFor(card, phase, challenge, variant);
   if (phase === 1) {
     if (challenge === '模糊输入') return { triggerType: 'USER_MESSAGE', message: card.studentOpening };
@@ -472,19 +525,8 @@ export function compileScenarioCases(cards: TopicCard[], scenarios: TutorCaseSce
 
 export function compileCases(cards: TopicCard[], counts: Record<number, number>, split: TutorCaseSplit, promptVersion: TutorLanguagePromptVersion = DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION): CompiledTutorCase[] {
   assertCardsReady(cards);
-  const cases: CompiledTutorCase[] = [];
-  let cursor = 0;
-  for (const [phaseText, count] of Object.entries(counts)) {
-    const phase = Number(phaseText);
-    const challenges = CHALLENGES[phase] ?? ['一般澄清'];
-    for (let index = 0; index < count; index += 1) {
-      const fallbackIndex = cursor;
-      cursor += 1;
-      const challenge = challenges[index % challenges.length];
-      const variant = Math.floor(index / challenges.length);
-      const card = cardForChallenge(cards, phase, challenge, fallbackIndex);
-      cases.push(compileOneCase({ card, phase, challenge, variant, split, promptVersion }));
-    }
-  }
-  return cases;
+  return caseSpecs(counts).map(({ phase, challenge, variant, fallbackIndex }) => {
+    const card = cardForChallenge(cards, phase, challenge, fallbackIndex);
+    return compileOneCase({ card, phase, challenge, variant, split, promptVersion });
+  });
 }

@@ -1,17 +1,17 @@
 import 'server-only';
 import { db } from '@/app/lib/db';
 import { validateConfig } from '@/app/lib/llm/provider';
-
-function configuredSecret(value: string | undefined) {
-  const secret = value?.trim() ?? '';
-  return secret.length >= 32 && !/please-change|change-me|placeholder/i.test(secret);
-}
+import { getRuntimeModelIdentity } from '@/app/lib/modelRegistry';
+import { evaluateSetupReadiness } from '@/app/lib/dataLab/setupStatus';
 
 export async function getDataLabSetupStatus() {
   const llm = validateConfig();
-  const [adminCount, modelCount, serviceCount] = await Promise.all([
+  const runtimeIdentity = getRuntimeModelIdentity();
+  const [adminCount, runtimeModel, serviceCount, encryptedCredentialCount, activeDeployment] = await Promise.all([
     db.user.count({ where: { role: 'admin', isActive: true } }),
-    db.modelVersion.count(),
+    runtimeIdentity
+      ? db.modelVersion.findUnique({ where: { tag: runtimeIdentity.tag }, select: { id: true } })
+      : Promise.resolve(null),
     db.providerConnection.count({
       where: {
         status: 'ACTIVE',
@@ -19,17 +19,31 @@ export async function getDataLabSetupStatus() {
         endpoints: { some: { status: 'ACTIVE', lastTestStatus: 'PASS' } },
       },
     }),
+    db.providerCredential.count({ where: { sourceType: 'ENCRYPTED_DB' } }),
+    db.modelDeployment.findFirst({
+      where: { environment: 'PRODUCTION', status: 'ACTIVE' },
+      orderBy: { startedAt: 'desc' },
+      select: {
+        id: true,
+        rolloutPercent: true,
+        modelVersion: { select: { tag: true } },
+        runtimeBundle: { select: { id: true, name: true, version: true } },
+      },
+    }),
   ]);
-  const timeoutMs = Number(process.env.LLM_TIMEOUT_MS ?? 0);
-  const checks = {
-    database: true,
-    sessionSecret: configuredSecret(process.env.SESSION_SECRET),
-    provider: llm.valid,
-    timeout: Number.isFinite(timeoutMs) && timeoutMs >= 180_000,
-    credentialMaster: configuredSecret(process.env.DATA_LAB_CREDENTIAL_MASTER_KEY),
-    administrator: adminCount > 0,
-    runtimeModel: modelCount > 0,
-    aiService: serviceCount > 0,
+  return {
+    ...evaluateSetupReadiness({
+      llm,
+      sessionSecret: process.env.SESSION_SECRET,
+      timeoutValue: process.env.LLM_TIMEOUT_MS,
+      credentialMaster: process.env.DATA_LAB_CREDENTIAL_MASTER_KEY,
+      encryptedCredentialCount,
+      administratorCount: adminCount,
+      runtimeModelRegistered: Boolean(runtimeModel),
+      activeProductionDeployment: Boolean(activeDeployment),
+      testedAiServiceCount: serviceCount,
+    }),
+    providerIssues: llm.issues,
+    activeDeployment,
   };
-  return { checks, allReady: Object.values(checks).every(Boolean), providerIssues: llm.issues };
 }

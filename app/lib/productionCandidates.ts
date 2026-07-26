@@ -15,6 +15,7 @@ import { parseJson, sha256 } from '@/app/lib/dataLab/validation';
 import { TUTOR_TRAINING_COHORT } from '@/app/lib/dataLab/trainingCohort';
 import { releasedTraceBlockReason } from '@/app/lib/releasePolicy';
 import type { StageData } from '@/app/models/stageData';
+import { isSystemTriggeredTurn } from '@/app/lib/stageContract';
 
 export const DATA_POLICY_VERSION = 'student-data-policy-v1';
 export const CONSENT_STATUSES = ['PENDING', 'GRANTED', 'DECLINED', 'WITHDRAWN'] as const;
@@ -297,7 +298,7 @@ export async function reviewProductionCandidate(input: {
   return updated;
 }
 
-export async function convertProductionCandidates(input: { ids: string[]; batchName: string; adminId: string }) {
+export async function convertProductionCandidates(input: { ids: string[]; adminId: string }) {
   const ids = [...new Set(input.ids)];
   if (ids.length === 0) throw new Error('请选择生产候选');
   const candidates = await db.productionCandidate.findMany({
@@ -313,7 +314,9 @@ export async function convertProductionCandidates(input: { ids: string[]; batchN
       const record = parseJson<ShareGPTRecord>(candidate.redactedRecordJson, {} as ShareGPTRecord);
       const messages = Array.isArray(record.conversations) ? record.conversations : [];
       const lastHumanIndex = messages.map((message) => message.from).lastIndexOf('human');
-      const studentMessage = lastHumanIndex >= 0 ? messages[lastHumanIndex].value : '';
+      const studentMessage = isSystemTriggeredTurn(candidate.generationTrace.triggerType)
+        ? ''
+        : lastHumanIndex >= 0 ? messages[lastHumanIndex].value : '';
       const history = redactedProductionHistory(record);
       const traceContract = parseJson<{
         stageContractVersion?: string;
@@ -399,7 +402,7 @@ export async function convertProductionCandidates(input: { ids: string[]; batchN
       await tx.productionCandidate.update({ where: { id: candidate.id }, data: { status: 'CONVERTED', convertedTutorTurnCaseId: caseItem.id, processedAt: new Date() } });
       cases.push(caseItem);
     }
-    await tx.dataLabAuditLog.create({ data: { actorId: input.adminId, action: 'PRODUCTION_CANDIDATES_CONVERTED', entityType: 'TutorTurnCase', entityId: cases[0]?.id ?? 'none', payloadJson: JSON.stringify({ candidateIds: ids, caseIds: cases.map((item) => item.id), legacyBatchNameIgnored: input.batchName }) } });
+    await tx.dataLabAuditLog.create({ data: { actorId: input.adminId, action: 'PRODUCTION_CANDIDATES_CONVERTED', entityType: 'TutorTurnCase', entityId: cases[0]?.id ?? 'none', payloadJson: JSON.stringify({ candidateIds: ids, caseIds: cases.map((item) => item.id) }) } });
     return cases;
   });
   return { cases: created, summary: { records: created.length, sourceType: 'PRODUCTION_TRACE', requiresHumanCorrection: created.length } };

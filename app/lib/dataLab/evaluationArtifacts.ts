@@ -1,8 +1,24 @@
+import { EVAL_CASE_COUNTS, expectedCoverageCells } from '@/app/lib/dataLab/bootstrap/caseCompiler';
+
 export interface EvaluationArtifactDiagnostic {
-  code: 'PHASE_SUMMARY_MISSING' | 'PHASE_SUMMARY_INCOMPLETE' | 'PARSE_METRICS_MISSING' | 'SCENARIO_IDS_MISMATCH' | 'MODEL_IDENTITIES_MISMATCH';
+  code:
+    | 'PHASE_SUMMARY_MISSING'
+    | 'PHASE_SUMMARY_INCOMPLETE'
+    | 'TRIGGER_SUMMARY_INCOMPLETE'
+    | 'FOCUS_SUMMARY_INCOMPLETE'
+    | 'PARSE_METRICS_MISSING'
+    | 'SCENARIO_IDS_MISMATCH'
+    | 'MODEL_IDENTITIES_MISMATCH';
   category: 'PRODUCT_INCOMPLETE' | 'ARTIFACT_MISMATCH';
   message: string;
   remediation: string;
+}
+
+export interface ImportedEvaluationSummary {
+  phase?: Record<string, unknown>;
+  trigger?: Record<string, unknown>;
+  focus?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface ImportedEvaluationArtifact {
@@ -10,7 +26,7 @@ export interface ImportedEvaluationArtifact {
   tag?: string;
   scope?: string;
   tags?: { A?: string; B?: string };
-  summary?: unknown;
+  summary?: ImportedEvaluationSummary;
   styleFamily?: string;
   stylePolicyVersion?: string;
   scenarios?: unknown;
@@ -21,6 +37,9 @@ export interface ImportedEvaluationArtifact {
 const PHASES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as const;
 const PARSE_FIELDS = ['parseSuccessA', 'parseTotalA', 'parseSuccessB', 'parseTotalB'] as const;
 const COUNT_FIELDS = ['A', 'B', 'tie', 'inconsistent', 'criticalErrors'] as const;
+const EXPECTED_CELLS = expectedCoverageCells(EVAL_CASE_COUNTS);
+const EXPECTED_TRIGGERS = [...new Set(EXPECTED_CELLS.map((cell) => cell.triggerType))];
+const EXPECTED_FOCUSES = [...new Set(EXPECTED_CELLS.map((cell) => cell.focus))];
 
 function objectValue(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -63,6 +82,14 @@ function normalizedPhaseSummary(summary: unknown) {
   return Object.fromEntries(Object.entries(phase).map(([key, value]) => {
     const number = Number(key.replace(/^P/i, ''));
     return [`P${number}`, value];
+  }));
+}
+
+function structuralSummaryComplete(summary: unknown, dimension: 'trigger' | 'focus', expectedKeys: string[]) {
+  const bucket = objectValue(objectValue(summary)?.[dimension]);
+  return Boolean(bucket && expectedKeys.every((key) => {
+    const counts = objectValue(bucket[key]);
+    return counts && COUNT_FIELDS.every((field) => typeof counts[field] === 'number');
   }));
 }
 
@@ -127,6 +154,20 @@ export function validateEvaluationArtifacts(input: {
     message: '逐阶段统计缺少 A/B 结构解析成功率，部署资格无法计算。',
     remediation: '使用新版 blind-eval 重新生成 verdict，使每个阶段包含 parseSuccessA/parseTotalA/parseSuccessB/parseTotalB。',
   });
+  const triggerSummaryComplete = structuralSummaryComplete(input.verdict.summary, 'trigger', EXPECTED_TRIGGERS);
+  if (!triggerSummaryComplete) diagnostics.push({
+    code: 'TRIGGER_SUMMARY_INCOMPLETE',
+    category: 'PRODUCT_INCOMPLETE',
+    message: '逐触发类型裁决统计不完整，无法确认评测覆盖了学生发言与生产系统触发轮次。',
+    remediation: `重新生成 verdict，确保 summary.trigger 覆盖：${EXPECTED_TRIGGERS.join('、')}。`,
+  });
+  const focusSummaryComplete = structuralSummaryComplete(input.verdict.summary, 'focus', EXPECTED_FOCUSES);
+  if (!focusSummaryComplete) diagnostics.push({
+    code: 'FOCUS_SUMMARY_INCOMPLETE',
+    category: 'PRODUCT_INCOMPLETE',
+    message: '逐 focus 裁决统计不完整，无法确认评测覆盖全部格式性决策。',
+    remediation: `重新生成 verdict，确保 summary.focus 覆盖：${EXPECTED_FOCUSES.join('、')}。`,
+  });
 
   return {
     complete: diagnostics.length === 0,
@@ -135,6 +176,8 @@ export function validateEvaluationArtifacts(input: {
     modelIdentitiesVerified: identitiesMatch,
     phaseSummaryComplete,
     parseMetricsComplete,
+    triggerSummaryComplete,
+    focusSummaryComplete,
     scenarioCount: transcriptScenarioSets[0]?.size ?? 0,
     diagnostics,
   };

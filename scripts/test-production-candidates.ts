@@ -177,7 +177,7 @@ async function main() {
   const candidateRecord = JSON.parse(candidate.redactedRecordJson) as ShareGPTRecord;
   check(candidateRecord.meta?.stageContractVersion === 'stage-contract-v2' && candidateRecord.meta?.promptVersion === TUTOR_LANGUAGE_PROMPT_V1 && candidateRecord.meta?.extractorVersion === 'student-fact-extractor-v1', '生产候选保留轨迹实际 Prompt、Extractor 和阶段合同版本');
   await reviewProductionCandidate({ id: candidate.id, action: 'APPROVE', adminId: admin.id });
-  const converted = await convertProductionCandidates({ ids: [candidate.id], batchName: `production-trace-${suffix}`, adminId: admin.id });
+  const converted = await convertProductionCandidates({ ids: [candidate.id], adminId: admin.id });
   const convertedCandidate = await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id }, include: { convertedTutorTurnCase: true } });
   check(converted.cases.length === 1 && converted.cases[0].dataSource === 'PRODUCTION_TRACE', '通过候选转换为独立 TutorTurnCase');
   check(convertedCandidate.status === 'CONVERTED' && convertedCandidate.convertedTutorTurnCase?.dataSource === 'PRODUCTION_TRACE', '转换后候选与 TutorTurnCase 双向追溯');
@@ -190,13 +190,60 @@ async function main() {
   check(convertedCandidate.convertedTutorTurnCase?.sourceSystemPrompt?.includes(student.displayName) === false
     && convertedCandidate.convertedTutorTurnCase?.systemPrompt.includes(TUTOR_TRAINING_COHORT.promptVersion) === true, '来源 Prompt 脱敏留存并重建目标 Prompt');
 
+  const reportSourcePrompt = buildTutorLanguagePrompt({
+    phase: 5,
+    triggerType: 'REPORT_BOOTSTRAP',
+    visibleFacts: { 报告框架由服务器生成: true },
+    allowedFocusIds: ['report_handoff'],
+  }, TUTOR_LANGUAGE_PROMPT_V1);
+  await db.generationTrace.update({
+    where: { id: systemTrace.id },
+    data: {
+      triggerType: 'REPORT_BOOTSTRAP',
+      stage: 5,
+      promptVersion: TUTOR_LANGUAGE_PROMPT_V1,
+      promptSha256: sha256(reportSourcePrompt),
+      trainingSystemPromptSnapshot: reportSourcePrompt,
+      responseJson: JSON.stringify({ dialogue: '报告框架已生成，请查看待完成部分。', interactionType: 'information', focus: 'report_handoff', hints: [] }),
+      contractVersion: 'tutor-language-v1',
+      contractCheckJson: JSON.stringify({ stageContractVersion: 'stage-contract-v2', extractorVersion: 'student-fact-extractor-v1', chosenFocus: 'report_handoff', allowedFocusIds: ['report_handoff'] }),
+    },
+  });
+  const reportCandidate = await db.productionCandidate.create({
+    data: {
+      generationTraceId: systemTrace.id,
+      status: 'APPROVED',
+      triggerType: 'TEACHER_NOMINATION',
+      consentStatusSnapshot: 'GRANTED',
+      dataPolicyVersion: 'student-data-policy-v1',
+      redactedRecordJson: JSON.stringify({
+        id: `report-bootstrap-${suffix}`,
+        source: 'production_trace',
+        scenario: '报告框架系统触发',
+        phase: 5,
+        conversations: [{ from: 'gpt', value: '{"dialogue":"报告框架已生成"}' }],
+        meta: { systemPrompt: reportSourcePrompt, generationContext: { modelVisibleHistory: [] } },
+      } satisfies ShareGPTRecord),
+      contentSha256: '4'.repeat(64),
+      familyKey: `report-bootstrap-${suffix}`,
+      nominatedById: teacher.id,
+      processedById: admin.id,
+    },
+  });
+  const convertedReport = await convertProductionCandidates({ ids: [reportCandidate.id], adminId: admin.id });
+  check(
+    convertedReport.cases[0]?.triggerType === 'REPORT_BOOTSTRAP'
+      && convertedReport.cases[0]?.studentMessage === '',
+    'REPORT_BOOTSTRAP 生产轨迹可转换为空学生消息的系统触发案例',
+  );
+
   await setStudentDataConsent({ studentAssignmentId: studentAssignment.id, studentId: student.id, decision: 'WITHDRAW' });
   check((await db.productionCandidate.findUniqueOrThrow({ where: { id: candidate.id } })).status === 'WITHDRAWN', '撤回授权使已转换候选停止使用');
   check((await db.tutorTurnCase.findUniqueOrThrow({ where: { id: converted.cases[0].id } })).status === 'BLOCKED', '撤回授权同步阻断已转换 TutorTurnCase');
 
   await db.dataLabAuditLog.deleteMany({ where: { actorId: { in: [teacher.id, student.id, admin.id] } } });
-  await db.productionCandidate.delete({ where: { id: candidate.id } });
-  await db.tutorTurnCase.delete({ where: { id: converted.cases[0].id } });
+  await db.productionCandidate.deleteMany({ where: { id: { in: [candidate.id, reportCandidate.id] } } });
+  await db.tutorTurnCase.deleteMany({ where: { id: { in: [converted.cases[0].id, convertedReport.cases[0].id] } } });
   await db.generationTrace.deleteMany({ where: { id: { in: [trace.id, systemTrace.id, legacyTrace.id] } } });
   await db.studentAssignment.delete({ where: { id: studentAssignment.id } });
   await db.conversation.delete({ where: { id: conversation.id } });

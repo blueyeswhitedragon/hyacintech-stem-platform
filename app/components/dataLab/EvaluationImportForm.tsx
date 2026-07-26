@@ -135,7 +135,7 @@ export default function EvaluationImportForm({ bundles, planned }: {
       <input type="hidden" name="evaluationRunId" value={evaluationRunId} />
       <input type="hidden" name="runtimeBundleAId" value={runtimeBundleAId} />
       <input type="hidden" name="runtimeBundleBId" value={runtimeBundleBId} />
-      <label className="text-sm">评测产物 JSON 文件<input name="artifacts" type="file" accept="application/json,.json" multiple required className="mt-2 block w-full text-sm" /><span className="mt-1 block text-xs leading-5 text-muted">选择三个文件：基线 transcript 需含 schemaVersion、tag、scope、scenarios/turns；候选 transcript 字段相同；verdict 需含 schemaVersion、tags.A/B、scenarioVerdicts，以及 summary.phase 的 P1-P6。每个阶段必须含胜负计数与 A/B parse 成功/总数，否则部署资格无法计算。</span></label>
+      <label className="text-sm">评测产物 JSON 文件<input name="artifacts" type="file" accept="application/json,.json" multiple required className="mt-2 block w-full text-sm" /><span className="mt-1 block text-xs leading-5 text-muted">选择三个文件：基线 transcript 需含 schemaVersion、tag、scope、scenarios/turns；候选 transcript 字段相同；verdict 需含 schemaVersion、tags.A/B、scenarioVerdicts，以及 summary.phase、summary.trigger、summary.focus。逐阶段统计还必须含 A/B parse 成功/总数，否则部署资格无法计算。</span></label>
       <div className="mt-2 flex flex-wrap gap-3 text-xs"><a href="/samples/evaluation-baseline-transcript.json" download className="text-coral hover:underline">下载基线样例</a><a href="/samples/evaluation-candidate-transcript.json" download className="text-coral hover:underline">下载候选样例</a><a href="/samples/evaluation-verdict.json" download className="text-coral hover:underline">下载 verdict 样例</a></div>
       <button disabled={pending || !evaluationRunId} className={buttonClass('primary', 'md', 'mt-3')}>{pending ? '处理中…' : '导入评测产物'}</button>
     </form>

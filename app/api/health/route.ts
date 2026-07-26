@@ -4,8 +4,9 @@ import { validateConfig } from '../../lib/llm/provider';
 import { classifyError } from '../../lib/llm/errors';
 import { resolveProviderApiBase } from '../../lib/llm/endpoints';
 
-export async function GET() {
+export async function GET(request: Request) {
   const result: HealthResponse = {
+    service: 'hyacintech-stem-platform',
     status: 'healthy',
     provider: null,
     model: null,
@@ -29,6 +30,12 @@ export async function GET() {
     return NextResponse.json(result, { status: 200 });
   }
   result.checks.config = { ok: true };
+
+  if (new URL(request.url).searchParams.get('mode') === 'readiness') {
+    result.checks.connectivity = { ok: true, detail: 'readiness 模式未调用外部服务' };
+    result.checks.auth = { ok: true, detail: 'readiness 模式未调用外部服务' };
+    return NextResponse.json(result);
+  }
 
   // ---- Step 2: connectivity test ----
   const baseURL = resolveProviderApiBase(config.provider === 'deepseek' ? 'deepseek' : 'openai');

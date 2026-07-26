@@ -70,7 +70,13 @@ export const TUTOR_SPLIT_LABELS: Record<string, string> = {
 
 export const TRIGGER_TYPE_LABELS: Record<string, string> = {
   USER_MESSAGE: '学生发言触发',
-  SYSTEM_TRIGGER: '平台状态触发',
+  STAGE_ENTER: '阶段首次进入',
+  STAGE_TRANSITION: '阶段切换触发',
+  TEACHER_APPROVAL: '教师放行触发',
+  REPORT_BOOTSTRAP: '报告框架触发',
+  OPTIONAL_COACHING: '可选辅导触发',
+  FINAL_SUBMISSION: '最终提交触发',
+  SYSTEM_TRIGGER: '平台状态触发（历史值）',
 };
 
 export const REVIEW_POLICY_LABELS: Record<string, string> = {
@@ -229,6 +235,7 @@ export const GATE_FAILURE_LABELS: Record<string, string> = {
   NEAR_DUPLICATE_RATE_AT_OR_ABOVE_10_PERCENT: '近重复率达到或超过 10%',
   TEMPLATE_REPEAT_RATE_AT_OR_ABOVE_10_PERCENT: '模板化表达重复率达到或超过 10%',
   TRIAL_REQUIRES_36_CASES: '需要完成并定稿 36 条试验案例（创建案例 → 生成双候选 → 初审 → 定稿，全流程走完后统计）',
+  TRIAL_STRUCTURAL_DISTRIBUTION_OUTDATED: '当前试验批次仍是旧阶段配比；请先标记为已替代，再按六阶段新配比重跑 36 条并重新完成人工签署',
   SMOKE_REQUIRES_SIX_FINALIZED_CASES: '需要完成并定稿 6 条冒烟案例',
   SMOKE_REQUIRES_FOUR_LIGHT_OR_NO_EDIT: '至少 4 条冒烟案例应无需大改',
   SMOKE_REQUIRES_ALL_DIRECT_CONFIRM: '6 条冒烟案例均需一次通过定稿',
@@ -301,6 +308,11 @@ export const TUTOR_FOCUS_LABELS: Record<string, string> = {
   data_recording: '思考数据记录',
   experiment_process: '规划实验过程',
   expected_result: '推测实验结果',
+  plan_confirmation: '核对方案预览',
+  safety_checkpoint: '完成安全检查',
+  report_handoff: '接收报告框架',
+  report_gap: '补齐报告缺口',
+  reflection_coaching: '回应反馈与反思',
   independent_variable: '明确主动改变的条件',
   controls: '明确控制条件',
   measurement: '明确测量或记录方式',
@@ -352,6 +364,8 @@ export function gateFailureLabel(value: string): string {
   if (code === 'FULL_REQUIRES_6_ENGINEERING_OR_HYBRID_TOPIC_CARDS') return `至少需要 6 张工程或混合型话题卡，当前 ${detail ?? 0} 张`;
   if (code === 'FULL_DUPLICATE_PROJECT_FAMILY') return `同一课程项目被重复选入（${count ?? 2} 张）`;
   if (code === 'PHASE_MISSING') return `评测产物缺少 ${detail ?? '某一阶段'} 的有效裁决，请用新版 blind-eval 重新生成`;
+  if (code === 'TRIGGER_MISSING') return `评测产物缺少 ${TRIGGER_TYPE_LABELS[detail] ?? detail ?? '某类触发'} 的有效裁决`;
+  if (code === 'FOCUS_MISSING') return `评测产物缺少 ${TUTOR_FOCUS_LABELS[detail] ?? detail ?? '某个 focus'} 的有效裁决`;
   if (code === 'PHASE_WIN_RATE_BELOW_50') return `${detail ?? '某一阶段'} 候选胜率低于 50%`;
   if (code === 'PHASE_CRITICAL_ERROR') return `${detail ?? '某一阶段'} 出现关键安全、事实依据或学生主体性错误`;
   if (code === 'JUDGE_INCONSISTENCY_ABOVE_10') return `${detail ?? '某一阶段'} 双向裁决不一致率高于 10%`;
@@ -377,7 +391,7 @@ export function gateFailureLabel(value: string): string {
 
 export function gateFailureCategory(value: string): 'PRODUCT_INCOMPLETE' | 'QUALITY' {
   const code = value.split(':')[0];
-  return ['EVALUATION_ARTIFACTS_INCOMPLETE', 'NO_DECISIVE_EVALUATIONS', 'PARSE_SUCCESS_METRICS_MISSING', 'PHASE_MISSING'].includes(code)
+  return ['EVALUATION_ARTIFACTS_INCOMPLETE', 'NO_DECISIVE_EVALUATIONS', 'PARSE_SUCCESS_METRICS_MISSING', 'PHASE_MISSING', 'TRIGGER_MISSING', 'FOCUS_MISSING'].includes(code)
     ? 'PRODUCT_INCOMPLETE'
     : 'QUALITY';
 }

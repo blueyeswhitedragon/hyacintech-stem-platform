@@ -30,6 +30,7 @@ import { importTopicSources, sourcePackagesForCompilation } from '../app/lib/dat
 import { createTrainingRun, importEvaluation } from '../app/lib/dataLab/service';
 import { registerModelVersion } from '../app/lib/modelRegistry';
 import { createOrPromoteDeployment, updateDeploymentObservation } from '../app/lib/deployment';
+import { EVAL_CASE_COUNTS, expectedCoverageCells } from '../app/lib/dataLab/bootstrap/caseCompiler';
 
 let passed = 0; let failed = 0;
 function check(condition: unknown, label: string) { if (condition) { passed++; console.log(`PASS ${label}`); } else { failed++; console.error(`FAIL ${label}`); } }
@@ -422,10 +423,14 @@ async function main() {
   const trainingRun = await createTrainingRun({ name: `training-${suffix}`, releaseId: release.id, baseModel: baseline.externalModelId, status: 'SUCCEEDED', parentModelVersionId: baseline.id, user: admin });
   const candidateModel = await registerModelVersion({ tag: `candidate-${suffix}`, provider: 'deepseek', externalModelId: 'candidate', parentModelVersionId: baseline.id, trainingRunId: trainingRun.id, status: 'TRAINED', createdById: admin.id });
   const phaseSummary = Object.fromEntries([1, 2, 3, 4, 5, 6].map((phase) => [String(phase), { A: 1, B: 2, tie: 0, inconsistent: 0, criticalErrors: 0, parseSuccessA: 9, parseTotalA: 10, parseSuccessB: 10, parseTotalB: 10 }]));
+  const structuralCounts = { A: 1, B: 2, tie: 0, inconsistent: 0, criticalErrors: 0 };
+  const structuralCells = expectedCoverageCells(EVAL_CASE_COUNTS);
+  const triggerSummary = Object.fromEntries([...new Set(structuralCells.map((cell) => cell.triggerType))].map((value) => [value, structuralCounts]));
+  const focusSummary = Object.fromEntries([...new Set(structuralCells.map((cell) => cell.focus))].map((value) => [value, structuralCounts]));
   await importEvaluation({ name: `evaluation-${suffix}`, user: admin, files: [
     { fileName: 'baseline-transcript.json', raw: JSON.stringify({ schemaVersion: 4, tag: baseline.tag, scope: 'all', scenarios: [{ scenarioId: 'P1-1', phase: 1 }] }) },
     { fileName: 'candidate-transcript.json', raw: JSON.stringify({ schemaVersion: 4, tag: candidateModel.tag, scope: 'all', scenarios: [{ scenarioId: 'P1-1', phase: 1 }] }) },
-    { fileName: 'verdict.json', raw: JSON.stringify({ schemaVersion: 4, tags: { A: baseline.tag, B: candidateModel.tag }, scope: 'all', summary: { phase: phaseSummary, criticalErrors: 0 }, scenarioVerdicts: [{ id: 'P1-1', title: 'integration', phases: [1], winner: 'B', inconsistent: false }] }) },
+    { fileName: 'verdict.json', raw: JSON.stringify({ schemaVersion: 4, tags: { A: baseline.tag, B: candidateModel.tag }, scope: 'all', summary: { phase: phaseSummary, trigger: triggerSummary, focus: focusSummary, criticalErrors: 0 }, scenarioVerdicts: [{ id: 'P1-1', title: 'integration', phases: [1], winner: 'B', inconsistent: false }] }) },
   ] });
   check((await db.modelVersion.findUniqueOrThrow({ where: { id: candidateModel.id } })).status === 'ELIGIBLE', '离线评测按阶段门禁通过后模型变为 ELIGIBLE');
   const deployment10 = await createOrPromoteDeployment({ modelVersionId: candidateModel.id, rolloutPercent: 10, adminId: admin.id });

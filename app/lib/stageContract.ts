@@ -13,6 +13,10 @@ export type StageTriggerType =
   | 'OPTIONAL_COACHING'
   | 'FINAL_SUBMISSION';
 
+export function isSystemTriggeredTurn(triggerType: string): boolean {
+  return ['STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP', 'SYSTEM_TRIGGER'].includes(triggerType);
+}
+
 export interface StageBehaviorContract {
   phase: 1 | 2 | 3 | 4 | 5 | 6;
   label: string;

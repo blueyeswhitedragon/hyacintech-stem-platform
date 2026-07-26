@@ -15,6 +15,7 @@ npm run db:migrate # prisma migrate dev (apply schema changes + reseed)
 npm run db:deploy  # deploy committed migrations (new server / CI / production)
 npm run db:seed    # Seed demo teacher + class (tsx prisma/seed.ts)
 npm run db:studio  # Open Prisma Studio (inspect dev.db)
+npm run platform:doctor # Validate deploy prerequisites without showing secrets
 ```
 
 Tests (no test framework configured; pure-function unit tests run via `npx tsx`):
@@ -33,8 +34,12 @@ npx tsx scripts/test-stage2-fallbacks.ts   # categorical-variable extraction + h
 npx tsx scripts/test-advance-hint.ts       # server-derived readiness hints across all stages
 npx tsx scripts/test-stage-release.ts      # audited P2–P5 release and artifact bootstrapping
 npx tsx scripts/test-evaluation-artifacts.ts # evaluation artifact validation and persistence
+npx tsx scripts/test-coverage-cells.ts       # Data Lab phase/trigger/focus coverage cells and system-trigger predicates
 npx tsx scripts/test-stage4-evidence.ts    # P4 证据判定：比较谓词、逐格行约束、单调去重、逐轮原因
 npx tsx scripts/test-source-quote.ts       # 引文定位：吞掉 Markdown 标记仍可命中，拼接/编造仍驳回
+npx tsx scripts/test-llm-errors.ts         # provider error classification, including 503 model_not_found
+npx tsx scripts/test-llm-config.ts         # provider/key/default-model resolution
+npx tsx scripts/test-setup-readiness.ts    # teaching/Data Lab readiness semantics
 ```
 
 `scripts/probe-json-schema.ts` is a diagnostic (not a test): checks whether the configured LLM gateway supports `response_format: json_schema` strict mode.
@@ -236,6 +241,12 @@ Both share one provider path (`createLLMProvider({ role: 'EVALUATOR' })`, `repai
 
 "Verbatim" is resolved by `locateSourceQuote()` / `locateSourceQuoteIn()` in `app/lib/sourceQuote.ts` (pure, tested), shared by both extractors. A quote matches if it is verbatim **after ignoring Markdown emphasis/heading/quote markers and whitespace**, and the validator then rewrites `sourceQuote` to the corresponding span of the student's own message — so the ledger always stores the student's characters, never the model's paraphrase. This exists because a student who wrote his plan with `**bold**` headings was blocked for nine rounds: the model quoted the heading without its asterisks, the remaining 380 characters matched exactly, and the whole fact was still rejected as `SOURCE_QUOTE_NOT_FOUND_IN_STUDENT_MESSAGES`. Only layout noise is forgiven — changed digits, added words, and quotes stitched together across non-adjacent passages are still rejected.
 
+### 模型的格式性决策面
+
+Tutor 模型只决定 `interactionType`、`focus` 与 `hints`；`dialogue` 是教学语言正文，不是状态指令。阶段产物、确认哈希、`phase_complete`、`next_action_type`、方案、数据表、安全题、分析进度和报告框架一律由服务器合成或覆盖，模型不能通过增加字段改变业务状态。模型单方面输出 `checkpoint` 时，如果服务器没有明确声明检查点，兼容层将其映射为 `text_input`，避免产生页面不存在的确认按钮。
+
+Data Lab 的结构覆盖由 `expectedCoverageCells()` 从案例编译器同一份 challenge、triggerType 与 allowed focus 推导，不维护第二份手写清单。独立评测产物必须按 phase、triggerType、focus 提供裁决汇总；`deployment-gate-v3-structural-coverage` 对任何缺格都阻断部署。
+
 ### Response types
 
 `ChatResponse.next_action_type` drives the UI:
@@ -279,6 +290,8 @@ source material / generated drafts → TopicCard review and preview
 
 TopicCard V2 is the compiler input for inquiry scenarios. New `stage-contract-v3` cases are regenerated from approved inputs without deriving from or relabeling old release items. Compiler views strictly separate student-visible state from hidden TopicCard bridges, answer keys, rubrics, and evaluator evidence. Expansion gates and review provenance are defined in `docs/tutor-language-bootstrap-workflow.md`. Data Lab is a data export and result registry, not an in-process training console.
 
+Data Lab 案例的 `triggerType` 统一使用生产 `StageTriggerType`：`USER_MESSAGE / STAGE_ENTER / STAGE_TRANSITION / TEACHER_APPROVAL / REPORT_BOOTSTRAP / OPTIONAL_COACHING / FINAL_SUBMISSION`。`SYSTEM_TRIGGER` 只为已发布 JSON 的历史兼容值；所有系统触发判断统一经过 `isSystemTriggeredTurn()`。`TRIAL_36` 当前配比为 P1=8、P2=8、P3=4、P4=8、P5=4、P6=4，因此解锁 Full 180 的人工逐条复盘签署必须实际看过六阶段及 `STAGE_ENTER / STAGE_TRANSITION / REPORT_BOOTSTRAP`。旧配比 Trial 及其签署会被识别为过期，必须 supersede 后重跑。
+
 The previous `DatasetBatch` / `AnnotationCampaign` ShareGPT five-style workflow is frozen and retained read-only for history, exports, and audit lineage. Its import/create/start APIs return 410 and must not be presented as the primary workflow.
 
 Legacy M9A style lineage remains end-to-end for historical records: assignments select one of five versioned styles or stable `auto`; conversations freeze the resolved style; revisions and release items persist it. Historical frozen releases expose canonical `clean` and model-ready `training` JSON. This does not reopen the legacy campaign workflow for new data.
@@ -313,6 +326,7 @@ DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:init
 DATABASE_URL="file:./hyacintech-verify.db" npm run model:bootstrap
 DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:test:setup
 DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:test
+DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:test
 ```
 
 Remove the disposable database after the test run.
@@ -334,4 +348,8 @@ Remove the disposable database after the test run.
 
 ### Env vars
 
-`DATABASE_URL`, a 32+ character `SESSION_SECRET`, and at least one valid provider key are required. Provider keys are `OPENAI_API_KEY` (+ optional `OPENAI_API_BASE`) and `DEEPSEEK_API_KEY` (+ optional `DEEPSEEK_API_BASE`). Optional runtime overrides include `LLM_PROVIDER`, `LLM_MODEL`, role-specific token/timeout settings, `EXTRACTOR_LLM_*`, `DATA_LAB_AI_CURATOR_*`, `DATA_LAB_MODEL_A/B*`, `ENABLE_MODEL_DEPLOYMENT`, and `PROMOTE_RUNTIME_PROMPT_BASELINE`. `.env.example` is the canonical inventory and separates production settings from script/test-only variables.
+`DATABASE_URL`, a 32+ character `SESSION_SECRET`, and at least one valid provider key are required. Provider keys are `OPENAI_API_KEY` (+ optional `OPENAI_API_BASE`) and `DEEPSEEK_API_KEY` (+ optional `DEEPSEEK_API_BASE`). Exactly one valid key permits provider auto-detection; if both are configured, `LLM_PROVIDER` is mandatory. `LLM_MODEL` defaults to `gpt-4o` for OpenAI or `deepseek-v4-pro` for DeepSeek. `DATA_LAB_CREDENTIAL_MASTER_KEY` is required only after an `ENCRYPTED_DB` credential is stored; ENV-referenced Data Lab connections do not need it. Optional runtime overrides include role-specific token/timeout settings, `EXTRACTOR_LLM_*`, `DATA_LAB_AI_CURATOR_*`, `DATA_LAB_MODEL_A/B*`, `ENABLE_MODEL_DEPLOYMENT`, and `PROMOTE_RUNTIME_PROMPT_BASELINE`. `.env.example` is the canonical inventory and separates production settings from script/test-only variables.
+
+Data Lab provider connections, endpoints, and RuntimeBundles are executable configuration, not a display-only registry. Role defaults preselect forms only. Formal Tutor traffic follows the current ACTIVE production deployment: a new conversation remains unpinned until its first LLM call, then atomically pins both model and RuntimeBundle according to the stable rollout bucket. Existing conversations never silently switch. Guest, Extractor, TopicCard curation, and other callers not explicitly passed a RuntimeBundle still use the `.env` baseline.
+
+The Windows launcher uses `db:deploy`, backs up the actual configured SQLite file before migration, reruns `npm ci` when `package-lock.json` changes, and never auto-creates the frozen legacy Pilot. Its readiness probe verifies service identity without external traffic; the subsequent health probe must validate the selected model unless the operator explicitly supplies `-AllowDegraded`.

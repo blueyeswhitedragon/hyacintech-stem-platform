@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
+import { EVAL_CASE_COUNTS, expectedCoverageCells } from '@/app/lib/dataLab/bootstrap/caseCompiler';
 
-export const DEPLOYMENT_GATE_VERSION = 'deployment-gate-v2-phase-and-observation';
+export const DEPLOYMENT_GATE_VERSION = 'deployment-gate-v3-structural-coverage';
 
 interface CountSummary {
   A?: number;
@@ -23,6 +24,8 @@ export interface GateEvaluationRun {
   summary: {
     scenario?: CountSummary;
     phase?: Record<string, CountSummary>;
+    trigger?: Record<string, CountSummary>;
+    focus?: Record<string, CountSummary>;
     criticalErrors?: number;
     artifactValidation?: { complete?: boolean; invalidArtifacts?: number; scenarioIdsComplete?: boolean; modelIdentitiesVerified?: boolean };
   };
@@ -71,7 +74,12 @@ function addCounts(target: Aggregate, value: CountSummary, candidateIsA: boolean
 }
 
 export function evaluateDeploymentGate(input: { candidateTag: string; runs: GateEvaluationRun[]; trainingReady: boolean }) {
+  const expectedCells = expectedCoverageCells(EVAL_CASE_COUNTS);
+  const expectedTriggers = [...new Set(expectedCells.map((cell) => cell.triggerType))];
+  const expectedFocuses = [...new Set(expectedCells.map((cell) => cell.focus))];
   const byPhase = Object.fromEntries([1, 2, 3, 4, 5, 6].map((phase) => [phase, emptyCounts()])) as Record<number, Aggregate>;
+  const byTrigger = Object.fromEntries(expectedTriggers.map((triggerType) => [triggerType, emptyCounts()])) as Record<string, Aggregate>;
+  const byFocus = Object.fromEntries(expectedFocuses.map((focus) => [focus, emptyCounts()])) as Record<string, Aggregate>;
   const failures: string[] = [];
   let artifactsComplete = true;
   for (const run of input.runs) {
@@ -88,6 +96,12 @@ export function evaluateDeploymentGate(input: { candidateTag: string; runs: Gate
       const match = run.scope?.match(/(?:phase|P)[-_ :]?(\d)/i);
       if (match && byPhase[Number(match[1])]) addCounts(byPhase[Number(match[1])], run.summary.scenario ?? {}, candidateIsA);
     }
+    for (const [triggerType, counts] of Object.entries(run.summary.trigger ?? {})) {
+      if (byTrigger[triggerType]) addCounts(byTrigger[triggerType], counts, candidateIsA);
+    }
+    for (const [focus, counts] of Object.entries(run.summary.focus ?? {})) {
+      if (byFocus[focus]) addCounts(byFocus[focus], counts, candidateIsA);
+    }
     const artifact = run.summary.artifactValidation;
     if (!artifact || artifact.complete !== true || artifact.scenarioIdsComplete !== true || artifact.modelIdentitiesVerified !== true || (artifact.invalidArtifacts ?? 0) > 0) artifactsComplete = false;
     if ((run.summary.criticalErrors ?? 0) > 0) failures.push(`RUN_CRITICAL_ERRORS:${run.id}`);
@@ -103,6 +117,12 @@ export function evaluateDeploymentGate(input: { candidateTag: string; runs: Gate
     if (item.criticalErrors > 0) failures.push(`PHASE_CRITICAL_ERROR:P${phase}`);
     if (total > 0 && item.inconsistent / total > 0.10) failures.push(`JUDGE_INCONSISTENCY_ABOVE_10:P${phase}`);
   }
+  for (const [triggerType, item] of Object.entries(byTrigger)) {
+    if (item.wins + item.losses === 0) failures.push(`TRIGGER_MISSING:${triggerType}`);
+  }
+  for (const [focus, item] of Object.entries(byFocus)) {
+    if (item.wins + item.losses === 0) failures.push(`FOCUS_MISSING:${focus}`);
+  }
   const aggregate = Object.values(byPhase).reduce((acc, item) => {
     for (const key of Object.keys(acc) as Array<keyof Aggregate>) acc[key] += item[key];
     return acc;
@@ -116,8 +136,23 @@ export function evaluateDeploymentGate(input: { candidateTag: string; runs: Gate
     const baselineRate = aggregate.baselineParseSuccess / aggregate.baselineParseTotal;
     if (candidateRate < baselineRate) failures.push('STRUCTURE_PARSE_SUCCESS_BELOW_BASELINE');
   } else failures.push('PARSE_SUCCESS_METRICS_MISSING');
-  const insufficient = failures.length > 0 && failures.every((failure) => failure.startsWith('PHASE_MISSING') || failure === 'NO_DECISIVE_EVALUATIONS' || failure === 'PARSE_SUCCESS_METRICS_MISSING' || failure === 'EVALUATION_ARTIFACTS_INCOMPLETE');
-  return { policyVersion: DEPLOYMENT_GATE_VERSION, result: failures.length === 0 ? 'PASS' : insufficient ? 'INSUFFICIENT' : 'FAIL', failures: [...new Set(failures)], aggregate, byPhase, artifactsComplete } as const;
+  const insufficient = failures.length > 0 && failures.every((failure) =>
+    failure.startsWith('PHASE_MISSING')
+    || failure.startsWith('TRIGGER_MISSING')
+    || failure.startsWith('FOCUS_MISSING')
+    || failure === 'NO_DECISIVE_EVALUATIONS'
+    || failure === 'PARSE_SUCCESS_METRICS_MISSING'
+    || failure === 'EVALUATION_ARTIFACTS_INCOMPLETE');
+  return {
+    policyVersion: DEPLOYMENT_GATE_VERSION,
+    result: failures.length === 0 ? 'PASS' : insufficient ? 'INSUFFICIENT' : 'FAIL',
+    failures: [...new Set(failures)],
+    aggregate,
+    byPhase,
+    byTrigger,
+    byFocus,
+    artifactsComplete,
+  } as const;
 }
 
 export function evaluateOnlineObservationGate(input: OnlineObservationInput) {

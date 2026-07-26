@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import AuthNav from '@/app/components/AuthNav';
+import BrandMark from '@/app/components/icons/BrandMark';
 import DataLabNav, { type NavigationGroupData } from '@/app/components/dataLab/DataLabNav';
 import { getCurrentUser } from '@/app/lib/session';
 import { canUseDataLab } from '@/app/lib/dataLab/service';
@@ -54,7 +55,7 @@ export default async function DataLabLayout({ children }: { children: React.Reac
   // density-compact：Data Lab 的使用者整天在比对版本号、状态和计数，
   // 信息密度优先于呼吸感——与学生端的 density-roomy 共用同一套颜色与圆角令牌。
   return <main className="density-compact min-h-screen bg-canvas text-body">
-    <header className="border-b border-b-hairline border-hairline bg-canvas"><div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3.5 lg:px-6"><div className="min-w-0"><Link href="/data-lab" className="display-sm">Hyacintech <span className="font-lineage">Data Lab</span></Link><p className="mt-0.5 text-[13px] text-muted">教学数据生产、交付与模型迭代登记</p></div><AuthNav /></div></header>
+    <header className="border-b border-b-hairline border-hairline bg-canvas"><div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3.5 lg:px-6"><div className="flex min-w-0 items-center gap-3"><BrandMark className="size-8 shrink-0" /><div className="min-w-0"><Link href="/data-lab" className="display-sm">Hyacintech <span className="font-lineage">Data Lab</span></Link><p className="mt-0.5 text-[13px] text-muted">教学数据生产、交付与模型迭代登记</p></div></div><AuthNav /></div></header>
     <details className="border-b border-b-hairline border-hairline bg-surface-soft px-4 py-2 lg:hidden">
       <summary className="cursor-pointer py-1 text-sm font-medium text-ink">Data Lab 导航</summary>
       <nav className="pb-3 pt-1"><DataLabNav groups={navigationGroups} /></nav>
