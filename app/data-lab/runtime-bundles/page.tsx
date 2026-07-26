@@ -16,7 +16,7 @@ export default async function RuntimeBundlesPage() {
     runtimeBundleOptions(),
   ]);
   return <div className="space-y-6">
-    <header><h1 className="text-2xl font-semibold">运行组合</h1><p className="mt-1 text-sm text-gray-500">把模型产物、服务 Endpoint、Prompt 策略、合同和生成参数组成一个不可变版本。只有通过实际调用与兼容性评测的组合，才能绑定角色或进入部署。</p></header>
+    <header><h1 className="text-2xl font-semibold">运行组合</h1><p className="mt-1 text-sm text-muted">把模型产物、服务 Endpoint、Prompt 策略、合同和生成参数组成一个不可变版本。只有通过实际调用与兼容性评测的组合，才能绑定角色或进入部署。</p><p className="mt-2 border border-warning/40 bg-warning/8 p-3 text-xs leading-5 text-body-strong"><b>角色默认组合目前仅作登记与批次选择用途，不会直接改写所有运行时调用。</b>学生端切换仍由通过门禁的生产部署控制。</p></header>
     <RuntimeBundleManager
       roles={roles.map((role) => ({
         roleKey: role.roleKey,

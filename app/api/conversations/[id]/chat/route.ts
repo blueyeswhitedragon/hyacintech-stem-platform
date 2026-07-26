@@ -17,6 +17,7 @@ import { shouldNudgeConvergence } from '@/app/lib/pacing';
 import { PhaseEnum, type Message } from '@/app/models/types';
 import type { StageData } from '@/app/models/stageData';
 import { studentVisibleStageData } from '@/app/lib/stageState';
+import { advanceHint } from '@/app/lib/advanceHint';
 
 function buildContext(stage: number, conv: {
   topicDirection: string | null;
@@ -166,7 +167,12 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
               ? 'OPTIONAL_COACHING'
               : 'USER_MESSAGE',
       });
-      return NextResponse.json({ ...turn.response, currentStage: nextStage, stageData: studentVisibleStageData(stageData) });
+      return NextResponse.json({
+        ...turn.response,
+        currentStage: nextStage,
+        stageData: studentVisibleStageData(stageData),
+        advanceHint: advanceHint({ currentStage: nextStage, stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
+      });
     }
 
     // 历史会话继续走 stage-contract-v2，不改变既有解析、风格快照和结构化产物。
@@ -226,7 +232,12 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       contractCheck: llmResult.trace.contractCheck,
       triggerType: context?.triggerType ?? 'USER_MESSAGE',
     });
-    return NextResponse.json({ ...response, currentStage: nextStage, stageData: studentVisibleStageData(stageData) });
+    return NextResponse.json({
+      ...response,
+      currentStage: nextStage,
+      stageData: studentVisibleStageData(stageData),
+      advanceHint: advanceHint({ currentStage: nextStage, stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
+    });
   } catch (err) {
     console.error('会话聊天处理出错:', err);
     const { error, detail, status } = classifyError(err);

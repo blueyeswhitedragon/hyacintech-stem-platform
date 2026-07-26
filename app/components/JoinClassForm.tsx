@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from './ui/Button';
+import { Input } from './ui/Field';
 
 export default function JoinClassForm() {
   const router = useRouter();
@@ -34,20 +36,19 @@ export default function JoinClassForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 items-start">
-      <input
+    <form onSubmit={handleSubmit} className="flex flex-col items-start gap-2 sm:flex-row">
+      <Input
         type="text"
         value={inviteCode}
         onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
         placeholder="输入班级邀请码"
-        className="border rounded-lg p-2 text-gray-900 tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-0"
+        className="min-w-0 flex-1 font-lineage uppercase tracking-[0.2em]"
         maxLength={6}
       />
-      <button type="submit" disabled={loading || inviteCode.trim() === ''}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
+      <Button type="submit" variant="primary" disabled={loading || inviteCode.trim() === ''}>
         {loading ? '加入中…' : '加入班级'}
-      </button>
-      {error && <span className="text-sm text-red-600 self-center">{error}</span>}
+      </Button>
+      {error && <span className="self-center text-sm text-error">{error}</span>}
     </form>
   );
 }

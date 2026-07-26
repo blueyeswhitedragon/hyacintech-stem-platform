@@ -44,18 +44,18 @@ export default function Fireworks() {
   return (
     <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
       {/* 暗色遮罩 */}
-      <div className="absolute inset-0 bg-black/30 animate-in fade-in duration-500" />
+      <div className="absolute inset-0 bg-ink/40 animate-in fade-in duration-500" />
 
       {/* 中央祝贺文字 */}
       <div className="relative z-10 text-center animate-in zoom-in-95 fade-in duration-700">
         <div className="text-4xl mb-3">🎓</div>
-        <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-2">
+        <h2 className="display-md mb-2 text-canvas drop-shadow-lg">
           恭喜完成探究！
         </h2>
-        <p className="text-white/90 text-lg drop-shadow">
+        <p className="text-lg text-canvas/90 drop-shadow">
           你已完成了全部六个阶段的科学探究，太棒了！
         </p>
-        <p className="text-white/60 text-sm mt-3">点击任意位置或按任意键关闭</p>
+        <p className="mt-3 text-sm text-canvas/60">点击任意位置或按任意键关闭</p>
       </div>
 
       {/* 烟花粒子 */}

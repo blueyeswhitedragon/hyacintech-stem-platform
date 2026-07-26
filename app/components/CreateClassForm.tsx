@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from './ui/Button';
+import { Input } from './ui/Field';
 
 export default function CreateClassForm() {
   const router = useRouter();
@@ -31,15 +33,18 @@ export default function CreateClassForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 items-start">
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+    <form onSubmit={handleSubmit} className="flex flex-col items-start gap-2 sm:flex-row">
+      <Input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         placeholder="新班级名称"
-        className="border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-0" />
-      <button type="submit" disabled={loading || name.trim() === ''}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
+        className="min-w-0 flex-1"
+      />
+      <Button type="submit" variant="primary" disabled={loading || name.trim() === ''}>
         {loading ? '创建中…' : '创建班级'}
-      </button>
-      {error && <span className="text-sm text-red-600 self-center">{error}</span>}
+      </Button>
+      {error && <span className="self-center text-sm text-error">{error}</span>}
     </form>
   );
 }

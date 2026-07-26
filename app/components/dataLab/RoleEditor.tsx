@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { UserRole } from '@/app/lib/roles';
+import { Select } from '@/app/components/ui/Field';
 
 export default function RoleEditor({ userId, currentRole }: { userId: string; currentRole: UserRole }) {
   const router = useRouter();
@@ -25,5 +26,5 @@ export default function RoleEditor({ userId, currentRole }: { userId: string; cu
       setError(err instanceof Error ? err.message : String(err));
     } finally { setPending(false); }
   }
-  return <div><select value={role} disabled={pending} onChange={(event) => update(event.target.value as UserRole)} className="border px-2 py-1 text-sm"><option value="annotator">标注者</option><option value="reviewer">复审者</option><option value="admin">管理员</option></select>{error && <div className="mt-1 text-xs text-red-600">{error}</div>}</div>;
+  return <div><Select value={role} disabled={pending} onChange={(event) => update(event.target.value as UserRole)}><option value="annotator">标注者</option><option value="reviewer">复审者</option><option value="admin">管理员</option></Select>{error && <div className="mt-1 text-xs text-error">{error}</div>}</div>;
 }

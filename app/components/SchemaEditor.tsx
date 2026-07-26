@@ -2,6 +2,8 @@
 
 import React from 'react';
 import type { Stage2Column } from '@/app/models/stageData';
+import Button from './ui/Button';
+import { Input, Select } from './ui/Field';
 
 interface Props {
   columns: Stage2Column[];
@@ -46,52 +48,76 @@ export default function SchemaEditor({ columns: initial, onSave }: Props) {
     setSaving(true); setMsg(null); setErr(null);
     const e = await handleSave();
     setSaving(false);
-    if (e) setErr(e); else setMsg('✓ 已保存');
+    if (e) setErr(e); else setMsg('已保存');
   };
 
   return (
     <div className="p-4">
-      <h3 className="font-medium mb-2">📋 数据表结构（可修改）</h3>
-      <p className="text-xs text-gray-500 mb-3">
+      <h3 className="display-sm mb-1.5">数据表结构（可修改）</h3>
+      <p className="mb-3 text-sm leading-6 text-muted">
         AI 生成了以下列结构。你可以修改列名、调整类型、增减列，确认无误后点击保存。
       </p>
 
-      <div className="overflow-x-auto mb-3">
-        <table className="w-full text-sm border">
-          <thead className="bg-gray-50 text-gray-600">
+      {/* 这是一张密集编辑网格：即使在学生端的宽松版式里，逐格输入也要用紧凑密度，
+          否则一行会撑到两指高，反而更难对照修改。 */}
+      <div className="density-compact mb-3 overflow-x-auto rounded-lg border border-hairline">
+        <table className="w-full border-collapse text-xs">
+          <thead className="border-b border-hairline bg-surface-soft">
             <tr>
-              <th className="p-2 border text-left w-12">#</th>
-              <th className="p-2 border text-left">key</th>
-              <th className="p-2 border text-left">中文名</th>
-              <th className="p-2 border text-left w-24">类型</th>
-              <th className="p-2 border text-center w-16">必填</th>
-              <th className="p-2 border text-center w-12"></th>
+              <th className="w-10 p-2 text-center font-medium text-muted">#</th>
+              <th className="p-2 text-left font-medium text-muted">key</th>
+              <th className="p-2 text-left font-medium text-muted">中文名</th>
+              <th className="w-28 p-2 text-left font-medium text-muted">类型</th>
+              <th className="w-14 p-2 text-center font-medium text-muted">必填</th>
+              <th className="w-10 p-2" />
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-hairline-soft">
             {columns.map((col, i) => (
-              <tr key={i} className="hover:bg-gray-50">
-                <td className="p-1 border text-center text-gray-400 text-xs">{i + 1}</td>
-                <td className="p-1 border">
-                  <input value={col.key} onChange={(e) => setCol(i, { key: e.target.value })}
-                    className="w-full border rounded px-1 py-0.5 text-xs font-mono text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              <tr key={i}>
+                <td className="p-1.5 text-center tabular-nums text-muted-soft">{i + 1}</td>
+                <td className="p-1.5">
+                  <Input
+                    value={col.key}
+                    onChange={(e) => setCol(i, { key: e.target.value })}
+                    className="font-mono text-xs"
+                  />
                 </td>
-                <td className="p-1 border">
-                  <input value={col.title} onChange={(e) => setCol(i, { title: e.target.value })}
-                    className="w-full border rounded px-1 py-0.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <td className="p-1.5">
+                  <Input
+                    value={col.title}
+                    onChange={(e) => setCol(i, { title: e.target.value })}
+                    className="text-xs"
+                  />
                 </td>
-                <td className="p-1 border">
-                  <select value={col.type} onChange={(e) => setCol(i, { type: e.target.value as Stage2Column['type'] })}
-                    className="w-full border rounded px-1 py-0.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    <option value="text">text</option><option value="number">number</option><option value="image">image</option>
-                  </select>
+                <td className="p-1.5">
+                  <Select
+                    value={col.type}
+                    onChange={(e) => setCol(i, { type: e.target.value as Stage2Column['type'] })}
+                    className="text-xs"
+                  >
+                    <option value="text">text</option>
+                    <option value="number">number</option>
+                    <option value="image">image</option>
+                  </Select>
                 </td>
-                <td className="p-1 border text-center">
-                  <input type="checkbox" checked={col.required} onChange={(e) => setCol(i, { required: e.target.checked })} className="h-3.5 w-3.5" />
+                <td className="p-1.5 text-center">
+                  <input
+                    type="checkbox"
+                    checked={col.required}
+                    onChange={(e) => setCol(i, { required: e.target.checked })}
+                    className="size-3.5 accent-coral"
+                  />
                 </td>
-                <td className="p-1 border text-center">
-                  <button onClick={() => removeColumn(i)} disabled={columns.length <= 1}
-                    className="text-red-400 hover:text-red-600 disabled:opacity-30 text-xs" title="删除列">✕</button>
+                <td className="p-1.5 text-center">
+                  <button
+                    onClick={() => removeColumn(i)}
+                    disabled={columns.length <= 1}
+                    className="text-muted-soft transition-colors duration-[120ms] hover:text-error disabled:opacity-30 disabled:hover:text-muted-soft"
+                    title="删除列"
+                  >
+                    ✕
+                  </button>
                 </td>
               </tr>
             ))}
@@ -99,15 +125,13 @@ export default function SchemaEditor({ columns: initial, onSave }: Props) {
         </table>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
-        <button onClick={addColumn}
-          className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded hover:bg-gray-100">+ 添加列</button>
-        <button onClick={doSave} disabled={saving}
-          className="px-4 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" onClick={addColumn}>添加列</Button>
+        <Button size="sm" variant="primary" onClick={doSave} disabled={saving}>
           {saving ? '保存中…' : '保存列定义'}
-        </button>
-        {msg && <span className="text-sm text-green-600">{msg}</span>}
-        {err && <span className="text-sm text-red-600">{err}</span>}
+        </Button>
+        {msg && <span className="text-sm text-[#2f7a43]">{msg}</span>}
+        {err && <span className="text-sm text-error">{err}</span>}
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
+import Button from '@/app/components/ui/Button';
+import Callout from '@/app/components/ui/Callout';
 
 export default function Dialog({
   open,
@@ -30,14 +32,25 @@ export default function Dialog({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
-      <section role="dialog" aria-modal="true" aria-label={title} className={`w-full ${maxWidth} max-h-[calc(100vh-2rem)] overflow-auto rounded-lg border bg-white p-5 shadow-xl`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/45 p-4" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
+      <section role="dialog" aria-modal="true" aria-label={title} className={`density-compact w-full ${maxWidth} max-h-[calc(100vh-2rem)] overflow-auto rounded-lg border border-hairline bg-canvas p-5 shadow-xl`}>
         <div className="flex items-start justify-between gap-4">
-          <div><h2 className="text-lg font-semibold">{title}</h2>{description && <p className="mt-1 text-sm leading-6 text-gray-600">{description}</p>}</div>
-          <button type="button" onClick={onClose} className="size-8 shrink-0 rounded border text-lg leading-none text-gray-500 hover:bg-gray-50" aria-label="关闭对话框" title="关闭">×</button>
+          <div>
+            <h2 className="display-sm">{title}</h2>
+            {description && <p className="mt-1.5 text-sm leading-6 text-muted">{description}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="size-8 shrink-0 rounded-md border border-hairline text-lg leading-none text-muted transition-colors duration-[120ms] hover:bg-surface-soft hover:text-ink"
+            aria-label="关闭对话框"
+            title="关闭"
+          >
+            ×
+          </button>
         </div>
         {children && <div className="mt-4">{children}</div>}
-        {footer && <div className="mt-5 flex flex-wrap justify-end gap-2 border-t pt-4">{footer}</div>}
+        {footer && <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-t-hairline border-hairline pt-4">{footer}</div>}
       </section>
     </div>
   );
@@ -64,7 +77,23 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onClose: () => void;
 }) {
-  return <Dialog open={open} title={title} description={description} onClose={onClose} footer={<><button type="button" onClick={onClose} disabled={pending} className="rounded border px-4 py-2 text-sm disabled:opacity-40">取消</button><button type="button" onClick={onConfirm} disabled={pending} className={`rounded px-4 py-2 text-sm text-white disabled:opacity-40 ${danger ? 'bg-red-700' : 'bg-gray-950'}`}>{pending ? '处理中…' : confirmLabel}</button></>}>
-    {consequence && <p className={`rounded border p-3 text-sm leading-6 ${danger ? 'border-red-200 bg-red-50 text-red-900' : 'border-amber-200 bg-amber-50 text-amber-950'}`}>{consequence}</p>}
-  </Dialog>;
+  return (
+    <Dialog
+      open={open}
+      title={title}
+      description={description}
+      onClose={onClose}
+      footer={
+        <>
+          <Button type="button" onClick={onClose} disabled={pending}>取消</Button>
+          <Button type="button" variant={danger ? 'danger' : 'primary'} onClick={onConfirm} disabled={pending}>
+            {pending ? '处理中…' : confirmLabel}
+          </Button>
+        </>
+      }
+    >
+      {/* 后果说明：不可逆操作用 error，其余用 warning。 */}
+      {consequence && <Callout tone={danger ? 'error' : 'warning'}>{consequence}</Callout>}
+    </Dialog>
+  );
 }

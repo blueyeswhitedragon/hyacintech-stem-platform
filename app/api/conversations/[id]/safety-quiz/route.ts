@@ -4,6 +4,7 @@ import { requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import { deterministicSafetyQuiz } from '@/app/lib/serverTutorState';
 import { finalizeStageData, studentVisibleStageData } from '@/app/lib/stageState';
+import { advanceHint } from '@/app/lib/advanceHint';
 
 // POST /api/conversations/[id]/safety-quiz —— 服务端核验安全问答
 // body: { answer: number }。不能信任客户端直接声明 passed。
@@ -34,11 +35,8 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   if (conv.currentStage !== 3) {
     return NextResponse.json({ error: '当前不在过程执行阶段' }, { status: 400 });
   }
-  const quiz = conv.stageData.stage3?.safetyQuiz;
-  if (!quiz) {
-    return NextResponse.json({ error: '尚未生成可核验的安全问答' }, { status: 400 });
-  }
   const deterministic = deterministicSafetyQuiz(conv.stageData);
+  const quiz = conv.stageData.stage3?.safetyQuiz ?? deterministic;
   const expectedAnswer = Number.isInteger(quiz.correct) ? quiz.correct : deterministic.correct;
   if (body.answer !== expectedAnswer) {
     return NextResponse.json({ error: '回答不正确，请重新选择' }, { status: 400 });
@@ -51,6 +49,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
       safetyQuiz: {
         question: quiz.question,
         options: quiz.options,
+        correct: expectedAnswer,
         selected: body.answer,
         passed: true,
       },
@@ -63,5 +62,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
     data: { safetyQuizCompleted: true, stageData: JSON.stringify(stageData) },
   });
 
-  return NextResponse.json({ ok: true, stageData: studentVisibleStageData(stageData) });
+  return NextResponse.json({
+    ok: true,
+    stageData: studentVisibleStageData(stageData),
+    advanceHint: advanceHint({ currentStage: conv.currentStage, stageData, safetyQuizCompleted: true }),
+  });
 }

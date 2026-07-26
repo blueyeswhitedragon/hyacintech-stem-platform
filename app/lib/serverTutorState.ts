@@ -1,5 +1,6 @@
 import type { ChatResponse, SafetyQuiz } from '@/app/models/types';
-import type { Stage2RiskAnnotation, StageData } from '@/app/models/stageData';
+import type { Stage2RiskAnnotation, Stage4RoundRejection, StageData } from '@/app/models/stageData';
+import type { ValidatedAnalysisClaim } from '@/app/lib/analysisClaimExtractor';
 import { composeReportSections } from '@/app/lib/stageArtifacts';
 import type { TutorServerEnvelope } from '@/app/lib/tutorLanguage';
 import { contractHash } from '@/app/lib/stageState';
@@ -97,20 +98,36 @@ export function deterministicSafetyQuiz(stageData: StageData): SafetyQuiz & { co
   };
 }
 
-function normalizedCellValue(value: unknown): string {
+export function normalizedCellValue(value: unknown): string {
   return String(value ?? '').replace(/\s+/g, '').trim();
 }
 
-function isIndexColumn(key: string, title: string): boolean {
+export function isIndexColumn(key: string, title: string): boolean {
   return /^(?:trial|repeat|repeat_index|index|row_index)$/i.test(key)
     || /(?:重复|试验|实验)?序号|编号/.test(title);
 }
 
-function containsCellValue(message: string, value: string): boolean {
+export function containsCellValue(message: string, value: string): boolean {
   if (!value) return false;
   if (!/^-?\d+(?:\.\d+)?$/.test(value)) return message.includes(value);
   const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(^|[^0-9.])${escaped}([^0-9.]|$)`).test(message);
+}
+
+/**
+ * 「这句话有没有在做比较」的确定性兜底判定。
+ *
+ * 覆盖比较句式而不是枚举形容词：裸「比」只在构成比字比较句（比…高/低/多/少…）时才算，
+ * 因此「比较认真」「比如」不再误命中；「大于/更强/超过/一样」这类此前漏判的写法全部纳入。
+ * 语义判断本身不该由正则承担，这里只是兜底——正例/反例清单固定在 scripts/test-stage4-evidence.ts。
+ */
+export function expressesComparison(message: string): boolean {
+  const text = message ?? '';
+  if (!text) return false;
+  // 比字比较句：「比」后 8 字内出现比较形容词。排除「比如」「比方说」「好比／打比方」，
+  // 但「圆形比方形高」必须命中——不能因为它以「比方」开头就整句作废。
+  if (/(?<![好打])比(?!如|方说)[^，。！？；、,.!?;\s]{0,8}(?:多|少|高|低|大|小|快|慢|强|弱|重|轻|长|短|好|差|久|远|近|深|浅)/.test(text)) return true;
+  return /相比|对比|相较|比起|高于|低于|大于|小于|多于|少于|优于|劣于|快于|慢于|超过|不如|不及|领先|落后|等于|一样|持平|翻倍|倍|增加|减少|增大|减小|变大|变小|上升|下降|提高|降低|最多|最少|最高|最低|最大|最小|相同|不同|差异|差距|更[多少高低大小快慢强弱重轻长短好差]/.test(text);
 }
 
 function chineseRowNumber(index: number): string {
@@ -122,7 +139,7 @@ function chineseRowNumber(index: number): string {
   return String(index);
 }
 
-interface AnalysisCellEvidence {
+export interface AnalysisCellEvidence {
   rowIndex: number;
   columnKey: string;
   columnName: string;
@@ -130,12 +147,24 @@ interface AnalysisCellEvidence {
   fingerprint: string;
 }
 
-function columnAliases(key: string, title: string): string[] {
+/** 单元格证据指纹的唯一配方：确定性抽取与主张抽取器必须算出同一个值，否则去重会失效。 */
+export function evidenceCellFingerprint(rowIndex: number, columnKey: string, citedValue: string): string {
+  return contractHash('stage-contract-v3/evidence-cell/v1', { rowIndex, columnKey, citedValue });
+}
+
+export function columnAliases(key: string, title: string): string[] {
   return [...new Set([
     key,
     title,
     ...title.split(/[：:（(）)、/\s]+/).map((item) => item.trim()).filter((item) => item.length >= 2),
   ])];
+}
+
+function mentionsRow(studentMessage: string, oneBased: number): boolean {
+  const rowNumber = `(?:${oneBased}|${chineseRowNumber(oneBased)})`;
+  return new RegExp(
+    `(?:第\\s*${rowNumber}\\s*(?:行|次(?:记录)?|轮)|重复\\s*${rowNumber}(?:\\s*(?:次|轮))?)`,
+  ).test(studentMessage);
 }
 
 function evidenceCells(stageData: StageData, studentMessage: string): AnalysisCellEvidence[] {
@@ -149,12 +178,16 @@ function evidenceCells(stageData: StageData, studentMessage: string): AnalysisCe
   const valueFrequency = new Map<string, number>();
   for (const candidate of candidates) valueFrequency.set(candidate.citedValue, (valueFrequency.get(candidate.citedValue) ?? 0) + 1);
 
+  // 逐格行约束：学生点名了哪几行，同一个取值就只归属那几行，不再因为列别名命中而记满整表。
+  // 只对「能在被点名行里找到」的取值生效；点名行里没有的取值仍走原有歧义判定，避免制造新的死点。
+  const mentionedRows = new Set(rows.map((_, rowIndex) => rowIndex).filter((rowIndex) => mentionsRow(studentMessage, rowIndex + 1)));
+  const anchoredValues = new Set(
+    candidates.filter((candidate) => mentionedRows.has(candidate.rowIndex)).map((candidate) => candidate.citedValue),
+  );
+
   return candidates.flatMap(({ rowIndex, column, citedValue, row }) => {
-    const oneBased = rowIndex + 1;
-    const rowNumber = `(?:${oneBased}|${chineseRowNumber(oneBased)})`;
-    const rowMentioned = new RegExp(
-      `(?:第\\s*${rowNumber}\\s*(?:行|次(?:记录)?|轮)|重复\\s*${rowNumber}(?:\\s*(?:次|轮))?)`,
-    ).test(studentMessage);
+    const rowMentioned = mentionedRows.has(rowIndex);
+    if (anchoredValues.has(citedValue) && !rowMentioned) return [];
     const columnMentioned = columnAliases(column.key, column.title).some((alias) => studentMessage.includes(alias));
     const rowLabelMentioned = Object.entries(row).some(([key, value]) => (
       key !== column.key
@@ -169,41 +202,106 @@ function evidenceCells(stageData: StageData, studentMessage: string): AnalysisCe
       columnKey: column.key,
       columnName: column.title,
       citedValue,
-      fingerprint: contractHash('stage-contract-v3/evidence-cell/v1', {
-        rowIndex,
-        columnKey: column.key,
-        citedValue,
-      }),
+      fingerprint: evidenceCellFingerprint(rowIndex, column.key, citedValue),
     }];
   });
 }
 
-export function updateServerAnalysis(stageData: StageData, studentMessage: string): {
+/**
+ * 逐轮判定第四阶段的分析证据。纯函数。
+ *
+ * 第三参是经服务器核验后的模型主张（`validateAnalysisClaim` 的输出）：
+ * - 引用：主张里还剩下至少一条通过核验的引用时以它为准（逐格精确，不吃列别名全表命中）；
+ *   缺省或全被驳回时回落到确定性解析。
+ * - 比较：两路取或。模型只可能把「这句话算不算比较」判得更宽，不可能让门禁比原先更严，
+ *   因此不会追溯性地卡住按旧规则本可推进的学生。
+ * 「引用的值必须真实存在于学生自己提交的行里」始终由服务器算，不因为有模型主张而放松。
+ */
+export function updateServerAnalysis(
+  stageData: StageData,
+  studentMessage: string,
+  claim?: ValidatedAnalysisClaim | null,
+): {
   stageData: StageData;
   accepted: boolean;
   duplicate: boolean;
   matchedValues: string[];
+  rejection: Stage4RoundRejection | null;
+  /** 分歧观测用：本轮的引用最终采信了哪一路，以及两路各自的判定。 */
+  signals: {
+    evidenceSource: 'extractor' | 'deterministic';
+    deterministicEvidenceCount: number;
+    deterministicComparison: boolean;
+    claimEvidenceCount: number | null;
+    claimComparison: boolean | null;
+  };
 } {
-  const evidence = evidenceCells(stageData, studentMessage);
+  const deterministicEvidence = evidenceCells(stageData, studentMessage);
+  const claimCitations = claim?.citations ?? [];
+  const useClaim = claimCitations.length > 0;
+  const evidence = useClaim ? claimCitations : deterministicEvidence;
   const matchedValues = [...new Set(evidence.map((item) => item.citedValue))];
-  const comparison = /比|相比|高于|低于|增加|减少|上升|下降|最多|最少|差|相同|不同/.test(studentMessage);
+  const deterministicComparison = expressesComparison(studentMessage);
+  const comparison = deterministicComparison || claim?.comparison === true;
+  const signals = {
+    evidenceSource: (useClaim ? 'extractor' : 'deterministic') as 'extractor' | 'deterministic',
+    deterministicEvidenceCount: deterministicEvidence.length,
+    deterministicComparison,
+    claimEvidenceCount: claim ? claim.citations.length : null,
+    claimComparison: claim ? claim.comparison : null,
+  };
   const roundFingerprint = contractHash(
     'stage-contract-v3/evidence-round/v1',
     evidence.map((item) => item.fingerprint).sort(),
   );
   const previous = stageData.stage4 ?? { analysisCount: 0 };
-  const duplicate = (previous.evidenceRounds ?? []).some((round) => round.roundFingerprint === roundFingerprint);
+  // 去重改为单调增量：本轮至少要包含一个此前从未计入过的单元格指纹。
+  // 取值种类少的表（初中最常见）用整集合指纹会在第二轮必然撞车，那不是重复，是同一批数据的另一个切面。
+  const seenCellFingerprints = new Set(
+    (previous.evidenceRounds ?? []).flatMap((round) => (round.evidence ?? []).map((item) => item.fingerprint)),
+  );
+  const newEvidence = evidence.filter((item) => !seenCellFingerprints.has(item.fingerprint));
+  const duplicate = evidence.length > 0 && newEvidence.length === 0;
   const accepted = evidence.length >= 2 && comparison && !duplicate;
-  if (!accepted) return { stageData, accepted, duplicate, matchedValues };
+  const rejection: Stage4RoundRejection | null = accepted
+    ? null
+    : evidence.length === 0
+      ? 'NO_EVIDENCE'
+      : evidence.length === 1
+        ? 'SINGLE_EVIDENCE'
+        : !comparison
+          ? 'NO_COMPARISON'
+          : 'NO_NEW_EVIDENCE';
+  const lastRound = {
+    accepted,
+    ...(rejection ? { rejection } : {}),
+    evidenceCount: evidence.length,
+    newEvidenceCount: newEvidence.length,
+    hasComparison: comparison,
+    matchedValues,
+  };
+  if (!accepted) {
+    return {
+      accepted,
+      duplicate,
+      matchedValues,
+      rejection,
+      signals,
+      stageData: { ...stageData, stage4: { ...previous, lastRound } },
+    };
+  }
   return {
     accepted,
     duplicate,
     matchedValues,
+    rejection,
+    signals,
     stageData: {
       ...stageData,
       stage4: {
         ...previous,
         analysisCount: previous.analysisCount + 1,
+        lastRound,
         observations: [...(previous.observations ?? []), studentMessage],
         evidenceCitations: [...(previous.evidenceCitations ?? []), ...matchedValues],
         evidenceRounds: [...(previous.evidenceRounds ?? []), {

@@ -6,6 +6,7 @@ import { buildDataTableSchema } from '@/app/lib/stageArtifacts';
 import { deterministicRisks } from '@/app/lib/serverTutorState';
 import { finalizeStageData, stage2DraftHash, studentVisibleStageData } from '@/app/lib/stageState';
 import type { StageData } from '@/app/models/stageData';
+import { advanceHint } from '@/app/lib/advanceHint';
 
 export async function POST(
   req: Request,
@@ -73,5 +74,9 @@ export async function POST(
     where: { id: conversationId },
     data: { stageData: JSON.stringify(stageData) },
   });
-  return NextResponse.json({ stageData: studentVisibleStageData(stageData), confirmedPlanHash: computedHash });
+  return NextResponse.json({
+    stageData: studentVisibleStageData(stageData),
+    confirmedPlanHash: computedHash,
+    advanceHint: advanceHint({ currentStage: conv.currentStage, stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
+  });
 }

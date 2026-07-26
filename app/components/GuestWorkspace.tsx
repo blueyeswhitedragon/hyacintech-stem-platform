@@ -362,24 +362,24 @@ export default function GuestWorkspace() {
   const panelWidth = stage === 4 ? 'lg:w-3/5' : 'lg:w-1/2';
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="density-roomy flex h-full min-h-0 flex-col">
       {documentStage && panel ? (
         <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-          <main className="order-1 min-h-fit min-w-0 shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:flex-1 lg:shrink lg:overflow-y-auto">{panel}</main>
+          <main className="order-1 min-h-fit min-w-0 shrink-0 rounded-lg border border-hairline bg-canvas lg:min-h-0 lg:flex-1 lg:shrink lg:overflow-y-auto">{panel}</main>
           <aside className="order-2 shrink-0 lg:w-80">
-            <details className="rounded-lg bg-white shadow-sm">
-              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-gray-800">
+            <details className="rounded-lg border border-hairline bg-canvas">
+              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-body-strong">
                 AI 导师（可选辅导）
-                <span className="ml-2 text-xs font-normal text-gray-500">点击展开</span>
+                <span className="ml-2 text-xs font-normal text-muted">点击展开</span>
               </summary>
-              <div className="h-[32rem] min-h-0 border-t border-gray-100">{chat}</div>
+              <div className="h-[32rem] min-h-0 border-t border-hairline">{chat}</div>
             </details>
           </aside>
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-          <div className={`flex h-[38rem] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg bg-white shadow-sm lg:h-auto lg:shrink ${panel ? chatWidth : 'w-full'}`}>{chat}</div>
-          {panel && <div className={`min-h-fit shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:shrink lg:overflow-y-auto ${panelWidth}`}>{panel}</div>}
+          <div className={`flex h-[38rem] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg border border-hairline bg-canvas lg:h-auto lg:shrink ${panel ? chatWidth : 'w-full'}`}>{chat}</div>
+          {panel && <div className={`min-h-fit shrink-0 rounded-lg border border-hairline bg-canvas lg:min-h-0 lg:shrink lg:overflow-y-auto ${panelWidth}`}>{panel}</div>}
         </div>
       )}
       {completed && <Fireworks />}

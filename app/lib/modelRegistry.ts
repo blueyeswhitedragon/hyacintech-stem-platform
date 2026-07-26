@@ -291,3 +291,50 @@ export async function modelTraceCoverageSummary() {
   ]);
   return { complete, legacy, traces };
 }
+
+export function listGenerationTraceLineage(input: { query?: string; take?: number } = {}) {
+  const query = input.query?.trim();
+  return db.generationTrace.findMany({
+    where: query ? {
+      OR: [
+        { id: { contains: query } },
+        { conversationId: { contains: query } },
+        { assistantMessageId: { contains: query } },
+        { userMessageId: { contains: query } },
+        { modelTagSnapshot: { contains: query } },
+        { promptVersion: { contains: query } },
+      ],
+    } : undefined,
+    orderBy: { createdAt: 'desc' },
+    take: Math.min(200, Math.max(1, input.take ?? 100)),
+    include: {
+      conversation: {
+        select: {
+          id: true,
+          traceCoverage: true,
+          user: { select: { username: true, displayName: true } },
+          studentAssignment: { select: { assignment: { select: { title: true, class: { select: { name: true } } } } } },
+          deployedModelVersion: { select: { id: true, tag: true } },
+          deployedRuntimeBundle: { select: { id: true, name: true, version: true } },
+        },
+      },
+      modelVersion: {
+        select: {
+          id: true,
+          tag: true,
+          trainingRun: { select: { id: true, name: true, release: { select: { id: true, version: true } } } },
+        },
+      },
+      runtimeBundle: {
+        select: {
+          id: true,
+          name: true,
+          version: true,
+          endpoint: { select: { displayName: true, remoteModelId: true } },
+          promptPolicyVersion: { select: { version: true } },
+        },
+      },
+      productionCandidate: { select: { id: true, status: true, convertedTutorTurnCaseId: true } },
+    },
+  });
+}

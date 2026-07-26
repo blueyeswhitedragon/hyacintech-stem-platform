@@ -103,7 +103,7 @@ export interface Stage2Readiness {
   nextFocusId: Stage2SectionId | 'plan_confirmation';
 }
 
-export type Stage2PlanProvenanceSource = 'student_fact' | 'server_composed' | 'server_baseline';
+export type Stage2PlanProvenanceSource = 'student_fact' | 'student_form' | 'server_composed' | 'server_baseline' | 'teacher_release';
 
 export interface Stage2PlanProvenanceEntry {
   source: Stage2PlanProvenanceSource;
@@ -152,6 +152,7 @@ export interface Stage2Data {
     columns: Stage2Column[];
     minRows: number;
     maxRows: number; // 默认200
+    provenance?: 'server_composed' | 'teacher_release';
   };
   aiRiskAnnotations?: Stage2RiskAnnotation[];
 }
@@ -179,9 +180,28 @@ export interface Stage3Data {
   teacherFeedback?: string;
 }
 
+/** 单轮分析未被计入的原因；null/缺省表示该轮已被接受。 */
+export type Stage4RoundRejection =
+  | 'NO_EVIDENCE'
+  | 'SINGLE_EVIDENCE'
+  | 'NO_COMPARISON'
+  | 'NO_NEW_EVIDENCE';
+
 // 阶段4：分析轮次计数（至少2轮有效分析才能进入阶段5）
 export interface Stage4Data {
   analysisCount: number;
+  /**
+   * 最近一轮分析的服务器判定，只用于告诉学生和导师「差在哪一半」。
+   * 不参与门禁计数；旧记录缺省即可。
+   */
+  lastRound?: {
+    accepted: boolean;
+    rejection?: Stage4RoundRejection;
+    evidenceCount: number;
+    newEvidenceCount: number;
+    hasComparison: boolean;
+    matchedValues: string[];
+  };
   observations?: string[];
   evidenceCitations?: string[];
   anomalies?: string[];
@@ -277,6 +297,8 @@ export interface Stage6Data {
 export interface ExtractedFactLedgerEntry {
   value: unknown;
   sourceQuote: string;
+  /** 缺省按 tutor_dialogue 处理，兼容历史账本。 */
+  origin?: 'tutor_dialogue' | 'student_form';
 }
 
 export interface StageData {
@@ -296,6 +318,14 @@ export interface StageData {
       stage: number;
       occurredAt: string;
       dueAt: string;
+    }>;
+    releases?: Array<{
+      stage: number;
+      fromStage: number;
+      toStage: number;
+      teacherId: string;
+      reason: string;
+      occurredAt: string;
     }>;
   };
   /** 仅保存通过逐字来源校验的学生事实；Tutor 历史永不写入。 */

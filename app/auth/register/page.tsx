@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Button from '@/app/components/ui/Button';
+import { Field, Input, Label } from '@/app/components/ui/Field';
 
 type Role = 'student' | 'teacher';
 
@@ -41,56 +43,56 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-blue-600 mb-1">注册</h1>
-        <p className="text-sm text-gray-500 mb-6">Hyacintech STEM 平台</p>
+    <main className="density-roomy flex min-h-screen items-center justify-center bg-surface-soft p-4">
+      <div className="w-full max-w-sm rounded-lg border border-hairline bg-canvas [padding:var(--pad-card)]">
+        <h1 className="display-md">注册</h1>
+        <p className="mt-1 text-sm text-muted">Hyacintech STEM 平台</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">用户名（至少 3 字符）</label>
-            <input
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <Field label="用户名" hint="至少 3 字符" htmlFor="reg-username">
+            <Input
+              id="reg-username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoFocus
             />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">显示名称</label>
-            <input
+          </Field>
+          <Field label="显示名称" htmlFor="reg-display-name">
+            <Input
+              id="reg-display-name"
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">密码（至少 6 字符）</label>
-            <input
+          </Field>
+          <Field label="密码" hint="至少 6 字符" htmlFor="reg-password">
+            <Input
+              id="reg-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </Field>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">身份</label>
+            <Label>身份</Label>
+            {/* 公开注册只开放学生与教师；标注/审核/管理员由后台开号，这里刻意不给入口。 */}
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-body">
                 <input
                   type="radio"
                   name="role"
+                  className="accent-coral"
                   checked={role === 'student'}
                   onChange={() => setRole('student')}
                 />
                 学生
               </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-body">
                 <input
                   type="radio"
                   name="role"
+                  className="accent-coral"
                   checked={role === 'teacher'}
                   onChange={() => setRole('teacher')}
                 />
@@ -99,20 +101,16 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {error && <div className="text-sm text-red-600">{error}</div>}
+          {error && <p className="text-sm text-error">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 disabled:opacity-50"
-          >
+          <Button type="submit" variant="primary" disabled={loading} className="w-full">
             {loading ? '注册中…' : '注册'}
-          </button>
+          </Button>
         </form>
 
-        <p className="text-sm text-gray-500 mt-4 text-center">
+        <p className="mt-4 text-center text-sm text-muted">
           已有账号？
-          <Link href="/auth/login" className="text-blue-600 hover:underline ml-1">
+          <Link href="/auth/login" className="ml-1 text-coral hover:underline">
             登录
           </Link>
         </p>

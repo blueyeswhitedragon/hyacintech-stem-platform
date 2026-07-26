@@ -1,6 +1,16 @@
 import 'server-only';
+import { Prisma } from '@prisma/client';
 import { db } from './db';
-import { parseStageData } from './conversation';
+import {
+  normalizePageParams,
+  clampToPage,
+  toPage,
+  STAGE3_PENDING_FROM_WHERE,
+  STUCK_FROM_WHERE,
+  type PageParams,
+} from './pagination';
+import { advanceHint } from '@/app/lib/advanceHint';
+import { parseStageData } from '@/app/lib/conversation';
 import type { AssignmentStatus } from '@/app/models/stageData';
 import type { AssistantStyleSelection } from '@/app/lib/stylePolicy';
 
@@ -182,14 +192,26 @@ export async function getTeacherStats(teacherId: string) {
   return { classCount: classIds.length, studentCount: uniqueStudents, assignmentCount, pendingCount };
 }
 
-/** 教师待审核列表：所辖班级中 status 为 PENDING_STAGE2/5 的学生作业。 */
-export async function getPendingReviews(teacherId: string) {
-  return db.studentAssignment.findMany({
-    where: {
-      status: { in: ['PENDING_STAGE2', 'PENDING_STAGE5'] },
-      assignment: { class: { teacherId } },
-    },
+/**
+ * 教师待审核列表：所辖班级中 status 为 PENDING_STAGE2/5 的学生作业。
+ * 必须分页：一个教师带多个班时这里会线性增长，而每行都要拖 generationTraces。
+ */
+export async function getPendingReviews(teacherId: string, params: PageParams = {}) {
+  const { page: requested, pageSize } = normalizePageParams(params);
+  const where: Prisma.StudentAssignmentWhereInput = {
+    status: { in: ['PENDING_STAGE2', 'PENDING_STAGE5'] },
+    assignment: { class: { teacherId } },
+  };
+
+  // 先数后取：越界页码要夹回最后一页，否则 URL 上的 ?p=999 会渲染出「无待审」的假空态。
+  const total = await db.studentAssignment.count({ where });
+  const { page, skip } = clampToPage(requested, pageSize, total);
+
+  const items = await db.studentAssignment.findMany({
+    where,
     orderBy: { updatedAt: 'asc' },
+    skip,
+    take: pageSize,
     select: {
       id: true,
       status: true,
@@ -197,46 +219,148 @@ export async function getPendingReviews(teacherId: string) {
       dataConsentStatus: true,
       updatedAt: true,
       student: { select: { displayName: true, username: true } },
-      assignment: { select: { title: true, class: { select: { name: true } } } },
+      assignment: { select: { title: true, dataContributionMode: true, class: { select: { name: true } } } },
+      conversation: { select: { traceCoverage: true, generationTraces: { where: { triggerType: 'USER_MESSAGE', trainingSystemPromptSnapshot: { not: '' } }, select: { id: true } } } },
     },
   });
+
+  return toPage(items, total, page, pageSize);
 }
 
 /**
  * 第三阶段「数据表待过目（可选）」清单：
  * 所辖班级中 currentStage∈{3,4}、IN_PROGRESS，且 stage3 已提交、尚未被教师认可的学生作业。
- * stage3.submitted/approved 存在 stageData JSON 中，无法用 Prisma where 过滤，故先取候选再在内存里筛。
+ *
+ * 谓词见 `pagination.ts` 的 STAGE3_PENDING_FROM_WHERE（下推到 SQL 的原因也写在那里）。
+ * 这里先只取本页 id 与总数，再用 Prisma 补齐关联字段——关联的类型推导比手写 JOIN 可靠。
  */
-export async function getOptionalStage3Reviews(teacherId: string) {
+export async function getOptionalStage3Reviews(teacherId: string, params: PageParams = {}) {
+  const { page: requested, pageSize } = normalizePageParams(params);
+
+  // 同 getPendingReviews：先数后取，越界页码夹回最后一页。
+  const countRows = await db.$queryRawUnsafe<{ total: bigint | number }[]>(
+    `SELECT COUNT(*) AS total ${STAGE3_PENDING_FROM_WHERE}`,
+    teacherId,
+  );
+  const total = Number(countRows[0]?.total ?? 0);
+  const { page, skip } = clampToPage(requested, pageSize, total);
+
+  const idRows = await db.$queryRawUnsafe<{ id: string }[]>(
+    `SELECT sa.id AS id ${STAGE3_PENDING_FROM_WHERE} ORDER BY sa.updatedAt ASC LIMIT ? OFFSET ?`,
+    teacherId,
+    pageSize,
+    skip,
+  );
+
+  const ids = idRows.map((r) => r.id);
+  if (ids.length === 0) return toPage<Stage3ReviewRow>([], total, page, pageSize);
+
   const rows = await db.studentAssignment.findMany({
-    where: {
-      status: 'IN_PROGRESS',
-      currentStage: { in: [3, 4] },
-      assignment: { class: { teacherId } },
-    },
-    orderBy: { updatedAt: 'asc' },
+    where: { id: { in: ids } },
     select: {
       id: true,
       currentStage: true,
+      dataConsentStatus: true,
       updatedAt: true,
       student: { select: { displayName: true, username: true } },
-      assignment: { select: { title: true, class: { select: { name: true } } } },
-      conversation: { select: { stageData: true } },
+      assignment: { select: { title: true, dataContributionMode: true, class: { select: { name: true } } } },
+      conversation: { select: { traceCoverage: true, generationTraces: { where: { triggerType: 'USER_MESSAGE', trainingSystemPromptSnapshot: { not: '' } }, select: { id: true } } } },
     },
   });
 
-  return rows
-    .filter((r) => {
-      const sd = parseStageData(r.conversation?.stageData ?? '{}');
-      return sd.stage3?.submitted === true && sd.stage3?.approved !== true;
-    })
+  // `in` 查询不保证顺序，按上面 SQL 的 updatedAt ASC 复原。
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  const items = ids
+    .map((id) => byId.get(id))
+    .filter((r): r is (typeof rows)[number] => r !== undefined)
     .map((r) => ({
       id: r.id,
       currentStage: r.currentStage,
       updatedAt: r.updatedAt,
       student: r.student,
       assignment: r.assignment,
+      eligibleTraceCount: r.dataConsentStatus === 'GRANTED' && r.conversation?.traceCoverage === 'COMPLETE' ? r.conversation.generationTraces.length : 0,
     }));
+
+  return toPage(items, total, page, pageSize);
+}
+
+export interface Stage3ReviewRow {
+  id: string;
+  currentStage: number;
+  updatedAt: Date;
+  student: { displayName: string; username: string };
+  assignment: { title: string; dataContributionMode: string; class: { name: string } };
+  eligibleTraceCount: number;
+}
+
+export async function getStuckStudents(
+  teacherId: string,
+  params: PageParams & { minRounds?: number } = {},
+) {
+  const { page: requested, pageSize } = normalizePageParams(params);
+  const minRounds = Number.isInteger(params.minRounds) && Number(params.minRounds) > 0
+    ? Number(params.minRounds)
+    : 8;
+  const countRows = await db.$queryRawUnsafe<{ total: bigint | number }[]>(
+    `SELECT COUNT(*) AS total ${STUCK_FROM_WHERE}`,
+    teacherId,
+    minRounds,
+  );
+  const total = Number(countRows[0]?.total ?? 0);
+  const { page, skip } = clampToPage(requested, pageSize, total);
+  const idRows = await db.$queryRawUnsafe<{ id: string }[]>(
+    `SELECT sa.id AS id ${STUCK_FROM_WHERE} ORDER BY sa.updatedAt ASC LIMIT ? OFFSET ?`,
+    teacherId,
+    minRounds,
+    pageSize,
+    skip,
+  );
+  const ids = idRows.map((row) => row.id);
+  if (ids.length === 0) return toPage<StuckStudentRow>([], total, page, pageSize);
+
+  const rows = await db.studentAssignment.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      currentStage: true,
+      updatedAt: true,
+      student: { select: { displayName: true, username: true } },
+      assignment: { select: { title: true, class: { select: { name: true } } } },
+      conversation: { select: { stageData: true, safetyQuizCompleted: true } },
+    },
+  });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const items = ids.flatMap((id) => {
+    const row = byId.get(id);
+    if (!row?.conversation) return [];
+    const stageData = parseStageData(row.conversation.stageData);
+    const hint = advanceHint({
+      currentStage: row.currentStage,
+      stageData,
+      safetyQuizCompleted: row.conversation.safetyQuizCompleted,
+    });
+    return [{
+      id: row.id,
+      currentStage: row.currentStage,
+      roundCount: stageData.roundCounts?.[row.currentStage] ?? 0,
+      reason: hint.ok ? '服务器已满足推进条件，但学生尚未推进' : hint.reason ?? '当前阶段尚未满足推进条件',
+      updatedAt: row.updatedAt,
+      student: row.student,
+      assignment: row.assignment,
+    }];
+  });
+  return toPage(items, total, page, pageSize);
+}
+
+export interface StuckStudentRow {
+  id: string;
+  currentStage: number;
+  roundCount: number;
+  reason: string;
+  updatedAt: Date;
+  student: { displayName: string; username: string };
+  assignment: { title: string; class: { name: string } };
 }
 
 /** 审核详情：单个学生作业 + 会话 messages/stageData + 归属（class.teacherId）。 */
@@ -266,6 +390,7 @@ export async function getReviewItem(studentAssignmentId: string) {
               assistantMessageId: true,
               stage: true,
               responseJson: true,
+              trainingSystemPromptSnapshot: true,
               createdAt: true,
               productionCandidate: { select: { id: true, status: true } },
             },

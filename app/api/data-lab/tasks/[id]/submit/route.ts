@@ -1,19 +1,8 @@
 import { NextResponse } from 'next/server';
 import { requireAnyRole } from '@/app/lib/auth';
-import { AnnotationValidationError, submitAnnotationTask } from '@/app/lib/dataLab/service';
-import type { RevisionInput } from '@/app/lib/dataLab/types';
 
-export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/tasks/[id]/submit'>) {
+export async function POST() {
   const auth = await requireAnyRole(['annotator', 'reviewer', 'admin']);
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
-  try {
-    const { id } = await ctx.params;
-    const body = await request.json() as RevisionInput;
-    return NextResponse.json(await submitAnnotationTask(id, body, auth.user));
-  } catch (error) {
-    if (error instanceof AnnotationValidationError) {
-      return NextResponse.json({ error: error.message, check: error.check }, { status: 422 });
-    }
-    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
-  }
+  return NextResponse.json({ error: '旧五风格标注流程已冻结，不能继续提交。', code: 'LEGACY_WORKFLOW_FROZEN' }, { status: 410 });
 }

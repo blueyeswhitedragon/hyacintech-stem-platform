@@ -1,20 +1,170 @@
 @import "tailwindcss";
 
+/*
+ * 设计令牌来自 docs/DESIGN-claude (1).md（暖奶油画布 + 珊瑚强调 + 深墨产品面）。
+ * 中文标题走无衬线（Noto Sans SC），衬线只用于版本号、英文标识与数字，
+ * 因为中文宋体在 14px 正文附近笔画过细、可读性差。
+ */
+@theme {
+  --color-coral: #cc785c;
+  --color-coral-active: #a9583e;
+  --color-coral-disabled: #e6dfd8;
+
+  --color-ink: #141413;
+  --color-body-strong: #252523;
+  --color-body: #3d3d3a;
+  --color-muted: #6c6a64;
+  --color-muted-soft: #8e8b82;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #faf9f5;
+  --color-on-dark-soft: #a09d96;
+
+  --color-canvas: #faf9f5;
+  --color-surface-soft: #f5f0e8;
+  --color-surface-card: #efe9de;
+  --color-surface-cream-strong: #e8e0d2;
+  --color-surface-dark: #181715;
+  --color-surface-dark-elevated: #252320;
+  --color-surface-dark-soft: #1f1e1b;
+  --color-hairline: #e6dfd8;
+  --color-hairline-soft: #ebe6df;
+
+  /* 语义：全站只用这四种状态色，不再引入第五种 */
+  --color-success: #5db872;
+  --color-warning: #d4a017;
+  --color-error: #c64545;
+  --color-info: #5db8a6;
+
+  --font-sans: var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif: var(--font-eb-garamond), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains-mono), "SFMono-Regular", Consolas, monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
   color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+body {
+  background: var(--color-canvas);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+/*
+ * 版本号、模型 tag、数据集标识用衬线小体：这是本系统「编辑感」的唯一出处。
+ * 中文不会命中 EB Garamond，会自动回落到无衬线，因此中英混排安全。
+ */
+.font-lineage {
+  font-family: var(--font-serif);
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.01em;
+}
+
+/* 标题：中文无衬线 500 + 负字距，对应 Copernicus 的紧凑排布 */
+.display-lg { font-size: 34px; font-weight: 500; line-height: 1.15; letter-spacing: -0.5px; color: var(--color-ink); }
+.display-md { font-size: 26px; font-weight: 500; line-height: 1.2; letter-spacing: -0.4px; color: var(--color-ink); }
+.display-sm { font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -0.2px; color: var(--color-ink); }
+
+.caption-upper {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* 焦点环统一走珊瑚色，替代浏览器默认蓝 */
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--color-coral);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-coral) 22%, transparent);
+  color: var(--color-ink);
+}
+
+/*
+ * 密度分层：同一套颜色/字体/圆角，两种节奏。
+ * 学生端是初中生长时间阅读与书写的地方，要松；DataLab 是管理员比对数据的地方，要紧。
+ * 用祖先类切换 CSS 变量，组件本身不需要知道自己在哪个房间。
+ */
+.density-roomy {
+  --pad-card: 32px;
+  --pad-control: 10px 14px;
+  --text-body: 16px;
+  --leading-body: 1.6;
+  --gap-stack: 24px;
+}
+
+.density-compact {
+  --pad-card: 16px;
+  --pad-control: 6px 10px;
+  --text-body: 14px;
+  --leading-body: 1.5;
+  --gap-stack: 12px;
+}
+
+/* 未声明房间时按紧凑走，避免旧页面突然变松导致布局跳动 */
+:root {
+  --pad-card: 16px;
+  --pad-control: 6px 10px;
+  --text-body: 14px;
+  --leading-body: 1.5;
+  --gap-stack: 12px;
+}
+
+.density-roomy :where(p, li) {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+/* ── 动效 ───────────────────────────────────────────────
+ * 设计文档原则是「只描述默认态与按下态」，此处刻意只在学生端突破：
+ * 学生要感知「我的探究在推进」，而管理员只需要数据不跳动。
+ * 所有动效都必须能被 prefers-reduced-motion 关掉。
+ */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 消息、卡片进场：淡入上浮 */
+.animate-rise-in {
+  animation: rise-in 260ms cubic-bezier(0.2, 0, 0.2, 1) both;
+}
+
+/* 线描字形描边生长：进入某阶段时播放一次 */
+@keyframes draw-stroke {
+  from { stroke-dashoffset: var(--glyph-len); }
+  to   { stroke-dashoffset: 0; }
+}
+
+.phase-glyph-draw path {
+  --glyph-len: 64;
+  stroke-dasharray: var(--glyph-len);
+  animation: draw-stroke 620ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* 珊瑚那一笔稍晚起笔，让"结构先立、动作后发生"读得出来 */
+.phase-glyph-draw path.text-coral {
+  animation-delay: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in,
+  .phase-glyph-draw path {
+    animation: none;
+  }
+  .phase-glyph-draw path {
+    stroke-dashoffset: 0;
+  }
 }

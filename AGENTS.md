@@ -39,7 +39,7 @@ Stage boundaries are product contracts, not prompt suggestions:
 - **P1**: canonical research question + explicit confirmation only. Interest, mechanism, and classroom proxy are optional context. Variables, levels, measurement, controls, materials, procedure, repeats, and safety belong to P2.
 - **P2**: the server composes a complete plan preview. Confirmation is accepted only for the current draft hash, then freezes the plan and derives schema/risks.
 - **P3**: safety answers are verified server-side; approved schema and plan are immutable during collection. Teacher review is nonblocking.
-- **P4**: analysis progress requires distinct, verifiable citations to submitted row values, not message count.
+- **P4**: analysis progress requires distinct, verifiable citations to submitted row values, not message count. Citations resolve to a specific row and column and are verified against submitted cells; each accepted round must bring at least one cell no earlier round used. Whether a sentence expresses a comparison is judged by the P4 claim extractor, with a deterministic predicate as fallback; fact verification is never delegated.
 - **P5**: platform report sections are authoritative; uploaded Word files are attachments. Reflection here means experiment limitations/discussion. Teacher approval requires a valid 0–10 score.
 - **P6**: respond to teacher feedback and reflect on learning, then complete.
 
@@ -51,6 +51,8 @@ SQLite + Prisma persist operational, teaching, Data Lab, model, and audit record
 - `checkBlacklistedKeywords()` must run before every chat LLM call
 - Dynamic Tutor responses use the versioned Tutor parser/contract; legacy six-phase responses may still use `safeParseChatResponse()`. Always handle parse failure.
 - Stage artifacts, confirmation hashes, safety verification, evidence fingerprints, and transitions are server-owned. Never trust client claims for them.
+- Extractor facts are only accepted when their `sourceQuote` is located in the student's own message by `locateSourceQuote()` (`app/lib/sourceQuote.ts`), which ignores Markdown emphasis and whitespace but nothing else, and rewrites the quote to the student's original span. Never compare quotes with a bare `includes()` — students write Markdown and models drop the markers.
+- Teacher release is the only supported bypass around a stage gate. It is limited to the student's current P2/P3/P4/P5 stage, requires an audited reason, and excludes that stage's traces from positive training candidates; every other gate remains server-owned and never accepts a client claim.
 - Prompt execution is pinned to the model/conversation's recorded `promptPolicyVersion`; never silently replace it with a global current version.
 - Student-visible prompt state contains only authorized facts. TopicCard answer keys, hidden rubrics, Critic output, and evaluator-only evidence must never be injected into Tutor-visible state.
 - Pending, submitted, and completed assignment status is enforced on every write route. Soft deadlines record/display lateness but do not lock student work.

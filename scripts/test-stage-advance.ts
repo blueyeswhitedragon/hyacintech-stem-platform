@@ -171,7 +171,10 @@ check('紧凑确认状态只保留研究问题正文', confirmationDocumentBody(
     stage3: { rows: [{ trial: 1, low: 2, high: 7 }, { trial: 2, low: 3, high: 6 }] },
   };
   const indexOnly = updateServerAnalysis(state, '重复序号1比2小');
-  check('P4 重复序号比较不算证据', !indexOnly.accepted && !indexOnly.stageData.stage4);
+  // 被拒的轮次现在也会写 stage4.lastRound（只说明差在哪一半），因此断言改看计数与轮次
+  check('P4 重复序号比较不算证据', !indexOnly.accepted
+    && (indexOnly.stageData.stage4?.analysisCount ?? 0) === 0
+    && (indexOnly.stageData.stage4?.evidenceRounds ?? []).length === 0);
   const first = updateServerAnalysis(state, '第1行低水平结果2比高水平结果7低');
   const repeated = updateServerAnalysis(first.stageData, '第1行低水平结果2比高水平结果7低');
   check('P4 真实单元格证据可接受', first.accepted && first.stageData.stage4?.analysisCount === 1);

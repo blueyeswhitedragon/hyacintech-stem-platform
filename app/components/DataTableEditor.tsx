@@ -2,6 +2,10 @@
 
 import React, { useState } from 'react';
 import type { Stage2Data, Stage3Data, Stage3FileAssociation } from '@/app/models/stageData';
+import Button from './ui/Button';
+import Callout from './ui/Callout';
+import EmptyState from './ui/EmptyState';
+import { Input } from './ui/Field';
 
 interface Props {
   schema?: Stage2Data['schema'];
@@ -24,8 +28,12 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
 
   if (!schema || schema.columns.length === 0) {
     return (
-      <div className="text-sm text-gray-500 p-4">
-        请先在「方案设计」阶段与 AI 确定实验方案并生成数据表结构，然后回到本阶段录入数据。
+      <div className="p-4">
+        <EmptyState
+          art="flask"
+          title="还没有数据表结构"
+          description="数据表的列由「方案设计」阶段确认的方案生成。请先回到第 2 阶段与 AI 导师确认实验方案，确认后这里会自动出现可录入的表格。"
+        />
       </div>
     );
   }
@@ -82,95 +90,107 @@ export default function DataTableEditor({ schema, initial, onSave, onComplete, a
 
   return (
     <div className="p-4">
-      <h3 className="font-medium mb-3">实验数据表</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border">
-          <thead className="bg-gray-50 text-gray-600">
-            <tr>
-              <th className="p-2 border w-10">#</th>
-              {columns.map((c) => (
-                <th key={c.key} className="p-2 border text-left whitespace-nowrap">
-                  {c.title}{c.required && <span className="text-red-500 ml-0.5">*</span>}
-                </th>
-              ))}
-              <th className="p-2 border w-12"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i}>
-                <td className="p-2 border text-center text-gray-400">{i + 1}</td>
+      <h3 className="display-sm mb-3">实验数据表</h3>
+      {schema.provenance === 'teacher_release' && (
+        <Callout tone="warning">
+          这是教师放行时补充的通用最小数据表，不代表你确认过完整实验方案。请按真实实验填写每次的条件与测量结果。
+        </Callout>
+      )}
+      {rows.length === 0 ? (
+        <EmptyState
+          art="chart"
+          title="还没有记录任何数据"
+          description={`按方案做一次实验，就在这里记一行。建议至少 ${minRows} 行，这样第 4 阶段才看得出规律。`}
+          action={<Button variant="primary" onClick={addRow} disabled={disabled}>记录第一行数据</Button>}
+        />
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-hairline">
+          <table className="w-full border-collapse text-sm">
+            <thead className="border-b border-hairline bg-surface-soft">
+              <tr>
+                <th className="w-10 px-2 py-2 text-center text-xs font-medium text-muted">#</th>
                 {columns.map((c) => (
-                  <td key={c.key} className="p-1 border">
-                    {c.type === 'image' ? (
-                      allowUpload ? (
-                        <div className="flex items-center gap-2">
-                          {row[c.key] ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={String(row[c.key])} alt="" className="h-10 w-10 object-cover rounded" />
-                          ) : null}
-                          <label className={`text-blue-600 text-xs hover:underline ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                            {row[c.key] ? '更换' : '上传'}
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              disabled={disabled}
-                              onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(i, c.key, f); }}
-                            />
-                          </label>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400">体验模式不支持上传</span>
-                      )
-                    ) : (
-                      <input
-                        type={c.type === 'number' ? 'number' : 'text'}
-                        value={String(row[c.key] ?? '')}
-                        onChange={(e) =>
-                          setCell(i, c.key, c.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value)
-                        }
-                        disabled={disabled}
-                        className="w-full border rounded px-1 py-0.5 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
-                    )}
-                  </td>
+                  <th key={c.key} className="whitespace-nowrap px-2 py-2 text-left text-xs font-medium text-muted">
+                    {c.title}{c.required && <span className="ml-0.5 text-coral">*</span>}
+                  </th>
                 ))}
-                <td className="p-1 border text-center">
-                  <button onClick={() => removeRow(i)} disabled={disabled} className="text-red-400 hover:text-red-600 text-xs disabled:opacity-40">删除</button>
-                </td>
+                <th className="w-12 px-2 py-2"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-hairline-soft">
+              {rows.map((row, i) => (
+                <tr key={i}>
+                  <td className="px-2 py-1.5 text-center text-xs tabular-nums text-muted-soft">{i + 1}</td>
+                  {columns.map((c) => (
+                    <td key={c.key} className="px-1.5 py-1">
+                      {c.type === 'image' ? (
+                        allowUpload ? (
+                          <div className="flex items-center gap-2">
+                            {row[c.key] ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={String(row[c.key])} alt="" className="size-10 rounded object-cover" />
+                            ) : null}
+                            <label className={`text-xs text-coral hover:text-coral-active ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                              {row[c.key] ? '更换' : '上传'}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                disabled={disabled}
+                                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(i, c.key, f); }}
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-soft">体验模式不支持上传</span>
+                        )
+                      ) : (
+                        <Input
+                          type={c.type === 'number' ? 'number' : 'text'}
+                          value={String(row[c.key] ?? '')}
+                          onChange={(e) =>
+                            setCell(i, c.key, c.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value)
+                          }
+                          disabled={disabled}
+                          className={c.type === 'number' ? 'tabular-nums' : ''}
+                        />
+                      )}
+                    </td>
+                  ))}
+                  <td className="px-1.5 py-1 text-center">
+                    <button
+                      onClick={() => removeRow(i)}
+                      disabled={disabled}
+                      className="text-xs text-muted-soft transition-colors duration-[120ms] hover:text-error disabled:opacity-40"
+                    >
+                      删除
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <div className="flex items-center gap-2 mt-3 flex-wrap">
-        {disabledReason && <div className="w-full rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">⚠️ {disabledReason}</div>}
-        <button
-          onClick={addRow}
-          disabled={disabled || rows.length >= maxRows}
-          className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded hover:bg-gray-100 disabled:opacity-50"
-        >
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {disabledReason && (
+          <div className="w-full">
+            <Callout tone="warning">{disabledReason}</Callout>
+          </div>
+        )}
+        <Button size="sm" onClick={addRow} disabled={disabled || rows.length >= maxRows}>
           + 添加一行
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={disabled || saving || completing}
-          className="px-4 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-        >
+        </Button>
+        <Button size="sm" onClick={handleSave} disabled={disabled || saving || completing}>
           {saving ? '保存中…' : '保存'}
-        </button>
-        <button
-          onClick={handleComplete}
-          disabled={disabled || saving || completing}
-          className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-        >
+        </Button>
+        <Button size="sm" variant="primary" onClick={handleComplete} disabled={disabled || saving || completing}>
           {completing ? '推进中…' : '完成数据收集，进入分析'}
-        </button>
-        <span className="text-xs text-gray-400">建议至少 {minRows} 行，最多 {maxRows} 行</span>
-        {msg && <span className="text-sm text-green-600">{msg}</span>}
-        {err && <span className="text-sm text-red-600">{err}</span>}
+        </Button>
+        <span className="text-xs text-muted-soft">建议至少 {minRows} 行，最多 {maxRows} 行</span>
+        {msg && <span className="text-sm text-[#2f7a43]">{msg}</span>}
+        {err && <span className="text-sm text-error">{err}</span>}
       </div>
     </div>
   );

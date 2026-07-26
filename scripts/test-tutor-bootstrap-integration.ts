@@ -21,6 +21,7 @@ import {
   renewTutorReviewLease,
   resolveTutorCaseQualityTask,
   retryTutorCandidateCritics,
+  saveTutorReviewDraft,
   submitConfirmReview,
   submitEditReview,
   updateTopicCard,
@@ -33,8 +34,119 @@ import { createOrPromoteDeployment, updateDeploymentObservation } from '../app/l
 let passed = 0; let failed = 0;
 function check(condition: unknown, label: string) { if (condition) { passed++; console.log(`PASS ${label}`); } else { failed++; console.error(`FAIL ${label}`); } }
 
+async function teardown(suffix: string, originalActiveDeploymentIds: string[]) {
+  const users = await db.user.findMany({
+    where: {
+      username: {
+        in: [
+          `bootstrap-admin-${suffix}`,
+          `bootstrap-annotator-${suffix}`,
+          `bootstrap-reviewer-${suffix}`,
+        ],
+      },
+    },
+    select: { id: true },
+  });
+  const userIds = users.map((item) => item.id);
+  const sourceCandidates = await db.topicSourceCandidate.findMany({
+    where: {
+      sourcePlatform: 'integration',
+      sourceResourceId: { in: [`shade-course-${suffix}`, `shade-task-${suffix}`] },
+    },
+    select: { id: true },
+  });
+  const topicCards = await db.topicCard.findMany({
+    where: { createdById: { in: userIds } },
+    select: { id: true },
+  });
+  const generationRuns = await db.bootstrapGenerationRun.findMany({
+    where: { createdById: { in: userIds } },
+    select: { id: true },
+  });
+  const topicCardIds = topicCards.map((item) => item.id);
+  const generationRunIds = generationRuns.map((item) => item.id);
+  const cases = await db.tutorTurnCase.findMany({
+    where: {
+      OR: [
+        { topicCardId: { in: topicCardIds } },
+        { generationRunId: { in: generationRunIds } },
+      ],
+    },
+    select: { id: true },
+  });
+  const caseIds = cases.map((item) => item.id);
+  const releases = await db.datasetRelease.findMany({
+    where: {
+      version: { in: [`tutor-integration-${suffix}`, `pilot-block-${suffix}`] },
+    },
+    select: { id: true },
+  });
+  const releaseIds = releases.map((item) => item.id);
+  const trainingRuns = await db.trainingRun.findMany({
+    where: {
+      OR: [
+        { name: `training-${suffix}` },
+        { releaseId: { in: releaseIds } },
+      ],
+    },
+    select: { id: true },
+  });
+  const modelVersions = await db.modelVersion.findMany({
+    where: { tag: { in: [`baseline-${suffix}`, `candidate-${suffix}`] } },
+    select: { id: true },
+  });
+  const modelVersionIds = modelVersions.map((item) => item.id);
+  const evaluationRuns = await db.evaluationRun.findMany({
+    where: { name: `evaluation-${suffix}` },
+    select: { id: true },
+  });
+  const evaluationRunIds = evaluationRuns.map((item) => item.id);
+  const deployments = await db.modelDeployment.findMany({
+    where: {
+      OR: [
+        { modelVersionId: { in: modelVersionIds } },
+        { previousModelVersionId: { in: modelVersionIds } },
+        { createdById: { in: userIds } },
+      ],
+    },
+    select: { id: true },
+  });
+  const deploymentIds = deployments.map((item) => item.id);
+
+  try {
+    await db.dataLabAuditLog.deleteMany({ where: { actorId: { in: userIds } } });
+    await db.modelDeployment.deleteMany({ where: { id: { in: deploymentIds } } });
+    await db.evaluationRun.deleteMany({ where: { id: { in: evaluationRunIds } } });
+    await db.modelVersion.deleteMany({ where: { id: { in: modelVersionIds } } });
+    await db.trainingRun.deleteMany({ where: { id: { in: trainingRuns.map((item) => item.id) } } });
+    await db.datasetReleaseItem.deleteMany({ where: { releaseId: { in: releaseIds } } });
+    await db.datasetRelease.deleteMany({ where: { id: { in: releaseIds } } });
+    await db.finalizedTutorTurn.deleteMany({ where: { caseId: { in: caseIds } } });
+    await db.tutorReviewTask.deleteMany({ where: { caseId: { in: caseIds } } });
+    await db.tutorCandidate.deleteMany({ where: { caseId: { in: caseIds } } });
+    await db.tutorTurnCase.deleteMany({ where: { id: { in: caseIds } } });
+    await db.topicCard.deleteMany({ where: { id: { in: topicCardIds } } });
+    await db.topicSourceCandidate.deleteMany({ where: { id: { in: sourceCandidates.map((item) => item.id) } } });
+    await db.bootstrapGenerationRun.deleteMany({ where: { id: { in: generationRunIds } } });
+    await db.user.deleteMany({ where: { id: { in: userIds } } });
+  } finally {
+    if (originalActiveDeploymentIds.length > 0) {
+      await db.modelDeployment.updateMany({
+        where: { id: { in: originalActiveDeploymentIds } },
+        data: { status: 'ACTIVE', endedAt: null },
+      });
+    }
+    await rm(path.join(process.cwd(), 'data', 'releases', `tutor-integration-${suffix}`), { recursive: true, force: true });
+  }
+}
+
 async function main() {
   const suffix = randomUUID().slice(0, 8);
+  const originalActiveDeployments = await db.modelDeployment.findMany({
+    where: { environment: 'PRODUCTION', status: 'ACTIVE' },
+    select: { id: true },
+  });
+  try {
   const users = await Promise.all([
     db.user.create({ data: { username: `bootstrap-admin-${suffix}`, passwordHash: 'x', role: 'admin', displayName: '启动管理员' } }),
     db.user.create({ data: { username: `bootstrap-annotator-${suffix}`, passwordHash: 'x', role: 'annotator', displayName: '首次审核员' } }),
@@ -169,6 +281,9 @@ async function main() {
 
   const editPayload = await claimTutorReviewTask('EDIT', annotator);
   check(Boolean(editPayload) && editPayload?.candidates.length === 2, '首次审核员领取并并排查看 A/B');
+  await saveTutorReviewDraft({ taskId: editPayload!.task.id, type: 'EDIT', decision: 'SELECT_B', selectedCandidateId: candidateB.id, finalOutput: candidateB.normalizedOutput, reason: '草稿自动保存测试。', preferenceRejectedCandidateId: candidateA.id, preferenceReason: 'B 更聚焦。', submissionMode: 'HUMAN', user: annotator });
+  const restoredEdit = await claimTutorReviewTask('EDIT', annotator);
+  check(restoredEdit?.reviewDraft.reason === '草稿自动保存测试。' && restoredEdit.reviewDraft.selectedCandidateId === candidateB.id && restoredEdit.reviewDraft.draft.finalOutputRaw === candidateB.normalizedOutput, '审核租约内自动保存并在重新领取时恢复草稿');
   await submitEditReview({ taskId: editPayload!.task.id, decision: 'SELECT_B', selectedCandidateId: candidateB.id, finalOutput: candidateB.normalizedOutput, reason: 'B 更具体回应纸桥形状，且没有泛化表扬。', preferenceRejectedCandidateId: candidateA.id, preferenceReason: 'B 直接回应学生观察并聚焦一个问题；A 有模板化表扬。', user: annotator });
   let confirmPayload = await claimTutorReviewTask('CONFIRM', reviewer);
   check(Boolean(confirmPayload) && !('modelFamily' in (confirmPayload!.candidates[0] as object)), '最终确认隐藏候选模型身份');
@@ -310,7 +425,7 @@ async function main() {
   await importEvaluation({ name: `evaluation-${suffix}`, user: admin, files: [
     { fileName: 'baseline-transcript.json', raw: JSON.stringify({ schemaVersion: 4, tag: baseline.tag, scope: 'all', scenarios: [{ scenarioId: 'P1-1', phase: 1 }] }) },
     { fileName: 'candidate-transcript.json', raw: JSON.stringify({ schemaVersion: 4, tag: candidateModel.tag, scope: 'all', scenarios: [{ scenarioId: 'P1-1', phase: 1 }] }) },
-    { fileName: 'verdict.json', raw: JSON.stringify({ schemaVersion: 4, tags: { A: baseline.tag, B: candidateModel.tag }, scope: 'all', summary: { phase: phaseSummary, criticalErrors: 0 } }) },
+    { fileName: 'verdict.json', raw: JSON.stringify({ schemaVersion: 4, tags: { A: baseline.tag, B: candidateModel.tag }, scope: 'all', summary: { phase: phaseSummary, criticalErrors: 0 }, scenarioVerdicts: [{ id: 'P1-1', title: 'integration', phases: [1], winner: 'B', inconsistent: false }] }) },
   ] });
   check((await db.modelVersion.findUniqueOrThrow({ where: { id: candidateModel.id } })).status === 'ELIGIBLE', '离线评测按阶段门禁通过后模型变为 ELIGIBLE');
   const deployment10 = await createOrPromoteDeployment({ modelVersionId: candidateModel.id, rolloutPercent: 10, adminId: admin.id });
@@ -323,9 +438,11 @@ async function main() {
   const deployment100 = await createOrPromoteDeployment({ modelVersionId: candidateModel.id, rolloutPercent: 100, adminId: admin.id });
   check(deployment100.rolloutPercent === 100, '满足 48h/50 与 72h/150 线上门禁后完成 10→30→100 灰度');
 
-  await rm(path.join(process.cwd(), 'data', 'releases', version), { recursive: true, force: true });
   console.log(`\nTutor bootstrap integration tests: ${passed} passed, ${failed} failed`);
   if (failed) process.exitCode = 1;
+  } finally {
+    await teardown(suffix, originalActiveDeployments.map((item) => item.id));
+  }
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; }).finally(async () => db.$disconnect());

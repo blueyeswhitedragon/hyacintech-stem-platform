@@ -46,7 +46,7 @@ import {
 
 const OUT_DIR = path.join(process.cwd(), 'data/blind-eval');
 const TRANSCRIPT_SCHEMA_VERSION = 2;
-const VERDICT_SCHEMA_VERSION = 3;
+const VERDICT_SCHEMA_VERSION = 4;
 let evaluationStyleFamily: StyleFamily = DEFAULT_STYLE_FAMILY;
 let evaluationStylePolicyVersion = DEFAULT_STYLE_POLICY_VERSION;
 const FALLBACKS = [
@@ -148,6 +148,7 @@ interface JudgeResponse {
 interface FinalVerdict {
   id: string;
   title: string;
+  phases: number[];
   winner: Winner;
   inconsistent: boolean;
   dimensions: Partial<Record<DimensionKey, Winner>>;
@@ -180,6 +181,8 @@ interface VerdictFile {
     scenario: CountSummary;
     turn: CountSummary;
     dimensions: Record<DimensionKey, CountSummary>;
+    phase: Record<string, PhaseCountSummary>;
+    criticalErrors: number;
   };
   scenarioVerdicts: FinalVerdict[];
   turnVerdicts: FinalVerdict[];
@@ -190,6 +193,14 @@ interface CountSummary {
   B: number;
   tie: number;
   inconsistent: number;
+}
+
+interface PhaseCountSummary extends CountSummary {
+  criticalErrors: number;
+  parseSuccessA: number;
+  parseTotalA: number;
+  parseSuccessB: number;
+  parseTotalB: number;
 }
 
 const P2_TRIGGER = '我已确认选题，现在开始设计实验方案。';
@@ -1289,7 +1300,7 @@ function mergeDimensions(
   return out;
 }
 
-async function bidirectionalJudge(id: string, title: string, aText: string, bText: string): Promise<FinalVerdict> {
+async function bidirectionalJudge(id: string, title: string, phases: number[], aText: string, bText: string): Promise<FinalVerdict> {
   const systemPrompt = judgeSystemPrompt();
   const aAsX = await callJudge(systemPrompt, buildJudgePrompt(title, `【导师X】\n${aText}`, `【导师Y】\n${bText}`));
   const bAsX = await callJudge(systemPrompt, buildJudgePrompt(title, `【导师X】\n${bText}`, `【导师Y】\n${aText}`));
@@ -1299,6 +1310,7 @@ async function bidirectionalJudge(id: string, title: string, aText: string, bTex
   return {
     id,
     title,
+    phases,
     winner,
     inconsistent: winner1 !== winner2,
     dimensions: mergeDimensions(mapDimensions(aAsX.dimensions ?? {}, true), mapDimensions(bAsX.dimensions ?? {}, false)),
@@ -1456,6 +1468,35 @@ function dimensionSummary(scenarioVerdicts: FinalVerdict[]): Record<DimensionKey
   return out;
 }
 
+function criticalErrorCount(scenarios: ScenarioRecord[], phase: number) {
+  return scenarios.flatMap((scenario) => scenario.turns)
+    .filter((turn) => turn.phase === phase)
+    .reduce((count, turn) => count + turn.violations.filter((violation) => /(?:safety|unsafe|ungrounded|grounding|agency)/i.test(violation.rule)).length, 0);
+}
+
+function phaseSummary(
+  scenarioVerdicts: FinalVerdict[],
+  turnVerdicts: FinalVerdict[],
+  scenariosA: ScenarioRecord[],
+  scenariosB: ScenarioRecord[],
+): Record<string, PhaseCountSummary> {
+  return Object.fromEntries([1, 2, 3, 4, 5, 6].map((phase) => {
+    const phaseTurns = turnVerdicts.filter((verdict) => verdict.phases.includes(phase));
+    const verdicts = phaseTurns.length ? phaseTurns : scenarioVerdicts.filter((verdict) => verdict.phases.includes(phase));
+    const counts = countSummary(verdicts);
+    const turnsA = scenariosA.flatMap((scenario) => scenario.turns).filter((turn) => turn.phase === phase);
+    const turnsB = scenariosB.flatMap((scenario) => scenario.turns).filter((turn) => turn.phase === phase);
+    return [`P${phase}`, {
+      ...counts,
+      criticalErrors: criticalErrorCount(scenariosA, phase) + criticalErrorCount(scenariosB, phase),
+      parseSuccessA: turnsA.filter((turn) => turn.parseOk).length,
+      parseTotalA: turnsA.length,
+      parseSuccessB: turnsB.filter((turn) => turn.parseOk).length,
+      parseTotalB: turnsB.length,
+    }];
+  }));
+}
+
 async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: JudgeLevel, scenarioFilter?: string) {
   const transcriptA = await readTranscript(tagA);
   const transcriptB = await readTranscript(tagB);
@@ -1478,6 +1519,7 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
     scenarioVerdicts.push(await bidirectionalJudge(
       left.id,
       left.name,
+      [...new Set([...left.turns, ...right.turns].map((turn) => turn.phase))],
       formatScenarioForJudge(left),
       formatScenarioForJudge(right)
     ));
@@ -1490,6 +1532,7 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
         turnVerdicts.push(await bidirectionalJudge(
           left.id,
           title,
+          [left.phase],
           formatTurnForJudge(left),
           formatTurnForJudge(right)
         ));
@@ -1498,6 +1541,7 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
   }
 
   const cfg = judgeConfig();
+  const byPhase = phaseSummary(scenarioVerdicts, turnVerdicts, scenariosA, scenariosB);
   const verdict: VerdictFile = {
     schemaVersion: VERDICT_SCHEMA_VERSION,
     createdAt: new Date().toISOString(),
@@ -1517,6 +1561,8 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
       scenario: countSummary(scenarioVerdicts),
       turn: countSummary(turnVerdicts),
       dimensions: dimensionSummary(scenarioVerdicts),
+      phase: byPhase,
+      criticalErrors: Object.values(byPhase).reduce((sum, counts) => sum + counts.criticalErrors, 0),
     },
     scenarioVerdicts,
     turnVerdicts,

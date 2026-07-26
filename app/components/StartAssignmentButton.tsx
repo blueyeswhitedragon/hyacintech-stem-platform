@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Button from './ui/Button';
 
 interface Props {
   assignmentId: string;
@@ -19,10 +20,10 @@ export default function StartAssignmentButton({ assignmentId, started, completed
   else if (started) label = '继续';
   else label = '开始';
 
+  // 已完成的作业只是「可回看」，不该继续占用珊瑚色——那是留给待办动作的。
   return (
-    <button onClick={handleClick}
-      className={`px-4 py-2 rounded-lg font-medium transition-colors ${completed ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
+    <Button variant={completed ? 'secondary' : 'primary'} onClick={handleClick}>
       {label}
-    </button>
+    </Button>
   );
 }

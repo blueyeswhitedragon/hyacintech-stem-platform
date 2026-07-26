@@ -5,6 +5,8 @@ import { getConversationForUser } from '@/app/lib/conversation';
 import type { StageData, Stage2Column, Stage3FileAssociation } from '@/app/models/stageData';
 import { validateStage3Rows } from '@/app/lib/stage3Rows';
 import { finalizeStageData, studentVisibleStageData } from '@/app/lib/stageState';
+import { advanceHint } from '@/app/lib/advanceHint';
+import { hasStageRelease } from '@/app/lib/releasePolicy';
 
 // PATCH /api/conversations/[id]/stage-data
 // 学生录入数据落库（白名单字段，按当前阶段校验）：
@@ -45,7 +47,19 @@ export async function PATCH(req: Request, ctx: RouteContext<'/api/conversations/
       return NextResponse.json({ error: '当前不在过程执行阶段' }, { status: 400 });
     }
     const stage2 = conv.stageData.stage2;
-    if (!stage2?.experimentPlan || !stage2.confirmedPlanHash || stage2.confirmedPlanHash !== stage2.draftHash) {
+    if (!stage2) {
+      return NextResponse.json({ error: '实验方案尚未确认或已变化' }, { status: 409 });
+    }
+    const confirmedPlan = Boolean(
+      stage2.experimentPlan
+      && stage2.confirmedPlanHash
+      && stage2.confirmedPlanHash === stage2.draftHash,
+    );
+    const releasedSchema = Boolean(
+      stage2.schema.columns.length
+      && hasStageRelease(conv.stageData, 2),
+    );
+    if (!confirmedPlan && !releasedSchema) {
       return NextResponse.json({ error: '实验方案尚未确认或已变化' }, { status: 409 });
     }
     if (!conv.safetyQuizCompleted && conv.stageData.stage3?.safetyQuiz?.passed !== true) {
@@ -98,5 +112,12 @@ export async function PATCH(req: Request, ctx: RouteContext<'/api/conversations/
     data: { stageData: JSON.stringify(finalized) },
   });
 
-  return NextResponse.json({ stageData: studentVisibleStageData(finalized) });
+  return NextResponse.json({
+    stageData: studentVisibleStageData(finalized),
+    advanceHint: advanceHint({
+      currentStage: conv.currentStage,
+      stageData: finalized,
+      safetyQuizCompleted: conv.safetyQuizCompleted,
+    }),
+  });
 }

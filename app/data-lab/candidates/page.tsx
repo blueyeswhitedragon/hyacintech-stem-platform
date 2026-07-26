@@ -11,7 +11,7 @@ export default async function CandidatesPage() {
   const candidates = await listProductionCandidates();
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-semibold">线上问题候选池</h1><p className="mt-1 text-sm text-gray-500">仅显示本机确定性脱敏快照；通过仍不等于训练资格，必须继续完成人工纠正和复核。</p></div>
+      <div><h1 className="text-2xl font-semibold">线上问题候选池</h1><p className="mt-1 text-sm text-muted">仅显示本机确定性脱敏快照；通过仍不等于训练资格，必须继续完成人工纠正和复核。</p></div>
       <ProductionCandidateManager candidates={candidates.map((candidate) => {
         const record = parseJson<ShareGPTRecord>(candidate.redactedRecordJson, {} as ShareGPTRecord);
         const report = parseJson<{ replacements?: Record<string, number> }>(candidate.redactionReportJson, {});

@@ -19,6 +19,7 @@ import {
   topicCardV2Fields,
   type CandidateCheck,
   type CandidateModelConfig,
+  type CandidateModelSelection,
   type DeterministicIssue,
   type TopicCardInput,
   type TutorCaseSplit,
@@ -954,7 +955,7 @@ async function completeCandidateReviewFlow(caseId: string, runId: string, actorI
 }
 
 export async function generateTutorCandidates(
-  input: { caseId: string; modelA?: CandidateModelConfig; modelB?: CandidateModelConfig; user: SessionUser },
+  input: { caseId: string; modelA?: CandidateModelSelection; modelB?: CandidateModelSelection; user: SessionUser },
   deps: CandidateGenerationDeps = {},
 ) {
   const generate = deps.generateOne ?? generateOne;
@@ -968,8 +969,8 @@ export async function generateTutorCandidates(
     },
   });
   if (!caseItem || !['READY', 'NEEDS_REGEN', 'IN_REVIEW'].includes(caseItem.status)) throw new Error('案例不存在或当前状态不可生成');
-  let modelA = input.modelA;
-  let modelB = input.modelB;
+  let modelA: CandidateModelSelection | undefined = input.modelA;
+  let modelB: CandidateModelSelection | undefined = input.modelB;
   const frozenA = caseItem.generationRun?.candidateARuntimeBundleId;
   const frozenB = caseItem.generationRun?.candidateBRuntimeBundleId;
   if (frozenA || frozenB) {
@@ -983,6 +984,21 @@ export async function generateTutorCandidates(
     ]);
     modelA = { provider: runtimeA.provider, model: runtimeA.model, family: runtimeA.family, tag: runtimeA.tag, runtimeBundleId: runtimeA.runtimeBundleId };
     modelB = { provider: runtimeB.provider, model: runtimeB.model, family: runtimeB.family, tag: runtimeB.tag, runtimeBundleId: runtimeB.runtimeBundleId };
+  } else {
+    const resolveSelection = async (selection: CandidateModelSelection | undefined): Promise<CandidateModelConfig | undefined> => {
+      if (!selection) return undefined;
+      if (!('provider' in selection) || !selection.provider || !selection.model) {
+        if (!selection.runtimeBundleId) throw new Error('模型选择缺少 provider/model 或 runtimeBundleId');
+        const runtime = await resolveRuntimeBundleConfig(selection.runtimeBundleId);
+        return { provider: runtime.provider, model: runtime.model, family: runtime.family, tag: runtime.tag, runtimeBundleId: runtime.runtimeBundleId };
+      }
+      if (!selection.family && selection.runtimeBundleId) {
+        const runtime = await resolveRuntimeBundleConfig(selection.runtimeBundleId);
+        return { provider: runtime.provider, model: runtime.model, family: runtime.family, tag: runtime.tag, runtimeBundleId: runtime.runtimeBundleId };
+      }
+      return selection;
+    };
+    [modelA, modelB] = await Promise.all([resolveSelection(modelA), resolveSelection(modelB)]);
   }
   if (!modelA || !modelB) throw new Error('案例未冻结运行组合，modelA 和 modelB 必填');
   const families = assertIndependentModelFamilies(modelA, modelB);
@@ -1155,6 +1171,7 @@ export async function listTutorCases() {
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
+      dataSource: true,
       phase: true,
       triggerType: true,
       studentMessage: true,
@@ -1241,10 +1258,11 @@ export async function deleteGenerationRun(runId: string, user: SessionUser) {
 }
 
 export async function tutorWorkflowCounts() {
-  const [latestProfileRuns, topicDrafts, approvedTopics, editPending, confirmPending, caseQualityPending, finalized] = await Promise.all([
+  const [latestProfileRuns, topicDrafts, approvedTopics, productionCandidatesPending, editPending, confirmPending, caseQualityPending, finalized] = await Promise.all([
     Promise.all((['SMOKE_6', 'CALIBRATION_12', 'TRIAL_36', 'FULL_180', 'EVAL_80'] as TutorCaseProfile[]).map((profile) => latestCaseCompilationRun(profile))),
     db.topicCard.count({ where: { status: 'DRAFT' } }),
     db.topicCard.count({ where: { status: 'APPROVED' } }),
+    db.productionCandidate.count({ where: { status: 'NOMINATED' } }),
     db.tutorReviewTask.count({ where: { type: 'EDIT', status: { in: ['PENDING', 'RETURNED'] }, case: { status: 'IN_REVIEW' } } }),
     db.tutorReviewTask.count({ where: { type: 'CONFIRM', status: 'PENDING', case: { status: 'AWAITING_CONFIRMATION' } } }),
     db.tutorReviewTask.count({ where: { type: 'CASE', status: 'PENDING', case: { status: 'CASE_NEEDS_REVISION' } } }),
@@ -1261,7 +1279,27 @@ export async function tutorWorkflowCounts() {
       ],
     },
   });
-  return { topicDrafts, approvedTopics, casesReady, editPending, confirmPending, caseQualityPending, finalized };
+  return { topicDrafts, approvedTopics, productionCandidatesPending, casesReady, editPending, confirmPending, caseQualityPending, finalized };
+}
+
+export async function tutorConfirmationConflictCount(userId: string) {
+  return db.tutorReviewTask.count({
+    where: {
+      type: 'CONFIRM',
+      status: { in: ['PENDING', 'IN_PROGRESS'] },
+      case: {
+        status: 'AWAITING_CONFIRMATION',
+        reviewTasks: {
+          some: {
+            type: 'EDIT',
+            status: 'SUBMITTED',
+            operatorId: userId,
+            submissionMode: { not: 'AI_DIRECT_ADMIN_AUTHORIZED' },
+          },
+        },
+      },
+    },
+  });
 }
 
 export async function tutorPersonalQueueCount(user: SessionUser) {
@@ -1427,6 +1465,17 @@ export async function claimTutorReviewTask(type: 'EDIT' | 'CONFIRM', user: Sessi
       returnReason: type === 'EDIT' ? confirmTask?.reason ?? '' : '',
       reviewerProposedOutput: type === 'EDIT' ? parseJson<{ reviewerProposedOutput?: TutorLanguageResponse }>(confirmTask?.draftJson ?? '{}', {}).reviewerProposedOutput : undefined,
     } : undefined,
+    reviewDraft: {
+      decision: claimed.decision,
+      selectedCandidateId: claimed.selectedCandidateId,
+      preferenceRejectedCandidateId: claimed.preferenceRejectedCandidateId,
+      draft: parseJson<{ finalOutputRaw?: string; finalOutput?: TutorLanguageResponse }>(claimed.draftJson, {}),
+      reason: claimed.reason,
+      preferenceReason: claimed.preferenceReason,
+      submissionMode: claimed.submissionMode,
+      warningClosures: parseJson(claimed.warningClosureJson, {}),
+      caseIssue: parseJson(claimed.caseIssueJson, {}),
+    },
     warnings: warnings.map((warning) => ({
       ...warning,
       computedFinalRelation: type === 'CONFIRM' && editDraft.finalOutput && draftCheck
@@ -1434,6 +1483,50 @@ export async function claimTutorReviewTask(type: 'EDIT' | 'CONFIRM', user: Sessi
         : undefined,
     })),
   };
+}
+
+export async function saveTutorReviewDraft(input: {
+  taskId: string;
+  type: 'EDIT' | 'CONFIRM';
+  decision: string;
+  selectedCandidateId?: string;
+  finalOutput: string;
+  reason: string;
+  preferenceRejectedCandidateId?: string;
+  preferenceReason?: string;
+  submissionMode?: string;
+  warningClosures?: unknown;
+  caseIssue?: unknown;
+  user: SessionUser;
+}) {
+  const task = await db.tutorReviewTask.findUnique({ where: { id: input.taskId }, select: { id: true, type: true, status: true, assignedToId: true, leaseExpiresAt: true, caseId: true } });
+  if (!task || task.type !== input.type || task.status !== 'IN_PROGRESS' || task.assignedToId !== input.user.id) throw new Error('审核任务不存在、未领取或无权保存');
+  if (task.leaseExpiresAt && task.leaseExpiresAt < new Date()) throw new Error('任务租约已过期，草稿未保存');
+  const allowedDecisions = input.type === 'EDIT'
+    ? ['SELECT_A', 'SELECT_B', 'MERGE', 'EDIT', 'RETURN_CASE', 'REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT']
+    : ['CONFIRM', 'RETURN_TUTOR', 'RETURN_CASE', 'REJECT'];
+  if (!allowedDecisions.includes(input.decision)) throw new Error('审核决定无效');
+  const candidateIds = new Set((await db.tutorCandidate.findMany({ where: { caseId: task.caseId }, select: { id: true } })).map((candidate) => candidate.id));
+  if (input.selectedCandidateId && !candidateIds.has(input.selectedCandidateId)) throw new Error('所选候选不属于当前案例');
+  if (input.preferenceRejectedCandidateId && !candidateIds.has(input.preferenceRejectedCandidateId)) throw new Error('未采用候选不属于当前案例');
+  const submissionMode = input.submissionMode && TUTOR_DRAFT_PROVENANCES.includes(input.submissionMode as TutorDraftProvenance)
+    ? input.submissionMode
+    : 'HUMAN';
+  await db.tutorReviewTask.update({
+    where: { id: task.id },
+    data: {
+      decision: input.decision,
+      selectedCandidateId: input.selectedCandidateId || null,
+      preferenceRejectedCandidateId: input.preferenceRejectedCandidateId || null,
+      draftJson: JSON.stringify({ finalOutputRaw: input.finalOutput.slice(0, 100_000) }),
+      reason: input.reason.slice(0, 10_000),
+      preferenceReason: (input.preferenceReason ?? '').slice(0, 10_000),
+      submissionMode,
+      warningClosureJson: JSON.stringify(input.warningClosures ?? {}),
+      caseIssueJson: JSON.stringify(input.caseIssue ?? {}),
+    },
+  });
+  return { savedAt: new Date().toISOString() };
 }
 
 export async function renewTutorReviewLease(taskId: string, user: SessionUser) {

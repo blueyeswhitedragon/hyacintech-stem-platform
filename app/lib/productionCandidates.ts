@@ -13,6 +13,8 @@ import {
 } from '@/app/lib/tutorLanguage';
 import { parseJson, sha256 } from '@/app/lib/dataLab/validation';
 import { TUTOR_TRAINING_COHORT } from '@/app/lib/dataLab/trainingCohort';
+import { releasedTraceBlockReason } from '@/app/lib/releasePolicy';
+import type { StageData } from '@/app/models/stageData';
 
 export const DATA_POLICY_VERSION = 'student-data-policy-v1';
 export const CONSENT_STATUSES = ['PENDING', 'GRANTED', 'DECLINED', 'WITHDRAWN'] as const;
@@ -23,6 +25,15 @@ function parseMessages(raw: string): Message[] {
     return Array.isArray(parsed) ? parsed as Message[] : [];
   } catch {
     return [];
+  }
+}
+
+function parseStageData(raw: string): StageData {
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed as StageData : {};
+  } catch {
+    return {};
   }
 }
 
@@ -152,6 +163,8 @@ export async function nominateProductionCandidate(input: {
   if (studentAssignment.assignment.dataContributionMode !== 'CONSENT_REQUIRED') throw new Error('该作业未开启数据回流');
   if (studentAssignment.dataConsentStatus !== 'GRANTED') throw new Error('学生尚未授权或已撤回授权');
   if (trace.conversation.traceCoverage !== 'COMPLETE') throw new Error('历史不可验证会话不能进入候选池');
+  const releasedBlock = releasedTraceBlockReason(parseStageData(trace.conversation.stageData), trace.stage);
+  if (releasedBlock) throw new Error(releasedBlock);
   if (!trace.trainingSystemPromptSnapshot.trim()) {
     throw new Error('该生成轨迹未保存经授权的完整训练上下文，不能进入正向训练候选池');
   }

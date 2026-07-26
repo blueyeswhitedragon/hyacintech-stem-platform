@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAnyRole } from '@/app/lib/auth';
-import { renewTutorReviewLease, submitConfirmReview, submitEditReview } from '@/app/lib/dataLab/bootstrap/service';
+import { renewTutorReviewLease, saveTutorReviewDraft, submitConfirmReview, submitEditReview } from '@/app/lib/dataLab/bootstrap/service';
 
 export async function PATCH(_request: Request, ctx: RouteContext<'/api/data-lab/tutor-reviews/[id]'>) {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
@@ -8,6 +8,32 @@ export async function PATCH(_request: Request, ctx: RouteContext<'/api/data-lab/
   const { id } = await ctx.params;
   try {
     return NextResponse.json(await renewTutorReviewLease(id, auth.user));
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+  }
+}
+
+export async function PUT(request: Request, ctx: RouteContext<'/api/data-lab/tutor-reviews/[id]'>) {
+  const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  const { id } = await ctx.params;
+  try {
+    const body = await request.json() as Record<string, unknown>;
+    if (body.type !== 'EDIT' && body.type !== 'CONFIRM') return NextResponse.json({ error: 'type 无效' }, { status: 400 });
+    return NextResponse.json(await saveTutorReviewDraft({
+      taskId: id,
+      type: body.type,
+      decision: String(body.decision ?? ''),
+      selectedCandidateId: typeof body.selectedCandidateId === 'string' ? body.selectedCandidateId : undefined,
+      finalOutput: String(body.finalOutput ?? ''),
+      reason: String(body.reason ?? ''),
+      preferenceRejectedCandidateId: typeof body.preferenceRejectedCandidateId === 'string' ? body.preferenceRejectedCandidateId : undefined,
+      preferenceReason: typeof body.preferenceReason === 'string' ? body.preferenceReason : undefined,
+      submissionMode: typeof body.submissionMode === 'string' ? body.submissionMode : undefined,
+      warningClosures: body.warningClosures,
+      caseIssue: body.caseIssue,
+      user: auth.user,
+    }));
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
   }

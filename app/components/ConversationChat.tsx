@@ -4,11 +4,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Message, ChatResponse, SafetyQuiz } from '../models/types';
 import type { StageData } from '../models/stageData';
+import type { AdvanceHint } from '../lib/advanceHint';
 import MessageItem from './MessageItem';
 import StageProgress from './StageProgress';
 import { shouldShowEscapeHatch } from '../lib/pacing';
 import { injectMessageOnce } from '../lib/messageInjection';
 import { phaseConfirmationAction } from '../lib/confirmationFlow';
+import Button from './ui/Button';
+import Callout from './ui/Callout';
+import { Textarea } from './ui/Field';
 
 /** 逃生按钮发送的强制收敛消息：促使模型核对研究问题，不绕过服务器门禁。 */
 const FORCE_CONVERGE_TEXT = '我觉得研究问题已经清楚了，请直接让我核对并确认这个问题。';
@@ -17,6 +21,7 @@ const EXPLICIT_PHASE_CONFIRM_TEXT = '我确认按这个问题做。';
 export interface ChatApiResponse extends ChatResponse {
   currentStage?: number;
   stageData?: StageData;
+  advanceHint?: AdvanceHint;
 }
 
 interface Props {
@@ -41,6 +46,9 @@ interface Props {
   initialSafetyQuiz?: SafetyQuiz | null;
   /** 待审/已完成时由父级给出只读原因。 */
   readOnlyReason?: string;
+  /** 服务端用 canAdvance 计算出的权威推进状态。 */
+  advanceReady?: boolean;
+  advanceReason?: string;
 }
 
 const noop = () => {};
@@ -57,7 +65,7 @@ function structuredNotice(data: ChatApiResponse): string | null {
   return null;
 }
 
-export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, phaseConfirmLabel = '确认，进入下一阶段', roundCount = 0, injectedMessage, initialSafetyQuiz = null, readOnlyReason }: Props) {
+export default function ConversationChat({ initialMessages, stage, completed, send, onResult, onSafetyPassed, onPhaseConfirm, phaseConfirmLabel = '确认，进入下一阶段', roundCount = 0, injectedMessage, initialSafetyQuiz = null, readOnlyReason, advanceReady = false, advanceReason }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -171,12 +179,12 @@ export default function ConversationChat({ initialMessages, stage, completed, se
 
   /** 未形成确认书时先记录学生确认；确认落库后再推进阶段。 */
   const handleConfirm = async () => {
-    if (!onPhaseConfirm || !confirmationAction || confirmingRef.current || readOnlyReason) return;
+    if (!onPhaseConfirm || (!advanceReady && !confirmationAction) || confirmingRef.current || readOnlyReason) return;
     confirmingRef.current = true;
     setIsLoading(true);
     setError(null);
     try {
-      if (confirmationAction === 'CONFIRM_AND_ADVANCE') {
+      if (!advanceReady && confirmationAction === 'CONFIRM_AND_ADVANCE') {
         const confirmation = await doSend(EXPLICIT_PHASE_CONFIRM_TEXT);
         if (!confirmation) return;
         // 历史合同可能仍由聊天回合直接推进；不要再重复调用 /advance。
@@ -221,7 +229,7 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   const confirmationAction = onPhaseConfirm
     ? phaseConfirmationAction(stage, lastActionType ?? undefined, lastWithAction?.phaseComplete)
     : null;
-  const canConfirmPhase = confirmationAction !== null;
+  const canConfirmPhase = Boolean(onPhaseConfirm && (advanceReady || confirmationAction !== null));
   const options =
     stage !== 1 && hintsEnabled && lastActionType === 'ask_choice' && lastWithAction?.options?.length ? lastWithAction.options : null;
   const hints =
@@ -234,22 +242,22 @@ export default function ConversationChat({ initialMessages, stage, completed, se
   const confirmAttachedToDoc = canConfirmPhase && lastDocIndex === displayedMessages.length - 1;
 
   const confirmButton = (
-    <button
+    <Button
+      variant="primary"
       onClick={handleConfirm}
       disabled={Boolean(readOnlyReason) || isLoading}
-      className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 text-lg font-medium"
     >
       {isLoading
         ? '处理中…'
-        : confirmationAction === 'CONFIRM_AND_ADVANCE'
+        : !advanceReady && confirmationAction === 'CONFIRM_AND_ADVANCE'
           ? '方向无误，确认并进入方案设计'
           : phaseConfirmLabel}
-    </button>
+    </Button>
   );
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="border-b bg-white p-4">
+    <div className="flex h-full flex-col bg-canvas">
+      <div className="border-b border-hairline bg-canvas p-4">
         <StageProgress currentStage={stage} completed={completed} />
       </div>
 
@@ -265,11 +273,11 @@ export default function ConversationChat({ initialMessages, stage, completed, se
         ))}
         {/* 确认状态存在时，确认按钮紧跟状态渲染。 */}
         {confirmAttachedToDoc && (
-          <div className="mb-4 -mt-2 text-left">{confirmButton}</div>
+          <div className="-mt-2 mb-4 text-left">{confirmButton}</div>
         )}
         {isLoading && (
-          <div className="text-left mb-4">
-            <div className="inline-block rounded-lg px-4 py-2 bg-gray-100 text-gray-800">
+          <div className="mb-4 text-left">
+            <div className="inline-block rounded-lg border border-hairline bg-surface-soft px-4 py-3">
               <div className="flex items-center">
                 <div className="dot-typing"></div>
               </div>
@@ -277,8 +285,8 @@ export default function ConversationChat({ initialMessages, stage, completed, se
           </div>
         )}
         {error && (
-          <div className="text-center mb-4">
-            <div className="inline-block rounded-lg px-4 py-2 bg-red-100 text-red-800">{error}</div>
+          <div className="mb-4">
+            <Callout tone="error">{error}</Callout>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -286,25 +294,22 @@ export default function ConversationChat({ initialMessages, stage, completed, se
 
       {/* 思考线索区域（可开关，仅展示不互动） */}
       {hints && hints.length > 0 && (
-        <div className="px-4 py-3 bg-amber-50 border-t border-amber-100">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-amber-800 font-medium">
-              {stage === 1 ? '思考线索' : '思维提示'}
-            </span>
-          </div>
-          <div className="rounded-md border border-amber-200 border-l-4 border-l-amber-400 bg-white px-3 py-2 text-sm text-amber-950">
+        <div className="border-t border-hairline bg-surface-soft px-4 py-3">
+          <span className="caption-upper">{stage === 1 ? '思考线索' : '思维提示'}</span>
+          {/* 左侧珊瑚竖线：这是"提示"而非"指令"，靠一笔颜色区分，不整块上色 */}
+          <div className="mt-1.5 rounded-md border border-hairline border-l-2 border-l-coral bg-canvas px-3 py-2 text-sm leading-6 text-body">
             {hints[0]}
           </div>
         </div>
       )}
 
       {options && options.length > 0 && (
-        <div className="p-4 bg-gray-50">
-          <div className="flex flex-wrap gap-2 justify-center">
+        <div className="border-t border-hairline bg-surface-soft p-4">
+          <div className="flex flex-wrap justify-center gap-2">
             {options.map((option, index) => (
               <span
                 key={index}
-                className="px-4 py-2 bg-blue-50 text-blue-700 rounded-md border border-blue-200 text-sm"
+                className="rounded-md border border-hairline bg-canvas px-4 py-2 text-sm text-body"
               >
                 {option}
               </span>
@@ -314,40 +319,38 @@ export default function ConversationChat({ initialMessages, stage, completed, se
       )}
 
       {canConfirmPhase && !confirmAttachedToDoc && (
-        <div className="p-4 bg-gray-50 flex justify-center">
+        <div className="flex justify-center border-t border-hairline bg-surface-soft p-4">
           {confirmButton}
         </div>
       )}
 
       {readOnlyReason && (
-        <div className="border-t border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="border-t border-hairline bg-surface-soft px-4 py-3 text-sm text-muted">
           {readOnlyReason}
         </div>
       )}
 
       {/* 逃生按钮：轮次过多且当前没有确认按钮时出现。发送强制收敛消息促使模型给出确认书。 */}
-      {lastActionType !== 'confirmation' && !quiz && shouldShowEscapeHatch(stage, roundCount) && (
-        <div className="px-4 pt-3 flex justify-center">
-          <button
-            onClick={() => doSend(FORCE_CONVERGE_TEXT)}
-            disabled={isLoading}
-            className="px-4 py-1.5 text-sm bg-white border border-green-400 text-green-700 rounded-md hover:bg-green-50 disabled:opacity-50"
-          >
+      {!canConfirmPhase && !quiz && shouldShowEscapeHatch(stage, roundCount) && (
+        <div className="px-4 pt-3 text-center">
+          <Button size="sm" onClick={() => doSend(FORCE_CONVERGE_TEXT)} disabled={isLoading}>
             讨论得差不多了？让我进入下一步 →
-          </button>
+          </Button>
+          {advanceReason && <p className="mt-1 text-xs text-muted">{advanceReason}</p>}
         </div>
       )}
 
       {quiz && (
-        <div className="p-4 bg-amber-50 border-t border-amber-200">
-          <div className="font-medium text-amber-800 mb-2">⚠️ 安全问答（答对后才能继续）</div>
-          <div className="text-gray-800 mb-2">{quiz.question}</div>
-          <div className="space-y-1 mb-2">
+        <div className="border-t border-warning/40 bg-warning/8 p-4">
+          <div className="mb-2 font-medium text-ink">安全问答（答对后才能继续）</div>
+          <div className="mb-2 text-body">{quiz.question}</div>
+          <div className="mb-3 space-y-1">
             {quiz.options.map((opt, i) => (
-              <label key={i} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <label key={i} className="flex cursor-pointer items-center gap-2 text-sm text-body">
                 <input
                   type="radio"
                   name="safety-quiz"
+                  className="accent-coral"
                   checked={quizChoice === i}
                   onChange={() => { setQuizChoice(i); setQuizError(null); }}
                 />
@@ -355,56 +358,52 @@ export default function ConversationChat({ initialMessages, stage, completed, se
               </label>
             ))}
           </div>
-          {quizError && <div className="text-sm text-red-600 mb-2">{quizError}</div>}
-          <button
-            onClick={submitQuiz}
-            disabled={quizChoice === null}
-            className="px-4 py-1.5 bg-amber-500 text-white rounded hover:bg-amber-600 disabled:opacity-50 text-sm"
-          >
+          {quizError && <div className="mb-2 text-sm text-error">{quizError}</div>}
+          <Button size="sm" variant="primary" onClick={submitQuiz} disabled={quizChoice === null}>
             提交答案
-          </button>
+          </Button>
         </div>
       )}
 
-      <div className="border-t p-4 bg-white">
+      <div className="border-t border-hairline bg-canvas p-4">
         {/* 提示开关：控制思维提示(hints)和非阶段1选择项(options)的显示 */}
-        <div className="flex items-center justify-end mb-2">
-          <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer select-none">
+        <div className="mb-2 flex items-center justify-end">
+          <label className="flex cursor-pointer select-none items-center gap-1.5 text-xs text-muted">
             <span>提示</span>
             <button
               type="button"
               role="switch"
               aria-checked={hintsEnabled}
               onClick={() => setHintsEnabled(!hintsEnabled)}
-              className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${
-                hintsEnabled ? 'bg-yellow-400' : 'bg-gray-300'
+              className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors duration-[120ms] ${
+                hintsEnabled ? 'bg-coral' : 'bg-hairline'
               }`}
             >
               <span
-                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-3 w-3 transform rounded-full bg-canvas transition-transform ${
                   hintsEnabled ? 'translate-x-4' : 'translate-x-0.5'
                 }`}
               />
             </button>
           </label>
         </div>
-        <div className="flex">
-          <textarea
+        <div className="flex items-end gap-2">
+          <Textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={readOnlyReason ?? (quiz ? '请先完成上方安全问答…' : '输入你的问题或回答...')}
-            className="flex-1 resize-none border rounded-l-lg p-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            className="flex-1 resize-none"
             rows={2}
             disabled={Boolean(readOnlyReason) || isLoading || quiz !== null}
           />
-          <button
+          <Button
+            variant="primary"
             onClick={sendMessage}
             disabled={Boolean(readOnlyReason) || isLoading || quiz !== null || inputValue.trim() === ''}
-            className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 disabled:opacity-50"
           >
             发送
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -415,19 +414,22 @@ export default function ConversationChat({ initialMessages, stage, completed, se
           width: 6px;
           height: 6px;
           border-radius: 3px;
-          background-color: #9880ff;
-          color: #9880ff;
-          box-shadow: 9984px 0 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px 0 0 0 #9880ff;
+          background-color: #cc785c;
+          color: #cc785c;
+          box-shadow: 9984px 0 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px 0 0 0 #cc785c;
           animation: dot-typing 1.5s infinite linear;
         }
         @keyframes dot-typing {
-          0% { box-shadow: 9984px 0 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px 0 0 0 #9880ff; }
-          16.667% { box-shadow: 9984px -6px 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px 0 0 0 #9880ff; }
-          33.333% { box-shadow: 9984px 0 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px 0 0 0 #9880ff; }
-          50% { box-shadow: 9984px 0 0 0 #9880ff, 9999px -6px 0 0 #9880ff, 10014px 0 0 0 #9880ff; }
-          66.667% { box-shadow: 9984px 0 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px 0 0 0 #9880ff; }
-          83.333% { box-shadow: 9984px 0 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px -6px 0 0 #9880ff; }
-          100% { box-shadow: 9984px 0 0 0 #9880ff, 9999px 0 0 0 #9880ff, 10014px 0 0 0 #9880ff; }
+          0% { box-shadow: 9984px 0 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px 0 0 0 #cc785c; }
+          16.667% { box-shadow: 9984px -6px 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px 0 0 0 #cc785c; }
+          33.333% { box-shadow: 9984px 0 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px 0 0 0 #cc785c; }
+          50% { box-shadow: 9984px 0 0 0 #cc785c, 9999px -6px 0 0 #cc785c, 10014px 0 0 0 #cc785c; }
+          66.667% { box-shadow: 9984px 0 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px 0 0 0 #cc785c; }
+          83.333% { box-shadow: 9984px 0 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px -6px 0 0 #cc785c; }
+          100% { box-shadow: 9984px 0 0 0 #cc785c, 9999px 0 0 0 #cc785c, 10014px 0 0 0 #cc785c; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .dot-typing { animation: none; }
         }
       `}</style>
     </div>

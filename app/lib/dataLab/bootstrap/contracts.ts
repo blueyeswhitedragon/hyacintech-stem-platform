@@ -66,6 +66,8 @@ export interface CandidateModelConfig {
   runtimeBundleId?: string;
 }
 
+export type CandidateModelSelection = CandidateModelConfig | { runtimeBundleId: string };
+
 export interface DeterministicIssue {
   id: string;
   severity: 'error' | 'warning';

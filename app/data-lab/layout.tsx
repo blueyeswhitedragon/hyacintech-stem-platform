@@ -1,22 +1,10 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import AuthNav from '@/app/components/AuthNav';
+import DataLabNav, { type NavigationGroupData } from '@/app/components/dataLab/DataLabNav';
 import { getCurrentUser } from '@/app/lib/session';
 import { canUseDataLab } from '@/app/lib/dataLab/service';
 import { tutorPersonalQueueCount, tutorWorkflowCounts } from '@/app/lib/dataLab/bootstrap/service';
-
-interface NavigationItem {
-  href: string;
-  label: string;
-  count?: number;
-}
-
-function NavigationGroup({ label, items }: { label: string; items: NavigationItem[] }) {
-  return <div>
-    <div className="px-3 pb-1 pt-3 text-xs font-medium text-gray-400">{label}</div>
-    <div className="grid grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-1">{items.map((item) => <Link key={item.href} href={item.href} className="flex min-h-10 items-center justify-between gap-2 rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-950"><span>{item.label}</span>{Boolean(item.count) && <span className="min-w-6 rounded-full bg-red-100 px-1.5 py-0.5 text-center text-xs font-medium text-red-700">{item.count}</span>}</Link>)}</div>
-  </div>;
-}
 
 export default async function DataLabLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -25,10 +13,11 @@ export default async function DataLabLayout({ children }: { children: React.Reac
 
   const workflow = user.role === 'admin' ? await tutorWorkflowCounts() : null;
   const personalQueue = user.role === 'admin' ? 0 : await tutorPersonalQueueCount(user);
-  const adminGroups: Array<{ label: string; items: NavigationItem[] }> = workflow ? [
+  const adminGroups: NavigationGroupData[] = workflow ? [
     { label: '指挥台', items: [{ href: '/data-lab', label: '流水线概览' }] },
     { label: '数据生产', items: [
       { href: '/data-lab/topic-cards', label: '话题库', count: workflow.topicDrafts },
+      { href: '/data-lab/candidates', label: '线上候选审核', count: workflow.productionCandidatesPending },
       { href: '/data-lab/case-generation', label: '案例批次', count: workflow.casesReady },
       { href: '/data-lab/first-review', label: '初审工作台', count: workflow.editPending },
       { href: '/data-lab/final-confirmation', label: '定稿工作台', count: workflow.confirmPending },
@@ -43,12 +32,14 @@ export default async function DataLabLayout({ children }: { children: React.Reac
       { href: '/data-lab/evaluations', label: '评测与部署' },
     ] },
     { label: '后台', items: [
+      { href: '/data-lab/setup', label: '环境检查' },
+      { href: '/data-lab/traces', label: '生成追踪' },
       { href: '/data-lab/users', label: '后台账号' },
       { href: '/data-lab/history', label: '历史数据' },
     ] },
   ] : [];
 
-  const personalGroups: Array<{ label: string; items: NavigationItem[] }> = [
+  const personalGroups: NavigationGroupData[] = [
     { label: '我的工作', items: [
       { href: '/data-lab', label: '待办概览', count: personalQueue },
       ...(user.role === 'annotator' ? [{ href: '/data-lab/first-review', label: '初审工作台', count: personalQueue }] : []),
@@ -58,15 +49,19 @@ export default async function DataLabLayout({ children }: { children: React.Reac
 
   const navigationGroups = user.role === 'admin' ? adminGroups : personalGroups;
 
-  return <main className="min-h-screen bg-gray-50 text-gray-900">
-    <header className="border-b bg-white"><div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3 lg:px-6"><div className="min-w-0"><Link href="/data-lab" className="text-lg font-semibold text-gray-950">Hyacintech Data Lab</Link><p className="text-xs text-gray-500">教学数据生产、交付与模型迭代登记</p></div><AuthNav /></div></header>
-    <details className="border-b bg-white px-4 py-2 lg:hidden">
-      <summary className="cursor-pointer py-1 text-sm font-medium text-gray-800">Data Lab 导航</summary>
-      <nav className="pb-3 pt-1">{navigationGroups.map((group) => <NavigationGroup key={group.label} {...group} />)}</nav>
+  // 侧栏用 surface-soft、正文区用 canvas：同属奶油色系但有一档明度差，
+  // 不引入第四种表面色也能让导航从内容里分离出来。
+  // density-compact：Data Lab 的使用者整天在比对版本号、状态和计数，
+  // 信息密度优先于呼吸感——与学生端的 density-roomy 共用同一套颜色与圆角令牌。
+  return <main className="density-compact min-h-screen bg-canvas text-body">
+    <header className="border-b border-b-hairline border-hairline bg-canvas"><div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-3.5 lg:px-6"><div className="min-w-0"><Link href="/data-lab" className="display-sm">Hyacintech <span className="font-lineage">Data Lab</span></Link><p className="mt-0.5 text-[13px] text-muted">教学数据生产、交付与模型迭代登记</p></div><AuthNav /></div></header>
+    <details className="border-b border-b-hairline border-hairline bg-surface-soft px-4 py-2 lg:hidden">
+      <summary className="cursor-pointer py-1 text-sm font-medium text-ink">Data Lab 导航</summary>
+      <nav className="pb-3 pt-1"><DataLabNav groups={navigationGroups} /></nav>
     </details>
-    <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[230px_minmax(0,1fr)]">
-      <aside className="hidden border-r bg-white px-3 py-3 lg:block lg:min-h-[calc(100vh-65px)]"><nav className="space-y-1">{navigationGroups.map((group) => <NavigationGroup key={group.label} {...group} />)}</nav></aside>
-      <section className="min-w-0 p-4 lg:p-6">{children}</section>
+    <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[236px_minmax(0,1fr)]">
+      <aside className="hidden border-r border-r-hairline border-hairline bg-surface-soft px-3 pb-6 pt-1 lg:block lg:min-h-[calc(100vh-69px)]"><nav className="sticky top-4 space-y-0.5"><DataLabNav groups={navigationGroups} /></nav></aside>
+      <section className="min-w-0 p-5 lg:p-8">{children}</section>
     </div>
   </main>;
 }

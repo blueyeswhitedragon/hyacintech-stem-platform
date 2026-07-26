@@ -28,6 +28,13 @@ npx tsx scripts/test-pacing.ts             # shouldNudgeConvergence / shouldShow
 npx tsx scripts/test-normalize-schema.ts   # normalizeSchema (stage 2 column cleanup)
 npx tsx scripts/test-report-docx.ts        # buildReportDocx + zip roundtrip
 npx tsx scripts/test-report-summary.ts     # buildPriorSummary
+npx tsx scripts/test-review-pagination.ts  # normalizePageParams/toPage + stage3 SQL 谓词等价性
+npx tsx scripts/test-stage2-fallbacks.ts   # categorical-variable extraction + hypothesis sentinels
+npx tsx scripts/test-advance-hint.ts       # server-derived readiness hints across all stages
+npx tsx scripts/test-stage-release.ts      # audited P2–P5 release and artifact bootstrapping
+npx tsx scripts/test-evaluation-artifacts.ts # evaluation artifact validation and persistence
+npx tsx scripts/test-stage4-evidence.ts    # P4 证据判定：比较谓词、逐格行约束、单调去重、逐轮原因
+npx tsx scripts/test-source-quote.ts       # 引文定位：吞掉 Markdown 标记仍可命中，拼接/编造仍驳回
 ```
 
 `scripts/probe-json-schema.ts` is a diagnostic (not a test): checks whether the configured LLM gateway supports `response_format: json_schema` strict mode.
@@ -109,11 +116,15 @@ ConversationWorkspace.tsx (client, owns stage/stageData/status)
 
 `canAdvance` handles student-driven transitions. Teacher-reviewed transitions go through review routes. `phase_complete` is a UI hint only. Every route must re-check the server-owned assignment/conversation status; pending, submitted, and completed work is read-only. Deadlines are soft and record lateness rather than blocking writes.
 
+Teacher release is an audited bypass transition, not an alternative regular gate. A teacher may release only the student's current P2, P3, P4, or P5 stage and must provide a reason of at least 10 characters. Each release appends `stageData.timeline.releases` and a `DataLabAuditLog` with `action='STAGE_RELEASED'` and `entityType='StudentAssignment'`; traces from the released stage are ineligible for positive training nomination. P2 release creates a provenance-marked four-column minimum data schema when no usable schema exists, and P4 release deterministically bootstraps the report frame when it is missing. P1 cannot be released because the server must not invent a student's research question.
+
 ### Confirmation button behavior
 
 Confirmation is a server-owned checkpoint, not a generic LLM action:
 - P1 confirmation is tied to a hash of the canonical question; changing the question invalidates it.
 - P2 shows a server-composed preview and sends `{ draftHash }` to the dedicated plan-confirmation endpoint. Stale hashes are rejected.
+- `advanceHint()` derives button readiness and blocking reasons from server stage state, so the UI does not depend only on the latest Tutor `actionType`.
+- `POST /api/conversations/[id]/stage2-fields` lets the owning student directly fill missing P2 core fields; the server recomposes the same preview and draft hash, and teacher review remains required.
 - `direction_confirmation` and `plan_confirmation` must return `checkpoint`; semantic contract checks reject stage-overreaching Tutor output even when its JSON is valid.
 - Confirmation documents/previews are hydrated from persisted stage state, so older recoverable conversations do not depend on a particular assistant message still being visible.
 
@@ -129,6 +140,7 @@ Confirmation is a server-owned checkpoint, not a generic LLM action:
 - **Auth** — iron-session (encrypted cookie `hyacintech_session`). `app/lib/session.ts` + `app/lib/auth.ts`. `requireUser()` / `requireRole(role)` return `{ ok, user } | { ok:false, error, status }`.
 - **Classes & assignments** — Routes under `app/api/classes/*` and `app/api/{assignments,student/assignments}/*`. `DELETE /api/classes/[id]` cascades in a transaction.
 - **Conversation persistence** — `app/lib/conversation.ts`: `ensureStudentConversation(assignmentId, studentId)` find-or-create with an assignment-aware welcome message; `getConversationForUser(conversationId, userId)` ownership-checked load. Visiting `/student/assignments/[id]` auto-creates/resumes.
+- **Stuck-student visibility** — the teacher review page lists in-progress students whose `roundCounts[currentStage] >= 8`, with `advanceHint()` explaining the current server-side blocker.
 
 ### Welcome message (assignment-aware)
 
@@ -149,11 +161,13 @@ The server composes the P1 confirmation document from the canonical question and
 
 ### Teacher review & scoring
 
-`applyReview` in `app/lib/review.ts` (pure function, tested):
+`applyReview` in `app/lib/review.ts` is the pure approve/reject state machine for P2, P3, and P5:
 - Stage 2 approve → stage 3; reject → stay at 2 with feedback
 - Stage 5 approve + score ≥ 6 → stage 6
 - Stage 5 approve + score < 6 → **treated as soft-reject**: `approved=false, submitted=false`, feedback auto-appends rewrite prompt, student stays at stage 5
 - `ReviewActionForm.tsx` shows real-time score threshold hints to the teacher
+
+`applyRelease` is the separate pure P2/P3/P4/P5 bypass state machine. It records release provenance and required downstream server artifacts. P5 release preserves the teacher's actual finite 0–10 score, including scores below 6, while setting `approved=true` so the server-owned P6 response gate can be satisfied.
 
 ### Stage 2 schema normalization
 
@@ -186,7 +200,17 @@ Word round-trip (both routes require ownership via `getConversationForUser`):
 
 ### Stage 4 analysis gate
 
-`StageData.stage4` stores accepted evidence records containing row index, column key/display name, cited value, and a deterministic fingerprint. Progress requires at least two distinct accepted fingerprints from submitted rows; repeated messages, bare row indices, and invented values do not count.
+`StageData.stage4` stores accepted evidence records containing row index, column key/display name, cited value, and a deterministic fingerprint. Progress requires **at least two accepted rounds, each citing at least one submitted cell that no earlier accepted round already used**, and each expressing a comparison. Repeated messages, bare row indices, and invented values do not count.
+
+Three parts of the judgment are server-owned and deliberately distinct:
+
+- **Cell resolution is per value, anchored to named rows.** When the message names rows (`第N行/次/轮`, `重复N`), a cited value that occurs in one of those rows is attributed only to those rows, so citing two cells cannot credit the whole table through column-alias matching. Values absent from every named row keep the existing ambiguity guard.
+- **Deduplication is monotonic, not whole-set.** Low-cardinality tables (the common junior-high case) legitimately repeat values across rounds; only "no new cell at all" is a duplicate. `evaluateStage4Readiness` still counts distinct persisted rounds — equivalent by construction, and it never retroactively demotes rounds accepted under an older rule.
+- **Comparison detection is judged by the extractor, with a deterministic fallback.** `app/lib/analysisClaimExtractor.ts` asks the model which cells the student's sentence cites and whether it compares them; `expressesComparison()` in `app/lib/serverTutorState.ts` recognizes comparative constructions rather than a closed word list and remains the fallback when the extractor is unavailable. Bare `比` only counts inside a 比-comparative, so 「比较认真」/「比如」/「比方说」 do not match while 「圆形比方形高」 does.
+
+`updateServerAnalysis(stageData, message, claim?)` stays pure. The optional third argument is the *validated* claim: citations replace the deterministic cell resolution only when at least one survived verification, and the two comparison signals are OR-ed so the model can widen recall but can never make the gate stricter than it was. The returned `signals` record which path was used and what each side judged, and they land in the GenerationTrace under `generationParams.extractor` for divergence auditing.
+
+`updateServerAnalysis` returns and persists `stage4.lastRound` with a `rejection` of `NO_EVIDENCE | SINGLE_EVIDENCE | NO_COMPARISON | NO_NEW_EVIDENCE`, so a rejected round says which half is missing. It is surfaced in the `ChartViewer` progress card, in the Tutor's visible state as 「上一轮判定」 (both `tutorTurn.ts` and guest chat), and it makes `stage4CitationExample` round-aware so the suggested wording prefers cells not yet cited. `lastRound` is explanatory only and never affects gating.
 
 ### Completion & fireworks
 
@@ -198,6 +222,19 @@ When `StudentAssignment.status === 'COMPLETED'`:
 ### Prompt system
 
 The production Tutor uses versioned prompt policies and a stable structured output contract. Execution dispatches by the prompt version pinned to the conversation/model, and GenerationTrace records the stage contract, Prompt/extractor versions, allowed/chosen focus, interaction type, state revision/hash, and server artifacts. The older `app/prompts/phase<N>-<name>.ts` path is compatibility-only and must not silently become the production policy.
+
+### Extractors (two, versioned independently)
+
+`app/lib/contractVersions.ts` carries two extractor version constants. They are parallel, not successive:
+
+| Constant | Module | Stages | Output consumer | Training cohort |
+|---|---|---|---|---|
+| `STUDENT_FACT_EXTRACTOR_VERSION` | `app/lib/stateExtractor.ts` | 1, 2 | `stageData.extractedFacts` ledger | Gates `TUTOR_TRAINING_COHORT` (`app/lib/dataLab/trainingCohort.ts`) — bumping it invalidates existing traces |
+| `ANALYSIS_CLAIM_EXTRACTOR_VERSION` | `app/lib/analysisClaimExtractor.ts` | 4 | `stageData.stage4` evidence rounds | **Not** in `TUTOR_TRAINING_COHORT`; bumping it changes no trace's training eligibility |
+
+Both share one provider path (`createLLMProvider({ role: 'EVALUATOR' })`, `repairJson`, two attempts where `finishReason !== 'length'` is required for success), both write `StateExtractionTrace` (the P4 extractor at `stage=4`, so no Prisma migration was needed), and both are strictly non-blocking: on failure the turn continues on the deterministic path. In both, the model only performs language understanding — every fact it claims is verified server-side against the student's own text (`sourceQuote` must appear verbatim) and, for P4, against the submitted rows (row, column, and value must resolve to a real cell, and the value must appear inside the quote it was justified by). `validateAnalysisClaim` is pure and unit-tested.
+
+"Verbatim" is resolved by `locateSourceQuote()` / `locateSourceQuoteIn()` in `app/lib/sourceQuote.ts` (pure, tested), shared by both extractors. A quote matches if it is verbatim **after ignoring Markdown emphasis/heading/quote markers and whitespace**, and the validator then rewrites `sourceQuote` to the corresponding span of the student's own message — so the ledger always stores the student's characters, never the model's paraphrase. This exists because a student who wrote his plan with `**bold**` headings was blocked for nine rounds: the model quoted the heading without its asterisks, the remaining 380 characters matched exactly, and the whole fact was still rejected as `SOURCE_QUOTE_NOT_FOUND_IN_STUDENT_MESSAGES`. Only layout noise is forgiven — changed digits, added words, and quotes stitched together across non-adjacent passages are still rejected.
 
 ### Response types
 
@@ -265,8 +302,20 @@ Initialization:
 ```bash
 npm run data-lab:init   # requires ADMIN_USERNAME / ADMIN_PASSWORD / ADMIN_DISPLAY_NAME
 npm run model:bootstrap # idempotently register the configured runtime model/baseline
-npm run data-lab:test
 ```
+
+Database-backed Data Lab tests must run against a dedicated disposable `DATABASE_URL`, never the teaching or production database. Initialize and test that database in this order; the fixture setup is required by the workload, account-lifecycle, and campaign-lifecycle suites:
+
+```bash
+DATABASE_URL="file:./hyacintech-verify.db" npm run db:deploy
+DATABASE_URL="file:./hyacintech-verify.db" npm run db:seed
+DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:init
+DATABASE_URL="file:./hyacintech-verify.db" npm run model:bootstrap
+DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:test:setup
+DATABASE_URL="file:./hyacintech-verify.db" npm run data-lab:test
+```
+
+Remove the disposable database after the test run.
 
 ### Type system
 

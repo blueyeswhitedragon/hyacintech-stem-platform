@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useState, useSyncExternalStore } from 'react';
+import Button from './ui/Button';
+import Card from './ui/Card';
 
 const CONSENT_STORAGE_EVENT = 'hyacintech:data-consent-storage';
 
@@ -68,45 +70,46 @@ export default function DataConsentCard({
   if (dismissed) {
     return (
       <div className="mb-3 flex justify-end">
-        <button
-          type="button"
-          onClick={() => setReminderDismissed(false)}
-          className="rounded border border-blue-200 bg-white px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-50"
-        >
+        <Button size="sm" variant="ghost" onClick={() => setReminderDismissed(false)}>
           数据授权设置
-        </button>
+        </Button>
       </div>
     );
   }
 
+  // 这是一个「可以不理会」的自愿邀请，不是警告，也不是本页主号召——
+  // 因此用中性 soft 卡片，而不是珊瑚 callout 或黄色警示条。
   return (
-    <div className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
+    <Card tone="soft" className="mb-3 text-sm">
       <div className="flex items-start justify-between gap-3">
-        <div className="font-medium">自愿参与模型改进（不影响作业成绩）</div>
+        <div className="font-medium text-ink">自愿参与模型改进（不影响作业成绩）</div>
         <button
           type="button"
           onClick={() => setReminderDismissed(true)}
-          className="shrink-0 text-xs text-blue-700 underline hover:text-blue-900"
+          className="shrink-0 text-xs text-muted underline transition-colors duration-[120ms] hover:text-ink"
         >
           本次作业不再提醒
         </button>
       </div>
-      <p className="mt-1 text-xs leading-5 text-blue-800">
+      <p className="mt-2 text-xs leading-5 text-muted">
         只有教师提名的导师回复片段会在本机删除姓名、账号、班级、联系方式、链接和附件后交给管理员审核。拒绝或撤回不会影响学习；已完成训练的模型参数无法直接撤销。
       </p>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+      <p className="mt-1 text-xs leading-5 text-muted">授权后的对话才能用于模型改进，之前的对话不受影响也不会被采集。</p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         {status !== 'GRANTED' && (
-          <button disabled={pending} onClick={() => decide('GRANT')} className="rounded bg-blue-600 px-3 py-1.5 text-xs text-white">同意参与</button>
+          <Button size="sm" variant="primary" disabled={pending} onClick={() => decide('GRANT')}>同意参与</Button>
         )}
         {status === 'PENDING' && (
-          <button disabled={pending} onClick={() => decide('DECLINE')} className="rounded border border-blue-300 bg-white px-3 py-1.5 text-xs">拒绝</button>
+          <Button size="sm" disabled={pending} onClick={() => decide('DECLINE')}>拒绝</Button>
         )}
         {status === 'GRANTED' && (
-          <button disabled={pending} onClick={() => decide('WITHDRAW')} className="rounded border border-red-300 bg-white px-3 py-1.5 text-xs text-red-700">撤回授权</button>
+          <Button size="sm" variant="danger" disabled={pending} onClick={() => decide('WITHDRAW')}>撤回授权</Button>
         )}
-        <span className="text-xs">当前：{status === 'GRANTED' ? '已授权' : status === 'DECLINED' ? '已拒绝' : status === 'WITHDRAWN' ? '已撤回' : '待选择'}</span>
+        <span className="text-xs text-muted">
+          当前：{status === 'GRANTED' ? '已授权' : status === 'DECLINED' ? '已拒绝' : status === 'WITHDRAWN' ? '已撤回' : '待选择'}
+        </span>
       </div>
-      {message && <p className="mt-2 text-xs">{message}</p>}
-    </div>
+      {message && <p className="mt-2 text-xs text-body">{message}</p>}
+    </Card>
   );
 }

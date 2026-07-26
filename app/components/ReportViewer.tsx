@@ -5,6 +5,10 @@ import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
 import ReportDocument from './ReportDocument';
 import { limitationsDiscussion } from '@/app/lib/reportFields';
 import { REPORT_IMPORT_FIELDS } from '@/app/lib/reportDocxImport';
+import Button, { buttonClass } from './ui/Button';
+import Callout from './ui/Callout';
+import Card from './ui/Card';
+import { Field, Textarea } from './ui/Field';
 
 interface Props {
   stage5?: Stage5Data;
@@ -93,20 +97,20 @@ export default function ReportViewer({
 
   if (!sections) {
     return (
-      <div className="text-sm text-gray-500 p-4 flex items-center gap-2">
-        <span className="inline-block h-3 w-3 rounded-full border-2 border-gray-300 border-t-blue-500 animate-spin" />
+      <div className="flex items-center gap-2 p-4 text-sm text-muted">
+        <span className="inline-block size-3 animate-spin rounded-full border-2 border-hairline border-t-coral" />
         正在根据前序阶段自动生成报告框架，请稍候…
       </div>
     );
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-medium text-lg">📝 实验报告</h3>
+    <div className="space-y-5 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="display-sm">实验报告</h3>
         <div className="flex items-center gap-2">
           {onImport && (
-            <label className="px-3 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 cursor-pointer">
+            <label className={buttonClass('secondary', 'sm', importing ? 'cursor-not-allowed opacity-40' : 'cursor-pointer')}>
               {importing ? '上传中…' : '上传我的 Word 报告'}
               <input
                 type="file"
@@ -118,13 +122,9 @@ export default function ReportViewer({
             </label>
           )}
           {onExport && (
-            <button
-              onClick={handleExport}
-              disabled={exporting}
-              className="px-3 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:opacity-50"
-            >
+            <Button size="sm" onClick={handleExport} disabled={exporting}>
               {exporting ? '导出中…' : '导出为 Word'}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -138,115 +138,97 @@ export default function ReportViewer({
       />
 
       {stage5?.importPreview && (
-        <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm">
-          <div className="font-medium text-amber-900">Word 章节导入预览</div>
-          <div className="mt-1 text-xs text-amber-800">
+        <Callout tone="warning" title="Word 章节导入预览">
+          <p>
             已识别 {stage5.importPreview.detectedFields.length}/8 节。确认后仅用下列识别内容覆盖对应平台字段，原 Word 仍作为附件保留。
-          </div>
-          <div className="mt-2 space-y-2">
+          </p>
+          <div className="mt-3 space-y-2">
             {REPORT_IMPORT_FIELDS.filter(({ key }) => stage5.importPreview?.detectedFields.includes(key)).map(({ key, label }) => (
-              <div key={key} className="rounded border border-amber-200 bg-white p-2">
-                <div className="text-xs font-medium text-gray-700">识别为：{label}</div>
-                <div className="mt-1 max-h-20 overflow-y-auto whitespace-pre-wrap text-xs text-gray-600">
+              <div key={key} className="rounded-md border border-hairline bg-canvas p-2">
+                <div className="text-xs font-medium text-body-strong">识别为：{label}</div>
+                <div className="mt-1 max-h-20 overflow-y-auto whitespace-pre-wrap text-xs leading-5 text-muted">
                   {stage5.importPreview?.sections[key]}
                 </div>
               </div>
             ))}
           </div>
           {stage5.importPreview.missingFields.length > 0 && (
-            <div className="mt-2 text-xs text-amber-800">
+            <p className="mt-3 text-xs leading-5">
               未识别：{REPORT_IMPORT_FIELDS.filter(({ key }) => stage5.importPreview?.missingFields.includes(key)).map(({ label }) => label).join('、')}。这些字段将保留平台当前内容。
-            </div>
+            </p>
           )}
           {stage5.importPreview.complete && (
-            <div className="mt-2 text-xs text-green-700">全部必需章节均已识别；导入后可按现有提交门禁直接提交。</div>
+            <p className="mt-2 text-xs text-[#2f7a43]">全部必需章节均已识别；导入后可按现有提交门禁直接提交。</p>
           )}
           {onConfirmImport && (
-            <button
-              onClick={handleConfirmImport}
-              disabled={confirmingImport}
-              className="mt-3 rounded bg-amber-600 px-3 py-1.5 text-xs text-white hover:bg-amber-700 disabled:opacity-50"
-            >
-              {confirmingImport ? '导入中…' : '确认映射并导入'}
-            </button>
+            <div className="mt-4">
+              <Button size="sm" variant="primary" onClick={handleConfirmImport} disabled={confirmingImport}>
+                {confirmingImport ? '导入中…' : '确认映射并导入'}
+              </Button>
+            </div>
           )}
-        </div>
-      )}
-
-      {/* 简单图表提示（阶段4的分析在数据概述中体现） */}
-      {dataRows && dataRows.length > 0 && (
-        <div className="text-xs text-gray-500 bg-blue-50 border border-blue-100 rounded p-2">
-          💡 图表分析请在「数据分析」阶段查看右侧 ChartViewer 面板。此处展示原始数据表供报告参考。
-        </div>
+        </Callout>
       )}
 
       {/* 学生填写结论与局限讨论 */}
-      <div>
-        <div className="text-sm font-medium text-blue-700 mb-1">✏️ 结论（请你填写）</div>
-        <textarea
+      <Field label="结论（请你填写）" htmlFor="report-conclusion">
+        <Textarea
+          id="report-conclusion"
           value={conclusion}
           onChange={(e) => setConclusion(e.target.value)}
           rows={4}
-          className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="根据数据分析，回答你的研究问题……"
         />
-      </div>
-      <div>
-        <div className="text-sm font-medium text-blue-700 mb-1">局限与讨论（请你填写）</div>
-        <textarea
+      </Field>
+      <Field label="局限与讨论（请你填写）" htmlFor="report-limitations">
+        <Textarea
+          id="report-limitations"
           value={limitations}
           onChange={(e) => setLimitations(e.target.value)}
           rows={4}
-          className="w-full border rounded p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="说明实验局限、可能的误差来源，以及下一次可怎样改进。"
         />
-      </div>
+      </Field>
 
-      {/* 教师评分展示 */}
+      {/* AI 参考分与教师分：AI 分是参考，教师分才是门禁，视觉上不能等重 */}
       {stage5?.aiReferenceScore && (
-        <div className="bg-purple-50 border border-purple-200 rounded p-3 text-sm">
-          <div className="font-medium text-purple-800 mb-1">🤖 AI 参考评分</div>
-          <div className="text-purple-700">
-            综合评分：{stage5.aiReferenceScore.overall}/10
-            {stage5.aiReferenceScore.highlights?.length > 0 && (
-              <ul className="list-disc pl-4 mt-1 space-y-0.5">
-                {stage5.aiReferenceScore.highlights.map((h, i) => <li key={i}>{h}</li>)}
-              </ul>
-            )}
+        <Card tone="soft">
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="caption-upper">AI 参考评分</span>
+            <span className="font-lineage text-lg text-ink">{stage5.aiReferenceScore.overall}/10</span>
           </div>
-        </div>
+          {stage5.aiReferenceScore.highlights?.length > 0 && (
+            <ul className="mt-2 list-disc space-y-0.5 pl-4 text-sm leading-6 text-body">
+              {stage5.aiReferenceScore.highlights.map((h, i) => <li key={i}>{h}</li>)}
+            </ul>
+          )}
+        </Card>
       )}
       {stage5?.teacherScore !== undefined && (
-        <div className={`border rounded p-3 text-sm ${stage5.teacherScore >= 6 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-          <div className={`font-medium mb-1 ${stage5.teacherScore >= 6 ? 'text-green-800' : 'text-red-800'}`}>
-            👨‍🏫 教师评分：{stage5.teacherScore}/10
-            {stage5.teacherScore < 6 && <span className="ml-2 text-red-600 font-bold">—— 需重新修改并提交</span>}
-          </div>
-          {stage5.teacherFeedback && (
-            <div className="whitespace-pre-wrap text-gray-700 mt-1">{stage5.teacherFeedback}</div>
-          )}
-        </div>
+        <Callout
+          tone={stage5.teacherScore >= 6 ? 'success' : 'warning'}
+          title={
+            <span className="flex flex-wrap items-baseline gap-2">
+              教师评分：<span className="font-lineage text-lg">{stage5.teacherScore}/10</span>
+              {stage5.teacherScore < 6 && <span className="text-sm font-normal text-error">需重新修改并提交</span>}
+            </span>
+          }
+        >
+          {stage5.teacherFeedback && <div className="whitespace-pre-wrap">{stage5.teacherFeedback}</div>}
+        </Callout>
       )}
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={handleSave}
-          disabled={saving || submitting}
-          className="px-4 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-        >
+      <div className="flex flex-wrap items-center gap-2 border-t border-hairline pt-4">
+        <Button onClick={handleSave} disabled={saving || submitting}>
           {saving ? '保存中…' : '保存报告'}
-        </button>
+        </Button>
         {onSubmit && (
-          <button
-            onClick={handleSubmit}
-            disabled={saving || submitting}
-            className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-          >
+          <Button variant="primary" onClick={handleSubmit} disabled={saving || submitting}>
             {submitting ? '提交中…' : submitLabel}
-          </button>
+          </Button>
         )}
-        {msg && <span className="text-sm text-green-600">{msg}</span>}
-        {err && <span className="text-sm text-red-600">{err}</span>}
+        {msg && <span className="text-sm text-[#2f7a43]">{msg}</span>}
+        {err && <span className="text-sm text-error">{err}</span>}
       </div>
     </div>
   );
