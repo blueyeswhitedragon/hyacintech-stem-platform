@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 import type { TopicCard } from '@prisma/client';
-import { buildTutorLanguagePrompt, DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION, parseTutorLanguageResponse, toCompatibleChatResponse, TUTOR_LANGUAGE_PROMPT_V1, TUTOR_LANGUAGE_PROMPT_V2, TUTOR_LANGUAGE_PROMPT_V2_1, TUTOR_LANGUAGE_PROMPT_V2_2, TUTOR_LANGUAGE_PROMPT_V2_3, tutorSftTarget } from '../app/lib/tutorLanguage';
+import { buildTutorLanguagePrompt, buildTutorRequestMessages, DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION, parseTutorLanguageResponse, toCompatibleChatResponse, TUTOR_LANGUAGE_PROMPT_V1, TUTOR_LANGUAGE_PROMPT_V2, TUTOR_LANGUAGE_PROMPT_V2_1, TUTOR_LANGUAGE_PROMPT_V2_2, TUTOR_LANGUAGE_PROMPT_V2_3, tutorSftTarget } from '../app/lib/tutorLanguage';
 import { applyDeterministicExtractionFallbacks, buildServerExperimentPlan, ensureExplicitConfirmationFact, mergeExtractedFacts, validateExtractedFacts, type ExtractedFact } from '../app/lib/stateExtractor';
 import { attachServerOwnedArtifacts, tutorFocusPlan, updateServerAnalysis, visibleDataRows } from '../app/lib/serverTutorState';
 import { assertIndependentModelFamilies, buildCaseTutorPrompt, casePromptLeaksPrivate, checkTutorCandidate, tutorTargetContainsServerArtifact, validateTutorCritiqueIssues } from '../app/lib/dataLab/bootstrap/contracts';
@@ -8,7 +8,7 @@ import { assertReleaseItemSource, computeEditMetrics, shingleJaccard, tutorTopic
 import { isTutorWarningClosed, sanitizeTutorWarningClosures, tutorWarningBlocksFinal } from '../app/lib/dataLab/bootstrap/warningClosure';
 import { evaluateDeploymentGate, evaluateOnlineObservationGate } from '../app/lib/deploymentGate';
 import { resolveChatContractBranch } from '../app/lib/tutorTurn';
-import { CALIBRATION_12_SCENARIOS, compileCases, compileOneCase, compileScenarioCases, EVAL_CASE_COUNTS, SMOKE_6_SCENARIOS } from '../app/lib/dataLab/bootstrap/caseCompiler';
+import { CALIBRATION_12_SCENARIOS, compileCases, compileOneCase, compileScenarioCases, EVAL_CASE_COUNTS, expectedCoverageCells, SMOKE_6_SCENARIOS } from '../app/lib/dataLab/bootstrap/caseCompiler';
 
 let passed = 0; let failed = 0;
 function check(condition: unknown, label: string) { if (condition) { passed++; console.log(`PASS ${label}`); } else { failed++; console.error(`FAIL ${label}`); } }
@@ -183,8 +183,22 @@ const measurementMenu = checkTutorCandidate({ rawOutput: '{"dialogue":"你说的
 check(measurementMenu.check.issues.some((item) => item.code === 'DIALOGUE_ANSWER_MENU') && !measurementMenu.check.issues.some((item) => item.code === 'MULTIPLE_QUESTION_MARKS'), '多个测量选项优先标记为答案菜单而不是机械的问号计数');
 const rhetoricalScaffold = checkTutorCandidate({ rawOutput: '{"dialogue":"别人重复实验时，怎样才能得到同样的判断呢？你打算用什么具体方式记录结果？","interactionType":"clarification","focus":"measurement","hints":[]}', allowedFocusIds: ['measurement'], phase: 2, triggerType: 'USER_MESSAGE', studentMessage: '我只记录效果好不好' });
 check(rhetoricalScaffold.check.issues.some((item) => item.code === 'MULTIPLE_QUESTION_MARKS') && !rhetoricalScaffold.check.issues.some((item) => item.code === 'TOO_MANY_QUESTIONS'), '多个问号只记录客观结构信号，不直接断言存在多个核心问题');
-const system = checkTutorCandidate({ rawOutput: '{"dialogue":"你刚才完成了数据收集，现在说说发现。","interactionType":"information","focus":"cite_evidence","hints":[]}', allowedFocusIds: ['cite_evidence'], phase: 4, triggerType: 'SYSTEM_TRIGGER', studentMessage: '' });
+const system = checkTutorCandidate({ rawOutput: '{"dialogue":"你刚才完成了数据收集，现在说说发现。","interactionType":"information","focus":"cite_evidence","hints":[]}', allowedFocusIds: ['cite_evidence'], phase: 4, triggerType: 'STAGE_TRANSITION', studentMessage: '' });
 check(system.check.issues.some((item) => item.code === 'SYSTEM_TRIGGER_AS_STUDENT'), '系统触发不会误标为学生发言');
+const systemMessages = buildTutorRequestMessages('system-prompt', {
+  phase: 5,
+  triggerType: 'REPORT_BOOTSTRAP',
+  currentStudentMessage: '',
+  priorStudentMessages: ['前序学生消息'],
+  tutorHistory: ['前序导师回复'],
+  visibleFacts: {},
+  allowedFocusIds: ['report_handoff'],
+});
+check(
+  systemMessages.at(-1)?.role === 'user'
+    && systemMessages.at(-1)?.content.startsWith('这是系统触发，不是学生发言。'),
+  '生产系统触发词表在 Tutor 消息装配中不会伪装为空白学生消息',
+);
 const p4 = checkTutorCandidate({ rawOutput: '{"dialogue":"请比较 result_a 和 level_1_result。","interactionType":"clarification","focus":"cite_evidence","hints":[]}', allowedFocusIds: ['cite_evidence'], phase: 4, triggerType: 'USER_MESSAGE', studentMessage: '我看不懂' });
 check(p4.check.issues.some((item) => item.code === 'INTERNAL_SCHEMA_KEY'), 'P4 阻断内部字段 key');
 
@@ -221,8 +235,12 @@ check(!JSON.stringify(language).includes('report_sections'), 'P5 server report �
 
 check(Object.values(EVAL_CASE_COUNTS).reduce((sum, count) => sum + count, 0) === 80 && Object.values(EVAL_CASE_COUNTS).every((count) => count >= 10), '独立 EVAL profile 共80场景且每阶段至少10个');
 const phase = Object.fromEntries([1, 2, 3, 4, 5, 6].map((p) => [String(p), { A: 4, B: 6, tie: 0, inconsistent: 0, criticalErrors: 0, parseSuccessA: 9, parseTotalA: 10, parseSuccessB: 10, parseTotalB: 10 }]));
-const gate = evaluateDeploymentGate({ candidateTag: 'candidate', trainingReady: true, runs: [{ id: 'run', modelATag: 'baseline', modelBTag: 'candidate', scope: 'all', summary: { phase, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true } } }] });
-check(gate.result === 'PASS', '新部署门禁按阶段、关键错误、结构解析和产物完整性通过');
+const coverageCells = expectedCoverageCells(EVAL_CASE_COUNTS);
+const summaryCounts = { A: 4, B: 6, tie: 0, inconsistent: 0, criticalErrors: 0 };
+const trigger = Object.fromEntries([...new Set(coverageCells.map((cell) => cell.triggerType))].map((value) => [value, summaryCounts]));
+const focus = Object.fromEntries([...new Set(coverageCells.map((cell) => cell.focus))].map((value) => [value, summaryCounts]));
+const gate = evaluateDeploymentGate({ candidateTag: 'candidate', trainingReady: true, runs: [{ id: 'run', modelATag: 'baseline', modelBTag: 'candidate', scope: 'all', summary: { phase, trigger, focus, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true } } }] });
+check(gate.result === 'PASS', '新部署门禁按阶段、trigger、focus、关键错误、结构解析和产物完整性通过');
 const onlineBlocked = evaluateOnlineObservationGate({ rolloutPercent: 10, startedAt: new Date('2026-01-01T00:00:00Z'), now: new Date('2026-01-02T00:00:00Z'), sessions: 10, criticalErrors: 0, structureFailureRate: 0.01, baselineStructureFailureRate: 0.01, teacherRejectRate: 0.1, baselineTeacherRejectRate: 0.1, earlyTerminationRate: 0.1, baselineEarlyTerminationRate: 0.1 });
 check(!onlineBlocked.pass && onlineBlocked.failures.length >= 2, '灰度未达到时间和会话量时阻断晋级并给出原因');
 const onlineCritical = evaluateOnlineObservationGate({ rolloutPercent: 30, startedAt: new Date('2026-01-01T00:00:00Z'), now: new Date('2026-01-05T00:00:00Z'), sessions: 200, criticalErrors: 1, structureFailureRate: 0.01, baselineStructureFailureRate: 0.01, teacherRejectRate: 0.1, baselineTeacherRejectRate: 0.1, earlyTerminationRate: 0.1, baselineEarlyTerminationRate: 0.1 });

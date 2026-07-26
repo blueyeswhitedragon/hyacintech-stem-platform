@@ -50,9 +50,9 @@ const BUILT_IN_PROMPTS = [
 ] as const;
 
 const INITIAL_RUNTIME_ROLES = [
-  ['FORMAL_TUTOR', '正式 Tutor', '正式账号中新会话使用的导师运行组合'],
-  ['GUEST_TUTOR', '体验模式 Tutor', '体验模式中新会话使用的导师运行组合'],
-  ['EXTRACTOR', 'Extractor', '学生事实提取与结构化'],
+  ['FORMAL_TUTOR', '正式 Tutor', '正式 Tutor 的部署候选；实际流量由 ACTIVE 生产部署控制'],
+  ['GUEST_TUTOR', '体验模式 Tutor', '预留的体验模式候选；当前 Guest 运行仍由 .env 控制'],
+  ['EXTRACTOR', 'Extractor', '提取器候选登记；当前运行仍由 .env 控制'],
   ['DATA_LAB_CANDIDATE_A', 'Data Lab 候选 A', '双候选数据生产的候选 A'],
   ['DATA_LAB_CANDIDATE_B', 'Data Lab 候选 B', '双候选数据生产的候选 B'],
   ['CRITIC', 'Critic', '候选输出的交叉检查'],
@@ -154,7 +154,7 @@ export async function ensureDataLabRuntimeRegistry(user?: Pick<SessionUser, 'id'
   for (const [roleKey, displayName, description] of INITIAL_RUNTIME_ROLES) {
     await db.runtimeRoleBinding.upsert({
       where: { roleKey },
-      update: {},
+      update: { displayName, description },
       create: { roleKey, displayName, description },
     });
   }

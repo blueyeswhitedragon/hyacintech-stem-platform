@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { requireAnyRole } from '@/app/lib/auth';
-import { compileTutorTurnCases, ExistingTutorCaseRunError, listTutorCases, type TutorCaseProfile, type TutorReviewPolicy } from '@/app/lib/dataLab/bootstrap/service';
+import { compileTutorTurnCases, ExistingTutorCaseRunError, listTutorCases, structuralCaseCoverage, type TutorCaseProfile, type TutorReviewPolicy } from '@/app/lib/dataLab/bootstrap/service';
 import type { TutorCaseSplit } from '@/app/lib/dataLab/bootstrap/contracts';
 import type { TutorLanguagePromptVersion } from '@/app/lib/tutorLanguage';
 
 export async function GET() {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
-  return NextResponse.json({ cases: await listTutorCases() });
+  const [cases, caseCoverage] = await Promise.all([listTutorCases(), structuralCaseCoverage()]);
+  return NextResponse.json({ cases, caseCoverage });
 }
 
 export async function POST(request: Request) {

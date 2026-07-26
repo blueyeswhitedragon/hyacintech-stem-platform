@@ -32,11 +32,28 @@ async function main() {
   const old = validateEvaluationArtifacts({ verdict: oldVerdict, transcripts: [baseline, candidate] });
   check(!old.complete && old.diagnostics.some((item) => item.code === 'PHASE_SUMMARY_MISSING'), '旧 verdict 可被识别为产物字段缺失');
 
+  const summaryWithCoverage = verdict.summary ?? {};
+  const missingTrigger = validateEvaluationArtifacts({
+    verdict: { ...verdict, summary: { ...summaryWithCoverage, trigger: {} } },
+    transcripts: [baseline, candidate],
+  });
+  check(missingTrigger.diagnostics.some((item) => item.code === 'TRIGGER_SUMMARY_INCOMPLETE'), '缺失 trigger 汇总被识别为产物字段缺失');
+  const missingFocus = validateEvaluationArtifacts({
+    verdict: { ...verdict, summary: { ...summaryWithCoverage, focus: {} } },
+    transcripts: [baseline, candidate],
+  });
+  check(missingFocus.diagnostics.some((item) => item.code === 'FOCUS_SUMMARY_INCOMPLETE'), '缺失 focus 汇总被识别为产物字段缺失');
+
   const mismatchedCandidate = { ...candidate, tag: 'wrong-tag' };
   const mismatch = validateEvaluationArtifacts({ verdict, transcripts: [baseline, mismatchedCandidate] });
   check(!mismatch.modelIdentitiesVerified && mismatch.diagnostics.some((item) => item.code === 'MODEL_IDENTITIES_MISMATCH'), 'A/B 身份错配不会被标为完整产物');
 
-  const summary = verdict.summary as { phase: Record<string, Record<string, number>>; criticalErrors: number };
+  const summary = verdict.summary as {
+    phase: Record<string, Record<string, number>>;
+    trigger: Record<string, Record<string, number>>;
+    focus: Record<string, Record<string, number>>;
+    criticalErrors: number;
+  };
   const gate = evaluateDeploymentGate({
     candidateTag: 'candidate-bundle:v1',
     trainingReady: true,

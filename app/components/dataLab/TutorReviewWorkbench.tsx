@@ -28,6 +28,7 @@ import {
 } from '@/app/lib/dataLab/bootstrap/warningClosure';
 import { buttonClass } from '@/app/components/ui/Button';
 import { Input, Select, Textarea } from '@/app/components/ui/Field';
+import { isSystemTriggeredTurn } from '@/app/lib/stageContract';
 
 type ReviewType = 'EDIT' | 'CONFIRM';
 type ConfirmDecision = 'CONFIRM' | 'RETURN_TUTOR' | 'RETURN_CASE' | 'REJECT';
@@ -502,7 +503,7 @@ export default function TutorReviewWorkbench({ type, confirmationConflictCount =
         <div className="flex flex-wrap justify-between gap-2">
           <div>
             <div className="text-xs text-muted">阶段 {payload.case.phase} · {TUTOR_SPLIT_LABELS[payload.case.split] ?? '用途待确认'} · {TRIGGER_TYPE_LABELS[payload.case.triggerType] ?? '触发方式待确认'} · 第 {payload.case.revision} 版</div>
-            <h2 className="mt-1 font-semibold">{payload.case.triggerType === 'SYSTEM_TRIGGER' ? '系统触发案例' : '学生情景'}</h2>
+            <h2 className="mt-1 font-semibold">{isSystemTriggeredTurn(payload.case.triggerType) ? '系统触发案例' : '学生情景'}</h2>
           </div>
           <div className="text-right text-xs text-muted"><div>本次占用至 {new Date(payload.task.leaseExpiresAt).toLocaleTimeString('zh-CN')}</div><div className="mt-1">初审策略：{REVIEW_POLICY_LABELS[payload.case.reviewPolicy]}</div></div>
         </div>

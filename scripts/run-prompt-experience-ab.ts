@@ -14,6 +14,7 @@ import { tutorFocusPlan, updateServerAnalysis, visibleDataRows } from '../app/li
 import { buildDataTableSchema, composeReportSections } from '../app/lib/stageArtifacts';
 import { composeStage2Plan, evaluateStage2Readiness } from '../app/lib/stage2Readiness';
 import { stage2DraftHash } from '../app/lib/stageState';
+import { isSystemTriggeredTurn } from '../app/lib/stageContract';
 import { validateConfig } from '../app/lib/llm/provider';
 
 const outputRoot = path.resolve(
@@ -181,7 +182,7 @@ async function run(promptVersion: TutorLanguagePromptVersion): Promise<RunResult
     const trace = await callTutorLanguageWithTrace({
       phase: stage,
       triggerType,
-      currentStudentMessage: ['STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP'].includes(triggerType) ? '' : studentMessage,
+      currentStudentMessage: isSystemTriggeredTurn(triggerType) ? '' : studentMessage,
       priorStudentMessages: studentHistory,
       tutorHistory,
       visibleFacts,
@@ -192,7 +193,7 @@ async function run(promptVersion: TutorLanguagePromptVersion): Promise<RunResult
     }, { role: 'TUTOR' }, promptVersion);
     sequence += 1;
     turns.push({ sequence, stage, triggerType, studentMessage, allowedFocusIds: focus.allowedFocusIds, visibleFacts, response: trace.response, rawOutput: trace.rawOutput, promptSha256: trace.promptSha256, attempts: trace.attempts, generationParams: trace.generationParams });
-    if (studentMessage && !['STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP'].includes(triggerType)) studentHistory.push(studentMessage);
+    if (studentMessage && !isSystemTriggeredTurn(triggerType)) studentHistory.push(studentMessage);
     tutorHistory.push(trace.response.dialogue);
   }
 

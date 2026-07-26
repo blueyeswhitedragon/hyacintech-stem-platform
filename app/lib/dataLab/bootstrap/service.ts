@@ -5,7 +5,17 @@ import type { SessionUser } from '@/app/lib/session';
 import { createConfiguredLLMProvider, createLLMProvider } from '@/app/lib/llm/provider';
 import type { LLMCompletion } from '@/app/lib/llm/types';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
-import { CALIBRATION_12_SCENARIOS, compileCases, compileScenarioCases, EVAL_CASE_COUNTS, FULL_CASE_COUNTS, SMOKE_6_SCENARIOS, TRIAL_CASE_COUNTS } from './caseCompiler';
+import {
+  CALIBRATION_12_SCENARIOS,
+  compileCases,
+  compileScenarioCases,
+  EVAL_CASE_COUNTS,
+  expectedCoverageCells,
+  FULL_CASE_COUNTS,
+  SMOKE_6_SCENARIOS,
+  TRIAL_CASE_COUNTS,
+  type CoverageCell,
+} from './caseCompiler';
 import {
   assertIndependentModelFamilies,
   BOOTSTRAP_SUBJECTS,
@@ -30,6 +40,7 @@ import { EXTRACTOR_VERSION } from '@/app/lib/stateExtractor';
 import { deriveAcceptableDirections, effectiveFamilyKey, normalizeInquiryBridges, TOPIC_ACTIVITY_MODES, TOPIC_CARD_SCHEMA_V2, TOPIC_CONTEXT_MODULES, TOPIC_DISCIPLINE_ANCHORS, type TopicActivityMode, type TopicContextModule, type TopicDisciplineAnchor, type TopicInquiryBridge } from './topicCardV2';
 import { isLegacyTutorWarningClosure, isTutorWarningAssessment, isTutorWarningAssessmentV2, isTutorWarningClosed, sanitizeTutorWarningClosures, tutorWarningBlocksFinal, TUTOR_WARNING_SEVERITIES, type TutorWarningClosureMap, type TutorWarningDetectorVerdict, type TutorWarningFinalRelation, type TutorWarningSeverity } from './warningClosure';
 import { caseStageContractVersion, tutorCohortReasons, TUTOR_TRAINING_COHORT } from '@/app/lib/dataLab/trainingCohort';
+import { isSystemTriggeredTurn } from '@/app/lib/stageContract';
 
 export const REVIEW_LEASE_MS = 30 * 60 * 1000;
 export const TUTOR_CRITIC_PROMPT_VERSION = 'tutor-critic-prompt-v2.1';
@@ -636,6 +647,62 @@ export async function approvedTopicCardCoverage() {
   return { coverage: tutorTopicCardCoverage(cards), fullFailures: tutorTopicCardDiversityFailures(cards) };
 }
 
+export interface CaseCoverageSource {
+  phase: number;
+  triggerType: string;
+  visibleFactsJson: string;
+  finalizedTurn: { id: string } | null;
+}
+
+export interface CaseCoverageCell extends CoverageCell {
+  generated: number;
+  finalized: number;
+}
+
+function coverageCellKey(cell: CoverageCell) {
+  return JSON.stringify([cell.phase, cell.triggerType, cell.focus]);
+}
+
+export function tutorCaseCoverage(cases: CaseCoverageSource[]) {
+  const expectedCells = expectedCoverageCells(EVAL_CASE_COUNTS);
+  const actual = new Map<string, { generated: number; finalized: number }>();
+  for (const item of cases) {
+    const focusIds = parseJson<{ allowedFocusIds?: unknown }>(item.visibleFactsJson, {}).allowedFocusIds;
+    if (!Array.isArray(focusIds)) continue;
+    for (const focus of focusIds.filter((value): value is string => typeof value === 'string')) {
+      const key = coverageCellKey({ phase: item.phase, triggerType: item.triggerType, focus });
+      const counts = actual.get(key) ?? { generated: 0, finalized: 0 };
+      counts.generated += 1;
+      if (item.finalizedTurn) counts.finalized += 1;
+      actual.set(key, counts);
+    }
+  }
+  const cells: CaseCoverageCell[] = expectedCells.map((cell) => ({
+    ...cell,
+    ...(actual.get(coverageCellKey(cell)) ?? { generated: 0, finalized: 0 }),
+  }));
+  return {
+    expectedCells: cells.length,
+    generatedCells: cells.filter((cell) => cell.generated > 0).length,
+    finalizedCells: cells.filter((cell) => cell.finalized > 0).length,
+    gaps: cells.filter((cell) => cell.generated === 0).length,
+    cells,
+  };
+}
+
+export async function structuralCaseCoverage() {
+  const cases = await db.tutorTurnCase.findMany({
+    where: { status: { not: 'SUPERSEDED' } },
+    select: {
+      phase: true,
+      triggerType: true,
+      visibleFactsJson: true,
+      finalizedTurn: { select: { id: true } },
+    },
+  });
+  return tutorCaseCoverage(cases);
+}
+
 export async function compileTutorTurnCases(input: {
   profile: TutorCaseProfile;
   counts?: Record<number, number>;
@@ -696,6 +763,7 @@ export async function compileTutorTurnCases(input: {
   const where: Prisma.TopicCardWhereInput = { status: 'APPROVED', ...(input.topicCardIds?.length ? { id: { in: input.topicCardIds } } : {}) };
   const cards = await db.topicCard.findMany({ where, orderBy: { approvedAt: 'asc' }, include: { sourceCandidate: { select: { familyKey: true, familyOverrideKey: true } } } });
   const topicCoverage = tutorTopicCardCoverage(cards);
+  const caseCoverage = await structuralCaseCoverage();
   const counts = input.profile === 'TRIAL_36' ? TRIAL_CASE_COUNTS : input.profile === 'FULL_180' ? FULL_CASE_COUNTS : input.profile === 'EVAL_80' ? EVAL_CASE_COUNTS : input.counts ?? {};
   if (input.profile === 'SMOKE_6' && input.split !== 'PILOT') throw new Error('SMOKE_6 profile 必须使用 PILOT split');
   if (input.profile === 'CALIBRATION_12' && input.split !== 'PILOT') throw new Error('CALIBRATION_12 profile 必须使用 PILOT split');
@@ -709,9 +777,8 @@ export async function compileTutorTurnCases(input: {
     if (!calibration.pass) throw new Error(`36 案例试验必须先通过最新 Calibration 12：${calibration.failures.join('、')}`);
   }
   if (input.profile === 'FULL_180') {
-    const latestTrial = await db.bootstrapGenerationRun.findFirst({ where: { kind: 'CASE_COMPILATION', parametersJson: { contains: '"profile":"TRIAL_36"' }, status: 'COMPLETED', cases: { some: { status: { not: 'SUPERSEDED' } } } }, orderBy: { completedAt: 'desc' } });
-    const signoff = latestTrial ? await db.bootstrapGenerationRun.findFirst({ where: { kind: 'TRIAL_SIGNOFF', status: 'COMPLETED', parametersJson: { contains: `"trialRunId":"${latestTrial.id}"` } }, orderBy: { completedAt: 'desc' } }) : null;
-    if (!latestTrial || !signoff) throw new Error('180 正式集必须在最新 36 案例试验通过自动指标并完成人工逐条复盘签署后生成');
+    const trial = await trialQualityReport();
+    if (!trial.pass || !trial.signedOff) throw new Error('180 正式集必须在当前六阶段配比的最新 36 案例试验通过自动指标并完成人工逐条复盘签署后生成');
     const diversityFailures = tutorTopicCardDiversityFailures(cards);
     if (diversityFailures.length) throw new Error(`180 条正式集的话题多样性门槛未通过：${diversityFailures.join('、')}`);
   }
@@ -738,6 +805,7 @@ export async function compileTutorTurnCases(input: {
     firstReviewMode: input.firstReviewMode ?? 'HUMAN',
     reviewPolicy,
     topicCoverage,
+    caseCoverage,
     trainingCohort: TUTOR_TRAINING_COHORT,
   };
   const run = await db.bootstrapGenerationRun.create({
@@ -784,7 +852,14 @@ export async function compileTutorTurnCases(input: {
     })));
     await db.bootstrapGenerationRun.update({ where: { id: run.id }, data: { status: 'COMPLETED', completedItems: created.length, completedAt: new Date(), promptHashesJson: JSON.stringify([...new Set(created.map((item) => item.promptSha256))]) } });
     await audit(input.user.id, 'TUTOR_CASES_COMPILED', 'BootstrapGenerationRun', run.id, { profile: input.profile, count: created.length, split: input.split, promptVersion, promptPolicyVersionId: promptPolicy?.id ?? null, candidateARuntimeBundleId: input.candidateARuntimeBundleId ?? null, candidateBRuntimeBundleId: input.candidateBRuntimeBundleId ?? null, reviewPolicy, firstReviewMode: input.firstReviewMode ?? 'HUMAN', aiDirectAuthorized: reviewPolicy === 'AI_DIRECT_TO_REVIEWER' });
-    return { runId: run.id, cases: created, promptVersion, topicCoverage, coverageWarnings: input.profile === 'FULL_180' ? [] : tutorTopicCardDiversityFailures(cards) };
+    return {
+      runId: run.id,
+      cases: created,
+      promptVersion,
+      topicCoverage,
+      caseCoverage: await structuralCaseCoverage(),
+      coverageWarnings: input.profile === 'FULL_180' ? [] : tutorTopicCardDiversityFailures(cards),
+    };
   } catch (error) {
     await db.bootstrapGenerationRun.update({ where: { id: run.id }, data: { status: 'FAILED', failedItems: total, failureReason: error instanceof Error ? error.message : String(error), completedAt: new Date() } });
     throw error;
@@ -847,7 +922,7 @@ async function generateOne(caseItem: { systemPrompt: string; historyJson: string
   const completion = await provider.complete([
     { role: 'system', content: caseItem.systemPrompt },
     ...history,
-    { role: 'user', content: caseItem.triggerType === 'SYSTEM_TRIGGER' ? '这是系统触发，不是学生发言。请按合同给出自然引导。' : caseItem.studentMessage },
+    { role: 'user', content: isSystemTriggeredTurn(caseItem.triggerType) ? '这是系统触发，不是学生发言。请按合同给出自然引导。' : caseItem.studentMessage },
   ], { useJsonFormat: true, maxTokens: 1200 });
   return { raw: completion.content, params: { ...completion.request, finishReason: completion.finishReason, usage: completion.usage } };
 }
@@ -2055,7 +2130,7 @@ export async function resolveTutorCaseQualityTask(input: {
   }
 
   const studentMessage = input.studentMessage?.trim() ?? '';
-  if (task.case.triggerType !== 'SYSTEM_TRIGGER' && !studentMessage) throw new Error('学生消息不能为空');
+  if (!isSystemTriggeredTurn(task.case.triggerType) && !studentMessage) throw new Error('学生消息不能为空');
   if (/internalArchetype|privateReviewSpec|高概念降级型|变量混乱型|一次给全型/.test(studentMessage)) throw new Error('学生消息包含内部审核术语');
   const oldVisibleFacts = parseJson<Record<string, unknown>>(task.case.visibleFactsJson, {});
   const visibleFacts = input.visibleFacts && typeof input.visibleFacts === 'object' && !Array.isArray(input.visibleFacts)
@@ -2175,11 +2250,27 @@ export async function trialQualityReport(runId?: string) {
     ? await db.bootstrapGenerationRun.findFirst({ where: { id: runId, kind: 'CASE_COMPILATION', parametersJson: { contains: '"profile":"TRIAL_36"' }, status: 'COMPLETED', cases: { some: { status: { not: 'SUPERSEDED' } } } } })
     : await latestCaseCompilationRun('TRIAL_36');
   const report = evaluateTrialQuality(trialRun ? await qualityRecordsForRun(trialRun.id) : []);
+  const runParameters = parseJson<{ counts?: Record<string, unknown> }>(trialRun?.parametersJson ?? '{}', {});
+  const actualCounts = runParameters.counts ?? {};
+  const expectedEntries = Object.entries(TRIAL_CASE_COUNTS).map(([phase, count]) => [String(phase), count] as const);
+  const distributionCurrent = !trialRun || (
+    expectedEntries.every(([phase, count]) => Number(actualCounts[phase]) === count)
+    && Object.keys(actualCounts).length === expectedEntries.length
+  );
+  const failures = distributionCurrent ? report.failures : ['TRIAL_STRUCTURAL_DISTRIBUTION_OUTDATED', ...report.failures];
   const signoff = trialRun ? await db.bootstrapGenerationRun.findFirst({
     where: { kind: 'TRIAL_SIGNOFF', status: 'COMPLETED', parametersJson: { contains: `"trialRunId":"${trialRun.id}"` } },
     orderBy: { completedAt: 'desc' },
   }) : null;
-  return { ...report, runId: trialRun?.id ?? null, signedOff: Boolean(signoff), signoffId: signoff?.id ?? null };
+  return {
+    ...report,
+    pass: report.pass && distributionCurrent,
+    failures,
+    runId: trialRun?.id ?? null,
+    signedOff: distributionCurrent && Boolean(signoff),
+    signoffId: distributionCurrent ? signoff?.id ?? null : null,
+    distributionCurrent,
+  };
 }
 
 export async function smokeQualityReport(runId?: string) {
@@ -2363,7 +2454,7 @@ export async function createTutorTurnRelease(input: { version: string; finalized
       { from: 'system', value: turn.case.systemPrompt },
       ...history.map((item) => ({ from: item.role === 'user' ? 'human' as const : 'gpt' as const, value: item.content })),
     ];
-    if (turn.case.triggerType === 'SYSTEM_TRIGGER') conversations.push({ from: 'system', value: 'SYSTEM_TRIGGER：平台状态变化触发本回合；这不是学生消息。' });
+    if (isSystemTriggeredTurn(turn.case.triggerType)) conversations.push({ from: 'system', value: `${turn.case.triggerType}：平台状态变化触发本回合；这不是学生消息。` });
     else conversations.push({ from: 'human', value: turn.case.studentMessage });
     conversations.push({ from: 'gpt', value: turn.finalOutputJson });
     return {

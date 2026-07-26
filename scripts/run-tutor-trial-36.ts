@@ -70,13 +70,12 @@ async function main() {
   if (!run) throw new Error(`Trial 36 run 不存在：${runId}`);
   if (run.cases.length !== 36) throw new Error(`Trial 36 应有 36 条案例，当前为 ${run.cases.length}`);
 
-  const canaryIds = new Set([1, 2, 4].flatMap((phase) => run.cases.filter((item) => item.phase === phase).slice(0, 2).map((item) => item.id)));
+  const canaryIds = new Set([1, 2, 3, 4, 5, 6].flatMap((phase) => run.cases.filter((item) => item.phase === phase).slice(0, 1).map((item) => item.id)));
   const remaining = run.cases.filter((item) => !canaryIds.has(item.id));
-  const remainingByPhase = Object.fromEntries([1, 2, 4].map((phase) => [phase, remaining.filter((item) => item.phase === phase)])) as Record<number, typeof remaining>;
   const batchCases: Record<string, typeof remaining> = {
-    '1': [...remainingByPhase[1].slice(0, 4), ...remainingByPhase[2].slice(0, 3), ...remainingByPhase[4].slice(0, 3)],
-    '2': [...remainingByPhase[1].slice(4, 7), ...remainingByPhase[2].slice(3, 7), ...remainingByPhase[4].slice(3, 6)],
-    '3': [...remainingByPhase[1].slice(7, 10), ...remainingByPhase[2].slice(7, 10), ...remainingByPhase[4].slice(6, 10)],
+    '1': remaining.filter((_, index) => index % 3 === 0),
+    '2': remaining.filter((_, index) => index % 3 === 1),
+    '3': remaining.filter((_, index) => index % 3 === 2),
   };
   const selected = batch === 'canary'
     ? run.cases.filter((item) => canaryIds.has(item.id))

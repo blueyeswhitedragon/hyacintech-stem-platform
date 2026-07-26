@@ -50,9 +50,11 @@ const GROUPS = [
 export default function AIServiceManager({
   connections,
   models,
+  encryptedCredentialAvailable,
 }: {
   connections: ConnectionItem[];
   models: ModelOption[];
+  encryptedCredentialAvailable: boolean;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -168,8 +170,7 @@ export default function AIServiceManager({
       <button onClick={() => setCreateOpen(true)} className={buttonClass('primary', 'md')}>新增服务连接</button>
     </section>
 
-    {/* 双轨凭据是最容易踩的坑：这里登记过不等于学生端能用，反之亦然。 */}
-    <p className="border border-warning/40 bg-warning/8 p-3 text-sm leading-6 text-body-strong"><b>这里登记的凭据只服务 Data Lab</b>（候选 A/B 生成、交叉检查、评测）。学生端 Tutor、Extractor、话题卡编译和报告评分读取服务器 <code>.env</code> 里的 <code>OPENAI_API_KEY</code> / <code>DEEPSEEK_API_KEY</code>，两边互不影响。同一个密钥通常需要在两处各配一次。</p>
+    <p className="border border-warning/40 bg-warning/8 p-3 text-sm leading-6 text-body-strong"><b>凭据按运行路径分开：</b>Data Lab 与已部署的正式 Tutor RuntimeBundle 使用这里登记的凭据；Guest、Extractor、话题卡编译、报告评分和环境基线使用服务器 <code>.env</code>。如果同一服务同时承担两条路径，密钥需要分别登记。</p>
 
     {feedback && <p aria-live="polite" className={`border border-hairline p-3 text-sm ${feedback.tone === 'success' ? 'border-success/40 bg-success/8 text-body-strong' : 'border-error/40 bg-error/8 text-body-strong'}`}>{feedback.text}</p>}
 
@@ -202,13 +203,13 @@ export default function AIServiceManager({
     </section>)}
 
     <Dialog open={createOpen} title="新增服务连接" description="按“连接身份 → 地址 → 凭据 → 保存”登记。保存不会自动调用外部服务。" onClose={() => !pending && setCreateOpen(false)} maxWidth="max-w-2xl">
-      <ServiceForm pending={pending} onSubmit={create} submitLabel="登记服务连接" />
+      <ServiceForm pending={pending} onSubmit={create} submitLabel="登记服务连接" encryptedCredentialAvailable={encryptedCredentialAvailable} />
     </Dialog>
     <Dialog open={Boolean(editing)} title="编辑连接信息" description="修改后连接会回到待测试状态，现有历史记录不变。" onClose={() => !pending && setEditing(null)}>
       {editing && <form action={updateConnection} className="space-y-3"><label className="block text-sm">显示名称<Input name="name" required defaultValue={editing.name} className="mt-1" /></label><label className="block text-sm">Base URL<Input name="baseUrl" required defaultValue={editing.baseUrl} className="mt-1" /></label><button disabled={pending} className={buttonClass('primary', 'md')}>保存连接信息</button></form>}
     </Dialog>
     <Dialog open={Boolean(credentialTarget)} title="更新访问密钥" description="系统不会展示旧密钥。保存后必须重新测试连接。" onClose={() => !pending && setCredentialTarget(null)}>
-      <CredentialFields pending={pending} action={updateCredential} submitLabel="更新访问密钥" />
+      <CredentialFields pending={pending} action={updateCredential} submitLabel="更新访问密钥" encryptedCredentialAvailable={encryptedCredentialAvailable} />
     </Dialog>
     <Dialog open={Boolean(endpointTarget)} title="关联可用模型" description="登记远程 model ID，并可选关联一个不可变模型产物。" onClose={() => !pending && setEndpointTarget(null)}>
       <form action={createEndpoint} className="space-y-3">
@@ -222,17 +223,17 @@ export default function AIServiceManager({
   </div>;
 }
 
-function ServiceForm({ pending, onSubmit, submitLabel }: { pending: boolean; onSubmit: (data: FormData) => void; submitLabel: string }) {
+function ServiceForm({ pending, onSubmit, submitLabel, encryptedCredentialAvailable }: { pending: boolean; onSubmit: (data: FormData) => void; submitLabel: string; encryptedCredentialAvailable: boolean }) {
   return <form action={onSubmit} className="space-y-4">
     <div className="grid gap-2 text-xs sm:grid-cols-4"><span className="border-b-2 border-ink pb-2">1. 连接身份</span><span className="border-b-2 border-hairline pb-2">2. 服务地址</span><span className="border-b-2 border-hairline pb-2">3. 安全凭据</span><span className="border-b-2 border-hairline pb-2">4. 保存</span></div>
     <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm">显示名称<Input name="name" required placeholder="校内 Qwen 推理服务" className="mt-1" /></label><label className="text-sm">协议<Select name="protocol" className="mt-1"><option value="OPENAI_COMPATIBLE">OpenAI Compatible</option><option value="DEEPSEEK_COMPATIBLE">DeepSeek Compatible</option></Select></label></div>
     <label className="block text-sm">Base URL<Input name="baseUrl" required placeholder="https://llm.example.edu/v1" className="mt-1" /><span className="mt-1 block text-xs text-muted">填写 API 根地址，不要包含 /chat/completions，不要在地址中写密钥。</span></label>
-    <CredentialFields pending={pending} submitLabel={submitLabel} embedded />
+    <CredentialFields pending={pending} submitLabel={submitLabel} embedded encryptedCredentialAvailable={encryptedCredentialAvailable} />
   </form>;
 }
 
-function CredentialFields({ pending, action, submitLabel, embedded = false }: { pending: boolean; action?: (data: FormData) => void; submitLabel: string; embedded?: boolean }) {
+function CredentialFields({ pending, action, submitLabel, embedded = false, encryptedCredentialAvailable }: { pending: boolean; action?: (data: FormData) => void; submitLabel: string; embedded?: boolean; encryptedCredentialAvailable: boolean }) {
   const [source, setSource] = useState('ENV');
-  const fields = <><label className="block text-sm">密钥来源<Select name="credentialSource" value={source} onChange={(event) => setSource(event.target.value)} className="mt-1"><option value="ENV">环境变量引用</option><option value="ENCRYPTED_DB">数据库加密凭据</option></Select></label>{source === 'ENV' ? <label className="block text-sm">环境变量名称<Input name="envVarName" required placeholder="QWEN_API_KEY" className="mt-1" /></label> : <label className="block text-sm">新访问密钥<Input name="apiKey" type="password" required autoComplete="new-password" className="mt-1" /><span className="mt-1 block text-xs text-muted">使用服务器主密钥 AES-GCM 加密；保存后不可查看。</span></label>}<button disabled={pending} className={buttonClass('primary', 'md')}>{submitLabel}</button></>;
+  const fields = <><label className="block text-sm">密钥来源<Select name="credentialSource" value={source} onChange={(event) => setSource(event.target.value)} className="mt-1"><option value="ENV">环境变量引用</option><option value="ENCRYPTED_DB" disabled={!encryptedCredentialAvailable}>数据库加密凭据{encryptedCredentialAvailable ? '' : '（未配置主密钥）'}</option></Select>{!encryptedCredentialAvailable && <span className="mt-1 block text-xs text-muted">如需网页保存密钥，请先在 .env 设置 DATA_LAB_CREDENTIAL_MASTER_KEY 并重启。</span>}</label>{source === 'ENV' ? <label className="block text-sm">环境变量名称<Input name="envVarName" required placeholder="QWEN_API_KEY" className="mt-1" /></label> : <label className="block text-sm">新访问密钥<Input name="apiKey" type="password" required autoComplete="new-password" className="mt-1" /><span className="mt-1 block text-xs text-muted">使用服务器主密钥 AES-GCM 加密；保存后不可查看。</span></label>}<button disabled={pending} className={buttonClass('primary', 'md')}>{submitLabel}</button></>;
   return embedded ? fields : <form action={action} className="space-y-3">{fields}</form>;
 }

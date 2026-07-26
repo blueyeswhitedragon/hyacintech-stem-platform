@@ -12,6 +12,33 @@ async function runtimeCallConfig(runtimeBundleId: string) {
   return resolveRuntimeBundleCallConfig(runtimeBundleId);
 }
 
+async function loadPinnedConversationModel(conversationId: string) {
+  const conversation = await db.conversation.findUnique({
+    where: { id: conversationId },
+    include: {
+      deployedModelVersion: true,
+      deployedRuntimeBundle: { include: { modelVersion: true } },
+    },
+  });
+  if (!conversation) throw new Error('会话不存在');
+  if (conversation.deployedRuntimeBundle) {
+    const config = await runtimeCallConfig(conversation.deployedRuntimeBundle.id);
+    return {
+      ...conversation.deployedRuntimeBundle.modelVersion,
+      promptPolicyVersion: config.promptVersion,
+      contractVersion: config.tutorContractVersion,
+      runtimeBundleId: config.runtimeBundleId,
+      runtimeConfig: {
+        provider: config.provider,
+        apiKey: config.apiKey,
+        baseURL: config.baseURL,
+        model: config.model,
+      },
+    };
+  }
+  return conversation.deployedModelVersion;
+}
+
 export async function refreshModelDeploymentGate(modelVersionId: string) {
   const model = await db.modelVersion.findUnique({
     where: { id: modelVersionId },
@@ -301,35 +328,13 @@ export async function setDeploymentPromotionPaused(input: {
 }
 
 export async function resolveConversationModel(conversationId: string) {
-  const conversation = await db.conversation.findUnique({
-    where: { id: conversationId },
-    include: {
-      deployedModelVersion: true,
-      deployedRuntimeBundle: { include: { modelVersion: true } },
-    },
-  });
-  if (!conversation) throw new Error('会话不存在');
-  if (conversation.deployedRuntimeBundle) {
-    const config = await runtimeCallConfig(conversation.deployedRuntimeBundle.id);
-    return {
-      ...conversation.deployedRuntimeBundle.modelVersion,
-      promptPolicyVersion: config.promptVersion,
-      contractVersion: config.tutorContractVersion,
-      runtimeBundleId: config.runtimeBundleId,
-      runtimeConfig: {
-        provider: config.provider,
-        apiKey: config.apiKey,
-        baseURL: config.baseURL,
-        model: config.model,
-      },
-    };
-  }
-  if (conversation.deployedModelVersion) return conversation.deployedModelVersion;
+  const pinned = await loadPinnedConversationModel(conversationId);
+  if (pinned) return pinned;
   const active = await db.modelDeployment.findFirst({
     where: { environment: 'PRODUCTION', status: 'ACTIVE' },
     orderBy: { startedAt: 'desc' },
   });
-  if (!active) throw new Error('当前没有 ACTIVE 生产部署');
+  if (!active) throw new Error('当前没有 ACTIVE 生产部署，请先运行 npm run model:bootstrap');
   if (active.runtimeBundleId) {
     const useCandidate = !active.previousModelVersionId
       || active.rolloutPercent >= 100
@@ -343,25 +348,16 @@ export async function resolveConversationModel(conversationId: string) {
         deployedRuntimeBundleId: selectedRuntimeBundleId,
       },
     });
-    if (selectedRuntimeBundleId) {
-      const config = await runtimeCallConfig(selectedRuntimeBundleId);
-      const model = await db.modelVersion.findUniqueOrThrow({ where: { id: selectedModelVersionId! } });
-      return {
-        ...model,
-        promptPolicyVersion: config.promptVersion,
-        contractVersion: config.tutorContractVersion,
-        runtimeBundleId: config.runtimeBundleId,
-        runtimeConfig: {
-          provider: config.provider,
-          apiKey: config.apiKey,
-          baseURL: config.baseURL,
-          model: config.model,
-        },
-      };
-    }
-    return db.modelVersion.findUniqueOrThrow({ where: { id: selectedModelVersionId! } });
+    const resolved = await loadPinnedConversationModel(conversationId);
+    if (!resolved) throw new Error('会话模型固定失败，请重试');
+    return resolved;
   }
   const modelId = chooseRolloutModel({ stableKey: conversationId, rolloutPercent: active.rolloutPercent, candidateModelId: active.modelVersionId, previousModelId: active.previousModelVersionId });
-  await db.conversation.updateMany({ where: { id: conversationId, deployedModelVersionId: null }, data: { deployedModelVersionId: modelId } });
-  return db.modelVersion.findUniqueOrThrow({ where: { id: modelId } });
+  await db.conversation.updateMany({
+    where: { id: conversationId, deployedModelVersionId: null, deployedRuntimeBundleId: null },
+    data: { deployedModelVersionId: modelId },
+  });
+  const resolved = await loadPinnedConversationModel(conversationId);
+  if (!resolved) throw new Error('会话模型固定失败，请重试');
+  return resolved;
 }

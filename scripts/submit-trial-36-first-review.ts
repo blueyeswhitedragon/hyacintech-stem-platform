@@ -19,7 +19,6 @@ interface ReviewPlan {
   preferenceReason?: string;
 }
 
-const DEFAULT_RUN_ID = 'bcb4a69a-a054-487a-9a44-3bf93e80762f';
 const DISCLOSURE = 'AI_ASSISTED_DRAFT：由 Codex 在管理员授权下完成 Trial 36 首次审核，必须经过独立 reviewer 实质确认。';
 
 const PLANS: Record<string, ReviewPlan> = {
@@ -231,22 +230,63 @@ function expectedDecision(plan: ReviewPlan): Decision {
   return plan.decision ?? (plan.selected === 'A' ? 'SELECT_A' : 'SELECT_B');
 }
 
-async function preflight(runId: string) {
-  const planEntries = Object.entries(PLANS);
-  const indexes = planEntries.map(([, plan]) => plan.index).sort((a, b) => a - b);
-  if (planEntries.length !== 36 || indexes.some((value, index) => value !== index + 1)) {
-    throw new Error('审核计划必须恰好覆盖编号 1-36，且编号不得重复或缺失');
-  }
+let activePlans: Record<string, ReviewPlan> = {};
 
-  const caseIds = planEntries.map(([caseId]) => caseId);
+function automaticPlan(
+  caseRow: {
+    phase: number;
+    triggerType: string;
+    candidates: Array<{ slot: string; normalizedOutput: string; deterministicCheckJson: string }>;
+  },
+  index: number,
+): ReviewPlan {
+  const ranked = caseRow.candidates.map((candidate) => {
+    const check = parseJson<{ hardErrorCount?: number; warningCount?: number }>(candidate.deterministicCheckJson, {});
+    return {
+      candidate,
+      hardErrors: check.hardErrorCount ?? 1,
+      warnings: check.warningCount ?? 0,
+    };
+  }).sort((left, right) =>
+    left.hardErrors - right.hardErrors
+    || left.warnings - right.warnings
+    || left.candidate.slot.localeCompare(right.candidate.slot));
+  const selected = ranked[0];
+  if (!selected || selected.hardErrors > 0 || !selected.candidate.normalizedOutput) {
+    throw new Error(`Trial #${index} 的 A/B 候选都存在硬错误，不能自动提交初审`);
+  }
+  const rejected = ranked[1];
+  const preference = Boolean(
+    rejected
+    && rejected.hardErrors === 0
+    && rejected.candidate.normalizedOutput
+    && rejected.candidate.normalizedOutput !== selected.candidate.normalizedOutput,
+  );
+  return {
+    index,
+    selected: selected.candidate.slot as Slot,
+    reason: `自动初审比较了合同硬错误与 warning 数量；P${caseRow.phase} ${caseRow.triggerType} 选择 ${selected.candidate.slot}（硬错误 ${selected.hardErrors}，warning ${selected.warnings}）。独立 reviewer 仍须逐条核验教学质量与系统触发语义。`,
+    preference,
+    preferenceReason: preference
+      ? `${selected.candidate.slot} 在确定性检查中不劣于另一候选，且两份合法输出存在实质文本差异。`
+      : undefined,
+  };
+}
+
+async function preflight(runId: string) {
   const cases = await db.tutorTurnCase.findMany({
-    where: { id: { in: caseIds } },
+    where: { generationRunId: runId, status: { not: 'SUPERSEDED' } },
+    orderBy: [{ phase: 'asc' }, { createdAt: 'asc' }],
     include: {
       candidates: { orderBy: { slot: 'asc' } },
       reviewTasks: true,
     },
   });
-  if (cases.length !== 36) throw new Error(`数据库中只找到 ${cases.length}/36 个计划 case`);
+  if (cases.length !== 36) throw new Error(`目标 Trial run 中只找到 ${cases.length}/36 个有效 case`);
+  activePlans = Object.fromEntries(cases.map((caseRow, index) => [
+    caseRow.id,
+    PLANS[caseRow.id] ?? automaticPlan(caseRow, index + 1),
+  ]));
 
   const otherActive = await db.tutorTurnCase.count({
     where: { status: 'IN_REVIEW', generationRunId: { not: runId } },
@@ -259,7 +299,7 @@ async function preflight(runId: string) {
   const editTypes: Record<string, number> = { SELECT_A: 0, SELECT_B: 0, EDIT: 0 };
 
   for (const caseRow of cases) {
-    const plan = PLANS[caseRow.id];
+    const plan = activePlans[caseRow.id];
     if (caseRow.generationRunId !== runId) throw new Error(`case ${plan.index} 不属于目标 run：${caseRow.generationRunId}`);
     if (!['IN_REVIEW', 'AWAITING_CONFIRMATION'].includes(caseRow.status)) {
       throw new Error(`case ${plan.index} 状态异常：${caseRow.status}`);
@@ -356,7 +396,19 @@ async function summarize(runId: string) {
 }
 
 async function main() {
-  const runId = arg('--run-id') ?? DEFAULT_RUN_ID;
+  const requestedRunId = arg('--run-id');
+  const latestRun = requestedRunId ? null : await db.bootstrapGenerationRun.findFirst({
+    where: {
+      kind: 'CASE_COMPILATION',
+      status: 'COMPLETED',
+      parametersJson: { contains: '"profile":"TRIAL_36"' },
+      cases: { some: { status: { not: 'SUPERSEDED' } } },
+    },
+    orderBy: { completedAt: 'desc' },
+    select: { id: true },
+  });
+  const runId = requestedRunId ?? latestRun?.id;
+  if (!runId) throw new Error('找不到可初审的 Trial 36 run，请先运行 data-lab:trial-36');
   const username = arg('--admin') ?? 'data-admin';
   const dryRun = hasFlag('--dry-run');
   const preflightResult = await preflight(runId);
@@ -366,12 +418,12 @@ async function main() {
   const adminRow = await db.user.findFirst({ where: { username, role: 'admin', isActive: true } });
   if (!adminRow) throw new Error(`找不到有效管理员：${username}`);
   const user: SessionUser = { id: adminRow.id, username: adminRow.username, displayName: adminRow.displayName, role: 'admin' };
-  const remaining = await db.tutorTurnCase.count({ where: { generationRunId: runId, status: 'IN_REVIEW', id: { in: Object.keys(PLANS) } } });
+  const remaining = await db.tutorTurnCase.count({ where: { generationRunId: runId, status: 'IN_REVIEW', id: { in: Object.keys(activePlans) } } });
 
   for (let index = 0; index < remaining; index += 1) {
     const payload = await claimTutorReviewTask('EDIT', user);
     if (!payload) throw new Error(`预计还需提交 ${remaining - index} 条，但未能领取任务`);
-    const plan = PLANS[payload.case.id];
+    const plan = activePlans[payload.case.id];
     if (!plan) throw new Error(`领取到计划外 case：${payload.case.id}`);
     const caseRow = await db.tutorTurnCase.findUniqueOrThrow({ where: { id: payload.case.id } });
     if (caseRow.generationRunId !== runId) throw new Error(`领取到其他 run 的任务：${caseRow.generationRunId}`);

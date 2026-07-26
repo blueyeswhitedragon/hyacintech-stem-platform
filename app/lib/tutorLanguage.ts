@@ -4,6 +4,7 @@ import type { StageData } from '@/app/models/stageData';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
 import { createConfiguredLLMProvider, createLLMProvider } from '@/app/lib/llm/provider';
 import type { LLMCompletion, LLMRuntimeOverride } from '@/app/lib/llm/types';
+import { isSystemTriggeredTurn } from '@/app/lib/stageContract';
 
 export const TUTOR_LANGUAGE_CONTRACT_VERSION = 'tutor-language-v1';
 export const TUTOR_SEMANTIC_VALIDATOR_VERSION = 'tutor-semantic-validator-v2';
@@ -416,8 +417,11 @@ export function extractTutorVisibleFactsFromPrompt(prompt: string): unknown | nu
   }
 }
 
-function interactionToAction(type: TutorInteractionType): ChatResponse['next_action_type'] {
-  if (type === 'checkpoint') return 'confirmation';
+export function interactionToAction(
+  type: TutorInteractionType,
+  opts: { serverSilent?: boolean } = {},
+): ChatResponse['next_action_type'] {
+  if (type === 'checkpoint') return opts.serverSilent ? 'text_input' : 'confirmation';
   if (type === 'information' || type === 'explanation') return 'info';
   return 'text_input';
 }
@@ -428,7 +432,9 @@ export function toCompatibleChatResponse(
 ): ChatResponse {
   return {
     dialogue: language.dialogue,
-    next_action_type: envelope.nextActionType ?? interactionToAction(language.interactionType),
+    next_action_type: envelope.nextActionType ?? interactionToAction(language.interactionType, {
+      serverSilent: envelope.nextActionType === undefined,
+    }),
     hints: language.hints,
     phase_complete: envelope.phaseComplete === true,
     tutor_language: language,
@@ -436,11 +442,11 @@ export function toCompatibleChatResponse(
   };
 }
 
-function messagesForTutor(systemPrompt: string, input: TutorVisibleContext, repair?: string) {
+export function buildTutorRequestMessages(systemPrompt: string, input: TutorVisibleContext, repair?: string) {
   const history: Message[] = [];
   for (const item of input.priorStudentMessages) history.push({ id: '', role: 'user', content: item });
   for (const item of input.tutorHistory) history.push({ id: '', role: 'assistant', content: item });
-  const systemTriggered = ['STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP'].includes(input.triggerType);
+  const systemTriggered = isSystemTriggeredTurn(input.triggerType);
   return [
     { role: 'system' as const, content: systemPrompt },
     ...history.map((message) => ({ role: message.role, content: message.content })),
@@ -502,7 +508,7 @@ export async function callTutorLanguageWithTrace(
   let repair: string | undefined;
   let completion: LLMCompletion | null = null;
   for (let attempt = 1; attempt <= 2; attempt += 1) {
-    completion = await provider.complete(messagesForTutor(systemPrompt, input, repair), {
+    completion = await provider.complete(buildTutorRequestMessages(systemPrompt, input, repair), {
       useJsonFormat: true,
       maxTokens: 1200,
     });

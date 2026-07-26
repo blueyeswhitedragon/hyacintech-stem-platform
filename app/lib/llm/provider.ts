@@ -134,18 +134,6 @@ function isPlaceholderKey(key: string): boolean {
 
 // ---- Provider detection ----
 
-function detectProvider(): 'openai' | 'deepseek' | null {
-  const openaiKey = process.env.OPENAI_API_KEY;
-  const deepseekKey = process.env.DEEPSEEK_API_KEY;
-
-  const hasOpenAI = openaiKey && !isPlaceholderKey(openaiKey);
-  const hasDeepSeek = deepseekKey && !isPlaceholderKey(deepseekKey);
-
-  if (hasOpenAI) return 'openai';
-  if (hasDeepSeek) return 'deepseek';
-  return null;
-}
-
 /**
  * Validate configuration without throwing. Used by health check and createLLMProvider.
  */
@@ -162,14 +150,41 @@ export function validateConfig(): ConfigValidation {
     issues.push('DEEPSEEK_API_KEY 为占位符值，已忽略。请设置为真实密钥。');
   }
 
-  const providerType = process.env.LLM_PROVIDER ?? detectProvider();
+  const hasOpenAI = Boolean(openaiKey && !isPlaceholderKey(openaiKey));
+  const hasDeepSeek = Boolean(deepseekKey && !isPlaceholderKey(deepseekKey));
+  const configuredProvider = process.env.LLM_PROVIDER?.trim().toLowerCase();
+  if (configuredProvider && configuredProvider !== 'openai' && configuredProvider !== 'deepseek') {
+    issues.push('LLM_PROVIDER 只支持 openai 或 deepseek。');
+    return { valid: false, provider: null, model: null, issues };
+  }
+
+  if (!configuredProvider && hasOpenAI && hasDeepSeek) {
+    issues.push('同时检测到 OPENAI_API_KEY 与 DEEPSEEK_API_KEY，请显式设置 LLM_PROVIDER。');
+    return { valid: false, provider: null, model: null, issues };
+  }
+
+  const providerType = configuredProvider ?? (hasOpenAI ? 'openai' : hasDeepSeek ? 'deepseek' : null);
 
   if (!providerType) {
     issues.push('未检测到有效的 API Key。请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。');
     return { valid: false, provider: null, model: null, issues };
   }
 
-  const model = process.env.LLM_MODEL ?? (providerType === 'deepseek' ? 'deepseek-v4-pro' : 'gpt-4o');
+  if (providerType === 'openai' && !hasOpenAI) {
+    issues.push('LLM_PROVIDER=openai，但未配置有效的 OPENAI_API_KEY。');
+    return { valid: false, provider: providerType, model: null, issues };
+  }
+  if (providerType === 'deepseek' && !hasDeepSeek) {
+    issues.push('LLM_PROVIDER=deepseek，但未配置有效的 DEEPSEEK_API_KEY。');
+    return { valid: false, provider: providerType, model: null, issues };
+  }
+
+  const configuredModel = process.env.LLM_MODEL?.trim();
+  if (process.env.LLM_MODEL !== undefined && !configuredModel) {
+    issues.push('LLM_MODEL 不能为空。');
+    return { valid: false, provider: providerType, model: null, issues };
+  }
+  const model = configuredModel ?? (providerType === 'deepseek' ? 'deepseek-v4-pro' : 'gpt-4o');
 
   return { valid: true, provider: providerType, model, issues: issues.length > 0 ? issues : [] };
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import BrandMark from './components/icons/BrandMark';
 import PhaseGlyph, { type PhaseGlyphName } from './components/icons/PhaseGlyph';
 import Badge from './components/ui/Badge';
 import { ButtonLink } from './components/ui/Button';
@@ -18,7 +19,7 @@ export default async function Home() {
       <header className="border-b border-hairline bg-canvas px-4 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-coral font-lineage text-base text-on-primary">H</div>
+            <BrandMark className="size-10 shrink-0" />
             <div className="min-w-0">
               <h1 className="display-sm">Hyacintech</h1>
               <p className="truncate text-xs text-muted">AI 驱动的 STEM 教育平台</p>

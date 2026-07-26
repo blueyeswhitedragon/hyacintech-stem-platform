@@ -89,6 +89,7 @@ export interface ClassifiedError {
 // ---- Health check ----
 
 export interface HealthResponse {
+  service: 'hyacintech-stem-platform';
   status: 'healthy' | 'degraded' | 'unhealthy';
   provider: string | null;
   model: string | null;

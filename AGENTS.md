@@ -57,6 +57,7 @@ SQLite + Prisma persist operational, teaching, Data Lab, model, and audit record
 - Student-visible prompt state contains only authorized facts. TopicCard answer keys, hidden rubrics, Critic output, and evaluator-only evidence must never be injected into Tutor-visible state.
 - Pending, submitted, and completed assignment status is enforced on every write route. Soft deadlines record/display lateness but do not lock student work.
 - Existing releases and traces are immutable historical data. A new stage contract gets newly generated cases and explicit provenance; do not relabel or derive them from an old release.
+- Data Lab cases must use the production `StageTriggerType` vocabulary. Use `isSystemTriggeredTurn()` for every system-trigger check; never add another `=== 'SYSTEM_TRIGGER'` comparison.
 - Conversation ownership check: `getConversationForUser(conversationId, userId)` returns null if not owner → reply 404
 - `stageData` and `messages` are stored as JSON strings in the Conversation model
 

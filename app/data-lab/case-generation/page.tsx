@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import CaseGenerationManager from '@/app/components/dataLab/CaseGenerationManager';
-import { approvedTopicCardCoverage, calibrationQualityReport, listTutorCases, minTopicCardRequirement, smokeQualityReport, trialQualityReport, type TutorCaseProfile } from '@/app/lib/dataLab/bootstrap/service';
+import { approvedTopicCardCoverage, calibrationQualityReport, listTutorCases, minTopicCardRequirement, smokeQualityReport, structuralCaseCoverage, trialQualityReport, type TutorCaseProfile } from '@/app/lib/dataLab/bootstrap/service';
 import { getCurrentUser } from '@/app/lib/session';
 import { ensureDataLabRuntimeRegistry, listRuntimeRolesAndBundles, listPromptPolicies } from '@/app/lib/dataLab/runtimeRegistry';
 
@@ -8,12 +8,13 @@ export default async function CaseGenerationPage() {
   const user = await getCurrentUser();
   if (!user || user.role !== 'admin') redirect('/data-lab');
   await ensureDataLabRuntimeRegistry(user);
-  const [cases, smoke, calibration, trial, topicCoverage, runtimeData, promptPolicies] = await Promise.all([
+  const [cases, smoke, calibration, trial, topicCoverage, caseCoverage, runtimeData, promptPolicies] = await Promise.all([
     listTutorCases(),
     smokeQualityReport(),
     calibrationQualityReport(),
     trialQualityReport(),
     approvedTopicCardCoverage(),
+    structuralCaseCoverage(),
     listRuntimeRolesAndBundles(),
     listPromptPolicies(),
   ]);
@@ -31,6 +32,7 @@ export default async function CaseGenerationPage() {
         calibration={calibration}
         trial={trial}
         topicCoverage={topicCoverage}
+        caseCoverage={caseCoverage}
         topicRequirements={topicRequirements}
         runtimeBundles={runtimeData.bundles.filter((bundle) => ['AVAILABLE', 'DEPLOYED'].includes(bundle.status)).map((bundle) => ({
           id: bundle.id,
@@ -42,6 +44,10 @@ export default async function CaseGenerationPage() {
           endpointName: bundle.endpoint.displayName,
           promptVersion: bundle.promptPolicyVersion.version,
         }))}
+        runtimeDefaults={{
+          candidateA: runtimeData.roles.find((role) => role.roleKey === 'DATA_LAB_CANDIDATE_A')?.defaultRuntimeBundle?.id ?? null,
+          candidateB: runtimeData.roles.find((role) => role.roleKey === 'DATA_LAB_CANDIDATE_B')?.defaultRuntimeBundle?.id ?? null,
+        }}
         promptPolicies={promptPolicies.filter((policy) => policy.status === 'APPROVED').map((policy) => ({
           id: policy.id,
           version: policy.version,

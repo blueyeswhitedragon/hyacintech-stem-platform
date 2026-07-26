@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { buildTutorLanguagePrompt, parseTutorLanguageResponse, type TutorLanguagePromptVersion, type TutorLanguageResponse } from '@/app/lib/tutorLanguage';
 import { inferModelFamily } from '@/app/lib/stateExtractor';
+import { isSystemTriggeredTurn } from '@/app/lib/stageContract';
 import { deriveAcceptableDirections, normalizeInquiryBridges, TOPIC_CARD_SCHEMA_V2, validateTopicCardV2, type TopicActivityMode, type TopicCardV2Fields, type TopicContextModule, type TopicDisciplineAnchor, type TopicInquiryBridge } from './topicCardV2';
 
 export const BOOTSTRAP_SUBJECTS = [
@@ -191,7 +192,7 @@ export function checkTutorCandidate(input: {
     if (normalized.hints.some((hint) => normalized.dialogue.includes(hint) || hint.includes(normalized.dialogue))) {
       issues.push(issue('DIALOGUE_HINT_DUPLICATE', 'error', 'dialogue 与 hints 重复'));
     }
-    if (input.triggerType === 'SYSTEM_TRIGGER' && /你刚才|你说|学生说|系统触发/.test(normalized.dialogue)) {
+    if (isSystemTriggeredTurn(input.triggerType) && /你刚才|你说|学生说|系统触发/.test(normalized.dialogue)) {
       issues.push(issue('SYSTEM_TRIGGER_AS_STUDENT', 'error', '系统触发被描述成学生发言', normalized.dialogue));
     }
     if (input.phase === 4 && INTERNAL_SCHEMA_KEY.test(normalized.dialogue)) issues.push(issue('P4_INTERNAL_KEY', 'error', 'P4 导师语言引用内部列 key'));

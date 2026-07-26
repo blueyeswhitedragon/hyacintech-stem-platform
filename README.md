@@ -21,9 +21,9 @@ npm run model:bootstrap          # 登记当前运行模型与初始基线
 DATABASE_URL="file:./dev.db"              # SQLite 数据库路径
 SESSION_SECRET="至少32字符的随机字符串"      # 生成方式：openssl rand -base64 32
 OPENAI_API_KEY="sk-..."                    # 至少配置一个有效提供方密钥
-# DEEPSEEK_API_KEY="sk-..."                # Data Lab A/B 使用两家时需同时配置
+# DEEPSEEK_API_KEY="sk-..."                # 可改为只配置 DeepSeek
 # 可选：
-# LLM_PROVIDER=openai|deepseek            # 自动检测，无需设置
+# LLM_PROVIDER=openai|deepseek            # 只有一个有效密钥时自动检测；两个密钥并存时必填
 # LLM_MODEL=gpt-4o|deepseek-v4-pro        # 默认 gpt-4o / deepseek-v4-pro
 
 # Data Lab 管理员（运行 npm run data-lab:init 时需要）
@@ -33,6 +33,8 @@ ADMIN_DISPLAY_NAME="数据平台主管"
 ```
 
 完整可选项、Data Lab A/B 模型和脚本专用变量见 [`.env.example`](./.env.example)。真实 `.env` 已被 Git 忽略，不应上传；生产环境也不要使用示例密钥或示例会话密钥。
+
+默认模型由 `LLM_PROVIDER` 与 `LLM_MODEL` 决定：未填写 `LLM_MODEL` 时，OpenAI 默认 `gpt-4o`，DeepSeek 默认 `deepseek-v4-pro`。Data Lab 的“AI 服务 → Endpoint → 运行组合”是真实运行配置：角色默认绑定只预选生成表单；正式 Tutor 是否切换由“部署与回滚”中的 ACTIVE 生产部署决定，新会话在第一次模型调用时固定路由。Guest、Extractor 等未接入运行组合的调用仍使用 `.env`。
 
 ## 运行
 
@@ -47,7 +49,10 @@ npm run data-lab:init   # 只创建/更新 Data Lab 管理员，不自动导入�
 npm run data-lab:import -- --file <候选集.json> --batch <唯一批次名>  # 显式导入新批次
 npm run data-lab:pilot  # 创建 2 位演示标注者、1 位复审者和 12 样本试运行活动（双标后为 22 条任务）
 npm run data-lab:test   # Data Lab 纯函数与数据库闭环测试
+npm run platform:doctor # 检查 Node、.env、模型选择、超时与数据库路径（不显示密钥）
 ```
+
+Windows 可直接运行 `npm run platform:launcher`。首次初始化会安全应用已提交迁移、可选写入演示种子、创建管理员并登记模型；不会自动创建已经冻结的旧 Pilot 活动。启动器会在数据库升级前备份实际 SQLite 文件、在 `package-lock.json` 改变后重装依赖，并用 `/api/health` 同时确认服务身份和模型可用性。仅为进入管理页排障时，可手动传入 `-AllowDegraded` 允许模型健康检查失败后继续运行。
 
 ## 新服务器生产部署
 

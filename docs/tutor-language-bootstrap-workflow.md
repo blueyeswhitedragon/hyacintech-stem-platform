@@ -52,9 +52,9 @@
 
 ## 36 → 180 门槛
 
-`/api/data-lab/bootstrap-runs/trial-quality` 只统计最新或指定的 `TRIAL_36` run：硬错误/内部泄漏为 0，NO_CHANGE/LIGHT_EDIT ≥75%，直接确认率 ≥85%，exact duplicate 为 0，三字符 shingle Jaccard ≥0.82 的近重复率 <10%，模板化重复率 <10%。团队仍须逐条复盘主题漂移和伪学生表达。
+`TRIAL_36` 固定配比为 P1=8、P2=8、P3=4、P4=8、P5=4、P6=4，必须覆盖 `STAGE_ENTER`、`STAGE_TRANSITION` 与 `REPORT_BOOTSTRAP`。`/api/data-lab/bootstrap-runs/trial-quality` 只统计最新或指定且配比仍为当前版本的 run：硬错误/内部泄漏为 0，NO_CHANGE/LIGHT_EDIT ≥75%，直接确认率 ≥85%，exact duplicate 为 0，三字符 shingle Jaccard ≥0.82 的近重复率 <10%，模板化重复率 <10%。团队仍须逐条复盘六阶段中的主题漂移、伪学生表达和系统触发话术。
 
-PILOT 一律为 `MONITORING_ONLY`，不能创建 Release。只有 36 条试验通过自动指标并完成人工签署后，才可生成 `FULL_180 / TRAIN`。
+PILOT 一律为 `MONITORING_ONLY`，不能创建 Release。只有当前六阶段配比的 36 条试验通过自动指标并完成人工签署后，才可生成 `FULL_180 / TRAIN`；旧 P1/P2/P4 配比的 run 与签署必须先 supersede，再重新生成和签署。
 
 ## 部分失败状态
 

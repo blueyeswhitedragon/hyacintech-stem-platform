@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Dialog from '@/app/components/dataLab/Dialog';
 import { dataLabStatusLabel, dataLabValueLabel } from '@/app/lib/dataLab/labels';
 import { buttonClass } from '@/app/components/ui/Button';
-import { Input, Textarea } from '@/app/components/ui/Field';
+import { Textarea } from '@/app/components/ui/Field';
 
 interface CandidateView {
   id: string;
@@ -24,7 +24,6 @@ interface CandidateView {
 export default function ProductionCandidateManager({ candidates }: { candidates: CandidateView[] }) {
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
-  const [batchName, setBatchName] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
@@ -56,12 +55,11 @@ export default function ProductionCandidateManager({ candidates }: { candidates:
     setMessage(null);
     try {
       const response = await fetch('/api/data-lab/candidates/convert', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: selected, batchName }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: selected }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? '转换失败');
       setSelected([]);
-      setBatchName('');
       setMessage(`已转换 ${data.summary.records} 条候选为导师回合案例。`);
       router.refresh();
     } catch (error) {
@@ -73,8 +71,7 @@ export default function ProductionCandidateManager({ candidates }: { candidates:
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-2 rounded-lg border border-hairline bg-canvas p-4">
-        <label className="text-sm">转换备注（可选）<Input value={batchName} onChange={(event) => setBatchName(event.target.value)} placeholder="线上问题回流-2026-07" className="mt-1" /></label>
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-hairline bg-canvas p-4">
         <button disabled={pending || selected.length === 0} onClick={convert} className={buttonClass('primary', 'md')}>转换为导师回合案例（{selected.length}）</button>
         {message && <span className="text-sm text-muted">{message}</span>}
       </div>

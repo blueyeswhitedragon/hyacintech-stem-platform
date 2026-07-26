@@ -4,7 +4,7 @@ import { classifyError } from '@/app/lib/llm/errors';
 import { checkRateLimit } from '@/app/lib/guestRateLimit';
 import { PhaseEnum, type Message } from '@/app/models/types';
 import type { Stage2Data, StageData } from '@/app/models/stageData';
-import type { StageTriggerType } from '@/app/lib/stageContract';
+import { isSystemTriggeredTurn, type StageTriggerType } from '@/app/lib/stageContract';
 import { applyDeterministicExtractionFallbacks, callStudentFactExtractor, mergeExtractedFacts } from '@/app/lib/stateExtractor';
 import { attachServerOwnedArtifacts, tutorFocusPlan, updateServerAnalysis, visibleDataRows } from '@/app/lib/serverTutorState';
 import { buildTutorVisibleState, callTutorLanguageWithTrace, toCompatibleChatResponse } from '@/app/lib/tutorLanguage';
@@ -21,10 +21,6 @@ function clientIp(req: Request): string {
   const xff = req.headers.get('x-forwarded-for');
   if (xff) return xff.split(',')[0].trim();
   return req.headers.get('x-real-ip') ?? 'local';
-}
-
-function isSystemTrigger(triggerType: StageTriggerType) {
-  return ['STAGE_ENTER', 'STAGE_TRANSITION', 'REPORT_BOOTSTRAP'].includes(triggerType);
 }
 
 // POST /api/guest/chat —— 体验模式使用 tutor-language-v1；不落库，但仍先独立提取学生事实。
@@ -77,7 +73,7 @@ export async function POST(req: Request) {
 
   try {
     let stageData = body.stageData ?? {};
-    if ([1, 2].includes(stage) && !isSystemTrigger(triggerType)) {
+    if ([1, 2].includes(stage) && !isSystemTriggeredTurn(triggerType)) {
       const expectedFocusId = tutorFocusPlan(stage, stageData, { triggerType }).allowedFocusIds[0];
       try {
         const extraction = await callStudentFactExtractor({
@@ -104,7 +100,7 @@ export async function POST(req: Request) {
     }
 
     let analysisAccepted = false;
-    if (stage === 4 && !isSystemTrigger(triggerType)) {
+    if (stage === 4 && !isSystemTriggeredTurn(triggerType)) {
       // 体验模式不落库，因此没有 StateExtractionTrace；抽取失败同样只回落到确定性路径。
       let claim: ValidatedAnalysisClaim | null = null;
       try {
@@ -117,7 +113,7 @@ export async function POST(req: Request) {
       analysisAccepted = analysis.accepted;
     }
 
-    if (!isSystemTrigger(triggerType)) {
+    if (!isSystemTriggeredTurn(triggerType)) {
       const previousRounds = stageData.roundCounts ?? {};
       stageData = {
         ...stageData,
@@ -133,7 +129,7 @@ export async function POST(req: Request) {
     });
     stageData = server.stageData;
     stageData = finalizeStageData(body.stageData ?? {}, stageData, {
-      mutation: isSystemTrigger(triggerType) ? `GUEST_${triggerType}` : 'GUEST_USER_MESSAGE',
+      mutation: isSystemTriggeredTurn(triggerType) ? `GUEST_${triggerType}` : 'GUEST_USER_MESSAGE',
     });
     const focus = tutorFocusPlan(stage, stageData, { triggerType, analysisAccepted });
     const visibleFacts = stage === 4
@@ -150,7 +146,7 @@ export async function POST(req: Request) {
     const tutor = await callTutorLanguageWithTrace({
       phase: stage,
       triggerType,
-      currentStudentMessage: isSystemTrigger(triggerType) ? '' : message,
+      currentStudentMessage: isSystemTriggeredTurn(triggerType) ? '' : message,
       priorStudentMessages: history.filter((item) => item.role === 'user').map((item) => item.content),
       tutorHistory: history.filter((item) => item.role === 'assistant' && !item.messageType).map((item) => item.content),
       visibleFacts,

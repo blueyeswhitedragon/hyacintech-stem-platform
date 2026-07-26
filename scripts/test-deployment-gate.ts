@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { db } from '../app/lib/db';
 import { chooseRolloutModel, evaluateDeploymentGate, evaluateOnlineObservationGate, stableRolloutBucket } from '../app/lib/deploymentGate';
 import { createOrPromoteDeployment, refreshModelDeploymentGate, resolveConversationModel, rollbackDeployment, updateDeploymentObservation } from '../app/lib/deployment';
+import { EVAL_CASE_COUNTS, expectedCoverageCells } from '../app/lib/dataLab/bootstrap/caseCompiler';
 
 let passed = 0;
 let failed = 0;
@@ -14,9 +15,20 @@ function check(condition: unknown, label: string) {
 async function main() {
   check(stableRolloutBucket('same') === stableRolloutBucket('same'), '稳定分桶对同一会话保持确定');
   check(chooseRolloutModel({ stableKey: 'x', rolloutPercent: 100, candidateModelId: 'new', previousModelId: 'old' }) === 'new', '100% 灰度全部选择新模型');
-  const phase = Object.fromEntries([1, 2, 3, 4, 5, 6].map((value) => [String(value), { B: 2, A: 1, tie: 0, inconsistent: 0, criticalErrors: 0, parseSuccessA: 9, parseTotalA: 10, parseSuccessB: 10, parseTotalB: 10 }]));
-  const pureRuns = [{ id: 'all', modelATag: 'base', modelBTag: 'candidate', scope: 'all', summary: { phase, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true } } }];
+  const winningCounts = { B: 2, A: 1, tie: 0, inconsistent: 0, criticalErrors: 0, parseSuccessA: 9, parseTotalA: 10, parseSuccessB: 10, parseTotalB: 10 };
+  const phase = Object.fromEntries([1, 2, 3, 4, 5, 6].map((value) => [String(value), winningCounts]));
+  const expectedCells = expectedCoverageCells(EVAL_CASE_COUNTS);
+  const trigger = Object.fromEntries([...new Set(expectedCells.map((cell) => cell.triggerType))].map((value) => [value, winningCounts]));
+  const focus = Object.fromEntries([...new Set(expectedCells.map((cell) => cell.focus))].map((value) => [value, winningCounts]));
+  const pureRuns = [{ id: 'all', modelATag: 'base', modelBTag: 'candidate', scope: 'all', summary: { phase, trigger, focus, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true } } }];
   check(evaluateDeploymentGate({ candidateTag: 'candidate', runs: pureRuns, trainingReady: true }).result === 'PASS', '六阶段均不退化且训练血缘合格时门禁通过');
+  const missingTrigger = { ...trigger }; delete missingTrigger.REPORT_BOOTSTRAP;
+  const triggerGap = evaluateDeploymentGate({ candidateTag: 'candidate', runs: [{ ...pureRuns[0], summary: { ...pureRuns[0].summary, trigger: missingTrigger } }], trainingReady: true });
+  check(triggerGap.failures.includes('TRIGGER_MISSING:REPORT_BOOTSTRAP'), '缺少 REPORT_BOOTSTRAP 触发桶时门禁报告 TRIGGER_MISSING');
+  const missingFocus = { ...focus }; delete missingFocus.plan_confirmation;
+  const focusGap = evaluateDeploymentGate({ candidateTag: 'candidate', runs: [{ ...pureRuns[0], summary: { ...pureRuns[0].summary, focus: missingFocus } }], trainingReady: true });
+  check(focusGap.failures.includes('FOCUS_MISSING:plan_confirmation'), '缺少 plan_confirmation focus 桶时门禁报告 FOCUS_MISSING');
+  check(evaluateDeploymentGate({ candidateTag: 'candidate', runs: pureRuns, trainingReady: true }).result === 'PASS', '补齐 trigger 与 focus 桶后门禁转为 PASS');
   const missingPhase = { ...phase }; delete missingPhase['6'];
   check(evaluateDeploymentGate({ candidateTag: 'candidate', runs: [{ ...pureRuns[0], summary: { ...pureRuns[0].summary, phase: missingPhase } }], trainingReady: true }).result === 'INSUFFICIENT', '缺少任一阶段评测时门禁资料不足');
   const regressedPhase = { ...phase, '1': { ...phase['1'], A: 3, B: 0 } };
@@ -30,7 +42,7 @@ async function main() {
   const release = await db.datasetRelease.create({ data: { version: `gate-release-${suffix}`, status: 'FROZEN', createdById: admin.id, eligibilityReportJson: JSON.stringify({ sftAllowed: 1, blocked: 0 }) } });
   const training = await db.trainingRun.create({ data: { name: `gate-training-${suffix}`, releaseId: release.id, baseModel: baseline.tag, status: 'SUCCEEDED', eligibilityReportJson: JSON.stringify({ sftAllowed: 1, blocked: 0 }), parentModelVersionId: baseline.id, createdById: admin.id } });
   const candidate = await db.modelVersion.create({ data: { tag: `gate-candidate-${suffix}`, provider: baseline.provider, externalModelId: baseline.externalModelId, parentModelVersionId: baseline.id, trainingRunId: training.id, status: 'TRAINED' } });
-  const evaluation = await db.evaluationRun.create({ data: { name: `gate-phase-${suffix}`, modelATag: baseline.tag, modelBTag: candidate.tag, modelAVersionId: baseline.id, modelBVersionId: candidate.id, scope: 'all-phases', summaryJson: JSON.stringify({ phase, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true } }), createdById: admin.id } });
+  const evaluation = await db.evaluationRun.create({ data: { name: `gate-phase-${suffix}`, modelATag: baseline.tag, modelBTag: candidate.tag, modelAVersionId: baseline.id, modelBVersionId: candidate.id, scope: 'all-phases', summaryJson: JSON.stringify({ phase, trigger, focus, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true } }), createdById: admin.id } });
   const evaluationIds = [evaluation.id];
   const gate = await refreshModelDeploymentGate(candidate.id);
   check(gate.result === 'PASS' && (await db.modelVersion.findUniqueOrThrow({ where: { id: candidate.id } })).status === 'ELIGIBLE', '数据库评测汇总使模型晋级 ELIGIBLE');

@@ -2,8 +2,9 @@
 
 /*
  * 设计令牌来自 docs/DESIGN-claude (1).md（暖奶油画布 + 珊瑚强调 + 深墨产品面）。
- * 中文标题走无衬线（Noto Sans SC），衬线只用于版本号、英文标识与数字，
+ * 中文标题走系统无衬线，衬线只用于版本号、英文标识与数字，
  * 因为中文宋体在 14px 正文附近笔画过细、可读性差。
+ * 使用本机字体栈，保证隔离网络环境也能完成生产构建。
  */
 @theme {
   --color-coral: #cc785c;
@@ -35,9 +36,9 @@
   --color-error: #c64545;
   --color-info: #5db8a6;
 
-  --font-sans: var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-serif: var(--font-eb-garamond), Georgia, "Times New Roman", serif;
-  --font-mono: var(--font-jetbrains-mono), "SFMono-Regular", Consolas, monospace;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 
   --radius-xs: 4px;
   --radius-sm: 6px;

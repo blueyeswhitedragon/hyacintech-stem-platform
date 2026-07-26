@@ -5,6 +5,7 @@ import { validateTopicCardInput, type TopicCardInput } from '../app/lib/dataLab/
 import { compileCases } from '../app/lib/dataLab/bootstrap/caseCompiler';
 import { normalizeResourceTitle, topicResourceFamilyKey } from '../app/lib/dataLab/bootstrap/topicCardV2';
 import { tutorTopicCardDiversityFailures } from '../app/lib/dataLab/bootstrap/service';
+import { isSystemTriggeredTurn } from '../app/lib/stageContract';
 
 let passed = 0; let failed = 0;
 function check(condition: unknown, label: string) { if (condition) { passed += 1; console.log(`PASS ${label}`); } else { failed += 1; console.error(`FAIL ${label}`); } }
@@ -54,7 +55,12 @@ const card: TopicCard = {
 const cases = compileCases([card], { 1: 2, 2: 2, 4: 6, 6: 4 }, 'PILOT');
 check(cases.every((item) => !JSON.stringify(item.stageState).includes('条件一') && !JSON.stringify(item.stageState).includes('记录单位')), 'V2 Case 不生成条件一或记录单位占位符');
 check(cases.filter((item) => item.phase === 1).every((item) => item.studentMessage.includes('装置') || item.studentMessage.includes('遮光')), 'V2 P1 保留真实工程情境');
-check(cases.filter((item) => item.phase === 4).every((item) => /低阈值|中阈值|高阈值/.test(item.studentMessage)), 'V2 P4 使用真实测试水平和性能数据');
+check(
+  cases
+    .filter((item) => item.phase === 4 && !isSystemTriggeredTurn(item.triggerType))
+    .every((item) => /低阈值|中阈值|高阈值/.test(item.studentMessage)),
+  'V2 P4 用户消息使用真实测试水平和性能数据',
+);
 check(cases.filter((item) => item.phase === 6).some((item) => item.studentMessage.includes('下一版')), 'V2 P6 将证据返回下一版设计');
 
 const modules = ['LIFE_HEALTH', 'ENERGY_ENVIRONMENT', 'INTELLIGENT_INFORMATION', 'AEROSPACE', 'DEEP_EARTH_OCEAN'];

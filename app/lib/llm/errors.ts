@@ -3,16 +3,16 @@ import { ErrorCode, ClassifiedError } from './types';
 const MESSAGES: Record<ErrorCode, string> = {
   network_error: '网络连接失败，无法访问AI服务。请检查网络连接或API地址配置。',
   timeout: 'AI响应超时，请重试。若持续超时请检查网络或切换模型。',
-  bad_api_key: 'API Key 无效，请检查 .env.local 中的密钥是否正确。',
+  bad_api_key: 'API Key 无效，请检查 .env 中的密钥是否正确。',
   insufficient_balance: 'API 账户余额不足，请充值后重试。',
   forbidden: '访问被拒绝，请检查API权限或网络代理设置。',
-  invalid_model: '模型不存在，请检查 LLM_MODEL 环境变量配置。',
+  invalid_model: '当前模型不可用或未配置，请联系管理员检查模型配置。',
   context_overflow: '对话上下文超过模型限制，请刷新页面重新开始。',
   content_filtered: '内容被AI安全策略拦截，请修改表述后重试。',
   rate_limited: '请求过于频繁，请等待几秒后重试。',
   server_overloaded: 'AI服务繁忙，请稍后再试。',
   server_error: 'AI服务器错误，请稍后再试。',
-  bad_config: 'LLM服务未配置。请在 .env.local 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。',
+  bad_config: 'LLM服务未配置。请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。',
   parse_error: 'AI回复格式异常，请重试。',
   safety_violation: '内容包含安全风险，请修改后重试。',
   unknown_error: '请求失败，请重试。',
@@ -80,6 +80,8 @@ function classifyByMessage(message: string): ClassifiedError {
 }
 
 function classifyHttpError(status: number, body: string): ClassifiedError {
+  const normalizedBody = body.replaceAll('_', ' ').replaceAll('-', ' ');
+
   // 401 — bad key
   if (status === 401 || body.includes('invalid api key') || body.includes('unauthorized') || body.includes('authentication')) {
     return { error: 'bad_api_key', detail: MESSAGES.bad_api_key, status: 401 };
@@ -95,12 +97,15 @@ function classifyHttpError(status: number, body: string): ClassifiedError {
     return { error: 'forbidden', detail: MESSAGES.forbidden, status: 403 };
   }
 
-  // 404 — model not found
-  if (status === 404 || body.includes('model not found') || body.includes('does not exist') || body.includes('invalid model')) {
-    // Try to extract model name
-    const modelMatch = body.match(/model[:\s]+([^\s,]+)/i);
-    const modelHint = modelMatch ? `（模型: ${modelMatch[1]}）` : '';
-    return { error: 'invalid_model', detail: MESSAGES.invalid_model + modelHint, status: 404 };
+  // Provider gateways sometimes return model_not_found with 503. Model identity
+  // errors must win over the generic status-based overload bucket.
+  const modelUnavailable = normalizedBody.includes('model not found')
+    || normalizedBody.includes('invalid model')
+    || normalizedBody.includes('unknown model')
+    || normalizedBody.includes('no such model')
+    || (normalizedBody.includes('model') && normalizedBody.includes('does not exist'));
+  if (status === 404 || modelUnavailable) {
+    return { error: 'invalid_model', detail: MESSAGES.invalid_model, status };
   }
 
   // 429 — rate limit
