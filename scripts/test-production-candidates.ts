@@ -123,6 +123,49 @@ async function main() {
   }
   check(legacyContextRejected, '缺少经授权完整上下文的历史轨迹不能进入正向训练候选池');
 
+  await Promise.all([
+    db.conversation.update({
+      where: { id: conversation.id },
+      data: {
+        stageData: JSON.stringify({
+          timeline: {
+            lateEvents: [],
+            releases: [{
+              stage: 2,
+              fromStage: 2,
+              toStage: 3,
+              teacherId: teacher.id,
+              reason: '集成测试中的教师放行理由足够长',
+              occurredAt: new Date().toISOString(),
+            }],
+          },
+        }),
+      },
+    }),
+    db.generationTrace.update({ where: { id: trace.id }, data: { stage: 2 } }),
+  ]);
+  let releasedTraceRejected = false;
+  let unexpectedReleasedCandidateId: string | undefined;
+  try {
+    const unexpected = await nominateProductionCandidate({
+      studentAssignmentId: studentAssignment.id,
+      assistantMessageId,
+      teacherId: teacher.id,
+      triggerType: 'TEACHER_NOMINATION',
+    });
+    unexpectedReleasedCandidateId = unexpected.id;
+  } catch (error) {
+    releasedTraceRejected = error instanceof Error && error.message.includes('教师放行');
+  }
+  if (unexpectedReleasedCandidateId) {
+    await db.productionCandidate.delete({ where: { id: unexpectedReleasedCandidateId } });
+  }
+  await Promise.all([
+    db.conversation.update({ where: { id: conversation.id }, data: { stageData: '{}' } }),
+    db.generationTrace.update({ where: { id: trace.id }, data: { stage: 1 } }),
+  ]);
+  check(releasedTraceRejected, '存在教师放行记录的阶段轨迹不能进入正向候选池');
+
   const teacherSession: SessionUser = { id: teacher.id, username: teacher.username, displayName: teacher.displayName, role: 'teacher' };
 
   const candidate = await nominateProductionCandidate({ studentAssignmentId: studentAssignment.id, assistantMessageId, teacherId: teacher.id, triggerType: 'TEACHER_NOMINATION', triggerNote: '导师泄露身份' });

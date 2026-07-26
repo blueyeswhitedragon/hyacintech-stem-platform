@@ -22,6 +22,7 @@ export function recordLateEvent(
   return {
     ...stageData,
     timeline: {
+      ...stageData.timeline,
       dueAt: due.toISOString(),
       lateEvents: [...previous, {
         event,

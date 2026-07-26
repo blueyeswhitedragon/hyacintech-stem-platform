@@ -4,6 +4,8 @@ import { getCurrentUser } from '@/app/lib/session';
 import { getStudentClasses } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import JoinClassForm from '@/app/components/JoinClassForm';
+import Card, { SectionHeader } from '@/app/components/ui/Card';
+import EmptyState from '@/app/components/ui/EmptyState';
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUser();
@@ -13,39 +15,43 @@ export default async function StudentDashboardPage() {
   const memberships = await getStudentClasses(user.id);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b p-4">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-600">学生主页</h1>
+    <main className="density-roomy min-h-screen bg-canvas">
+      <header className="border-b border-hairline bg-canvas px-4 py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+          <h1 className="display-sm">学生主页</h1>
           <AuthNav />
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <p className="text-gray-600">欢迎，{user.displayName}</p>
-          <Link href="/student/assignments" className="text-blue-600 hover:underline text-sm">
+      <div className="mx-auto max-w-5xl space-y-8 p-4 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-muted">欢迎，{user.displayName}</p>
+          <Link href="/student/assignments" className="text-sm text-coral transition-colors duration-[120ms] hover:text-coral-active">
             查看我的作业 →
           </Link>
         </div>
 
-        <div className="bg-white border rounded-lg p-4">
-          <h2 className="font-medium mb-3">加入新班级</h2>
+        <Card tone="soft">
+          <h2 className="display-sm mb-4">加入新班级</h2>
           <JoinClassForm />
-        </div>
+        </Card>
 
         <section>
-          <h2 className="font-medium mb-3">我加入的班级</h2>
+          <SectionHeader title="我加入的班级" />
           {memberships.length === 0 ? (
-            <p className="text-gray-500">还没有加入任何班级。向老师索取邀请码后在上方加入。</p>
+            <EmptyState
+              art="search"
+              title="还没有加入任何班级"
+              description="班级由老师创建。向老师索取邀请码后，在上方「加入新班级」里填入即可。"
+            />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {memberships.map((m) => (
-                <div key={m.class.id} className="bg-white border rounded-lg p-5">
-                  <div className="font-medium text-gray-900">{m.class.name}</div>
-                  <div className="text-sm text-gray-500 mt-2">教师：{m.class.teacher.displayName}</div>
-                  <div className="text-sm text-gray-400 mt-1">{m.class._count.assignments} 个作业</div>
-                </div>
+                <Card key={m.class.id}>
+                  <div className="font-medium text-ink">{m.class.name}</div>
+                  <div className="mt-2 text-sm text-muted">教师：{m.class.teacher.displayName}</div>
+                  <div className="mt-1 text-sm text-muted-soft">{m.class._count.assignments} 个作业</div>
+                </Card>
               ))}
             </div>
           )}

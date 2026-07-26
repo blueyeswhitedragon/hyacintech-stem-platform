@@ -1,48 +1,61 @@
 "use client";
 
 import React from 'react';
+import PhaseGlyph, { PHASE_GLYPH_LABELS, type PhaseGlyphName } from './icons/PhaseGlyph';
 
-// 阶段名（1–6），与 PhaseIndicator 一致
-const STAGE_NAMES: Record<number, string> = {
-  1: '选题定向',
-  2: '方案设计',
-  3: '过程执行',
-  4: '数据分析',
-  5: '报告成型',
-  6: '结果反思',
-};
+const STAGES = [1, 2, 3, 4, 5, 6] as const;
 
 interface Props {
   currentStage: number;
-  /** 全部完成时所有圆圈变绿勾 */
+  /** 全部完成时整条轨道变绿 */
   completed?: boolean;
 }
 
 export default function StageProgress({ currentStage, completed }: Props) {
+  // 进度轨道按"已完成的段数"填充，而不是按当前阶段的圆心，
+  // 否则停在第 1 阶段就已经有一截彩色，读起来像白送了一段进度。
+  const doneCount = completed ? STAGES.length - 1 : Math.max(currentStage - 1, 0);
+  const fillPercent = (doneCount / (STAGES.length - 1)) * 100;
+
   return (
     <div className="w-full overflow-x-auto pb-1">
-      <div className="relative flex min-w-[34rem] items-center justify-between px-1">
-        <div className={`absolute h-1 left-0 right-0 top-4 -translate-y-1/2 z-0 ${completed ? 'bg-green-300' : 'bg-gray-200'}`} />
-        {Object.entries(STAGE_NAMES).map(([num, name]) => {
-          const stage = parseInt(num, 10);
+      <div className="relative flex min-w-[36rem] items-start justify-between px-1">
+        {/* 轨道：底色 + 已完成填充，两层都收在圆心高度 */}
+        <div aria-hidden="true" className="absolute left-5 right-5 top-5 h-px -translate-y-1/2 bg-hairline" />
+        <div
+          aria-hidden="true"
+          className={`absolute left-5 top-5 h-px -translate-y-1/2 transition-[width] duration-500 ${completed ? 'bg-success' : 'bg-coral'}`}
+          style={{ width: `calc((100% - 2.5rem) * ${fillPercent / 100})` }}
+        />
+
+        {STAGES.map((stage) => {
           const isActive = !completed && currentStage === stage;
-          const isCompleted = completed || currentStage > stage;
+          const isDone = completed || currentStage > stage;
+          const ring = isActive
+            ? 'border-coral bg-canvas'
+            : isDone
+              ? 'border-success bg-canvas'
+              : 'border-hairline bg-canvas';
+
           return (
-            <div key={stage} className="flex flex-col items-center relative z-10">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors duration-500
-                  ${isActive ? 'bg-blue-500 text-white' : isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
-              >
-                {isCompleted ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <div key={stage} className="relative z-10 flex w-16 flex-col items-center">
+              <div className={`flex size-10 items-center justify-center rounded-full border transition-colors duration-300 ${ring}`}>
+                {isDone ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+                    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-4 text-success">
+                    <path d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  stage
+                  // 只有当前阶段播描边动画：六个字形同时生长会变成噪音
+                  <PhaseGlyph
+                    phase={stage as PhaseGlyphName}
+                    animate={isActive}
+                    className={`size-5 ${isActive ? '' : 'opacity-45'}`}
+                  />
                 )}
               </div>
-              <span className={`text-xs mt-1 ${isActive ? 'text-blue-600 font-medium' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
-                {name}
+              <span className={`mt-1.5 text-xs leading-5 ${isActive ? 'font-medium text-ink' : isDone ? 'text-muted' : 'text-muted-soft'}`}>
+                {PHASE_GLYPH_LABELS[stage as PhaseGlyphName]}
               </span>
             </div>
           );

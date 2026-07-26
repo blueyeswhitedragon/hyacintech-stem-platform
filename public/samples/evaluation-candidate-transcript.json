@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "tag": "candidate-bundle:v1",
+  "scope": "full",
+  "summary": {
+    "scenarios": 6,
+    "turns": 6,
+    "parseOk": 6,
+    "cleanTurns": 6,
+    "violationsByRule": {}
+  },
+  "scenarios": [
+    { "id": "sample-p1", "name": "P1 样例", "kind": "fixed-regression", "turns": [{ "id": "sample-p1-t1", "scenarioId": "sample-p1", "scenarioName": "P1 样例", "phase": 1, "turn": 1, "parseOk": true }] },
+    { "id": "sample-p2", "name": "P2 样例", "kind": "fixed-regression", "turns": [{ "id": "sample-p2-t1", "scenarioId": "sample-p2", "scenarioName": "P2 样例", "phase": 2, "turn": 1, "parseOk": true }] },
+    { "id": "sample-p3", "name": "P3 样例", "kind": "fixed-regression", "turns": [{ "id": "sample-p3-t1", "scenarioId": "sample-p3", "scenarioName": "P3 样例", "phase": 3, "turn": 1, "parseOk": true }] },
+    { "id": "sample-p4", "name": "P4 样例", "kind": "fixed-regression", "turns": [{ "id": "sample-p4-t1", "scenarioId": "sample-p4", "scenarioName": "P4 样例", "phase": 4, "turn": 1, "parseOk": true }] },
+    { "id": "sample-p5", "name": "P5 样例", "kind": "fixed-regression", "turns": [{ "id": "sample-p5-t1", "scenarioId": "sample-p5", "scenarioName": "P5 样例", "phase": 5, "turn": 1, "parseOk": true }] },
+    { "id": "sample-p6", "name": "P6 样例", "kind": "fixed-regression", "turns": [{ "id": "sample-p6-t1", "scenarioId": "sample-p6", "scenarioName": "P6 样例", "phase": 6, "turn": 1, "parseOk": true }] }
+  ]
+}

@@ -23,7 +23,7 @@ export default async function CaseGenerationPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-semibold">案例批次</h1>
-        <p className="mt-1 text-sm text-gray-500">从 6 条冒烟验证开始逐级扩产；每一级完成双审并通过质量门禁后，下一层才会解锁。</p>
+        <p className="mt-1 text-sm text-muted">从 6 条冒烟验证开始逐级扩产；每一级完成双审并通过质量门禁后，下一层才会解锁。</p>
       </div>
       <CaseGenerationManager
         cases={cases}

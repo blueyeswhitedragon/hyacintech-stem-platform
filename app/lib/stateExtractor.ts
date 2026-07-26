@@ -3,6 +3,7 @@ import { createLLMProvider } from '@/app/lib/llm/provider';
 import type { LLMRuntimeOverride } from '@/app/lib/llm/types';
 import type { StageData, Stage2ExperimentPlan } from '@/app/models/stageData';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
+import { locateSourceQuoteIn } from '@/app/lib/sourceQuote';
 import {
   STUDENT_FACT_EXTRACTOR_PROMPT_VERSION,
   STUDENT_FACT_EXTRACTOR_VERSION,
@@ -27,6 +28,7 @@ export interface ExtractedFact {
   field: string;
   value: unknown;
   sourceQuote: string;
+  origin?: 'tutor_dialogue' | 'student_form';
 }
 
 export interface RejectedExtractedFact extends ExtractedFact {
@@ -47,6 +49,8 @@ export interface ExtractorCallResult extends ValidatedExtraction {
   modelFamily: string;
   generationParams: Record<string, unknown>;
   deterministicFallbacks: string[];
+  attempts: Array<{ attempt: number; failure: string; finishReason: string | null }>;
+  truncated: boolean;
 }
 
 export function ensureExplicitConfirmationFact(
@@ -109,7 +113,7 @@ function modelFamily(provider: string, model: string): string {
   return `${provider}:${normalized.split(/[-_:]/)[0] || 'unknown'}`;
 }
 
-function parseFacts(raw: string): ExtractedFact[] {
+function parseFacts(raw: string): ExtractedFact[] | null {
   const candidates = [raw.trim()];
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1]?.trim();
   if (fenced) candidates.push(fenced);
@@ -121,7 +125,8 @@ function parseFacts(raw: string): ExtractedFact[] {
           ? parsed
           : parsed && typeof parsed === 'object' && Array.isArray((parsed as { facts?: unknown }).facts)
             ? (parsed as { facts: unknown[] }).facts
-            : [];
+            : null;
+        if (!facts) continue;
         return facts.flatMap((item) => {
           if (!item || typeof item !== 'object') return [];
           const fact = item as Record<string, unknown>;
@@ -134,7 +139,7 @@ function parseFacts(raw: string): ExtractedFact[] {
       }
     }
   }
-  return [];
+  return null;
 }
 
 function valueMatches(value: unknown, type: string): boolean {
@@ -166,7 +171,8 @@ export function validateExtractedFacts(
   const rejected: RejectedExtractedFact[] = [];
   const allowed = ALLOWED_FIELDS[stage] ?? {};
   for (const fact of facts) {
-    const sourceQuote = fact.sourceQuote.trim();
+    // 定位成功时用学生原文里的那一段覆盖模型引文（模型常吞掉 Markdown 强调标记）。
+    const sourceQuote = locateSourceQuoteIn(studentMessages, fact.sourceQuote) ?? fact.sourceQuote.trim();
     let reason = '';
     if (!Object.hasOwn(allowed, fact.field)) reason = 'FIELD_NOT_ALLOWED_FOR_STAGE';
     else if (!sourceQuote || !studentMessages.some((message) => message.includes(sourceQuote))) reason = 'SOURCE_QUOTE_NOT_FOUND_IN_STUDENT_MESSAGES';
@@ -238,6 +244,34 @@ function numericLevels(message: string): { values: string[]; sourceQuote: string
   return null;
 }
 
+function cleanCategoricalLevel(value: string): string {
+  return value
+    .replace(/^(?:我觉得可能是|我觉得|可能是|是)\s*/, '')
+    .replace(/^(?:(?:我想|我要|我们)?(?:比较|对比|相比)|将|把|用|一个是|另一?个是)\s*/, '')
+    .replace(/(?:这)?(?:两种|两组|两类)$/g, '')
+    .trim();
+}
+
+function categoricalLevels(message: string): { values: string[]; sourceQuote: string } | null {
+  const hasComparisonContext = /两种|两组|两类|对比|相比|比较|差异/.test(message);
+  if (!hasComparisonContext) return null;
+  const patterns = [
+    /([^，。；;\n]{1,18}?)\s*(?:和|与|及|、|\/)\s*([^，。；;\n]{1,18}?)(?=(?:这)?(?:两种|两组|两类)|(?:进行)?(?:对比|比较)|的差异|相比|，|。|；|;|$)/,
+    /一个是\s*([^，。；;\n]{1,16}?)\s*(?:，|,|\s)*(?:另)?一个是\s*([^，。；;\n]{1,16}?)(?=，|,|。|；|;|\n|$)/,
+    /([^，。；;\n]{1,12}?形(?:截面)?)\s*[^，。；;\n]{0,18}[，,]\s*([^，。；;\n]{1,12}?形(?:截面)?)\s*[^。；;\n]{0,28}(?:对比|相比|比较|差异)/,
+    /([^，。；;\n]{1,16}?形(?:截面)?)[^，。；;\n]{0,18}[，,]\s*([^，。；;\n]{1,16}?形(?:截面)?)/,
+  ];
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (!match) continue;
+    const values = distinctExperimentLevels([cleanCategoricalLevel(match[1]), cleanCategoricalLevel(match[2])]);
+    if (values.length >= 2 && values.every((value) => value.length <= 20 && !/\d/.test(value))) {
+      return { values, sourceQuote: match[0].trim() };
+    }
+  }
+  return null;
+}
+
 function repeatCount(message: string): { value: number; sourceQuote: string } | null {
   const patterns = [
     /(?:整个实验|实验|每组|每个水平|各组)?[^，。；\n]{0,10}?重复\s*(\d+)\s*(?:次|轮)/,
@@ -263,26 +297,49 @@ function sampleSizePerLevel(message: string): { value: number; sourceQuote: stri
 }
 
 function dependentResult(message: string): { value: string; sourceQuote: string } | null {
-  const explicit = message.match(/((?:豆苗|幼苗|植株|茎|根|叶片|豆)(?:的)?[^，。；\n]{0,8}(?:高度|长度|数量|质量))/)?.[1]
+  const incrementUntilFailure = message.match(
+    /(?:逐个|不断|每次|依次)加\s*(?:\d+(?:\.\d+)?\s*(?:g|克|kg|千克)\s*(?:的)?)?\s*([\p{Script=Han}A-Za-z]{1,10}?)(?=直到)/iu,
+  );
+  if (incrementUntilFailure?.[1]) {
+    return {
+      value: `${incrementUntilFailure[1].replace(/的$/, '')}数量`,
+      sourceQuote: incrementUntilFailure[0].trim(),
+    };
+  }
+  const counted = message.match(/(?:直到[^，。；\n]{1,20}时(?:的)?|[^，。；\n]{0,12}时的|测量|记录|观察|统计)\s*([\p{Script=Han}A-Za-z]{1,10}(?:的)?(?:数量|个数|次数|质量|时间))/u)?.[1];
+  const explicit = counted
+    ?? message.match(/((?:豆苗|幼苗|植株|茎|根|叶片|豆)(?:的)?[^，。；\n]{0,8}(?:高度|长度|数量|质量))/)?.[1]
     ?? message.match(/(?:测量|记录|观察)(?:第\s*\d+\s*天)?[^，。；\n]{0,8}?((?:豆苗|幼苗|植株|茎|根|叶片|豆)?(?:的)?(?:高度|长度|数量|质量|温度|浊度|萌发率|生长量))/)?.[1]
-    ?? message.match(/(?:测量|记录|观察)[^，。；\n]{0,12}?((?:高度|长度|数量|质量|温度|浊度|萌发率|生长量))/)?.[1];
+    ?? message.match(/(?:测量|记录|观察|统计)[^，。；\n]{0,12}?((?:高度|长度|数量|个数|次数|质量|时间|温度|浊度|萌发率|生长量))/)?.[1]
+    ?? message.match(/([\p{Script=Han}A-Za-z]{1,10}(?:的)?(?:数量|个数|次数|质量|时间))/u)?.[1]
+    ?? message.match(/直到[^，。；\n]{1,20}时(?:的|记录)?\s*([^，。；\n]{1,16}?(?:数量|个数|次数|质量|时间))/)?.[1];
   return explicit ? { value: explicit, sourceQuote: explicit } : null;
 }
 
-function independentVariable(message: string): { value: string; sourceQuote: string } | null {
+function independentVariable(
+  message: string,
+  categorical?: { values: string[]; sourceQuote: string } | null,
+): { value: string; sourceQuote: string } | null {
   const explicitPatterns = [
     /(?:我)?只(?:改变|调整|控制)\s*([^，。；\n]{1,24}?)(?=，|。|；|设置|并|$)/,
     /(?:唯一(?:改变|调整|控制)的变量|自变量)(?:是|为|：|:)\s*([^，。；\n]{1,24})/,
+    /(?:改变|换成|采用)\s*([^，。；\n\d]{1,18}?)(?=，|。|；|进行|比较|对比|$)/,
+    /不同的\s*([^，。；\n\d]{1,18}?)(?=，|。|；|进行|比较|对比|$)/,
   ];
   for (const pattern of explicitPatterns) {
     const match = message.match(pattern);
-    const value = match?.[1]?.trim();
+    const value = match?.[1]?.trim().replace(/^不同的\s*/, '');
     if (match && value) return { value, sourceQuote: match[0].trim() };
   }
 
   const contextual = message.match(/((?:每天)?(?:光照时长|光照|温度|浓度|剂量|酸碱度|pH值|水量|盐度|湿度))[^，。；\n]{0,12}?\d/iu);
   const value = contextual?.[1]?.trim();
-  return contextual && value ? { value, sourceQuote: contextual[0].trim() } : null;
+  if (contextual && value) return { value, sourceQuote: contextual[0].trim() };
+
+  if (categorical && /截面/.test(categorical.sourceQuote) && categorical.values.every((level) => /形/.test(level))) {
+    return { value: '截面形状', sourceQuote: categorical.sourceQuote };
+  }
+  return null;
 }
 
 function controlledVariables(message: string): { values: string[]; sourceQuote: string } | null {
@@ -325,8 +382,15 @@ function statedHypothesis(message: string): { value: string; sourceQuote: string
   const match = message.match(/((?:我)?(?:推测|预测|预计|假设|认为)[^。；\n]{2,120})/);
   if (!match) return null;
   const sourceQuote = match[1].trim();
+  if (/(?:环节|完成|确认|通过|系统|平台)|已经.{0,4}(?:好|完|齐)/.test(sourceQuote)) return null;
+  if (!/(?:越|更|比|高于|低于|多|少|大|小|快|慢)/.test(sourceQuote)) return null;
   const value = sourceQuote.replace(/^(?:我)?(?:推测|预测|预计|假设|认为)(?:是|为|：|:)?\s*/, '').trim();
   return value ? { value, sourceQuote } : null;
+}
+
+function validHypothesisSource(sourceQuote: string): boolean {
+  return !/(?:环节|完成|确认|通过|系统|平台)|已经.{0,4}(?:好|完|齐)/.test(sourceQuote)
+    && /(?:越|更|比|高于|低于|多|少|大|小|快|慢)/.test(sourceQuote);
 }
 
 function measurementPhrase(message: string): string {
@@ -353,12 +417,22 @@ export function applyDeterministicExtractionFallbacks(
   }
   if (stage !== 2) return { accepted, fallbacks };
 
-  const levels = numericLevels(currentStudentMessage);
+  accepted = accepted.filter((fact) => fact.field !== 'stage2.hypothesis' || validHypothesisSource(fact.sourceQuote));
+
+  const categorical = categoricalLevels(currentStudentMessage);
+  const levels = numericLevels(currentStudentMessage) ?? categorical;
   if (levels) {
     accepted = accepted.filter((fact) => fact.field !== 'stage2.independentVariable.levels');
-    appendFallback(accepted, 'stage2.independentVariable.levels', levels.values, levels.sourceQuote, 'semantic_numeric_levels', fallbacks);
+    appendFallback(
+      accepted,
+      'stage2.independentVariable.levels',
+      levels.values,
+      levels.sourceQuote,
+      categorical && levels === categorical ? 'categorical_levels' : 'semantic_numeric_levels',
+      fallbacks,
+    );
   }
-  const independent = independentVariable(currentStudentMessage);
+  const independent = independentVariable(currentStudentMessage, categorical);
   if (independent) {
     accepted = accepted.filter((fact) => fact.field !== 'stage2.independentVariable.name');
     appendFallback(accepted, 'stage2.independentVariable.name', independent.value, independent.sourceQuote, 'independent_variable_name', fallbacks);
@@ -444,21 +518,45 @@ export async function callStudentFactExtractor(input: {
     return {
       accepted: [], rejected: [], rawOutput: '{"facts":[]}', prompt: '', promptSha256: '',
       provider: '', model: '', modelFamily: '', generationParams: {}, deterministicFallbacks: [],
+      attempts: [], truncated: false,
     };
   }
   const providerName = input.runtimeModel?.provider ?? process.env.EXTRACTOR_LLM_PROVIDER ?? process.env.LLM_PROVIDER ?? 'deepseek';
   const model = input.runtimeModel?.model ?? process.env.EXTRACTOR_LLM_MODEL ?? process.env.LLM_MODEL ?? (providerName === 'openai' ? 'gpt-4o-mini' : 'deepseek-v4-pro');
   const prompt = buildExtractorPrompt(input.stage);
   const provider = createLLMProvider({ provider: providerName, model, role: 'EVALUATOR' });
-  const completion = await provider.complete([
-    { role: 'system', content: prompt },
-    { role: 'user', content: JSON.stringify({
+  const attempts: ExtractorCallResult['attempts'] = [];
+  const baseMessages = [
+    { role: 'system' as const, content: prompt },
+    { role: 'user' as const, content: JSON.stringify({
       currentStudentMessage: input.studentMessages.at(-1) ?? '',
       expectedFocusId: input.expectedFocusId,
       existingFacts: input.existingFacts ?? {},
     }) },
-  ], { useJsonFormat: true, maxTokens: 1400 });
-  const validated = validateExtractedFacts(input.stage, parseFacts(completion.content), input.studentMessages);
+  ];
+  let completion: Awaited<ReturnType<typeof provider.complete>> | null = null;
+  let parsed: ExtractedFact[] | null = null;
+  let successfulAttempt: number | null = null;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    completion = await provider.complete(
+      attempt === 1
+        ? baseMessages
+        : [...baseMessages, { role: 'system' as const, content: '上一次输出未完成或不是合法 JSON。只输出 JSON，不要解释。' }],
+      { useJsonFormat: true },
+    );
+    parsed = parseFacts(completion.content);
+    if (parsed && completion.finishReason !== 'length') {
+      successfulAttempt = attempt;
+      break;
+    }
+    attempts.push({
+      attempt,
+      failure: completion.finishReason === 'length' ? 'OUTPUT_TRUNCATED' : 'INVALID_EXTRACTOR_JSON',
+      finishReason: completion.finishReason,
+    });
+  }
+  const truncated = completion?.finishReason === 'length';
+  const validated = validateExtractedFacts(input.stage, parsed ?? [], input.studentMessages);
   const deterministic = applyDeterministicExtractionFallbacks(
     input.stage,
     validated.accepted,
@@ -468,20 +566,23 @@ export async function callStudentFactExtractor(input: {
   return {
     ...validated,
     accepted: deterministic.accepted,
-    rawOutput: completion.content,
+    rawOutput: completion?.content ?? '',
     prompt,
     promptSha256: createHash('sha256').update(prompt).digest('hex'),
     provider: providerName,
     model,
     modelFamily: modelFamily(providerName, model),
     generationParams: {
-      ...completion.request,
-      finishReason: completion.finishReason,
-      usage: completion.usage,
+      ...(completion?.request ?? {}),
+      finishReason: completion?.finishReason ?? null,
+      usage: completion?.usage,
+      successfulAttempt,
       expectedFocusId: input.expectedFocusId,
       deterministicFallbacks: deterministic.fallbacks,
     },
     deterministicFallbacks: deterministic.fallbacks,
+    attempts,
+    truncated,
   };
 }
 
@@ -503,14 +604,15 @@ function factMap(
   const explicitRevision = /(?:改成|改为|调整为|换成|重新|修改|更正|不是.{0,12}而是)/.test(context.currentStudentMessage ?? '');
   for (const fact of accepted) {
     const previous = facts[fact.field];
-    if (!previous || explicitRevision) {
-      facts[fact.field] = { value: fact.value, sourceQuote: fact.sourceQuote };
+    if (!previous || explicitRevision || fact.origin === 'student_form') {
+      facts[fact.field] = { value: fact.value, sourceQuote: fact.sourceQuote, origin: fact.origin };
       continue;
     }
     if (MERGEABLE_LIST_FIELDS.has(fact.field) && Array.isArray(previous.value) && Array.isArray(fact.value)) {
       facts[fact.field] = {
         value: [...new Set([...previous.value, ...fact.value].map(String).map((item) => item.trim()).filter(Boolean))],
         sourceQuote: `${previous.sourceQuote}；${fact.sourceQuote}`,
+        origin: previous.origin,
       };
     }
   }

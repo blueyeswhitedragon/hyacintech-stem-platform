@@ -2,12 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Badge from './ui/Badge';
+import Button from './ui/Button';
+import Callout from './ui/Callout';
+import Card from './ui/Card';
+import { Textarea } from './ui/Field';
 
 interface TraceOption {
   assistantMessageId: string;
   stage: number;
   dialogue: string;
   candidateStatus: string | null;
+  nominationBlockedReason: string | null;
 }
 
 export default function CandidateNominationPanel({
@@ -45,34 +51,60 @@ export default function CandidateNominationPanel({
     }
   }
 
+  const nominatable = traces.filter((trace) => !trace.nominationBlockedReason && !trace.candidateStatus).length;
+
   return (
-    <section className="rounded-lg border bg-white p-4">
-      <h2 className="font-medium">提名模型改进候选</h2>
-      <p className="mt-1 text-xs text-gray-500">只能提名已有不可变生成轨迹的导师回复；提名不是直接加入训练。</p>
+    <Card>
+      <h2 className="display-sm">提名模型改进候选</h2>
+      <p className="mt-1.5 text-sm leading-6 text-muted">
+        只能提名已有不可变生成轨迹的导师回复；提名不是直接加入训练，需管理员审核脱敏快照后才进入候选池。
+      </p>
+      <p className="mt-1 text-sm text-muted">
+        本作业可提名回合：<span className="tabular-nums text-body">{nominatable}</span>
+      </p>
       {consentStatus !== 'GRANTED' ? (
-        <p className="mt-3 rounded bg-amber-50 p-2 text-sm text-amber-800">学生未授权或已经撤回，当前不能提名。</p>
+        <div className="mt-3">
+          <Callout tone="warning">学生未授权或已经撤回，当前不能提名。</Callout>
+        </div>
       ) : (
         <>
-          <textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="问题说明（可选，例如：导师替学生下结论）" className="mt-3 min-h-16 w-full rounded border p-2 text-sm" />
-          <div className="mt-3 space-y-2">
+          <div className="mt-4">
+            <Textarea
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="问题说明（可选，例如：导师替学生下结论）"
+              rows={2}
+            />
+          </div>
+          {/* 轨迹列表是逐条扫读的候选池，用紧凑密度，一屏能多看几条。 */}
+          <div className="density-compact mt-3 space-y-2">
             {traces.map((trace) => (
-              <div key={trace.assistantMessageId} className="rounded border p-3 text-sm">
-                <div className="mb-1 text-xs text-gray-500">阶段 {trace.stage}</div>
-                <p className="line-clamp-3 whitespace-pre-wrap">{trace.dialogue}</p>
+              <div key={trace.assistantMessageId} className="rounded-md border border-hairline bg-surface-soft p-3 text-sm">
+                <div className="caption-upper mb-1.5">阶段 {trace.stage}</div>
+                <p className="line-clamp-3 whitespace-pre-wrap leading-6 text-body">{trace.dialogue}</p>
                 <div className="mt-2">
                   {trace.candidateStatus ? (
-                    <span className="text-xs text-blue-700">候选状态：{trace.candidateStatus}</span>
+                    <Badge tone="info">候选状态：{trace.candidateStatus}</Badge>
+                  ) : trace.nominationBlockedReason ? (
+                    <span className="text-xs leading-5 text-muted">{trace.nominationBlockedReason}</span>
                   ) : (
-                    <button disabled={pendingId !== null} onClick={() => nominate(trace.assistantMessageId)} className="rounded bg-blue-600 px-3 py-1.5 text-xs text-white">{pendingId === trace.assistantMessageId ? '处理中…' : '提名这一条'}</button>
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      disabled={pendingId !== null}
+                      onClick={() => nominate(trace.assistantMessageId)}
+                    >
+                      {pendingId === trace.assistantMessageId ? '处理中…' : '提名这一条'}
+                    </Button>
                   )}
                 </div>
               </div>
             ))}
-            {traces.length === 0 && <p className="text-sm text-gray-500">暂无可追踪的导师回复。</p>}
+            {traces.length === 0 && <p className="text-sm text-muted">暂无可追踪的导师回复。</p>}
           </div>
         </>
       )}
-      {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
-    </section>
+      {message && <p className="mt-3 text-sm text-muted">{message}</p>}
+    </Card>
   );
 }

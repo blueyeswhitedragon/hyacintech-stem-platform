@@ -51,6 +51,7 @@ import {
   isTrainableBatchStatus,
   resolveImportedBatchStatus,
 } from './datasetPolicy';
+import { validateEvaluationArtifacts, type ImportedEvaluationArtifact } from './evaluationArtifacts';
 
 const DATA_LAB_ROLES: UserRole[] = ['annotator', 'reviewer', 'admin'];
 const REVIEW_ROLES: UserRole[] = ['reviewer', 'admin'];
@@ -1652,16 +1653,6 @@ export async function updateTrainingRunStatus(input: {
   return updated;
 }
 
-interface ImportedArtifact {
-  schemaVersion?: number;
-  tag?: string;
-  scope?: string;
-  tags?: { A?: string; B?: string };
-  summary?: unknown;
-  styleFamily?: string;
-  stylePolicyVersion?: string;
-}
-
 export async function importEvaluation(input: {
   name: string;
   files: Array<{ fileName: string; raw: string }>;
@@ -1671,7 +1662,7 @@ export async function importEvaluation(input: {
   user: SessionUser;
 }) {
   if (input.files.length === 0) throw new Error('至少导入一个 transcript 或 verdict 文件');
-  const parsed = input.files.map((file) => ({ ...file, json: JSON.parse(file.raw) as ImportedArtifact }));
+  const parsed = input.files.map((file) => ({ ...file, json: JSON.parse(file.raw) as ImportedEvaluationArtifact }));
   for (const file of parsed) {
     if (typeof file.json.schemaVersion !== 'number') throw new Error(`${file.fileName} 缺少 schemaVersion`);
     if (file.json.styleFamily && !isStyleFamily(file.json.styleFamily)) throw new Error(`${file.fileName} 包含未知目标风格`);
@@ -1705,18 +1696,13 @@ export async function importEvaluation(input: {
   ]);
   if (!verdict || transcripts.length < 2) throw new Error('评测导入必须同时包含完整 verdict 和两个模型 transcript');
   if (!modelAVersion || !modelBVersion) throw new Error('评测产物中的 A/B 模型身份必须能解析到 ModelVersion');
-  const collectScenarioIds = (value: unknown, ids = new Set<string>()): Set<string> => {
-    if (Array.isArray(value)) for (const item of value) collectScenarioIds(item, ids);
-    else if (value && typeof value === 'object') for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
-      if (key === 'scenarioId' && typeof child === 'string' && child.trim()) ids.add(child);
-      collectScenarioIds(child, ids);
-    }
-    return ids;
-  };
-  const scenarioIds = [...new Set(transcripts.flatMap((file) => [...collectScenarioIds(file.json)]))];
-  if (scenarioIds.length === 0) throw new Error('transcript 缺少可核验 scenarioId');
   const rawSummary = verdict.json.summary && typeof verdict.json.summary === 'object' ? verdict.json.summary as Record<string, unknown> : {};
-  const summary = { ...rawSummary, artifactValidation: { complete: true, invalidArtifacts: 0, scenarioIdsComplete: true, modelIdentitiesVerified: true, scenarioCount: scenarioIds.length } };
+  const artifactValidation = validateEvaluationArtifacts({
+    verdict: verdict.json,
+    transcripts: transcripts.map((file) => file.json),
+    ...(runtimeBundleA && runtimeBundleB ? { expectedTags: { A: modelATag, B: modelBTag } } : {}),
+  });
+  const summary = { ...rawSummary, artifactValidation };
   const scope = verdict?.json.scope ?? transcripts[0]?.json.scope ?? 'unknown';
   const run = await db.$transaction(async (tx) => {
     const data = {
@@ -1749,7 +1735,7 @@ export async function importEvaluation(input: {
   await audit(input.user.id, 'EVALUATION_IMPORTED', 'EvaluationRun', run.id, { files: input.files.map((file) => file.fileName) });
   if (runtimeBundleB) await refreshRuntimeBundleDeploymentGate(runtimeBundleB.id);
   else if (modelBVersion) await refreshModelDeploymentGate(modelBVersion.id);
-  return run;
+  return { ...run, importDiagnostics: artifactValidation.diagnostics };
 }
 
 export async function listEvaluations() {

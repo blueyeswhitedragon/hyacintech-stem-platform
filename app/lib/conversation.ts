@@ -93,6 +93,12 @@ export async function ensureStudentConversation(
       select: { messages: true, stageData: true, safetyQuizCompleted: true, resolvedStyleFamily: true, stylePolicyVersion: true, contractVersion: true },
     });
     const recovered = recoverStageDataV3(parseStageData(conv?.stageData ?? '{}'));
+    if (recovered.recovered) {
+      await db.conversation.update({
+        where: { id: existing.conversationId },
+        data: { stageData: JSON.stringify(recovered.stageData) },
+      });
+    }
     return {
       ok: true,
       conversationId: existing.conversationId,

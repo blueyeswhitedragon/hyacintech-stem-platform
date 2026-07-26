@@ -3,6 +3,7 @@
 import React from 'react';
 import type { Stage5Data, Stage2Column } from '@/app/models/stageData';
 import { limitationsDiscussion } from '@/app/lib/reportFields';
+import DataChart from './DataChart';
 import ReadonlyDataTable from './ReadonlyDataTable';
 
 interface Props {
@@ -40,18 +41,26 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
       {/* AI 预填的报告各节 */}
       {AI_FIELDS.map(({ key, label }) => (
         <div key={key}>
-          <div className="text-sm font-medium text-gray-600 mb-1">{label}</div>
-          <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-            {sections[key] || <span className="text-gray-400">（AI 未预填）</span>}
+          <div className="caption-upper mb-1.5">{label}</div>
+          <div className="whitespace-pre-wrap rounded-md border border-hairline bg-surface-soft p-3 text-sm leading-6 text-body">
+            {sections[key] || <span className="text-muted-soft">（AI 未预填）</span>}
           </div>
         </div>
       ))}
 
-      {/* 嵌入的实验数据表 */}
+      {/* 嵌入的实验数据表，紧跟第 4 阶段同一套图表——报告要能自证结论，不必回上一阶段看图 */}
       {hasTable && (
         <div>
-          <div className="text-sm font-medium text-gray-600 mb-1">📊 实验数据记录</div>
+          <div className="caption-upper mb-1.5">实验数据记录</div>
           <ReadonlyDataTable columns={schemaColumns!} rows={dataRows!} />
+          <div className="mt-4 rounded-md border border-hairline bg-surface-soft p-3">
+            <DataChart
+              columns={schemaColumns!}
+              rows={dataRows!}
+              title="数据图表（与第 4 阶段一致）"
+              height={260}
+            />
+          </div>
         </div>
       )}
 
@@ -59,15 +68,16 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
       {showStudentFields && (
         <>
           <div>
-            <div className="text-sm font-medium text-blue-700 mb-1">结论</div>
-            <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-              {sections.conclusion || <span className="text-gray-400">（未填写）</span>}
+            {/* 学生自己写的部分用珊瑚小标题区分于平台预填 */}
+            <div className="caption-upper mb-1.5 text-coral">结论</div>
+            <div className="whitespace-pre-wrap rounded-md border border-hairline bg-surface-soft p-3 text-sm leading-6 text-body">
+              {sections.conclusion || <span className="text-muted-soft">（未填写）</span>}
             </div>
           </div>
           <div>
-            <div className="text-sm font-medium text-blue-700 mb-1">局限与讨论</div>
-            <div className="text-sm text-gray-800 whitespace-pre-wrap bg-gray-50 border rounded p-2">
-              {limitationsDiscussion(sections) || <span className="text-gray-400">（未填写）</span>}
+            <div className="caption-upper mb-1.5 text-coral">局限与讨论</div>
+            <div className="whitespace-pre-wrap rounded-md border border-hairline bg-surface-soft p-3 text-sm leading-6 text-body">
+              {limitationsDiscussion(sections) || <span className="text-muted-soft">（未填写）</span>}
             </div>
           </div>
         </>
@@ -76,12 +86,12 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
       {/* 上传原文作为附件留存；章节只有在学生确认预览后才写入权威字段。 */}
       {(stage5?.uploadedText || stage5?.uploadedDocUrl) && (
         <details>
-          <summary className="cursor-pointer text-sm font-medium text-gray-600 mb-1">
-            📎 学生上传的报告
+          <summary className="mb-1 cursor-pointer text-sm font-medium text-muted">
+            学生上传的报告（附件）
             {stage5?.uploadedDocUrl && (
               <a
                 href={stage5.uploadedDocUrl}
-                className="ml-2 text-blue-600 underline font-normal"
+                className="ml-2 font-normal text-coral hover:text-coral-active"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -90,7 +100,7 @@ export default function ReportDocument({ stage5, schemaColumns, dataRows, showSt
             )}
           </summary>
           {stage5?.uploadedText && (
-            <div className="text-sm text-gray-800 whitespace-pre-wrap bg-amber-50 border border-amber-200 rounded p-2 max-h-64 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md border border-hairline bg-surface-card p-3 text-sm leading-6 text-body">
               {stage5.uploadedText}
             </div>
           )}

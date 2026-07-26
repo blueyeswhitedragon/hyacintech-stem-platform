@@ -6,6 +6,8 @@ import { db } from '@/app/lib/db';
 import AuthNav from '@/app/components/AuthNav';
 import ConversationWorkspace from '@/app/components/ConversationWorkspace';
 import DataConsentCard from '@/app/components/DataConsentCard';
+import { advanceHint } from '@/app/lib/advanceHint';
+import { deterministicSafetyQuiz } from '@/app/lib/serverTutorState';
 
 export default async function StudentConversationPage(
   ctx: PageProps<'/student/assignments/[id]'>
@@ -35,16 +37,19 @@ export default async function StudentConversationPage(
       },
     },
   });
+  const fallbackSafetyQuiz = result.currentStage === 3 && !result.safetyQuizCompleted
+    ? result.stageData.stage3?.safetyQuiz ?? deterministicSafetyQuiz(result.stageData)
+    : null;
 
   return (
-    <main className="min-h-screen flex flex-col bg-gray-50">
-      <header className="bg-white border-b p-4 flex-shrink-0">
+    <main className="density-roomy flex min-h-screen flex-col bg-canvas">
+      <header className="flex-shrink-0 border-b border-hairline bg-canvas px-4 py-4">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/student/assignments" className="shrink-0 text-sm text-blue-600 hover:underline">
+            <Link href="/student/assignments" className="shrink-0 text-sm text-muted transition-colors duration-[120ms] hover:text-coral">
               ← 我的作业
             </Link>
-            <h1 className="min-w-0 text-lg font-bold text-blue-600">{assignment?.title ?? '科学探究'}</h1>
+            <h1 className="display-sm min-w-0 truncate">{assignment?.title ?? '科学探究'}</h1>
           </div>
           <div className="self-end sm:self-auto">
             <AuthNav />
@@ -67,6 +72,14 @@ export default async function StudentConversationPage(
             initialStageData={result.stageData}
             initialStatus={result.status}
             initialSafetyQuizCompleted={result.safetyQuizCompleted}
+            initialAdvanceHint={advanceHint({
+              currentStage: result.currentStage,
+              stageData: result.stageData,
+              safetyQuizCompleted: result.safetyQuizCompleted,
+            })}
+            initialSafetyQuiz={fallbackSafetyQuiz
+              ? { question: fallbackSafetyQuiz.question, options: fallbackSafetyQuiz.options }
+              : null}
             initialDueDate={assignment?.dueDate?.toISOString() ?? null}
           />
         </div>

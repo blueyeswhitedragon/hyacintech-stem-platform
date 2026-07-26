@@ -1,6 +1,7 @@
 'use client';
 
 import { TUTOR_FOCUS_LABELS, TUTOR_INTERACTION_META } from '@/app/lib/dataLab/labels';
+import { Input, Select } from '@/app/components/ui/Field';
 
 type InteractionType = keyof typeof TUTOR_INTERACTION_META;
 const INTERACTION_TYPES = Object.keys(TUTOR_INTERACTION_META) as InteractionType[];
@@ -62,14 +63,14 @@ export default function TutorLanguageEditor({
 
   if (!value) {
     return (
-      <div className="rounded-lg border border-amber-300 bg-amber-50 p-3">
-        <div className="font-medium text-amber-950">{title} · 原始 JSON 模式</div>
-        <p className="mt-1 text-xs text-amber-900">无法提取结构化字段：{parsed.error}。已回退到原始内容，不会静默修复。</p>
+      <div className="rounded-lg border border-warning/40 bg-warning/8 p-3">
+        <div className="font-medium text-[#8a6a0f]">{title} · 原始 JSON 模式</div>
+        <p className="mt-1 text-xs text-[#8a6a0f]">无法提取结构化字段：{parsed.error}。已回退到原始内容，不会静默修复。</p>
         <textarea
           value={raw}
           onChange={(event) => onChange?.(event.target.value)}
           readOnly={!editable}
-          className={`${compact ? 'min-h-28' : 'min-h-52'} mt-3 w-full border bg-white p-3 font-mono text-xs read-only:bg-gray-50`}
+          className={`${compact ? 'min-h-28' : 'min-h-52'} mt-3 w-full border border-hairline bg-canvas p-3 font-mono text-xs read-only:bg-surface-soft`}
         />
       </div>
     );
@@ -78,69 +79,53 @@ export default function TutorLanguageEditor({
   const interaction = TUTOR_INTERACTION_META[value.interactionType];
   const focusHelp = focusDescriptions?.[value.focus] ?? '处理当前案例允许的一个教学缺口。';
   return (
-    <div className="rounded-lg border bg-white p-3">
+    <div className="rounded-lg border border-hairline bg-canvas p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="font-medium text-gray-950">{title}</div>
-        <details className="text-xs text-gray-500">
+        <div className="font-medium text-ink">{title}</div>
+        <details className="text-xs text-muted">
           <summary className="cursor-pointer select-none">查看原始 JSON</summary>
-          <pre className="mt-2 max-w-2xl overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{serialize(value)}</pre>
+          <pre className="mt-2 max-w-2xl overflow-auto whitespace-pre-wrap rounded-md bg-surface-dark p-3 text-on-dark">{serialize(value)}</pre>
         </details>
       </div>
 
-      <label className="mt-3 block text-sm font-medium text-gray-800">
+      <label className="mt-3 block text-sm font-medium text-body-strong">
         对学生说的话
         <textarea
           value={value.dialogue}
           onChange={(event) => patch({ dialogue: event.target.value })}
           readOnly={!editable}
-          className={`${compact ? 'min-h-24' : 'min-h-36'} mt-1 w-full border p-3 font-normal leading-6 read-only:bg-gray-50`}
+          className={`${compact ? 'min-h-24' : 'min-h-36'} mt-1 w-full border border-hairline p-3 font-normal leading-6 read-only:bg-surface-soft`}
         />
-        <span className="mt-1 block text-right text-[11px] font-normal text-gray-400">{value.dialogue.length} 字 · {(value.dialogue.match(/[？?]/g) ?? []).length} 个问号</span>
+        <span className="mt-1 block text-right text-[11px] font-normal text-muted-soft">{value.dialogue.length} 字 · {(value.dialogue.match(/[？?]/g) ?? []).length} 个问号</span>
       </label>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        <label className="text-sm font-medium text-gray-800">
+        <label className="text-sm font-medium text-body-strong">
           互动方式
-          <select
-            value={value.interactionType}
-            onChange={(event) => patch({ interactionType: event.target.value as InteractionType })}
-            disabled={!editable}
-            className="mt-1 block w-full border bg-white px-3 py-2 font-normal disabled:bg-gray-100"
-          >
+          <Select value={value.interactionType} onChange={(event) => patch({ interactionType: event.target.value as InteractionType })} disabled={!editable} className="mt-1">
             {INTERACTION_TYPES.map((item) => <option key={item} value={item}>{TUTOR_INTERACTION_META[item].label}</option>)}
-          </select>
-          <details className="mt-1 text-xs font-normal text-gray-500">
+          </Select>
+          <details className="mt-1 text-xs font-normal text-muted">
             <summary className="cursor-pointer">ⓘ {interaction.label}是什么意思？</summary>
-            <p className="mt-1 rounded bg-blue-50 p-2 text-blue-900">{interaction.help}</p>
+            <p className="mt-1 rounded-md bg-info/8 p-2 text-body-strong">{interaction.help}</p>
           </details>
         </label>
 
-        <label className="text-sm font-medium text-gray-800">
+        <label className="text-sm font-medium text-body-strong">
           教学焦点
-          <select
-            value={value.focus}
-            onChange={(event) => patch({ focus: event.target.value })}
-            disabled={!editable}
-            className="mt-1 block w-full border bg-white px-3 py-2 font-normal disabled:bg-gray-100"
-          >
+          <Select value={value.focus} onChange={(event) => patch({ focus: event.target.value })} disabled={!editable} className="mt-1">
             {(allowedFocusIds.length ? allowedFocusIds : [value.focus]).map((focus) => <option key={focus} value={focus}>{TUTOR_FOCUS_LABELS[focus] ?? '其他教学焦点'}</option>)}
-          </select>
-          <details className="mt-1 text-xs font-normal text-gray-500">
+          </Select>
+          <details className="mt-1 text-xs font-normal text-muted">
             <summary className="cursor-pointer">ⓘ {TUTOR_FOCUS_LABELS[value.focus] ?? '其他教学焦点'}是什么意思？</summary>
-            <p className="mt-1 rounded bg-blue-50 p-2 text-blue-900">{focusHelp}</p>
+            <p className="mt-1 rounded-md bg-info/8 p-2 text-body-strong">{focusHelp}</p>
           </details>
         </label>
       </div>
 
-      <label className="mt-3 block text-sm font-medium text-gray-800">
+      <label className="mt-3 block text-sm font-medium text-body-strong">
         补充提示（可选，最多一条）
-        <input
-          value={value.hints[0] ?? ''}
-          onChange={(event) => patch({ hints: event.target.value.trim() ? [event.target.value] : [] })}
-          readOnly={!editable}
-          placeholder="没有必要时留空"
-          className="mt-1 block w-full border px-3 py-2 font-normal read-only:bg-gray-50"
-        />
+        <Input value={value.hints[0] ?? ''} onChange={(event) => patch({ hints: event.target.value.trim() ? [event.target.value] : [] })} readOnly={!editable} placeholder="没有必要时留空" className="mt-1" />
       </label>
     </div>
   );

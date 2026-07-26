@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import TutorLanguageEditor from '@/app/components/dataLab/TutorLanguageEditor';
+import { ConfirmDialog } from '@/app/components/dataLab/Dialog';
 import {
   REVIEW_DECISION_LABELS,
   REVIEW_POLICY_LABELS,
@@ -25,6 +26,8 @@ import {
   type TutorWarningFinalRelation,
   type TutorWarningSeverity,
 } from '@/app/lib/dataLab/bootstrap/warningClosure';
+import { buttonClass } from '@/app/components/ui/Button';
+import { Input, Select, Textarea } from '@/app/components/ui/Field';
 
 type ReviewType = 'EDIT' | 'CONFIRM';
 type ConfirmDecision = 'CONFIRM' | 'RETURN_TUTOR' | 'RETURN_CASE' | 'REJECT';
@@ -108,6 +111,17 @@ interface ReviewPayload {
     returnReason?: string;
     reviewerProposedOutput?: unknown;
   };
+  reviewDraft: {
+    decision: string;
+    selectedCandidateId?: string | null;
+    preferenceRejectedCandidateId?: string | null;
+    draft: { finalOutputRaw?: string; finalOutput?: unknown };
+    reason: string;
+    preferenceReason: string;
+    submissionMode: SubmissionMode;
+    warningClosures: Record<string, WarningClosureDraft>;
+    caseIssue: { categories?: CaseIssueCategory[]; suggestedStudentMessage?: string };
+  };
   warnings: WarningView[];
 }
 
@@ -171,7 +185,7 @@ function closureComplete(relation: TutorWarningFinalRelation | undefined, closur
     || Boolean(closure.finalSeverity);
 }
 
-export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
+export default function TutorReviewWorkbench({ type, confirmationConflictCount = 0 }: { type: ReviewType; confirmationConflictCount?: number }) {
   const [payload, setPayload] = useState<ReviewPayload | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -182,12 +196,14 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
   const [reason, setReason] = useState('');
   const [preferenceReason, setPreferenceReason] = useState('');
   const [submissionMode, setSubmissionMode] = useState<SubmissionMode>('HUMAN');
+  const [confirmingRiskySubmit, setConfirmingRiskySubmit] = useState(false);
   const [closures, setClosures] = useState<Record<string, WarningClosureDraft>>({});
   const [caseIssueCategories, setCaseIssueCategories] = useState<CaseIssueCategory[]>([]);
   const [suggestedStudentMessage, setSuggestedStudentMessage] = useState('');
   const [liveRelations, setLiveRelations] = useState<Record<string, TutorWarningFinalRelation>>({});
   const [finalPreviewError, setFinalPreviewError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [draftSaveStatus, setDraftSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   const allowedFocusIds = payload?.case.visibleFacts.allowedFocusIds ?? [];
   const focusDescriptions = payload?.case.visibleFacts.focusDescriptions;
@@ -205,24 +221,28 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
       if (!response.ok) throw new Error(data.error ?? '领取失败');
       if (!data.payload) {
         setPayload(null);
-        setMessage('当前没有可领取任务');
+        setMessage(type === 'CONFIRM' && confirmationConflictCount > 0
+          ? '当前没有你可以定稿的任务（原因见上方提示）'
+          : '当前没有可领取任务');
         return;
       }
       const claimed = data.payload as ReviewPayload;
       const firstCandidate = claimed.candidates[0];
+      const saved = claimed.reviewDraft;
       setPayload(claimed);
-      setDecision(type === 'EDIT' ? claimed.firstReview?.decision || 'SELECT_A' : 'CONFIRM');
-      setSelectedId(claimed.firstReview?.selectedCandidateId ?? firstCandidate?.id ?? '');
-      setFinalOutput(claimed.firstReview?.draft.finalOutput ? draftOutput(claimed.firstReview.draft.finalOutput) : candidateOutput(firstCandidate));
-      setClosures(Object.fromEntries(claimed.warnings.map((warning) => [warning.id, { ...EMPTY_CLOSURE }])));
-      setReason('');
-      setRejectedId('');
-      setPreferenceReason('');
-      setSubmissionMode(claimed.firstReview?.submissionMode ?? 'HUMAN');
-      setCaseIssueCategories([]);
-      setSuggestedStudentMessage(claimed.case.studentMessage);
+      setDecision(saved.decision || (type === 'EDIT' ? claimed.firstReview?.decision || 'SELECT_A' : 'CONFIRM'));
+      setSelectedId(saved.selectedCandidateId ?? claimed.firstReview?.selectedCandidateId ?? firstCandidate?.id ?? '');
+      setFinalOutput(saved.draft.finalOutputRaw ?? (saved.draft.finalOutput ? draftOutput(saved.draft.finalOutput) : claimed.firstReview?.draft.finalOutput ? draftOutput(claimed.firstReview.draft.finalOutput) : candidateOutput(firstCandidate)));
+      setClosures(Object.fromEntries(claimed.warnings.map((warning) => [warning.id, { ...EMPTY_CLOSURE, ...(saved.warningClosures[warning.id] ?? {}) }])));
+      setReason(saved.reason ?? '');
+      setRejectedId(saved.preferenceRejectedCandidateId ?? '');
+      setPreferenceReason(saved.preferenceReason ?? '');
+      setSubmissionMode(saved.submissionMode ?? claimed.firstReview?.submissionMode ?? 'HUMAN');
+      setCaseIssueCategories(saved.caseIssue.categories ?? []);
+      setSuggestedStudentMessage(saved.caseIssue.suggestedStudentMessage ?? claimed.case.studentMessage);
       setLiveRelations(Object.fromEntries(claimed.warnings.filter((warning) => warning.computedFinalRelation).map((warning) => [warning.id, warning.computedFinalRelation!])))
       setFinalPreviewError(null);
+      setDraftSaveStatus('idle');
       setNow(Date.now());
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
@@ -276,6 +296,41 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
     }, 350);
     return () => { window.clearTimeout(timer); controller.abort(); };
   }, [type, payload, finalOutput]);
+
+  useEffect(() => {
+    if (!payload || pending || new Date(payload.task.leaseExpiresAt).getTime() <= Date.now()) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setDraftSaveStatus('saving');
+      try {
+        const response = await fetch(`/api/data-lab/tutor-reviews/${payload.task.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type,
+            decision,
+            selectedCandidateId: selectedId || undefined,
+            finalOutput,
+            reason,
+            preferenceRejectedCandidateId: rejectedId || undefined,
+            preferenceReason,
+            submissionMode,
+            warningClosures: closures,
+            caseIssue: { categories: caseIssueCategories, suggestedStudentMessage },
+          }),
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error ?? '草稿保存失败');
+        }
+        setDraftSaveStatus('saved');
+      } catch {
+        if (!controller.signal.aborted) setDraftSaveStatus('error');
+      }
+    }, 900);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [payload, pending, type, decision, selectedId, finalOutput, reason, rejectedId, preferenceReason, submissionMode, closures, caseIssueCategories, suggestedStudentMessage]);
 
   function choose(candidate: CandidateView) {
     setSelectedId(candidate.id);
@@ -332,7 +387,6 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
       if (!response.ok) throw new Error(data.error ?? '提交失败');
       setMessage(`提交完成：${dataLabStatusLabel(data.status)}`);
       setPayload(null);
-      window.location.href = window.location.pathname;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -340,26 +394,27 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
     }
   }
 
-  const guide = <ol className="grid gap-2 border-y bg-white p-3 text-sm sm:grid-cols-4">
+  const guide = <ol className="grid gap-2 border-y bg-canvas p-3 text-sm sm:grid-cols-4">
     {(type === 'EDIT'
       ? ['领取一条任务', '比较候选并形成草稿', '记录选择或修改理由', '提交给定稿人']
       : ['领取一条任务', '核对案例与导师回复', '逐条处理自动信号', '通过定稿或分类退回']
-    ).map((step, index) => <li key={step} className="flex items-center gap-2"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-gray-950 text-xs text-white">{index + 1}</span><span>{step}</span></li>)}
+    ).map((step, index) => <li key={step} className="flex items-center gap-2"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-on-dark">{index + 1}</span><span>{step}</span></li>)}
   </ol>;
 
   if (!payload) {
     return (
       <div className="space-y-4">
         {guide}
-        <div className="rounded-xl border bg-white p-6">
+        <div className="rounded-lg border border-hairline bg-canvas p-6">
           <h2 className="font-semibold">{type === 'EDIT' ? '导师草稿初审队列' : '正式定稿队列'}</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted">
             {type === 'EDIT'
               ? '领取后比较两个匿名候选，形成一份可定稿的导师回复，并写清判断依据。'
               : '领取后独立核对学生案例、导师回复和自动检测信号，再决定定稿或退回。'}
           </p>
-          <button type="button" disabled={pending} onClick={claim} className="mt-4 bg-gray-950 px-4 py-2 text-sm text-white disabled:opacity-40">领取下一条</button>
-          {message && <p className="mt-3 rounded bg-gray-50 p-3 text-sm text-gray-700">{message} 若队列为空，请稍后刷新；管理员可在概览查看上游案例是否已生成或完成前一审。</p>}
+          {type === 'CONFIRM' && confirmationConflictCount > 0 && <div className="mt-4 border border-warning/40 bg-warning/8 p-3 text-sm text-body-strong"><b>有 {confirmationConflictCount} 条任务你无法定稿：</b>它们的初审是你本人提交的，同一个人不能既初审又定稿，否则该条数据会失去训练资格。请让另一个账号定稿，或在创建批次时把初审执行方式改为「单人/双人小组（AI 初审）」。</div>}
+          <button type="button" disabled={pending} onClick={claim} className={buttonClass('primary', 'md', 'mt-4')}>领取下一条</button>
+          {message && <p className="mt-3 rounded-md bg-surface-soft p-3 text-sm text-body">{message}{!(type === 'CONFIRM' && confirmationConflictCount > 0) && ' 若队列为空，请稍后刷新；管理员可在概览查看上游案例是否已生成或完成前一审。'}</p>}
         </div>
       </div>
     );
@@ -410,20 +465,20 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
         const isDraftSource = payload.firstReview?.selectedCandidateId === candidate.id;
         const isSelected = type === 'EDIT' && selectedId === candidate.id;
         return (
-          <article key={candidate.id} className={`rounded-xl border bg-white p-4 ${isSelected || isDraftSource ? 'border-blue-500 ring-1 ring-blue-200' : ''}`}>
+          <article key={candidate.id} className={`rounded-lg border border-hairline bg-canvas p-4 ${isSelected || isDraftSource ? 'border-coral/55 ring-1 ring-coral/25' : ''}`}>
             <div className="flex flex-wrap justify-between gap-2">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold">候选 {candidate.slot}</h3>
-                {isDraftSource && <span className="rounded bg-blue-100 px-2 py-0.5 text-[11px] text-blue-800">建议稿来源</span>}
+                {isDraftSource && <span className="rounded-md bg-info/10 px-2 py-0.5 text-[11px] text-body-strong">建议稿来源</span>}
               </div>
-              {type === 'EDIT' && <span className="text-xs text-gray-500">{candidate.modelFamily} · {candidate.externalModelId}</span>}
+              {type === 'EDIT' && <span className="text-xs text-muted">{candidate.modelFamily} · {candidate.externalModelId}</span>}
             </div>
             <div className="mt-3">
               <TutorLanguageEditor raw={candidate.normalizedOutput} allowedFocusIds={allowedFocusIds} focusDescriptions={focusDescriptions} editable={false} compact title={`候选 ${candidate.slot}`} />
             </div>
             <details className="mt-3 text-xs"><summary className="cursor-pointer">确定性检查</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap">{pretty(candidate.deterministicCheck)}</pre></details>
             <details className="mt-2 text-xs"><summary className="cursor-pointer">交叉检查</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap">{pretty(candidate.critique)}</pre></details>
-            {type === 'EDIT' && <button type="button" disabled={leaseExpired} onClick={() => choose(candidate)} className="mt-3 border px-3 py-1.5 text-xs disabled:opacity-40">选择 {candidate.slot} 作为草稿</button>}
+            {type === 'EDIT' && <button type="button" disabled={leaseExpired} onClick={() => choose(candidate)} className={buttonClass('secondary', 'sm', 'mt-3')}>选择 {candidate.slot} 作为草稿</button>}
           </article>
         );
       })}
@@ -433,119 +488,119 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
   return (
     <div className="space-y-4">
       {guide}
-      {payload.firstReview?.returnReason && type === 'EDIT' && <section className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+      {payload.firstReview?.returnReason && type === 'EDIT' && <section className="rounded-lg border border-warning/40 bg-warning/8 p-4 text-sm text-body-strong">
         <h2 className="font-semibold">这条导师回复被退回修改</h2>
         <p className="mt-2 whitespace-pre-wrap leading-6">{payload.firstReview.returnReason}</p>
         {Boolean(payload.firstReview.reviewerProposedOutput) && <details className="mt-3"><summary className="cursor-pointer font-medium">查看定稿人的建议稿</summary><div className="mt-2"><TutorLanguageEditor raw={draftOutput(payload.firstReview.reviewerProposedOutput)} allowedFocusIds={allowedFocusIds} focusDescriptions={focusDescriptions} editable={false} compact title="定稿人建议稿" /></div></details>}
         <p className="mt-2 text-xs">下方已恢复你上次提交的草稿，可在此基础上继续修改。</p>
       </section>}
-      <section className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm ${leaseExpired ? 'border-red-300 bg-red-50 text-red-900' : leaseWarning ? 'border-amber-300 bg-amber-50 text-amber-950' : 'bg-white'}`}>
+      <section className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border border-hairline p-3 text-sm ${leaseExpired ? 'border-error/40 bg-error/8 text-body-strong' : leaseWarning ? 'border-warning/40 bg-warning/8 text-body-strong' : 'bg-canvas'}`}>
         <div><b>{leaseExpired ? '租约已过期' : `剩余处理时间 ${formatRemaining(leaseRemaining)}`}</b><p className="mt-1 text-xs">{leaseExpired ? '编辑区已锁定。返回队列并重新领取后才能继续。' : leaseWarning ? '剩余不足 5 分钟，请续租后再继续编辑。' : '租约用于避免同一任务被多人同时修改。'}</p></div>
-        <button type="button" disabled={pending || leaseExpired} onClick={renewLease} className="border border-current px-3 py-1.5 text-xs disabled:opacity-40">续租 30 分钟</button>
+        <button type="button" disabled={pending || leaseExpired} onClick={renewLease} className="border border-hairline border-current px-3 py-1.5 text-xs disabled:opacity-40">续租 30 分钟</button>
       </section>
-      <section className="rounded-xl border bg-white p-4">
+      <section className="rounded-lg border border-hairline bg-canvas p-4">
         <div className="flex flex-wrap justify-between gap-2">
           <div>
-            <div className="text-xs text-gray-500">阶段 {payload.case.phase} · {TUTOR_SPLIT_LABELS[payload.case.split] ?? '用途待确认'} · {TRIGGER_TYPE_LABELS[payload.case.triggerType] ?? '触发方式待确认'} · 第 {payload.case.revision} 版</div>
+            <div className="text-xs text-muted">阶段 {payload.case.phase} · {TUTOR_SPLIT_LABELS[payload.case.split] ?? '用途待确认'} · {TRIGGER_TYPE_LABELS[payload.case.triggerType] ?? '触发方式待确认'} · 第 {payload.case.revision} 版</div>
             <h2 className="mt-1 font-semibold">{payload.case.triggerType === 'SYSTEM_TRIGGER' ? '系统触发案例' : '学生情景'}</h2>
           </div>
-          <div className="text-right text-xs text-gray-500"><div>本次占用至 {new Date(payload.task.leaseExpiresAt).toLocaleTimeString('zh-CN')}</div><div className="mt-1">初审策略：{REVIEW_POLICY_LABELS[payload.case.reviewPolicy]}</div></div>
+          <div className="text-right text-xs text-muted"><div>本次占用至 {new Date(payload.task.leaseExpiresAt).toLocaleTimeString('zh-CN')}</div><div className="mt-1">初审策略：{REVIEW_POLICY_LABELS[payload.case.reviewPolicy]}</div></div>
         </div>
-        <p className="mt-3 rounded bg-gray-50 p-3 text-sm leading-6">{payload.case.studentMessage || '（本案例没有学生消息）'}</p>
-        {history.length > 0 && <details className="mt-3 rounded border p-3 text-sm"><summary className="cursor-pointer font-medium">查看此前对话（{history.length} 条）</summary><div className="mt-3 space-y-2">{history.map((entry, index) => <div key={`${entry.role}-${index}`} className={`rounded p-3 ${entry.role === 'assistant' || entry.role === 'gpt' ? 'bg-blue-50' : 'bg-gray-50'}`}><div className="text-xs font-medium text-gray-500">{entry.role === 'assistant' || entry.role === 'gpt' ? '导师' : entry.role === 'system' ? '平台状态' : '学生'}</div><p className="mt-1 whitespace-pre-wrap leading-6">{entry.content}</p></div>)}</div></details>}
-        <details className="mt-3 text-xs"><summary className="cursor-pointer font-medium">学生可见事实</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{pretty(payload.case.visibleFacts)}</pre></details>
-        {type === 'EDIT' && <details className="mt-2 text-xs"><summary className="cursor-pointer font-medium text-amber-800">私有审核规范（不会进入导师模型提示词）</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap rounded bg-amber-50 p-3">{pretty(payload.case.privateReviewSpec)}</pre></details>}
+        <p className="mt-3 rounded-md bg-surface-soft p-3 text-sm leading-6">{payload.case.studentMessage || '（本案例没有学生消息）'}</p>
+        {history.length > 0 && <details className="mt-3 rounded-md border border-hairline p-3 text-sm"><summary className="cursor-pointer font-medium">查看此前对话（{history.length} 条）</summary><div className="mt-3 space-y-2">{history.map((entry, index) => <div key={`${entry.role}-${index}`} className={`rounded-md p-3 ${entry.role === 'assistant' || entry.role === 'gpt' ? 'bg-info/8' : 'bg-surface-soft'}`}><div className="text-xs font-medium text-muted">{entry.role === 'assistant' || entry.role === 'gpt' ? '导师' : entry.role === 'system' ? '平台状态' : '学生'}</div><p className="mt-1 whitespace-pre-wrap leading-6">{entry.content}</p></div>)}</div></details>}
+        <details className="mt-3 text-xs"><summary className="cursor-pointer font-medium">学生可见事实</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap rounded-md bg-surface-dark p-3 text-on-dark">{pretty(payload.case.visibleFacts)}</pre></details>
+        {type === 'EDIT' && <details className="mt-2 text-xs"><summary className="cursor-pointer font-medium text-[#8a6a0f]">私有审核规范（不会进入导师模型提示词）</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap rounded-md bg-warning/8 p-3">{pretty(payload.case.privateReviewSpec)}</pre></details>}
       </section>
 
-      <section className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+      <section className="rounded-lg border border-info/40 bg-info/8 p-4">
         <div className="grid gap-3 text-sm md:grid-cols-4">
-          <div><div className="text-xs text-blue-700">训练目标</div><b>{payload.trainingContext.targetPromptPolicy.version}</b></div>
-          <div><div className="text-xs text-blue-700">Tutor 合同</div><b>{payload.trainingContext.tutorContractVersion}</b></div>
-          <div><div className="text-xs text-blue-700">候选 A</div><b>{payload.trainingContext.candidateA?.modelVersionTag ?? '历史配置'}</b><div className="text-xs text-blue-700">{payload.trainingContext.candidateA?.modelFamily ?? '未登记运行组合'}</div></div>
-          <div><div className="text-xs text-blue-700">候选 B</div><b>{payload.trainingContext.candidateB?.modelVersionTag ?? '历史配置'}</b><div className="text-xs text-blue-700">{payload.trainingContext.candidateB?.modelFamily ?? '未登记运行组合'}</div></div>
+          <div><div className="text-xs text-[#2f7f70]">训练目标</div><b>{payload.trainingContext.targetPromptPolicy.version}</b></div>
+          <div><div className="text-xs text-[#2f7f70]">Tutor 合同</div><b>{payload.trainingContext.tutorContractVersion}</b></div>
+          <div><div className="text-xs text-[#2f7f70]">候选 A</div><b>{payload.trainingContext.candidateA?.modelVersionTag ?? '历史配置'}</b><div className="text-xs text-[#2f7f70]">{payload.trainingContext.candidateA?.modelFamily ?? '未登记运行组合'}</div></div>
+          <div><div className="text-xs text-[#2f7f70]">候选 B</div><b>{payload.trainingContext.candidateB?.modelVersionTag ?? '历史配置'}</b><div className="text-xs text-[#2f7f70]">{payload.trainingContext.candidateB?.modelFamily ?? '未登记运行组合'}</div></div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          <details className="rounded border border-blue-200 bg-white px-3 py-2 text-xs">
+          <details className="rounded-md border border-info/40 bg-canvas px-3 py-2 text-xs">
             <summary className="cursor-pointer font-medium">查看训练合同</summary>
-            <dl className="mt-2 grid gap-1 text-gray-700">
+            <dl className="mt-2 grid gap-1 text-body">
               <div>Tutor：{payload.trainingContext.tutorContractVersion}</div>
               <div>Stage：{payload.trainingContext.stageContractVersion}</div>
               <div>Extractor：{payload.trainingContext.extractorVersion}</div>
               <div>初审执行方式：{payload.trainingContext.firstReviewMode}</div>
             </dl>
           </details>
-          <details className="rounded border border-blue-200 bg-white px-3 py-2 text-xs">
+          <details className="rounded-md border border-info/40 bg-canvas px-3 py-2 text-xs">
             <summary className="cursor-pointer font-medium">查看本案例实际 Prompt</summary>
-            <div className="mt-2 text-gray-600">版本：{payload.trainingContext.actualPrompt.promptVersion} · SHA256：{payload.trainingContext.actualPrompt.sha256}</div>
-            <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{payload.trainingContext.actualPrompt.systemPrompt}</pre>
+            <div className="mt-2 text-muted">版本：{payload.trainingContext.actualPrompt.promptVersion} · SHA256：{payload.trainingContext.actualPrompt.sha256}</div>
+            <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-surface-dark p-3 text-on-dark">{payload.trainingContext.actualPrompt.systemPrompt}</pre>
           </details>
-          <details className="rounded border border-blue-200 bg-white px-3 py-2 text-xs">
+          <details className="rounded-md border border-info/40 bg-canvas px-3 py-2 text-xs">
             <summary className="cursor-pointer font-medium">查看来源 Prompt 血缘</summary>
             {payload.trainingContext.sourcePrompt ? (
-              <div className="mt-2 space-y-1 text-gray-700">
+              <div className="mt-2 space-y-1 text-body">
                 <div>来源版本：{payload.trainingContext.sourcePrompt.promptVersion ?? '未知'}</div>
                 <div>来源 SHA256：{payload.trainingContext.sourcePrompt.sha256 ?? '未知'}</div>
                 <div>来源合同：{payload.trainingContext.sourcePrompt.contractVersion ?? '未知'}</div>
                 <div>来源 Stage：{payload.trainingContext.sourcePrompt.stageContractVersion ?? '未知'}</div>
                 <div>来源 Extractor：{payload.trainingContext.sourcePrompt.extractorVersion ?? '未知'}</div>
-                {payload.trainingContext.sourcePrompt.systemPrompt && <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded bg-gray-950 p-3 text-gray-100">{payload.trainingContext.sourcePrompt.systemPrompt}</pre>}
+                {payload.trainingContext.sourcePrompt.systemPrompt && <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-md bg-surface-dark p-3 text-on-dark">{payload.trainingContext.sourcePrompt.systemPrompt}</pre>}
               </div>
-            ) : <p className="mt-2 text-gray-600">这是平台编译案例，没有独立的历史来源 Prompt；训练目标与实际 Prompt 如上。</p>}
+            ) : <p className="mt-2 text-muted">这是平台编译案例，没有独立的历史来源 Prompt；训练目标与实际 Prompt 如上。</p>}
           </details>
         </div>
       </section>
 
-      {type === 'EDIT' ? candidateSection : <details className="rounded-xl border bg-white p-4"><summary className="cursor-pointer font-medium">查看两个原始候选、交叉检查和确定性检查</summary><div className="mt-4">{candidateSection}</div></details>}
+      {type === 'EDIT' ? candidateSection : <details className="rounded-lg border border-hairline bg-canvas p-4"><summary className="cursor-pointer font-medium">查看两个原始候选、交叉检查和确定性检查</summary><div className="mt-4">{candidateSection}</div></details>}
 
-      <section className="rounded-xl border bg-white p-4">
+      <section className="rounded-lg border border-hairline bg-canvas p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-semibold">{type === 'EDIT' ? '标注员建议稿' : 'AI 或标注员建议稿与定稿人最终稿'}</h3>
-            {type === 'CONFIRM' && <p className="mt-1 text-xs text-gray-500">草稿来源：{SUBMISSION_MODE_LABELS[payload.firstReview?.submissionMode ?? 'HUMAN']}。定稿人可修改任意结构化字段后直接通过。</p>}
+            {type === 'CONFIRM' && <p className="mt-1 text-xs text-muted">草稿来源：{SUBMISSION_MODE_LABELS[payload.firstReview?.submissionMode ?? 'HUMAN']}。定稿人可修改任意结构化字段后直接通过。</p>}
           </div>
-          {type === 'CONFIRM' && reviewerChanged && <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800">将记录为定稿人修改后通过</span>}
+          {type === 'CONFIRM' && reviewerChanged && <span className="rounded-md bg-info/10 px-2 py-1 text-xs text-body-strong">将记录为定稿人修改后通过</span>}
         </div>
         <div className="mt-3"><TutorLanguageEditor raw={finalOutput} onChange={(raw) => { setFinalOutput(raw); if (type === 'EDIT' && ['SELECT_A', 'SELECT_B'].includes(decision)) setDecision('EDIT'); }} allowedFocusIds={allowedFocusIds} focusDescriptions={focusDescriptions} editable={!leaseExpired} title={type === 'EDIT' ? '导师初审草稿' : '定稿人最终草稿'} /></div>
-        {type === 'CONFIRM' && <details className="mt-3 rounded bg-gray-50 p-3 text-xs"><summary className="cursor-pointer font-medium">查看 AI 或标注员初筛说明</summary><p className="mt-2 whitespace-pre-wrap text-gray-600">{payload.firstReview?.reason}</p></details>}
+        {type === 'CONFIRM' && <details className="mt-3 rounded-md bg-surface-soft p-3 text-xs"><summary className="cursor-pointer font-medium">查看 AI 或标注员初筛说明</summary><p className="mt-2 whitespace-pre-wrap text-muted">{payload.firstReview?.reason}</p></details>}
       </section>
 
       {payload.warnings.length > 0 ? (
-        <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <section className="rounded-lg border border-warning/40 bg-warning/8 p-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <div><h3 className="font-semibold text-amber-950">自动检测信号</h3><p className="mt-1 max-w-3xl text-xs leading-5 text-amber-900">机器标签只是信号，不是既定结论。定稿人可确认、部分确认、纠正类别或标记误报；与最终稿的关系由平台自动计算。</p></div>
-            {type === 'CONFIRM' && <button type="button" onClick={() => { const index = payload.warnings.findIndex((warning) => !closureComplete(liveRelations[warning.id] ?? warning.computedFinalRelation, closures[warning.id])); if (index >= 0) document.getElementById(`warning-${index + 1}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }} className={`rounded px-2 py-1 text-xs font-medium ${unresolvedWarningCount === 0 ? 'bg-green-100 text-green-800' : 'bg-amber-200 text-amber-950'}`}>已处理 {payload.warnings.length - unresolvedWarningCount}/{payload.warnings.length}</button>}
+            <div><h3 className="font-semibold text-[#8a6a0f]">自动检测信号</h3><p className="mt-1 max-w-3xl text-xs leading-5 text-[#8a6a0f]">机器标签只是信号，不是既定结论。定稿人可确认、部分确认、纠正类别或标记误报；与最终稿的关系由平台自动计算。</p></div>
+            {type === 'CONFIRM' && <button type="button" onClick={() => { const index = payload.warnings.findIndex((warning) => !closureComplete(liveRelations[warning.id] ?? warning.computedFinalRelation, closures[warning.id])); if (index >= 0) document.getElementById(`warning-${index + 1}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }} className={`rounded-md px-2 py-1 text-xs font-medium ${unresolvedWarningCount === 0 ? 'bg-success/10 text-body-strong' : 'bg-warning/15 text-body-strong'}`}>已处理 {payload.warnings.length - unresolvedWarningCount}/{payload.warnings.length}</button>}
           </div>
           <fieldset disabled={leaseExpired} className="mt-3 space-y-3 disabled:opacity-70">
             {payload.warnings.map((warning, warningIndex) => {
               const closure = closures[warning.id] ?? EMPTY_CLOSURE;
               const relation = liveRelations[warning.id] ?? warning.computedFinalRelation;
               return (
-                <article id={`warning-${warningIndex + 1}`} key={warning.id} className="scroll-mt-24 rounded-lg border border-amber-200 bg-white p-3">
+                <article id={`warning-${warningIndex + 1}`} key={warning.id} className="scroll-mt-24 rounded-lg border border-warning/40 bg-canvas p-3">
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <b className="text-amber-950">第 {warningIndex + 1} 条 · {warningCodeLabel(warning.code.replace(/^CRITIQUE_/, '').toLowerCase()) === '其他自动检测信号' ? warningCodeLabel(warning.code) : warningCodeLabel(warning.code.replace(/^CRITIQUE_/, '').toLowerCase())}</b>
-                    <span className="rounded bg-gray-100 px-2 py-0.5">候选 {warning.candidateSlot}</span>
-                    <span className="rounded bg-gray-100 px-2 py-0.5">{warning.source === 'CRITIC' ? '交叉检查' : '确定性检查'}</span>
-                    {type === 'CONFIRM' && relation && <span className={`rounded px-2 py-0.5 ${relation === 'PRESENT_IN_FINAL' ? 'bg-red-100 text-red-800' : relation === 'REMOVED_BY_EDIT' ? 'bg-green-100 text-green-800' : 'bg-violet-100 text-violet-800'}`}>{TUTOR_WARNING_FINAL_RELATION_LABELS[relation]} · 系统随编辑实时计算</span>}
+                    <b className="text-[#8a6a0f]">第 {warningIndex + 1} 条 · {warningCodeLabel(warning.code.replace(/^CRITIQUE_/, '').toLowerCase()) === '其他自动检测信号' ? warningCodeLabel(warning.code) : warningCodeLabel(warning.code.replace(/^CRITIQUE_/, '').toLowerCase())}</b>
+                    <span className="rounded-md bg-surface-card px-2 py-0.5">候选 {warning.candidateSlot}</span>
+                    <span className="rounded-md bg-surface-card px-2 py-0.5">{warning.source === 'CRITIC' ? '交叉检查' : '确定性检查'}</span>
+                    {type === 'CONFIRM' && relation && <span className={`rounded-md px-2 py-0.5 ${relation === 'PRESENT_IN_FINAL' ? 'bg-error/10 text-body-strong' : relation === 'REMOVED_BY_EDIT' ? 'bg-success/10 text-body-strong' : 'bg-surface-card text-body'}`}>{TUTOR_WARNING_FINAL_RELATION_LABELS[relation]} · 系统随编辑实时计算</span>}
                   </div>
                   <p className="mt-2 text-sm">{warning.message}</p>
-                  {warning.evidence && <p className="mt-1 break-words text-xs text-gray-600">定位：{warning.evidence}</p>}
+                  {warning.evidence && <p className="mt-1 break-words text-xs text-muted">定位：{warning.evidence}</p>}
                   {type === 'CONFIRM' && (
                     <div className="mt-3 grid gap-3 md:grid-cols-2">
                       <label className="text-xs font-medium">机器分类是否正确
-                        <select disabled={leaseExpired} value={closure.detectorVerdict} onChange={(event) => updateClosure(warning.id, { detectorVerdict: event.target.value as TutorWarningDetectorVerdict | '' })} className="mt-1 block w-full border bg-white px-3 py-2 text-sm font-normal disabled:bg-gray-100">
+                        <Select disabled={leaseExpired} value={closure.detectorVerdict} onChange={(event) => updateClosure(warning.id, { detectorVerdict: event.target.value as TutorWarningDetectorVerdict | '' })} className="mt-1">
                           <option value="">请选择</option>{TUTOR_WARNING_DETECTOR_VERDICTS.map((item) => <option key={item} value={item}>{TUTOR_WARNING_DETECTOR_VERDICT_LABELS[item]}</option>)}
-                        </select>
+                        </Select>
                       </label>
                       {closure.detectorVerdict === 'MISCLASSIFIED' && <label className="text-xs font-medium">实际问题类别
-                        <select value={closure.correctedCategory} onChange={(event) => updateClosure(warning.id, { correctedCategory: event.target.value as TutorWarningCorrectedCategory | '' })} className="mt-1 block w-full border bg-white px-3 py-2 text-sm font-normal"><option value="">请选择</option>{TUTOR_WARNING_CORRECTED_CATEGORIES.map((item) => <option key={item} value={item}>{TUTOR_WARNING_CORRECTED_CATEGORY_LABELS[item]}</option>)}</select>
+                        <Select value={closure.correctedCategory} onChange={(event) => updateClosure(warning.id, { correctedCategory: event.target.value as TutorWarningCorrectedCategory | '' })} className="mt-1"><option value="">请选择</option>{TUTOR_WARNING_CORRECTED_CATEGORIES.map((item) => <option key={item} value={item}>{TUTOR_WARNING_CORRECTED_CATEGORY_LABELS[item]}</option>)}</Select>
                       </label>}
                       {relation === 'PRESENT_IN_FINAL' && closure.detectorVerdict && closure.detectorVerdict !== 'FALSE_POSITIVE' ? <label className="text-xs font-medium">对最终稿的严重程度（必填）
-                        <select value={closure.finalSeverity} onChange={(event) => updateClosure(warning.id, { finalSeverity: event.target.value as TutorWarningSeverity | '' })} className="mt-1 block w-full border bg-white px-3 py-2 text-sm font-normal"><option value="">请选择</option>{TUTOR_WARNING_SEVERITIES.map((item) => <option key={item} value={item}>{TUTOR_WARNING_SEVERITY_LABELS[item]}</option>)}</select>
+                        <Select value={closure.finalSeverity} onChange={(event) => updateClosure(warning.id, { finalSeverity: event.target.value as TutorWarningSeverity | '' })} className="mt-1"><option value="">请选择</option>{TUTOR_WARNING_SEVERITIES.map((item) => <option key={item} value={item}>{TUTOR_WARNING_SEVERITY_LABELS[item]}</option>)}</Select>
                       </label> : relation && relation !== 'PRESENT_IN_FINAL' ? <label className="text-xs font-medium">原候选问题强度（可选）
-                        <select value={closure.candidateSeverity} onChange={(event) => updateClosure(warning.id, { candidateSeverity: event.target.value as TutorWarningSeverity | '' })} className="mt-1 block w-full border bg-white px-3 py-2 text-sm font-normal"><option value="">不评价</option>{TUTOR_WARNING_SEVERITIES.map((item) => <option key={item} value={item}>{TUTOR_WARNING_SEVERITY_LABELS[item]}</option>)}</select>
+                        <Select value={closure.candidateSeverity} onChange={(event) => updateClosure(warning.id, { candidateSeverity: event.target.value as TutorWarningSeverity | '' })} className="mt-1"><option value="">不评价</option>{TUTOR_WARNING_SEVERITIES.map((item) => <option key={item} value={item}>{TUTOR_WARNING_SEVERITY_LABELS[item]}</option>)}</Select>
                       </label> : null}
                       <label className="text-xs font-medium md:col-span-2">人工说明（建议填写）
-                        <input value={closure.note} onChange={(event) => updateClosure(warning.id, { note: event.target.value })} placeholder="例如：真正的问题是过度推进，而不是多个独立问句" className="mt-1 block w-full border bg-white px-3 py-2 text-sm font-normal" />
+                        <Input value={closure.note} onChange={(event) => updateClosure(warning.id, { note: event.target.value })} placeholder="例如：真正的问题是过度推进，而不是多个独立问句" className="mt-1" />
                       </label>
                     </div>
                   )}
@@ -554,39 +609,41 @@ export default function TutorReviewWorkbench({ type }: { type: ReviewType }) {
             })}
           </fieldset>
         </section>
-      ) : type === 'CONFIRM' ? <section className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-900">本案例没有自动检测信号，仍需独立审核学生案例和最终导师回复。</section> : null}
+      ) : type === 'CONFIRM' ? <section className="rounded-lg border border-success/40 bg-success/8 p-4 text-sm text-body-strong">本案例没有自动检测信号，仍需独立审核学生案例和最终导师回复。</section> : null}
 
-      <fieldset disabled={leaseExpired} className="rounded-xl border bg-white p-4 disabled:bg-gray-50">
+      <fieldset disabled={leaseExpired} className="rounded-lg border border-hairline bg-canvas p-4 disabled:bg-surface-soft">
         {type === 'EDIT' ? (
           <>
             <label className="text-sm">初审决定
-              <select value={['REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT'].includes(decision) ? '' : decision} onChange={(event) => setDecision(event.target.value)} className="mt-1 block w-full border px-3 py-2"><option value="SELECT_A">{REVIEW_DECISION_LABELS.SELECT_A}</option><option value="SELECT_B">{REVIEW_DECISION_LABELS.SELECT_B}</option><option value="MERGE">{REVIEW_DECISION_LABELS.MERGE}</option><option value="EDIT">{REVIEW_DECISION_LABELS.EDIT}</option><option value="RETURN_CASE">{REVIEW_DECISION_LABELS.RETURN_CASE}</option>{['REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT'].includes(decision) && <option value="">已选择高级治理动作</option>}</select>
+              <Select value={['REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT'].includes(decision) ? '' : decision} onChange={(event) => setDecision(event.target.value)} className="mt-1"><option value="SELECT_A">{REVIEW_DECISION_LABELS.SELECT_A}</option><option value="SELECT_B">{REVIEW_DECISION_LABELS.SELECT_B}</option><option value="MERGE">{REVIEW_DECISION_LABELS.MERGE}</option><option value="EDIT">{REVIEW_DECISION_LABELS.EDIT}</option><option value="RETURN_CASE">{REVIEW_DECISION_LABELS.RETURN_CASE}</option>{['REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT'].includes(decision) && <option value="">已选择高级治理动作</option>}</Select>
             </label>
-            {decision === 'RETURN_CASE' && <div className="mt-3 rounded border border-violet-200 bg-violet-50 p-3"><div className="text-sm font-medium text-violet-950">学生案例质量问题</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{Object.entries(TUTOR_CASE_ISSUE_LABELS).map(([key, label]) => <label key={key} className="flex items-start gap-2 text-sm"><input type="checkbox" checked={caseIssueCategories.includes(key as CaseIssueCategory)} onChange={() => toggleCaseIssue(key as CaseIssueCategory)} className="mt-1" /><span>{label}</span></label>)}</div><label className="mt-3 block text-sm">建议学生问题改写（管理员审批后才会生效）<textarea value={suggestedStudentMessage} onChange={(event) => setSuggestedStudentMessage(event.target.value)} className="mt-1 min-h-24 w-full border bg-white p-3" /></label></div>}
-            <details className="mt-3 rounded border bg-gray-50 p-3"><summary className="cursor-pointer text-sm font-medium">高级：训练治理与草稿来源</summary><div className="mt-3 grid gap-3 md:grid-cols-2">
-              <label className="text-sm">高级治理动作<select value={['REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT'].includes(decision) ? decision : ''} onChange={(event) => { if (event.target.value) setDecision(event.target.value); }} className="mt-1 block w-full border bg-white px-3 py-2"><option value="">不使用高级动作</option><option value="REGENERATE">{REVIEW_DECISION_LABELS.REGENERATE}</option><option value="REGRESSION">{REVIEW_DECISION_LABELS.REGRESSION}</option><option value="NEGATIVE">{REVIEW_DECISION_LABELS.NEGATIVE}</option><option value="REJECT">{REVIEW_DECISION_LABELS.REJECT}</option></select></label>
-              <label className="text-sm">草稿形成方式<select value={submissionMode} onChange={(event) => setSubmissionMode(event.target.value as SubmissionMode)} className="mt-1 block w-full border bg-white px-3 py-2"><option value="HUMAN">{SUBMISSION_MODE_LABELS.HUMAN}</option><option value="AI_ASSISTED_HUMAN_SUBMIT">{SUBMISSION_MODE_LABELS.AI_ASSISTED_HUMAN_SUBMIT}</option>{payload.case.reviewPolicy === 'AI_DIRECT_TO_REVIEWER' && <option value="AI_DIRECT_ADMIN_AUTHORIZED">{SUBMISSION_MODE_LABELS.AI_DIRECT_ADMIN_AUTHORIZED}</option>}</select></label>
-              <label className="text-sm">未采用候选（可选）<select value={rejectedId} onChange={(event) => setRejectedId(event.target.value)} className="mt-1 block w-full border bg-white px-3 py-2"><option value="">不生成偏好对</option>{payload.candidates.filter((candidate) => candidate.id !== selectedId).map((candidate) => <option key={candidate.id} value={candidate.id}>候选 {candidate.slot}</option>)}</select></label>
-              <label className="text-sm">采用稿优于未采用稿的理由<textarea value={preferenceReason} onChange={(event) => setPreferenceReason(event.target.value)} disabled={!rejectedId} className="mt-1 min-h-20 w-full border bg-white p-2 disabled:bg-gray-100" /></label>
+            {decision === 'RETURN_CASE' && <div className="mt-3 rounded-md border border-hairline bg-surface-card p-3"><div className="text-sm font-medium text-body">学生案例质量问题</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{Object.entries(TUTOR_CASE_ISSUE_LABELS).map(([key, label]) => <label key={key} className="flex items-start gap-2 text-sm"><input type="checkbox" checked={caseIssueCategories.includes(key as CaseIssueCategory)} onChange={() => toggleCaseIssue(key as CaseIssueCategory)} className="mt-1" /><span>{label}</span></label>)}</div><label className="mt-3 block text-sm">建议学生问题改写（管理员审批后才会生效）<Textarea value={suggestedStudentMessage} onChange={(event) => setSuggestedStudentMessage(event.target.value)} className="mt-1 min-h-24" /></label></div>}
+            <details className="mt-3 rounded-md border border-hairline bg-surface-soft p-3"><summary className="cursor-pointer text-sm font-medium">高级：训练治理与草稿来源</summary><div className="mt-3 grid gap-3 md:grid-cols-2">
+              <label className="text-sm">高级治理动作<Select value={['REGENERATE', 'REGRESSION', 'NEGATIVE', 'REJECT'].includes(decision) ? decision : ''} onChange={(event) => { if (event.target.value) setDecision(event.target.value); }} className="mt-1"><option value="">不使用高级动作</option><option value="REGENERATE">{REVIEW_DECISION_LABELS.REGENERATE}</option><option value="REGRESSION">{REVIEW_DECISION_LABELS.REGRESSION}</option><option value="NEGATIVE">{REVIEW_DECISION_LABELS.NEGATIVE}</option><option value="REJECT">{REVIEW_DECISION_LABELS.REJECT}</option></Select></label>
+              <label className="text-sm">草稿形成方式<Select value={submissionMode} onChange={(event) => setSubmissionMode(event.target.value as SubmissionMode)} className="mt-1"><option value="HUMAN">{SUBMISSION_MODE_LABELS.HUMAN}</option><option value="AI_ASSISTED_HUMAN_SUBMIT">{SUBMISSION_MODE_LABELS.AI_ASSISTED_HUMAN_SUBMIT}</option>{payload.case.reviewPolicy === 'AI_DIRECT_TO_REVIEWER' && <option value="AI_DIRECT_ADMIN_AUTHORIZED">{SUBMISSION_MODE_LABELS.AI_DIRECT_ADMIN_AUTHORIZED}</option>}</Select></label>
+              <label className="text-sm">未采用候选（可选）<Select value={rejectedId} onChange={(event) => setRejectedId(event.target.value)} className="mt-1"><option value="">不生成偏好对</option>{payload.candidates.filter((candidate) => candidate.id !== selectedId).map((candidate) => <option key={candidate.id} value={candidate.id}>候选 {candidate.slot}</option>)}</Select></label>
+              <label className="text-sm">采用稿优于未采用稿的理由<Textarea value={preferenceReason} onChange={(event) => setPreferenceReason(event.target.value)} disabled={!rejectedId} className="mt-1 min-h-20" /></label>
             </div></details>
           </>
         ) : (
           <>
             <label className="text-sm">正式人工审核决定
-              <select value={decision} onChange={(event) => setDecision(event.target.value)} className="mt-1 block w-full border px-3 py-2"><option value="CONFIRM">通过（若草稿已修改，将记录为修改后通过）</option><option value="RETURN_TUTOR">退回标注员修订导师回复</option><option value="RETURN_CASE">提交管理员处理学生案例</option><option value="REJECT">拒绝案例</option></select>
+              <Select value={decision} onChange={(event) => setDecision(event.target.value)} className="mt-1"><option value="CONFIRM">通过（若草稿已修改，将记录为修改后通过）</option><option value="RETURN_TUTOR">退回标注员修订导师回复</option><option value="RETURN_CASE">提交管理员处理学生案例</option><option value="REJECT">拒绝案例</option></Select>
             </label>
-            {confirmDecision === 'RETURN_CASE' && <div className="mt-3 rounded border border-violet-200 bg-violet-50 p-3"><div className="text-sm font-medium text-violet-950">案例质量问题</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{Object.entries(TUTOR_CASE_ISSUE_LABELS).map(([key, label]) => <label key={key} className="flex items-start gap-2 text-sm"><input type="checkbox" checked={caseIssueCategories.includes(key as CaseIssueCategory)} onChange={() => toggleCaseIssue(key as CaseIssueCategory)} className="mt-1" /><span>{label}</span></label>)}</div><label className="mt-3 block text-sm">建议学生问题改写（管理员审批后才会生效）<textarea value={suggestedStudentMessage} onChange={(event) => setSuggestedStudentMessage(event.target.value)} className="mt-1 min-h-24 w-full border bg-white p-3" /></label></div>}
+            {confirmDecision === 'RETURN_CASE' && <div className="mt-3 rounded-md border border-hairline bg-surface-card p-3"><div className="text-sm font-medium text-body">案例质量问题</div><div className="mt-2 grid gap-2 sm:grid-cols-2">{Object.entries(TUTOR_CASE_ISSUE_LABELS).map(([key, label]) => <label key={key} className="flex items-start gap-2 text-sm"><input type="checkbox" checked={caseIssueCategories.includes(key as CaseIssueCategory)} onChange={() => toggleCaseIssue(key as CaseIssueCategory)} className="mt-1" /><span>{label}</span></label>)}</div><label className="mt-3 block text-sm">建议学生问题改写（管理员审批后才会生效）<Textarea value={suggestedStudentMessage} onChange={(event) => setSuggestedStudentMessage(event.target.value)} className="mt-1 min-h-24" /></label></div>}
           </>
         )}
         <label className="mt-3 block text-sm">{type === 'CONFIRM' ? '正式人工审核理由（必填）' : '导师初审理由（必填）'}
-          <textarea value={reason} onChange={(event) => setReason(event.target.value)} placeholder={type === 'CONFIRM' ? '说明为什么可以定稿、需要修订导师回复，或学生案例本身有什么问题。' : '说明选择、合并、编辑或重新生成的依据。'} className="mt-1 min-h-24 w-full border p-3" />
+          <Textarea value={reason} onChange={(event) => setReason(event.target.value)} placeholder={type === 'CONFIRM' ? '说明为什么可以定稿、需要修订导师回复，或学生案例本身有什么问题。' : '说明选择、合并、编辑或重新生成的依据。'} className="mt-1 min-h-24" />
         </label>
-        <button type="button" disabled={pending || leaseExpired || Boolean(editBlockedReason) || confirmationBlocked || caseReturnBlocked} onClick={submit} className="mt-4 bg-gray-950 px-4 py-2 text-sm text-white disabled:opacity-40">{submitLabel}</button>
-        {editBlockedReason && <p className="mt-2 text-sm text-amber-800">{editBlockedReason}</p>}
-        {type === 'CONFIRM' && finalPreviewError && <p className="mt-3 text-sm text-red-700">{finalPreviewError}</p>}
-        {type === 'CONFIRM' && confirmDecision === 'CONFIRM' && unresolvedWarningCount > 0 && <span className="ml-3 text-sm text-amber-800">还有 {unresolvedWarningCount} 条自动信号未完成必要判断</span>}
-        {message && <span className="ml-3 text-sm text-gray-600">{message}</span>}
+        <button type="button" disabled={pending || leaseExpired || Boolean(editBlockedReason) || confirmationBlocked || caseReturnBlocked} onClick={() => decision === 'REJECT' || decision === 'RETURN_CASE' ? setConfirmingRiskySubmit(true) : void submit()} className={buttonClass('primary', 'md', 'mt-4')}>{submitLabel}</button>
+        <span className={`ml-3 text-xs ${draftSaveStatus === 'error' ? 'text-error' : 'text-muted'}`}>{draftSaveStatus === 'saving' ? '正在保存草稿…' : draftSaveStatus === 'saved' ? '草稿已自动保存' : draftSaveStatus === 'error' ? '草稿自动保存失败，请检查租约或网络' : ''}</span>
+        {editBlockedReason && <p className="mt-2 text-sm text-[#8a6a0f]">{editBlockedReason}</p>}
+        {type === 'CONFIRM' && finalPreviewError && <p className="mt-3 text-sm text-error">{finalPreviewError}</p>}
+        {type === 'CONFIRM' && confirmDecision === 'CONFIRM' && unresolvedWarningCount > 0 && <span className="ml-3 text-sm text-[#8a6a0f]">还有 {unresolvedWarningCount} 条自动信号未完成必要判断</span>}
+        {message && <span className="ml-3 text-sm text-muted">{message}</span>}
       </fieldset>
+      <ConfirmDialog open={confirmingRiskySubmit} title={decision === 'RETURN_CASE' ? '提交管理员处理学生案例' : '拒绝这条案例'} description={decision === 'RETURN_CASE' ? '导师候选将暂停进入后续定稿，案例转入学生案例质量队列。' : '这条案例将不进入训练数据。'} consequence={decision === 'RETURN_CASE' ? '管理员需要决定保留、批准学生问题改写或淘汰；批准改写后必须对新 revision 重新生成 A/B 候选。' : '拒绝结果会记录在审计中；如需继续这个情景，应创建或改写新案例。'} confirmLabel={decision === 'RETURN_CASE' ? '确认转入案例质量队列' : '确认拒绝案例'} danger={decision === 'REJECT'} pending={pending} onClose={() => setConfirmingRiskySubmit(false)} onConfirm={async () => { await submit(); setConfirmingRiskySubmit(false); }} />
     </div>
   );
 }

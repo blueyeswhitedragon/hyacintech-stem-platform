@@ -201,9 +201,17 @@ export function evaluateStage2Readiness(stageData: StageData): Stage2Readiness {
 function studentOrComposedMaterials(
   stageData: StageData,
   composed: string[],
-): { values: string[]; source: 'student_fact' | 'server_composed' } {
+): { values: string[]; source: 'student_fact' | 'student_form' | 'server_composed' } {
   const values = strings(fact(stageData, 'stage2.materials'));
-  return values.length > 0 ? { values, source: 'student_fact' } : { values: composed, source: 'server_composed' };
+  return values.length > 0
+    ? { values, source: factSource(stageData, ['stage2.materials']), }
+    : { values: composed, source: 'server_composed' };
+}
+
+function factSource(stageData: StageData, sourceFields: string[]): 'student_fact' | 'student_form' {
+  return sourceFields.some((field) => stageData.extractedFacts?.[field]?.origin === 'student_form')
+    ? 'student_form'
+    : 'student_fact';
 }
 
 function positiveInteger(value: unknown, maximum = 200): number | undefined {
@@ -257,7 +265,7 @@ export function composeStage2Plan(stageData: StageData): {
     ? explicitSafety
     : ['保持实验区域整洁；材料或装置出现异常时立即停止，并告知教师。'];
 
-  const student = (sourceFields: string[]) => ({ source: 'student_fact' as const, sourceFields });
+  const student = (sourceFields: string[]) => ({ source: factSource(stageData, sourceFields), sourceFields });
   const provenance: Stage2PlanProvenance = {
     researchQuestion: student(['stage1.researchQuestion']),
     hypothesis: student(['stage2.hypothesis']),
@@ -282,7 +290,7 @@ export function composeStage2Plan(stageData: StageData): {
     sampleSizePerLevel: sampleSizePerLevel ? student(['stage2.sampleSizePerLevel']) : undefined,
     repeatCount: student(['stage2.repeatCount']),
     safetyNotes: {
-      source: explicitSafety.length > 0 ? 'student_fact' : 'server_baseline',
+      source: explicitSafety.length > 0 ? factSource(stageData, ['stage2.safetyNotes']) : 'server_baseline',
       sourceFields: explicitSafety.length > 0 ? ['stage2.safetyNotes'] : [],
     },
   };

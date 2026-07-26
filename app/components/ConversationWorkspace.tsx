@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import type { Message } from '../models/types';
-import type { StageData, Stage3FileAssociation, AssignmentStatus } from '../models/stageData';
+import type { Message, SafetyQuiz } from '../models/types';
+import type { StageData, Stage2CoreField, Stage3FileAssociation, AssignmentStatus } from '../models/stageData';
+import type { AdvanceHint } from '../lib/advanceHint';
 import ConversationChat, { type ChatApiResponse } from './ConversationChat';
 import DataTableEditor from './DataTableEditor';
 import ChartViewer from './ChartViewer';
@@ -11,6 +12,8 @@ import Stage6Panel from './Stage6Panel';
 import Stage2PlanPreview from './Stage2PlanPreview';
 import Fireworks from './Fireworks';
 import { evaluateStage2Readiness } from '../lib/stage2Readiness';
+import Button from './ui/Button';
+import Callout from './ui/Callout';
 
 interface Props {
   conversationId: string;
@@ -19,6 +22,8 @@ interface Props {
   initialStageData: StageData;
   initialStatus: AssignmentStatus;
   initialSafetyQuizCompleted: boolean;
+  initialAdvanceHint: AdvanceHint;
+  initialSafetyQuiz?: SafetyQuiz | null;
   initialDueDate?: string | null;
 }
 
@@ -49,6 +54,8 @@ export default function ConversationWorkspace({
   initialStageData,
   initialStatus,
   initialSafetyQuizCompleted,
+  initialAdvanceHint,
+  initialSafetyQuiz = null,
   initialDueDate,
 }: Props) {
   const [hydratedMessages] = useState(() => hydrateStage1Confirmation(initialMessages, initialStageData));
@@ -58,6 +65,7 @@ export default function ConversationWorkspace({
   const [completed, setCompleted] = useState(initialStatus === 'COMPLETED');
   const [injectedMessage, setInjectedMessage] = useState<Message | null>(null);
   const [safetyQuizCompleted, setSafetyQuizCompleted] = useState(initialSafetyQuizCompleted);
+  const [serverAdvanceHint, setServerAdvanceHint] = useState(initialAdvanceHint);
   const [overdue, setOverdue] = useState(false);
 
   useEffect(() => {
@@ -88,12 +96,14 @@ export default function ConversationWorkspace({
     if (!response.ok) throw new Error(data.error || '安全问答提交失败');
     setSafetyQuizCompleted(true);
     if (data.stageData) setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
   };
 
   // chat 响应后，以服务端返回的真相更新 stage / stageData
   const onChatResult = (data: ChatApiResponse) => {
     if (typeof data.currentStage === 'number') setStage(data.currentStage);
     if (data.stageData) setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
   };
 
   // 通用 POST helper：成功后用返回的 {stageData,status,currentStage} 更新本地态
@@ -106,6 +116,7 @@ export default function ConversationWorkspace({
     const data = await res.json();
     if (!res.ok) return data.error || '操作失败';
     if (data.stageData) setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
     if (data.status) {
       setStatus(data.status);
       if (data.status === 'COMPLETED') setCompleted(true);
@@ -130,6 +141,22 @@ export default function ConversationWorkspace({
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return data.error || '方案确认失败';
     if (data.stageData) setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
+    return null;
+  };
+
+  const saveStage2Fields = async (
+    fields: Partial<Record<Stage2CoreField, string>>,
+  ): Promise<string | null> => {
+    const res = await fetch(`/api/conversations/${conversationId}/stage2-fields`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return data.error || '方案字段保存失败';
+    if (data.stageData) setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
     return null;
   };
 
@@ -146,6 +173,7 @@ export default function ConversationWorkspace({
     const data = await res.json();
     if (!res.ok) return data.error || '保存失败';
     setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
     return null;
   };
 
@@ -158,6 +186,7 @@ export default function ConversationWorkspace({
     const data = await res.json();
     if (!res.ok) return data.error || '保存失败';
     setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
     return null;
   };
 
@@ -171,6 +200,7 @@ export default function ConversationWorkspace({
     if (!res.ok) return data.error || '推进失败';
     setStage(data.currentStage);
     if (data.stageData) setStageData(data.stageData);
+    if (data.advanceHint) setServerAdvanceHint(data.advanceHint);
     if (data.transitionMessage) setInjectedMessage(data.transitionMessage as Message);
     return null;
   };
@@ -250,17 +280,19 @@ export default function ConversationWorkspace({
   const banner = (() => {
     if (pendingStage2 || pendingStage5) {
       return (
-        <div className="m-4 p-3 bg-amber-50 border border-amber-300 rounded text-sm text-amber-800">
-          ⏳ 已提交，正在等待教师审核。审核通过后即可继续。
+        <div className="m-4">
+          {/* 等审核是「在等别人」而非出错，用中性信息色而非警告黄 */}
+          <Callout tone="info">已提交，正在等待教师审核。审核通过后即可继续。</Callout>
         </div>
       );
     }
     const fb = stage === 2 ? rejected2 : stage === 3 ? rejected3 : stage === 5 ? rejected5 : null;
     if (fb) {
       return (
-        <div className="m-4 p-3 bg-red-50 border border-red-300 rounded text-sm text-red-800">
-          <div className="font-medium mb-1">教师驳回，请修改后重新提交</div>
-          <div className="whitespace-pre-wrap">{fb}</div>
+        <div className="m-4">
+          <Callout tone="warning" title="教师驳回，请修改后重新提交">
+            <div className="whitespace-pre-wrap">{fb}</div>
+          </Callout>
         </div>
       );
     }
@@ -287,36 +319,36 @@ export default function ConversationWorkspace({
               provenance={formalStage2?.planProvenance}
               confirmed={planConfirmed}
               onConfirm={pendingStage2 || planConfirmed ? undefined : confirmStage2Plan}
+              onSaveFields={pendingStage2 || planConfirmed ? undefined : saveStage2Fields}
+              roundCount={stageData.roundCounts?.[2] ?? 0}
             />
             {planConfirmed && formalStage2 && formalStage2.schema.columns.length > 0 && (
-              <section className="border-b border-gray-200 px-4 py-4">
-                <h2 className="mb-2 text-sm font-semibold text-gray-900">数据表结构</h2>
-                <div className="space-y-1 text-sm text-gray-700">
+              <section className="border-b border-hairline px-4 py-4">
+                <h2 className="mb-2 text-sm font-medium text-ink">数据表结构</h2>
+                <div className="space-y-1 text-sm text-body">
                   {formalStage2.schema.columns.map((column) => (
-                    <div key={column.key} className="flex justify-between gap-3 border-b border-gray-100 py-1 last:border-0">
+                    <div key={column.key} className="flex justify-between gap-3 border-b border-hairline-soft py-1 last:border-0">
                       <span>{column.title}</span>
-                      <span className="text-xs text-gray-500">{column.type}{column.required ? ' · 必填' : ''}</span>
+                      <span className="text-xs text-muted">{column.type}{column.required ? ' · 必填' : ''}</span>
                     </div>
                   ))}
                 </div>
               </section>
             )}
             {planConfirmed && formalStage2?.aiRiskAnnotations && formalStage2.aiRiskAnnotations.length > 0 && (
-              <div className="mx-4 mb-3 bg-amber-50 border border-amber-200 rounded p-2 text-sm">
-                <div className="font-medium text-amber-800 mb-1">⚠️ 安全/风险提示</div>
-                {formalStage2.aiRiskAnnotations.map((r, i) => (
-                  <div key={i} className="text-amber-700">· {r.description}（{r.severity}）</div>
-                ))}
+              <div className="mx-4 mb-3">
+                <Callout tone="warning" title="安全 / 风险提示">
+                  {formalStage2.aiRiskAnnotations.map((r, i) => (
+                    <div key={i}>· {r.description}（{r.severity}）</div>
+                  ))}
+                </Callout>
               </div>
             )}
             {planConfirmed && !pendingStage2 && (
               <div className="px-4 pb-4">
-                <button
-                  onClick={submitStage2}
-                  className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-                >
+                <Button variant="primary" onClick={submitStage2}>
                   提交方案，等待教师审核
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -387,9 +419,13 @@ export default function ConversationWorkspace({
       onPhaseConfirm={stage === 1 ? onPhaseConfirm : undefined}
       phaseConfirmLabel="研究问题无误，进入方案设计"
       roundCount={stageData.roundCounts?.[stage] ?? 0}
+      advanceReady={serverAdvanceHint.to === stage + 1 && serverAdvanceHint.ok}
+      advanceReason={serverAdvanceHint.to === stage + 1 ? serverAdvanceHint.reason : undefined}
       injectedMessage={injectedMessage}
-      initialSafetyQuiz={stage === 3 && stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
-        ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
+      initialSafetyQuiz={stage === 3 && !safetyQuizCompleted
+        ? stageData.stage3?.safetyQuiz && !stageData.stage3.safetyQuiz.passed
+          ? { question: stageData.stage3.safetyQuiz.question, options: stageData.stage3.safetyQuiz.options }
+          : initialSafetyQuiz
         : null}
       readOnlyReason={readOnlyReason}
     />
@@ -399,24 +435,26 @@ export default function ConversationWorkspace({
   const panelWidth = stage === 4 ? 'lg:w-3/5' : 'lg:w-1/2';
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="density-roomy flex h-full min-h-0 flex-col">
       {overdue && !completed && (
-        <div className="mb-3 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          已超过截止时间，仍可继续完成；后续里程碑提交会记录为迟交{lateRecorded ? '（已记录）' : ''}。
+        <div className="mb-3">
+          <Callout tone="warning">
+            已超过截止时间，仍可继续完成；后续里程碑提交会记录为迟交{lateRecorded ? '（已记录）' : ''}。
+          </Callout>
         </div>
       )}
       {documentStage && panel ? (
         <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-          <main className="order-1 min-h-fit min-w-0 shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:flex-1 lg:shrink lg:overflow-y-auto">
+          <main className="order-1 min-h-fit min-w-0 shrink-0 rounded-lg border border-hairline bg-canvas lg:min-h-0 lg:flex-1 lg:shrink lg:overflow-y-auto">
             {panel}
           </main>
           <aside className="order-2 shrink-0 lg:w-80">
-            <details className="rounded-lg bg-white shadow-sm">
-              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-gray-800">
+            <details className="rounded-lg border border-hairline bg-canvas">
+              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-ink">
                 AI 导师（可选辅导）
-                <span className="ml-2 text-xs font-normal text-gray-500">点击展开</span>
+                <span className="ml-2 text-xs font-normal text-muted">点击展开</span>
               </summary>
-              <div className="h-[32rem] min-h-0 border-t border-gray-100">
+              <div className="h-[32rem] min-h-0 border-t border-hairline">
                 {chat}
               </div>
             </details>
@@ -424,11 +462,11 @@ export default function ConversationWorkspace({
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-          <div className={`flex h-[38rem] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg bg-white shadow-sm lg:h-auto lg:shrink ${panel ? chatWidth : 'w-full'}`}>
+          <div className={`flex h-[38rem] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg border border-hairline bg-canvas lg:h-auto lg:shrink ${panel ? chatWidth : 'w-full'}`}>
             <div className="min-h-0 flex-1">{chat}</div>
           </div>
           {panel && (
-            <div className={`min-h-fit shrink-0 rounded-lg bg-white shadow-sm lg:min-h-0 lg:shrink lg:overflow-y-auto ${panelWidth}`}>
+            <div className={`min-h-fit shrink-0 rounded-lg border border-hairline bg-canvas lg:min-h-0 lg:shrink lg:overflow-y-auto ${panelWidth}`}>
               {panel}
             </div>
           )}

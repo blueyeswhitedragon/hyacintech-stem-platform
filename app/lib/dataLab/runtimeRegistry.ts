@@ -454,20 +454,52 @@ export async function testProviderConnection(connectionId: string, user: Session
   try {
     const { connection, apiKey } = await providerWithSecret(connectionId);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15_000);
-    let response: Response;
+    const configuredTimeout = Number(process.env.LLM_TIMEOUT_MS ?? 30_000);
+    const timeoutMs = Number.isFinite(configuredTimeout) ? Math.min(180_000, Math.max(5_000, configuredTimeout)) : 30_000;
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    let modelIds: string[];
+    let probeModel: string;
     try {
-      response = await fetch(`${normalizeServiceBaseUrl(connection.baseUrl)}/models`, {
+      const modelsResponse = await fetch(`${normalizeServiceBaseUrl(connection.baseUrl)}/models`, {
         headers: { Authorization: `Bearer ${apiKey}` },
         signal: controller.signal,
         cache: 'no-store',
       });
+      if (!modelsResponse.ok) throw new Error(`模型列表返回 HTTP ${modelsResponse.status}`);
+      const modelsJson = await modelsResponse.json() as { data?: Array<{ id?: unknown }> };
+      modelIds = (modelsJson.data ?? []).map((item) => typeof item.id === 'string' ? item.id : '').filter(Boolean);
+      probeModel = modelIds[0] ?? '';
+      if (!probeModel) throw new Error('模型列表为空，无法执行实际生成探针');
+
+      const probeResponse = await fetch(`${normalizeServiceBaseUrl(connection.baseUrl)}/chat/completions`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: probeModel,
+          messages: [
+            { role: 'system', content: '只返回合法 JSON 对象。' },
+            { role: 'user', content: '返回 {"ok":true}。' },
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0,
+          max_tokens: 32,
+        }),
+        signal: controller.signal,
+        cache: 'no-store',
+      });
+      if (!probeResponse.ok) throw new Error(`实际生成探针返回 HTTP ${probeResponse.status}`);
+      const probeJson = await probeResponse.json() as { choices?: Array<{ message?: { content?: unknown } }> };
+      const content = probeJson.choices?.[0]?.message?.content;
+      if (typeof content !== 'string') throw new Error('实际生成探针未返回文本内容');
+      try {
+        const parsed = JSON.parse(content) as { ok?: unknown };
+        if (parsed.ok !== true) throw new Error();
+      } catch {
+        throw new Error('实际生成探针未按 JSON 模式返回 {"ok":true}');
+      }
     } finally {
       clearTimeout(timer);
     }
-    if (!response.ok) throw new Error(`服务返回 HTTP ${response.status}`);
-    const json = await response.json() as { data?: Array<{ id?: unknown }> };
-    const modelIds = (json.data ?? []).map((item) => typeof item.id === 'string' ? item.id : '').filter(Boolean);
     const latencyMs = Date.now() - started;
     await db.providerConnection.update({
       where: { id: connection.id },
@@ -484,8 +516,9 @@ export async function testProviderConnection(connectionId: string, user: Session
       ok: true,
       latencyMs,
       modelCount: modelIds.length,
+      probeModel,
     });
-    return { ok: true, latencyMs, modelIds };
+    return { ok: true, latencyMs, modelIds, probeModel };
   } catch (error) {
     const message = truncateError(error);
     await db.providerConnection.update({

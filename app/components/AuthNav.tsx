@@ -37,11 +37,11 @@ export default function AuthNav() {
     const dashboard = dashboardForRole(user.role);
     return (
       <div className="flex items-center gap-3 text-sm">
-        <Link href={dashboard} className="text-gray-600 hover:text-blue-600">
+        <Link href={dashboard} className="text-body transition-colors duration-[120ms] hover:text-coral">
           {user.displayName}
-          <span className="ml-1 text-gray-400">({roleLabel(user.role)})</span>
+          <span className="ml-1 text-muted">({roleLabel(user.role)})</span>
         </Link>
-        <button onClick={handleLogout} className="text-blue-600 hover:underline">
+        <button onClick={handleLogout} className="text-muted transition-colors duration-[120ms] hover:text-coral">
           登出
         </button>
       </div>
@@ -50,10 +50,10 @@ export default function AuthNav() {
 
   return (
     <div className="flex items-center gap-3 text-sm">
-      <Link href="/auth/login" className="text-blue-600 hover:underline">
+      <Link href="/auth/login" className="text-body transition-colors duration-[120ms] hover:text-coral">
         登录
       </Link>
-      <Link href="/auth/register" className="text-blue-600 hover:underline">
+      <Link href="/auth/register" className="text-coral hover:text-coral-active">
         注册
       </Link>
     </div>

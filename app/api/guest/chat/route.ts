@@ -11,6 +11,8 @@ import { buildTutorVisibleState, callTutorLanguageWithTrace, toCompatibleChatRes
 import { validateConfig } from '@/app/lib/llm/provider';
 import { finalizeStageData } from '@/app/lib/stageState';
 import { evaluateStage2Readiness } from '@/app/lib/stage2Readiness';
+import { describeStage4LastRound } from '@/app/lib/stage4Readiness';
+import { callAnalysisClaimExtractor, type ValidatedAnalysisClaim } from '@/app/lib/analysisClaimExtractor';
 
 const MAX_MESSAGE_LEN = 2000;
 const MAX_HISTORY = 20;
@@ -103,7 +105,14 @@ export async function POST(req: Request) {
 
     let analysisAccepted = false;
     if (stage === 4 && !isSystemTrigger(triggerType)) {
-      const analysis = updateServerAnalysis(stageData, message);
+      // 体验模式不落库，因此没有 StateExtractionTrace；抽取失败同样只回落到确定性路径。
+      let claim: ValidatedAnalysisClaim | null = null;
+      try {
+        claim = (await callAnalysisClaimExtractor({ stageData, studentMessage: message })).claim;
+      } catch (error) {
+        console.warn('Guest analysis claim extractor failed; falling back to deterministic evidence:', error instanceof Error ? error.message : String(error));
+      }
+      const analysis = updateServerAnalysis(stageData, message, claim);
       stageData = analysis.stageData;
       analysisAccepted = analysis.accepted;
     }
@@ -128,7 +137,12 @@ export async function POST(req: Request) {
     });
     const focus = tutorFocusPlan(stage, stageData, { triggerType, analysisAccepted });
     const visibleFacts = stage === 4
-      ? { 研究方案: stageData.stage2?.experimentPlan, 数据记录: visibleDataRows(stageData), 已接受分析次数: stageData.stage4?.analysisCount ?? 0 }
+      ? {
+          研究方案: stageData.stage2?.experimentPlan,
+          数据记录: visibleDataRows(stageData),
+          已接受分析次数: stageData.stage4?.analysisCount ?? 0,
+          上一轮判定: describeStage4LastRound(stageData.stage4),
+        }
       : buildTutorVisibleState(stage, stageData, { 前序摘要: body.priorSummary });
     const config = validateConfig();
     if (!config.valid || !config.provider || !config.model) throw new Error(config.issues.join(' '));

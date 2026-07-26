@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from './ui/Button';
+import { Field, Input, Select } from './ui/Field';
 
 interface ClassOption {
   id: string;
@@ -52,73 +54,61 @@ export default function PublishAssignmentForm({ classes }: { classes: ClassOptio
   };
 
   if (classes.length === 0) {
-    return <p className="text-sm text-gray-500">请先创建班级，才能发布作业。</p>;
+    return <p className="text-sm text-muted">请先创建班级，才能发布作业。</p>;
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 max-w-lg">
-      <div>
-        <label className="block text-sm text-gray-700 mb-1">班级</label>
-        <select
-          value={classId}
-          onChange={(e) => setClassId(e.target.value)}
-          className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
+    <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
+      <Field label="班级" htmlFor="assignment-class">
+        <Select id="assignment-class" value={classId} onChange={(e) => setClassId(e.target.value)}>
           {classes.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}
-        </select>
-      </div>
-      <div>
-        <label className="block text-sm text-gray-700 mb-1">作业标题</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div>
-        <label className="block text-sm text-gray-700 mb-1">研究方向（可选，限定阶段1选题）</label>
-        <input
+        </Select>
+      </Field>
+      <Field label="作业标题" htmlFor="assignment-title">
+        <Input id="assignment-title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+      </Field>
+      <Field label="研究方向" htmlFor="assignment-direction" hint="可选，用于限定第 1 阶段的选题范围">
+        <Input
+          id="assignment-direction"
           type="text"
           value={topicDirection}
           onChange={(e) => setTopicDirection(e.target.value)}
-          className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-      </div>
-      <label className="flex items-start gap-2 rounded-lg border bg-gray-50 p-3 text-sm">
+      </Field>
+
+      <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-hairline bg-surface-soft p-3 text-sm">
         <input
           type="checkbox"
           checked={allowDataContribution}
           onChange={(event) => setAllowDataContribution(event.target.checked)}
-          className="mt-1"
+          className="mt-1 size-4 shrink-0 accent-coral"
         />
         <span>
-          <span className="font-medium text-gray-800">允许学生自愿授权脱敏对话用于模型改进</span>
-          <span className="mt-1 block text-xs leading-5 text-gray-500">
+          <span className="font-medium text-body-strong">允许学生自愿授权脱敏对话用于模型改进</span>
+          <span className="mt-1 block text-xs leading-5 text-muted">
             默认关闭。开启后学生可以同意、拒绝或撤回；拒绝不会影响作业完成。只有教师提名且管理员审核通过的脱敏片段才会进入候选池。
+          </span>
+          {/* 时序陷阱：授权之前产生的回合不保存训练上下文，事后补开也救不回来。
+              这条必须视觉上跳出来，否则老师发完才发现数据取不回。 */}
+          <span className="mt-2 block border-l-2 border-l-warning pl-2.5 text-xs leading-5 text-body">
+            只有学生<b>点下同意之后</b>产生的对话才可提名——授权前的回合不会保存训练上下文，事后补开也无法追溯。需要回流数据时请现在勾选，并提醒学生先授权再开始探究（发布后仍可在作业列表里开关）。
           </span>
         </span>
       </label>
-      <div>
-        <label className="block text-sm text-gray-700 mb-1">截止日期（可选）</label>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
 
-      {error && <div className="text-sm text-red-600">{error}</div>}
+      <Field label="截止日期" htmlFor="assignment-due" hint="可选。逾期只记录并显示，不会锁住学生的作业">
+        <Input id="assignment-due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+      </Field>
 
-      <button type="submit" disabled={loading || title.trim() === ''}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
+      {error && <div className="text-sm text-error">{error}</div>}
+
+      <Button type="submit" variant="primary" disabled={loading || title.trim() === ''}>
         {loading ? '发布中…' : '发布作业'}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -14,7 +14,7 @@ const messages = [
   '水培，保证营养液量和水位等相同',
   '用刻度尺从种子量到茎尖，不包括根',
   '每天固定时间测量，轻柔拉直',
-  '每组10颗取平均值，差不多就可以了',
+  '每组10颗取平均值，独立重复3次',
 ];
 
 async function main() {
@@ -68,7 +68,10 @@ async function main() {
     completedFocusIds: tutorAtLevelsReadiness.completedFields,
     planReady: tutorAtLevelsReadiness.complete,
   }, { provider: config.provider, model: config.model });
-  if (tutorAtLevels.response.focus !== 'independent_variable' || /(?:哪些|哪几|几个).{0,12}(?:时长|组)|四组.{0,12}(?:最终|调整|增加)/.test(tutorAtLevels.response.dialogue)) {
+  if (
+    tutorAtLevels.response.focus !== tutorAtLevelsFocus.allowedFocusIds[0]
+    || /(?:哪些|哪几|几个).{0,12}(?:时长|组)|四组.{0,12}(?:最终|调整|增加)/.test(tutorAtLevels.response.dialogue)
+  ) {
     throw new Error(`Tutor reopened sufficient levels: ${tutorAtLevels.response.dialogue}`);
   }
 

@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ConfirmDialog } from '@/app/components/dataLab/Dialog';
+import { dataLabStatusLabel } from '@/app/lib/dataLab/labels';
+import { buttonClass } from '@/app/components/ui/Button';
+import { Input, Select } from '@/app/components/ui/Field';
 
 export function TrainingRunStatusControl({ id, currentStatus, currentExternalTaskId }: {
   id: string;
@@ -30,13 +33,13 @@ export function TrainingRunStatusControl({ id, currentStatus, currentExternalTas
     finally { setPending(false); }
   }
   return <div>
-    <button type="button" onClick={() => setOpen((value) => !value)} className="border px-3 py-1.5 text-xs">更新训练状态</button>
-    {open && <div className="mt-2 grid gap-2 rounded border bg-gray-50 p-3 sm:grid-cols-2">
-      <label className="text-xs">状态<select value={status} onChange={(event) => setStatus(event.target.value)} className="mt-1 w-full border bg-white px-2 py-1.5">{['DRAFT', 'SUBMITTED', 'RUNNING', 'SUCCEEDED', 'FAILED', 'CANCELLED'].map((item) => <option key={item}>{item}</option>)}</select></label>
-      <label className="text-xs">外部任务 ID<input value={externalTaskId} onChange={(event) => setExternalTaskId(event.target.value)} className="mt-1 w-full border bg-white px-2 py-1.5" /></label>
-      <button type="button" disabled={pending} onClick={save} className="bg-gray-950 px-3 py-1.5 text-xs text-white disabled:opacity-40">保存训练状态</button>
+    <button type="button" onClick={() => setOpen((value) => !value)} className={buttonClass('secondary', 'sm')}>更新训练状态</button>
+    {open && <div className="mt-2 grid gap-2 rounded-md border border-hairline bg-surface-soft p-3 sm:grid-cols-2">
+      <label className="text-xs">状态<Select value={status} onChange={(event) => setStatus(event.target.value)} className="mt-1">{['DRAFT', 'SUBMITTED', 'RUNNING', 'SUCCEEDED', 'FAILED', 'CANCELLED'].map((item) => <option key={item} value={item}>{dataLabStatusLabel(item)}</option>)}</Select></label>
+      <label className="text-xs">外部任务 ID<Input value={externalTaskId} onChange={(event) => setExternalTaskId(event.target.value)} className="mt-1" /></label>
+      <button type="button" disabled={pending} onClick={save} className={buttonClass('primary', 'sm')}>保存训练状态</button>
     </div>}
-    {message && <p aria-live="polite" className={`mt-1 text-xs ${message.includes('已更新') ? 'text-green-700' : 'text-red-700'}`}>{message}</p>}
+    {message && <p aria-live="polite" className={`mt-1 text-xs ${message.includes('已更新') ? 'text-[#2f7a43]' : 'text-error'}`}>{message}</p>}
   </div>;
 }
 
@@ -59,5 +62,5 @@ export function DisableModelButton({ id }: { id: string }) {
     } catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
     finally { setPending(false); }
   }
-  return <div><button type="button" disabled={pending} onClick={() => setConfirming(true)} className="border border-red-500 px-3 py-1.5 text-xs text-red-700 disabled:opacity-40">停用模型产物</button>{message && <p aria-live="polite" className="mt-1 text-xs text-red-700">{message}</p>}<ConfirmDialog open={confirming} title="停用模型产物" description="禁止新运行组合使用此模型，并停用其非生产运行组合。" consequence="历史训练、评测和生成轨迹会保留；生产中的模型必须先回滚或切换。" confirmLabel="确认停用模型产物" pending={pending} onClose={() => setConfirming(false)} onConfirm={async () => { await disable(); setConfirming(false); }} /></div>;
+  return <div><button type="button" disabled={pending} onClick={() => setConfirming(true)} className={buttonClass('danger', 'sm')}>停用模型产物</button>{message && <p aria-live="polite" className="mt-1 text-xs text-error">{message}</p>}<ConfirmDialog open={confirming} title="停用模型产物" description="禁止新运行组合使用此模型，并停用其非生产运行组合。" consequence="历史训练、评测和生成轨迹会保留；生产中的模型必须先回滚或切换。" confirmLabel="确认停用模型产物" pending={pending} onClose={() => setConfirming(false)} onConfirm={async () => { await disable(); setConfirming(false); }} /></div>;
 }

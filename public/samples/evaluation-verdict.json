@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 4,
+  "scope": "full",
+  "tags": {
+    "A": "baseline-bundle:v1",
+    "B": "candidate-bundle:v1"
+  },
+  "summary": {
+    "phase": {
+      "P1": { "A": 0, "B": 1, "tie": 0, "inconsistent": 0, "criticalErrors": 0, "parseSuccessA": 1, "parseTotalA": 1, "parseSuccessB": 1, "parseTotalB": 1 },
+      "P2": { "A": 0, "B": 1, "tie": 0, "inconsistent": 0, "criticalErrors": 0, "parseSuccessA": 1, "parseTotalA": 1, "parseSuccessB": 1, "parseTotalB": 1 },
+      "P3": { "A": 0, "B": 1, "tie": 0, "inconsistent": 0, "criticalErrors": 0, "parseSuccessA": 1, "parseTotalA": 1, "parseSuccessB": 1, "parseTotalB": 1 },
+      "P4": { "A": 0, "B": 1, "tie": 0, "inconsistent": 0, "criticalErrors": 0, "parseSuccessA": 1, "parseTotalA": 1, "parseSuccessB": 1, "parseTotalB": 1 },
+      "P5": { "A": 0, "B": 1, "tie": 0, "inconsistent": 0, "criticalErrors": 0, "parseSuccessA": 1, "parseTotalA": 1, "parseSuccessB": 1, "parseTotalB": 1 },
+      "P6": { "A": 0, "B": 1, "tie": 0, "inconsistent": 0, "criticalErrors": 0, "parseSuccessA": 1, "parseTotalA": 1, "parseSuccessB": 1, "parseTotalB": 1 }
+    },
+    "criticalErrors": 0
+  },
+  "scenarioVerdicts": [
+    { "id": "sample-p1", "title": "P1 样例", "phases": [1], "winner": "B", "inconsistent": false },
+    { "id": "sample-p2", "title": "P2 样例", "phases": [2], "winner": "B", "inconsistent": false },
+    { "id": "sample-p3", "title": "P3 样例", "phases": [3], "winner": "B", "inconsistent": false },
+    { "id": "sample-p4", "title": "P4 样例", "phases": [4], "winner": "B", "inconsistent": false },
+    { "id": "sample-p5", "title": "P5 样例", "phases": [5], "winner": "B", "inconsistent": false },
+    { "id": "sample-p6", "title": "P6 样例", "phases": [6], "winner": "B", "inconsistent": false }
+  ],
+  "turnVerdicts": []
+}

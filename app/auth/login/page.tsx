@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Button from '@/app/components/ui/Button';
+import { Field, Input } from '@/app/components/ui/Field';
 import { dashboardForRole, type UserRole } from '@/app/lib/roles';
 
 export default function LoginPage() {
@@ -38,46 +40,40 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-blue-600 mb-1">登录</h1>
-        <p className="text-sm text-gray-500 mb-6">Hyacintech STEM 平台</p>
+    <main className="density-roomy flex min-h-screen items-center justify-center bg-surface-soft p-4">
+      <div className="w-full max-w-sm rounded-lg border border-hairline bg-canvas [padding:var(--pad-card)]">
+        <h1 className="display-md">登录</h1>
+        <p className="mt-1 text-sm text-muted">Hyacintech STEM 平台</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">用户名</label>
-            <input
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <Field label="用户名" htmlFor="login-username">
+            <Input
+              id="login-username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoFocus
             />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">密码</label>
-            <input
+          </Field>
+          <Field label="密码" htmlFor="login-password">
+            <Input
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg p-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </Field>
 
-          {error && <div className="text-sm text-red-600">{error}</div>}
+          {error && <p className="text-sm text-error">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 disabled:opacity-50"
-          >
+          <Button type="submit" variant="primary" disabled={loading} className="w-full">
             {loading ? '登录中…' : '登录'}
-          </button>
+          </Button>
         </form>
 
-        <p className="text-sm text-gray-500 mt-4 text-center">
+        <p className="mt-4 text-center text-sm text-muted">
           还没有账号？
-          <Link href="/auth/register" className="text-blue-600 hover:underline ml-1">
+          <Link href="/auth/register" className="ml-1 text-coral hover:underline">
             注册
           </Link>
         </p>

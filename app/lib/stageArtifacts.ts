@@ -54,6 +54,18 @@ export function buildDataTableSchema(plan: AnyPlan): NonNullable<ChatResponse['d
   };
 }
 
+/** Locked fallback schema for a teacher-released P2 that has no usable confirmed plan. */
+export const TEACHER_RELEASE_SCHEMA = {
+  columns: [
+    { key: 'trial', title: '重复序号', type: 'number', required: true },
+    { key: 'condition', title: '实验条件', type: 'text', required: true },
+    { key: 'result', title: '测量结果', type: 'number', required: true },
+    { key: 'notes', title: '客观异常备注', type: 'text', required: false },
+  ],
+  minRows: 3,
+  maxRows: 200,
+} as const;
+
 interface ReportSource {
   plan?: AnyPlan;
   stageData?: StageData;

@@ -13,6 +13,7 @@ export const DATA_LAB_STATUS_LABELS: Record<string, string> = {
   AWAITING_CONFIRMATION: '待定稿',
   SUBMITTED: '已提交',
   RETURNED: '已退回',
+  RETURNED_TO_ANNOTATOR: '已退回标注员',
   REGEN_REQUESTED: '等待重新生成',
   NEEDS_REGEN: '需要重新生成',
   NEEDS_CRITIC: '等待补齐交叉检查',
@@ -47,6 +48,18 @@ export const DATA_LAB_STATUS_LABELS: Record<string, string> = {
   SHORTLISTED: '首轮入选',
   COMPILED: '已生成话题卡',
   INVALID: '无效',
+  CANDIDATE: '候选评测',
+  DISABLED: '已停用',
+  ERROR: '连接异常',
+  AVAILABLE: '可部署',
+  PENDING_COMPATIBILITY: '待兼容性评测',
+  COMPATIBLE: '兼容性通过',
+  INCOMPATIBLE: '不兼容',
+  VERIFIED_IDENTITY: '身份已核验',
+  EXTERNAL_ALIAS_UNVERIFIED: '外部别名待核验',
+  LEGACY_UNVERIFIED: '历史身份待核验',
+  NOT_TESTED: '尚未测试',
+  PLANNED: '等待导入',
 };
 
 export const TUTOR_SPLIT_LABELS: Record<string, string> = {
@@ -248,6 +261,11 @@ export const EVALUATION_SCOPE_LABELS: Record<string, string> = {
   unknown: '范围待确认',
 };
 
+export const TRACE_COVERAGE_LABELS: Record<string, string> = {
+  COMPLETE: '轨迹完整',
+  LEGACY_UNVERIFIED: '历史轨迹待核验',
+};
+
 export const EXPORT_KIND_META: Record<string, LabelMeta> = {
   training: { label: '监督微调训练集', help: '交给外部算力平台用于 SFT 训练' },
   preference: { label: '偏好对数据', help: '包含采用稿与未采用稿，用于偏好训练' },
@@ -333,7 +351,35 @@ export function gateFailureLabel(value: string): string {
   if (code === 'FULL_REQUIRES_ENGINEERING_OR_HYBRID_PER_CONTEXT_MODULE') return `${dataLabValueLabel(detail)}至少需要 1 张工程或混合型话题卡`;
   if (code === 'FULL_REQUIRES_6_ENGINEERING_OR_HYBRID_TOPIC_CARDS') return `至少需要 6 张工程或混合型话题卡，当前 ${detail ?? 0} 张`;
   if (code === 'FULL_DUPLICATE_PROJECT_FAMILY') return `同一课程项目被重复选入（${count ?? 2} 张）`;
+  if (code === 'PHASE_MISSING') return `评测产物缺少 ${detail ?? '某一阶段'} 的有效裁决，请用新版 blind-eval 重新生成`;
+  if (code === 'PHASE_WIN_RATE_BELOW_50') return `${detail ?? '某一阶段'} 候选胜率低于 50%`;
+  if (code === 'PHASE_CRITICAL_ERROR') return `${detail ?? '某一阶段'} 出现关键安全、事实依据或学生主体性错误`;
+  if (code === 'JUDGE_INCONSISTENCY_ABOVE_10') return `${detail ?? '某一阶段'} 双向裁决不一致率高于 10%`;
+  if (code === 'RUN_CRITICAL_ERRORS') return `评测 run ${detail ?? '未知'} 含关键错误`;
+  const deploymentLabels: Record<string, string> = {
+    TRAINING_LINEAGE_NOT_READY: '训练数据版本与外部训练血缘尚未就绪',
+    EVALUATION_ARTIFACTS_INCOMPLETE: '评测产物身份、scenarioId 或逐阶段字段不完整',
+    NO_DECISIVE_EVALUATIONS: '没有足够的有效胜负裁决',
+    PARSE_SUCCESS_METRICS_MISSING: '评测产物缺少 A/B 结构解析成功率',
+    OVERALL_WIN_RATE_BELOW_50: '候选总体胜率低于 50%',
+    CRITICAL_SAFETY_GROUNDING_AGENCY_ERRORS: '候选存在关键安全、事实依据或学生主体性错误',
+    STRUCTURE_PARSE_SUCCESS_BELOW_BASELINE: '候选结构解析成功率低于基线',
+  };
+  if (deploymentLabels[code]) return deploymentLabels[code];
+  if (code.startsWith('OBSERVATION_WINDOW_BELOW_')) return `线上观察时长不足 ${code.match(/\d+/)?.[0] ?? ''} 小时`;
+  if (code.startsWith('OBSERVED_SESSIONS_BELOW_')) return `线上观察会话数不足 ${code.match(/\d+/)?.[0] ?? ''} 条`;
+  if (code === 'ONLINE_CRITICAL_ERROR') return '线上观察出现关键错误';
+  if (code === 'STRUCTURE_FAILURE_RATE_REGRESSED_OVER_1PP') return '结构失败率较基线恶化超过 1 个百分点';
+  if (code === 'TEACHER_REJECT_RATE_REGRESSED_OVER_3PP') return '教师拒绝率较基线恶化超过 3 个百分点';
+  if (code === 'EARLY_TERMINATION_RATE_REGRESSED_OVER_3PP') return '提前终止率较基线恶化超过 3 个百分点';
   return '尚有一项质量门禁未达标';
+}
+
+export function gateFailureCategory(value: string): 'PRODUCT_INCOMPLETE' | 'QUALITY' {
+  const code = value.split(':')[0];
+  return ['EVALUATION_ARTIFACTS_INCOMPLETE', 'NO_DECISIVE_EVALUATIONS', 'PARSE_SUCCESS_METRICS_MISSING', 'PHASE_MISSING'].includes(code)
+    ? 'PRODUCT_INCOMPLETE'
+    : 'QUALITY';
 }
 
 export function formatGateMetric(key: string, value: number): string {

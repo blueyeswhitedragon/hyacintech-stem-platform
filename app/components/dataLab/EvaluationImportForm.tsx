@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { buttonClass } from '@/app/components/ui/Button';
+import { Input, Select } from '@/app/components/ui/Field';
 
 interface BundleOption {
   id: string;
@@ -93,7 +95,13 @@ export default function EvaluationImportForm({ bundles, planned }: {
       const response = await fetch('/api/data-lab/evaluations/import', { method: 'POST', body: formData });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? '导入失败');
-      setFeedback({ tone: 'success', text: '评测产物已导入，模型、Prompt、Endpoint 身份和 scenarioId 已完成核验。' });
+      const diagnostics = Array.isArray(data.run?.importDiagnostics) ? data.run.importDiagnostics as Array<{ message?: string; remediation?: string }> : [];
+      setFeedback({
+        tone: diagnostics.length ? 'error' : 'success',
+        text: diagnostics.length
+          ? `评测产物已导入，但产物结构不完整：${diagnostics.map((item) => `${item.message ?? '字段不完整'} ${item.remediation ?? ''}`).join('；')}`
+          : '评测产物已导入，模型、Prompt、Endpoint 身份和 scenarioId 已完成核验。',
+      });
       router.refresh();
     } catch (error) {
       setFeedback({ tone: 'error', text: error instanceof Error ? error.message : String(error) });
@@ -102,34 +110,35 @@ export default function EvaluationImportForm({ bundles, planned }: {
     }
   }
 
-  return <section className="rounded-xl border bg-white p-4">
+  return <section className="rounded-lg border border-hairline bg-canvas p-4">
     <h2 className="font-semibold">创建与导入离线评测</h2>
-    <p className="mt-1 text-xs text-gray-500">先冻结基线与候选运行组合，再由外部评测流程生成两份六阶段对话记录和一份裁决结果。导入时身份不一致会直接阻断。</p>
+    <p className="mt-1 text-xs text-muted">先冻结基线与候选运行组合，再由外部评测流程生成两份六阶段对话记录和一份裁决结果。导入时身份不一致会直接阻断。</p>
     {planned.length > 0 && <label className="mt-3 block text-sm">继续待导入任务
-      <select value={evaluationRunId} onChange={(event) => selectPlan(event.target.value)} className="mt-1 w-full border bg-white px-3 py-2">
+      <Select value={evaluationRunId} onChange={(event) => selectPlan(event.target.value)} className="mt-1">
         <option value="">新建评测</option>
         {planned.map((run) => <option key={run.id} value={run.id}>{run.name} · {run.modelATag} vs {run.modelBTag}</option>)}
-      </select>
+      </Select>
     </label>}
     <div className="mt-3 grid gap-3 md:grid-cols-3">
-      <label className="text-sm">评测名称<input value={name} onChange={(event) => setName(event.target.value)} required placeholder="qwen-v2.3-six-phase" className="mt-1 w-full border px-3 py-2" /></label>
-      <label className="text-sm">基线运行组合 A<select value={runtimeBundleAId} onChange={(event) => { setRuntimeBundleAId(event.target.value); setEvaluationRunId(''); }} className="mt-1 w-full border bg-white px-3 py-2"><option value="">请选择</option>{bundles.map((bundle) => <option key={bundle.id} value={bundle.id}>{bundle.label}</option>)}</select></label>
-      <label className="text-sm">候选运行组合 B<select value={runtimeBundleBId} onChange={(event) => { setRuntimeBundleBId(event.target.value); setEvaluationRunId(''); }} className="mt-1 w-full border bg-white px-3 py-2"><option value="">请选择</option>{bundles.map((bundle) => <option key={bundle.id} value={bundle.id}>{bundle.label}</option>)}</select></label>
+      <label className="text-sm">评测名称<Input value={name} onChange={(event) => setName(event.target.value)} required placeholder="qwen-v2.3-six-phase" className="mt-1" /></label>
+      <label className="text-sm">基线运行组合 A<Select value={runtimeBundleAId} onChange={(event) => { setRuntimeBundleAId(event.target.value); setEvaluationRunId(''); }} className="mt-1"><option value="">请选择</option>{bundles.map((bundle) => <option key={bundle.id} value={bundle.id}>{bundle.label}</option>)}</Select></label>
+      <label className="text-sm">候选运行组合 B<Select value={runtimeBundleBId} onChange={(event) => { setRuntimeBundleBId(event.target.value); setEvaluationRunId(''); }} className="mt-1"><option value="">请选择</option>{bundles.map((bundle) => <option key={bundle.id} value={bundle.id}>{bundle.label}</option>)}</Select></label>
     </div>
-    <div className="mt-3 rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
+    <div className="mt-3 rounded-md border border-info/40 bg-info/8 p-3 text-sm text-body-strong">
       <b>{change.label}</b>
       <div className="mt-1 text-xs">{change.details.length ? change.details.join('；') : '选择后会列出本次评测中的模型、Prompt 和 Endpoint 差异。'}</div>
     </div>
-    <button type="button" disabled={pending || Boolean(evaluationRunId) || !name.trim() || !a || !b || a.id === b.id} onClick={createPlan} className="mt-3 bg-blue-700 px-4 py-2 text-sm text-white disabled:opacity-40">创建离线评测</button>
+    <button type="button" disabled={pending || Boolean(evaluationRunId) || !name.trim() || !a || !b || a.id === b.id} onClick={createPlan} className={buttonClass('secondary', 'md', 'mt-3')}>创建离线评测</button>
 
-    <form action={submit} className="mt-4 border-t pt-4">
+    <form action={submit} className="mt-4 border-t border-t-hairline pt-4">
       <input type="hidden" name="name" value={name} />
       <input type="hidden" name="evaluationRunId" value={evaluationRunId} />
       <input type="hidden" name="runtimeBundleAId" value={runtimeBundleAId} />
       <input type="hidden" name="runtimeBundleBId" value={runtimeBundleBId} />
-      <label className="text-sm">评测产物 JSON 文件<input name="artifacts" type="file" accept="application/json,.json" multiple required className="mt-2 block w-full text-sm" /><span className="mt-1 block text-xs text-gray-500">选择基线对话、候选对话和裁决结果三个文件；产物 A/B 标签必须与已创建任务一致。</span></label>
-      <button disabled={pending || !evaluationRunId} className="mt-3 bg-gray-950 px-4 py-2 text-sm text-white disabled:opacity-40">{pending ? '处理中…' : '导入评测产物'}</button>
+      <label className="text-sm">评测产物 JSON 文件<input name="artifacts" type="file" accept="application/json,.json" multiple required className="mt-2 block w-full text-sm" /><span className="mt-1 block text-xs leading-5 text-muted">选择三个文件：基线 transcript 需含 schemaVersion、tag、scope、scenarios/turns；候选 transcript 字段相同；verdict 需含 schemaVersion、tags.A/B、scenarioVerdicts，以及 summary.phase 的 P1-P6。每个阶段必须含胜负计数与 A/B parse 成功/总数，否则部署资格无法计算。</span></label>
+      <div className="mt-2 flex flex-wrap gap-3 text-xs"><a href="/samples/evaluation-baseline-transcript.json" download className="text-coral hover:underline">下载基线样例</a><a href="/samples/evaluation-candidate-transcript.json" download className="text-coral hover:underline">下载候选样例</a><a href="/samples/evaluation-verdict.json" download className="text-coral hover:underline">下载 verdict 样例</a></div>
+      <button disabled={pending || !evaluationRunId} className={buttonClass('primary', 'md', 'mt-3')}>{pending ? '处理中…' : '导入评测产物'}</button>
     </form>
-    {feedback && <div aria-live="polite" className={`mt-3 border p-3 text-sm ${feedback.tone === 'success' ? 'border-green-200 bg-green-50 text-green-900' : 'border-red-200 bg-red-50 text-red-900'}`}>{feedback.text}</div>}
+    {feedback && <div aria-live="polite" className={`mt-3 border border-hairline p-3 text-sm ${feedback.tone === 'success' ? 'border-success/40 bg-success/8 text-body-strong' : 'border-error/40 bg-error/8 text-body-strong'}`}>{feedback.text}</div>}
   </section>;
 }

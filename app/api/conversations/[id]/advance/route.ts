@@ -18,6 +18,7 @@ import { resolveChatContractBranch, runNewTutorSystemTurn } from '@/app/lib/tuto
 import type { StageTriggerType } from '@/app/lib/stageContract';
 import { recordLateEvent } from '@/app/lib/deadline';
 import { finalizeStageData, studentVisibleStageData } from '@/app/lib/stageState';
+import { advanceHint } from '@/app/lib/advanceHint';
 
 const STAGE2_TRANSITION_TRIGGER = '系统触发：学生已确认选题。请发送阶段2方案设计的开场，只推进第一个方案缺口。';
 const STAGE4_TRANSITION_TRIGGER = '系统触发：学生已完成数据收集。请读取已提交的数据表，并发送阶段4的数据分析开场。';
@@ -167,7 +168,12 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
         generationParams: generated.generationParams,
         contractCheck: generated.contractCheck,
       });
-      return NextResponse.json({ currentStage: 2, stageData: studentVisibleStageData(generated.stageData), transitionMessage });
+      return NextResponse.json({
+        currentStage: 2,
+        stageData: studentVisibleStageData(generated.stageData),
+        transitionMessage,
+        advanceHint: advanceHint({ currentStage: 2, stageData: generated.stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
+      });
     } catch (error) {
       console.error('阶段1→2过渡生成失败:', error);
       const classified = classifyError(error);
@@ -249,6 +255,7 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
         currentStage: 4,
         stageData: studentVisibleStageData(stageData),
         transitionMessage,
+        advanceHint: advanceHint({ currentStage: 4, stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
       });
     } catch (error) {
       console.error('阶段3→4过渡生成失败:', error);
@@ -312,7 +319,12 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
         generationParams: generated.generationParams,
         contractCheck: generated.contractCheck,
       });
-      return NextResponse.json({ currentStage: 5, stageData: studentVisibleStageData(stageData), transitionMessage });
+      return NextResponse.json({
+        currentStage: 5,
+        stageData: studentVisibleStageData(stageData),
+        transitionMessage,
+        advanceHint: advanceHint({ currentStage: 5, stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
+      });
     } catch (error) {
       console.error('阶段4→5报告初始化失败:', error);
       const classified = classifyError(error);
@@ -327,5 +339,9 @@ export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[
   if (advanced.count !== 1) {
     return NextResponse.json({ error: '阶段已变化，请刷新后重试' }, { status: 409 });
   }
-  return NextResponse.json({ currentStage: body.to, stageData: studentVisibleStageData(conv.stageData) });
+  return NextResponse.json({
+    currentStage: body.to,
+    stageData: studentVisibleStageData(conv.stageData),
+    advanceHint: advanceHint({ currentStage: body.to, stageData: conv.stageData, safetyQuizCompleted: conv.safetyQuizCompleted }),
+  });
 }

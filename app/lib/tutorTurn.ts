@@ -24,13 +24,21 @@ import {
 } from '@/app/lib/stateExtractor';
 import {
   attachServerOwnedArtifacts,
+  expressesComparison,
   tutorFocusPlan,
   updateServerAnalysis,
   visibleDataRows,
 } from '@/app/lib/serverTutorState';
+import {
+  callAnalysisClaimExtractor,
+  CLAIM_EXTRACTOR_PROMPT_VERSION,
+  CLAIM_EXTRACTOR_VERSION,
+  type ValidatedAnalysisClaim,
+} from '@/app/lib/analysisClaimExtractor';
 import { STAGE_CONTRACT_VERSION } from '@/app/lib/stageContract';
 import { finalizeStageData } from '@/app/lib/stageState';
 import { evaluateStage2Readiness } from '@/app/lib/stage2Readiness';
+import { describeStage4LastRound } from '@/app/lib/stage4Readiness';
 
 export function resolveChatContractBranch(conversationContract: string, modelContract: string): 'TUTOR_LANGUAGE_V1' | 'LEGACY_STAGE_CONTRACT' {
   if (conversationContract === TUTOR_LANGUAGE_CONTRACT_VERSION && modelContract === TUTOR_LANGUAGE_CONTRACT_VERSION) return 'TUTOR_LANGUAGE_V1';
@@ -80,6 +88,7 @@ function visibleFacts(stage: number, stageData: StageData, conv: ConversationFor
       研究方案: stageData.stage2?.experimentPlan,
       数据记录: visibleDataRows(stageData),
       已接受分析次数: stageData.stage4?.analysisCount ?? 0,
+      上一轮判定: describeStage4LastRound(stageData.stage4),
     };
   }
   return buildTutorVisibleState(stage, stageData, {
@@ -96,6 +105,7 @@ async function recordExtraction(input: {
   failureContext?: Record<string, unknown>;
   error?: unknown;
 }) {
+  const outputTruncated = input.result?.truncated === true && input.result.accepted.length === 0;
   await db.stateExtractionTrace.create({
     data: {
       conversationId: input.conversationId,
@@ -112,10 +122,81 @@ async function recordExtraction(input: {
       validatedFactsJson: JSON.stringify(input.result?.accepted ?? []),
       rejectedFactsJson: JSON.stringify(input.result?.rejected ?? []),
       generationParamsJson: JSON.stringify(input.result?.generationParams ?? input.failureContext ?? {}),
-      status: input.error ? 'FAILED' : 'SUCCEEDED',
-      failureReason: input.error instanceof Error ? input.error.message : input.error ? String(input.error) : '',
+      status: input.error || outputTruncated ? 'FAILED' : 'SUCCEEDED',
+      failureReason: outputTruncated
+        ? 'OUTPUT_TRUNCATED'
+        : input.error instanceof Error ? input.error.message : input.error ? String(input.error) : '',
     },
   });
+}
+
+/**
+ * 第四阶段的分析主张抽取：模型只读学生这一句话，服务器核验它声称引用的每个单元格。
+ * 失败绝不阻塞回合——返回 null 即回落到 updateServerAnalysis 的确定性路径。
+ */
+async function extractAnalysisClaim(input: {
+  conversationId: string;
+  userMessageId: string;
+  stageData: StageData;
+  studentMessage: string;
+}): Promise<ValidatedAnalysisClaim | null> {
+  const sourceMessages = [input.studentMessage];
+  let extraction: Awaited<ReturnType<typeof callAnalysisClaimExtractor>>;
+  try {
+    extraction = await callAnalysisClaimExtractor({
+      stageData: input.stageData,
+      studentMessage: input.studentMessage,
+    });
+  } catch (error) {
+    await db.stateExtractionTrace.create({
+      data: {
+        conversationId: input.conversationId,
+        userMessageId: input.userMessageId,
+        stage: 4,
+        extractorVersion: CLAIM_EXTRACTOR_VERSION,
+        providerSnapshot: process.env.EXTRACTOR_LLM_PROVIDER ?? '',
+        externalModelSnapshot: process.env.EXTRACTOR_LLM_MODEL ?? '',
+        modelFamily: '',
+        promptVersion: CLAIM_EXTRACTOR_PROMPT_VERSION,
+        promptSha256: '',
+        sourceMessagesJson: JSON.stringify(sourceMessages),
+        rawOutput: '',
+        generationParamsJson: JSON.stringify({ fallback: 'DETERMINISTIC_EVIDENCE_ONLY' }),
+        status: 'FAILED',
+        failureReason: error instanceof Error ? error.message : String(error),
+      },
+    }).catch(() => undefined);
+    return null;
+  }
+  const emptyClaim = extraction.claim.citations.length === 0;
+  // 轨迹写失败不该连累已经拿到的主张。
+  await db.stateExtractionTrace.create({
+    data: {
+      conversationId: input.conversationId,
+      userMessageId: input.userMessageId,
+      stage: 4,
+      extractorVersion: CLAIM_EXTRACTOR_VERSION,
+      providerSnapshot: extraction.provider,
+      externalModelSnapshot: extraction.model,
+      modelFamily: extraction.modelFamily,
+      promptVersion: CLAIM_EXTRACTOR_PROMPT_VERSION,
+      promptSha256: extraction.promptSha256,
+      sourceMessagesJson: JSON.stringify(sourceMessages),
+      rawOutput: extraction.rawOutput,
+      validatedFactsJson: JSON.stringify(extraction.claim.citations),
+      rejectedFactsJson: JSON.stringify(extraction.claim.rejected),
+      generationParamsJson: JSON.stringify({
+        ...extraction.generationParams,
+        attempts: extraction.attempts,
+        comparison: extraction.claim.comparison,
+        comparisonRejection: extraction.claim.comparisonRejection,
+        deterministicComparison: expressesComparison(input.studentMessage),
+      }),
+      status: extraction.truncated && emptyClaim ? 'FAILED' : 'SUCCEEDED',
+      failureReason: extraction.truncated && emptyClaim ? 'OUTPUT_TRUNCATED' : '',
+    },
+  }).catch(() => undefined);
+  return extraction.claim;
 }
 
 export async function runNewTutorTurn(input: {
@@ -207,9 +288,23 @@ export async function runNewTutorTurn(input: {
 
   let analysisAccepted = false;
   if (stage === 4) {
-    const analysis = updateServerAnalysis(stageData, input.message);
+    const claim = await extractAnalysisClaim({
+      conversationId: input.conversationId,
+      userMessageId: userMessage.id,
+      stageData,
+      studentMessage: input.message,
+    });
+    const analysis = updateServerAnalysis(stageData, input.message, claim);
     stageData = analysis.stageData;
     analysisAccepted = analysis.accepted;
+    extractionSummary = {
+      version: CLAIM_EXTRACTOR_VERSION,
+      promptVersion: CLAIM_EXTRACTOR_PROMPT_VERSION,
+      failed: claim === null,
+      accepted: analysis.accepted,
+      rejection: analysis.rejection,
+      ...analysis.signals,
+    };
   }
 
   const server = attachServerOwnedArtifacts({
@@ -331,6 +426,7 @@ export async function runNewTutorSystemTurn(input: {
           研究方案: stageData.stage2?.experimentPlan,
           数据记录: visibleDataRows(stageData),
           已接受分析次数: stageData.stage4?.analysisCount ?? 0,
+          上一轮判定: describeStage4LastRound(stageData.stage4),
         }
       : buildTutorVisibleState(input.stage, stageData, { 前序摘要: input.priorSummary }),
     allowedFocusIds: focus.allowedFocusIds,
