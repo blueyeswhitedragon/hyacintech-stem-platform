@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { createTopicCardRevision, decideTopicCard, deleteTopicCard, updateTopicCard } from '@/app/lib/dataLab/bootstrap/service';
 import type { TopicCardInput } from '@/app/lib/dataLab/bootstrap/contracts';
 
 export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/topic-cards/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     const body = await request.json() as { action?: 'UPDATE' | 'APPROVE' | 'REJECT' | 'CREATE_REVISION'; card?: TopicCardInput; reason?: string };
@@ -20,7 +20,7 @@ export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/t
 
 export async function DELETE(request: Request, ctx: RouteContext<'/api/data-lab/topic-cards/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     await deleteTopicCard(id, auth.user);

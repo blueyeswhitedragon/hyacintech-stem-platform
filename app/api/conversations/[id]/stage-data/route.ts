@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import type { StageData, Stage2Column, Stage3FileAssociation } from '@/app/models/stageData';
 import { validateStage3Rows } from '@/app/lib/stage3Rows';
@@ -15,7 +15,7 @@ import { hasStageRelease } from '@/app/lib/releasePolicy';
 //   { stage5: { conclusion, limitationsDiscussion } } 仅 currentStage==5（不允许改平台预填字段）
 export async function PATCH(req: Request, ctx: RouteContext<'/api/conversations/[id]/stage-data'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
 

@@ -83,3 +83,31 @@ export function repairJson(src: string): string {
 
   return out;
 }
+
+/**
+ * 解析 LLM 返回的 JSON 对象，容忍常见的 Markdown 围栏和轻微 JSON 格式问题。
+ * 只接受非数组对象，调用方仍须验证自己的业务字段和类型。
+ */
+export function parseLlmJsonObject(raw: string): Record<string, unknown> | null {
+  const candidates = [raw.trim()];
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1]?.trim();
+  if (fenced) candidates.push(fenced);
+  // 最后一级：模型在 JSON 前后夹了说明文字且没有围栏时，取第一个 { 到最后一个 }。
+  const first = raw.indexOf('{');
+  const last = raw.lastIndexOf('}');
+  if (first !== -1 && last > first) candidates.push(raw.slice(first, last + 1));
+
+  for (const candidate of candidates) {
+    for (const value of [candidate, repairJson(candidate)]) {
+      try {
+        const parsed = JSON.parse(value) as unknown;
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          return parsed as Record<string, unknown>;
+        }
+      } catch {
+        // Try the next representation.
+      }
+    }
+  }
+  return null;
+}

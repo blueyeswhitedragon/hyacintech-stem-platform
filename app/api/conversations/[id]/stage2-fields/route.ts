@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import { db } from '@/app/lib/db';
 import { advanceHint } from '@/app/lib/advanceHint';
@@ -59,7 +59,7 @@ export async function POST(
   ctx: RouteContext<'/api/conversations/[id]/stage2-fields'>,
 ) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
   let body: { fields?: Record<string, unknown> };

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { ensureStudentConversation } from '@/app/lib/conversation';
 
 // POST /api/student/assignments/[id]/start  （[id] = assignmentId）
@@ -9,7 +9,7 @@ export async function POST(
   ctx: RouteContext<'/api/student/assignments/[id]/start'>
 ) {
   const auth = await requireRole('student');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: assignmentId } = await ctx.params;
   const result = await ensureStudentConversation(assignmentId, auth.user.id);

@@ -1,5 +1,6 @@
 import { redirect, notFound } from 'next/navigation';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getClassDetail } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import Badge, { type BadgeTone } from '@/app/components/ui/Badge';
@@ -28,8 +29,9 @@ const STATUS_TONE: Record<string, BadgeTone> = {
 export default async function TeacherClassDetailPage(
   ctx: PageProps<'/teacher/classes/[id]'>
 ) {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'teacher') redirect('/');
 
   const { id } = await ctx.params;

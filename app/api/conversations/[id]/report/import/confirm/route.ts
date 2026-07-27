@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { getConversationForUser, parseStageData } from '@/app/lib/conversation';
 import { finalizeStageData, recoverStageDataV3, studentVisibleStageData } from '@/app/lib/stageState';
 import type { Stage5Sections, StageData } from '@/app/models/stageData';
 
 export async function POST(request: Request, ctx: RouteContext<'/api/conversations/[id]/report/import/confirm'>) {
   const auth = await requireRole('student');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
   const conv = await getConversationForUser(conversationId, auth.user.id);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { DATA_POLICY_VERSION } from '@/app/lib/productionCandidates';
 
 /**
@@ -19,7 +19,7 @@ import { DATA_POLICY_VERSION } from '@/app/lib/productionCandidates';
  */
 export async function PATCH(request: Request, ctx: RouteContext<'/api/assignments/[id]'>) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id } = await ctx.params;
 

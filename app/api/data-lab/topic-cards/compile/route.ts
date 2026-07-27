@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { compileTopicCardsWithModels } from '@/app/lib/dataLab/bootstrap/service';
 import type { CandidateModelConfig } from '@/app/lib/dataLab/bootstrap/contracts';
 import { sourcePackagesForCompilation } from '@/app/lib/dataLab/bootstrap/topicSources';
 
 export async function POST(request: Request) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const body = await request.json() as { sources?: Array<Record<string, unknown>>; sourceCandidateIds?: string[]; modelA?: CandidateModelConfig; modelB?: CandidateModelConfig; internalArchetype?: string };
     if (!body.modelA || !body.modelB) return NextResponse.json({ error: 'modelA、modelB 必填' }, { status: 400 });

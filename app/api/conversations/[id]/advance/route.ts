@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
 import { getConversationForUser, type ConversationForUser } from '@/app/lib/conversation';
 import { canAdvance } from '@/app/lib/stageAdvance';
@@ -90,7 +90,7 @@ async function generateTransition(input: {
 // body: { to: number }
 export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[id]/advance'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
 

@@ -75,14 +75,19 @@ export async function ensureRuntimeModelVersion() {
       where: { environment: 'PRODUCTION', status: 'ACTIVE' },
       orderBy: { startedAt: 'desc' },
     });
+    // registerModelVersion 会推断家族，这里以前漏了，于是启动器登记的运行时模型
+    // modelFamily 为空。运行组合的候选 A/B 独立性判定依赖这个字段，空值会让
+    // 案例生成页误报「候选 A/B 属于同一模型家族」并禁用编译与生成。
+    const modelFamily = inferModelFamily(identity.provider, identity.externalModelId);
     const model =
       existing ??
       (await tx.modelVersion.create({
-        data: {
-          ...identity,
-          status: activeDeployment ? 'DRAFT' : 'DEPLOYED',
-        },
+        data: { ...identity, modelFamily, status: activeDeployment ? 'DRAFT' : 'DEPLOYED' },
       }));
+    // 本函数幂等，因此也负责回填早于该修正登记的历史行；只补空值，不覆盖人工设定的家族。
+    if (existing && !existing.modelFamily.trim()) {
+      await tx.modelVersion.update({ where: { id: existing.id }, data: { modelFamily } });
+    }
 
     if (!activeDeployment) {
       await tx.modelDeployment.create({

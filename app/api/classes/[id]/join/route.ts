@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 
 // POST /api/classes/[id]/join —— 学生用邀请码加入班级
 // 注：以邀请码为准；路由中的 [id] 仅作占位，不强制与邀请码对应的班级一致。
 export async function POST(request: Request) {
   const auth = await requireRole('student');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   let body: { inviteCode?: string };
   try {

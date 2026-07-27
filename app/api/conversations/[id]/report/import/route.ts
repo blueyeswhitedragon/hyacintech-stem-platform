@@ -3,7 +3,7 @@ import { mkdir, unlink, writeFile } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { getConversationForUser, parseStageData } from '@/app/lib/conversation';
 import { extractDocxText } from '@/app/lib/docxExtract';
 import { parseReportSections } from '@/app/lib/reportDocxImport';
@@ -16,7 +16,7 @@ const DOCX_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingm
 // POST /api/conversations/[id]/report/import —— 留存 Word 并生成章节映射预览；确认前不覆盖权威字段。
 export async function POST(request: Request, ctx: RouteContext<'/api/conversations/[id]/report/import'>) {
   const auth = await requireRole('student');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
   const conv = await getConversationForUser(conversationId, auth.user.id);

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getStudentAssignments } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import StartAssignmentButton from '@/app/components/StartAssignmentButton';
@@ -27,8 +28,9 @@ const STATUS_TONE: Record<string, BadgeTone> = {
 };
 
 export default async function StudentAssignmentsPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'student') redirect('/');
 
   const assignments = await getStudentAssignments(user.id);

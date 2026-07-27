@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import {
   ensureDataLabRuntimeRegistry,
   listPromptPolicies,
@@ -7,14 +7,14 @@ import {
 
 export async function GET() {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   await ensureDataLabRuntimeRegistry(auth.user);
   return NextResponse.json({ policies: await listPromptPolicies() });
 }
 
 export async function POST() {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     await ensureDataLabRuntimeRegistry(auth.user);
     return NextResponse.json({ policies: await listPromptPolicies() }, { status: 201 });

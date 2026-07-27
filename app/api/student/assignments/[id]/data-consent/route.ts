@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { setStudentDataConsent } from '@/app/lib/productionCandidates';
 
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   ctx: RouteContext<'/api/student/assignments/[id]/data-consent'>
 ) {
   const auth = await requireRole('student');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     const body = (await request.json()) as { decision?: 'GRANT' | 'DECLINE' | 'WITHDRAW' };

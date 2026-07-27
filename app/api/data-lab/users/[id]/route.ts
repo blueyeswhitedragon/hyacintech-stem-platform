@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { deleteUnusedDataLabUser, updateDataLabUser } from '@/app/lib/dataLab/service';
 import { isUserRole } from '@/app/lib/roles';
 
 export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/users/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     const body = await request.json() as { username?: string; displayName?: string; role?: string };
@@ -21,7 +21,7 @@ export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/u
 
 export async function DELETE(_request: Request, ctx: RouteContext<'/api/data-lab/users/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     return NextResponse.json(await deleteUnusedDataLabUser(id, auth.user));

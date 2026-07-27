@@ -21,6 +21,16 @@ export interface AppSession {
   user?: SessionIdentity;
 }
 
+export type SessionInvalidReason =
+  | 'ANONYMOUS'
+  | 'SESSION_SUPERSEDED'
+  | 'ACCOUNT_DISABLED'
+  | 'ROLE_INVALID';
+
+export type SessionState =
+  | { user: SessionUser; reason: null }
+  | { user: null; reason: SessionInvalidReason };
+
 export const sessionOptions: SessionOptions = {
   password: process.env.SESSION_SECRET ?? '',
   cookieName: 'hyacintech_session',
@@ -46,19 +56,29 @@ export async function getSession() {
 }
 
 /**
- * 仅读取当前登录用户（不抛错）。供 Server Component 页面使用：
- *   const user = await getCurrentUser();
- *   if (!user) redirect('/auth/login');
+ * 读取当前会话及失效原因。受保护页面应使用 getSessionState() + loginRedirectPath()
+ * 保留非匿名会话失效的说明；API 守卫也从这里取得唯一的失效原因。
  */
-export async function getCurrentUser(): Promise<SessionUser | null> {
+export async function getSessionState(): Promise<SessionState> {
   const session = await getSession();
-  if (!session.user?.id) return null;
+  if (!session.user?.id) return { user: null, reason: 'ANONYMOUS' };
   const user = await db.user.findUnique({
     where: { id: session.user.id },
     select: { id: true, username: true, displayName: true, role: true, isActive: true, sessionVersion: true },
   });
-  if (!user || !user.isActive || !isUserRole(user.role)) return null;
+  if (!user || !user.isActive) return { user: null, reason: 'ACCOUNT_DISABLED' };
+  if (!isUserRole(user.role)) return { user: null, reason: 'ROLE_INVALID' };
   const cookieVersion = typeof session.user.sessionVersion === 'number' ? session.user.sessionVersion : 0;
-  if (cookieVersion !== user.sessionVersion) return null;
-  return { id: user.id, username: user.username, displayName: user.displayName, role: user.role };
+  if (cookieVersion !== user.sessionVersion) return { user: null, reason: 'SESSION_SUPERSEDED' };
+  return {
+    user: { id: user.id, username: user.username, displayName: user.displayName, role: user.role },
+    reason: null,
+  };
+}
+
+/**
+ * 仅读取当前登录用户（不抛错）。供不需要展示失效原因的既有调用方使用。
+ */
+export async function getCurrentUser(): Promise<SessionUser | null> {
+  return (await getSessionState()).user;
 }

@@ -3,13 +3,15 @@ import Link from 'next/link';
 import AuthNav from '@/app/components/AuthNav';
 import BrandMark from '@/app/components/icons/BrandMark';
 import DataLabNav, { type NavigationGroupData } from '@/app/components/dataLab/DataLabNav';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { canUseDataLab } from '@/app/lib/dataLab/service';
 import { tutorPersonalQueueCount, tutorWorkflowCounts } from '@/app/lib/dataLab/bootstrap/service';
 
 export default async function DataLabLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (!canUseDataLab(user.role)) redirect('/');
 
   const workflow = user.role === 'admin' ? await tutorWorkflowCounts() : null;

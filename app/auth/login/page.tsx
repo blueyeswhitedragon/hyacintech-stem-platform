@@ -1,14 +1,22 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button';
 import { Field, Input } from '@/app/components/ui/Field';
 import { dashboardForRole, type UserRole } from '@/app/lib/roles';
 
-export default function LoginPage() {
+const SESSION_NOTICES: Record<string, string> = {
+  SESSION_SUPERSEDED: '你的账号在其他设备或标签页登录过，这里的登录状态已失效。重新登录即可继续，本次操作没有丢失。',
+  ACCOUNT_DISABLED: '账号已被停用，请联系管理员。',
+  ROLE_INVALID: '账号角色无效，请联系管理员。',
+};
+
+function LoginForm() {
   const router = useRouter();
+  // 会话失效原因由服务端重定向写进 query，渲染期直接读取，不经 effect 回写 state。
+  const notice = SESSION_NOTICES[useSearchParams().get('reason') ?? ''] ?? null;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +72,7 @@ export default function LoginPage() {
             />
           </Field>
 
+          {notice && <p className="text-sm text-info">{notice}</p>}
           {error && <p className="text-sm text-error">{error}</p>}
 
           <Button type="submit" variant="primary" disabled={loading} className="w-full">
@@ -79,5 +88,14 @@ export default function LoginPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  // useSearchParams 需要 Suspense 边界，否则整页退化为客户端渲染。
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

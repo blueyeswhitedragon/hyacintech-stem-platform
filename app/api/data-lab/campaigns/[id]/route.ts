@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { archiveCampaign, deleteDraftCampaign } from '@/app/lib/dataLab/service';
 
 export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/campaigns/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     const body = await request.json() as { action?: string; reason?: string };
@@ -17,7 +17,7 @@ export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/c
 
 export async function DELETE(_request: Request, ctx: RouteContext<'/api/data-lab/campaigns/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     return NextResponse.json(await deleteDraftCampaign(id, auth.user));

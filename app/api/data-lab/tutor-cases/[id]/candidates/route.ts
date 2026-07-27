@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { generateTutorCandidates } from '@/app/lib/dataLab/bootstrap/service';
 import type { CandidateModelSelection } from '@/app/lib/dataLab/bootstrap/contracts';
 
 export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/tutor-cases/[id]/candidates'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     const body = await request.json() as { modelA?: CandidateModelSelection; modelB?: CandidateModelSelection };

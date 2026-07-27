@@ -1,13 +1,15 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getTeacherStats } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import Card from '@/app/components/ui/Card';
 
 export default async function TeacherDashboardPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'teacher') redirect('/');
 
   const stats = await getTeacherStats(user.id);

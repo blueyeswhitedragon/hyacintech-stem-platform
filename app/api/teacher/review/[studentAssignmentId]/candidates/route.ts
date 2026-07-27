@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { nominateProductionCandidate } from '@/app/lib/productionCandidates';
 
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   ctx: RouteContext<'/api/teacher/review/[studentAssignmentId]/candidates'>
 ) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { studentAssignmentId } = await ctx.params;
   try {
     const body = (await request.json()) as {

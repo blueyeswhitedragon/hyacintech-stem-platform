@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { updateProviderConnection } from '@/app/lib/dataLab/runtimeRegistry';
 
 export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/ai-services/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     const body = await request.json() as {
@@ -22,7 +22,7 @@ export async function PATCH(request: Request, ctx: RouteContext<'/api/data-lab/a
 
 export async function DELETE(_request: Request, ctx: RouteContext<'/api/data-lab/ai-services/[id]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     await updateProviderConnection({ id, action: 'DELETE', user: auth.user });

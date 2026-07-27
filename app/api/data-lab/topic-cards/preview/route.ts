@@ -1,6 +1,6 @@
 import type { TopicCard } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { compileOneCase } from '@/app/lib/dataLab/bootstrap/caseCompiler';
 import {
   topicCardV2Fields,
@@ -78,7 +78,7 @@ function inMemoryTopicCard(input: TopicCardInput): TopicCard {
 
 export async function POST(request: Request) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const input = await request.json() as TopicCardInput;
     const errors = validateTopicCardInput(input);

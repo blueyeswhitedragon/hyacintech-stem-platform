@@ -72,7 +72,7 @@ export default function ModelVersionForm({
         外部模型 ID（兼容快照）
         <Input name="externalModelId" required placeholder="Qwen3.5-35B-A3B" className="mt-1" />
       </label>
-      <label className="text-sm">产物类型<Select name="artifactKind" className="mt-1"><option value="BASE">基础模型</option><option value="FINE_TUNED">训练产物</option><option value="EXTERNAL">外部产物</option></Select></label>
+      <label className="text-sm">产物类型<Select name="artifactKind" className="mt-1"><option value="BASE">基础模型</option><option value="FINE_TUNED">训练产物</option><option value="EXTERNAL">外部产物（外部平台微调）</option></Select><span className="mt-1 block text-xs text-muted">基础模型与外部产物（含在外部算力平台微调、只有 BaseURL + Key 的模型）不需要本平台 TrainingRun，但必须填 Checkpoint ID 或 64 位权重 SHA-256，否则身份为「待核验」，部署门禁会一直判不通过。</span></label>
       <label className="text-sm">模型家族<Input name="modelFamily" placeholder="qwen" className="mt-1" /></label>
       <label className="text-sm">参数规模<Input name="parameterScale" placeholder="35B-A3B" className="mt-1" /></label>
       <label className="text-sm">架构<Input name="architecture" placeholder="MoE / Dense" className="mt-1" /></label>
