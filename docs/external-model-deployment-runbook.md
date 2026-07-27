@@ -60,7 +60,7 @@ Endpoint 决定**实际请求地址、密钥与远程模型名**。远程模型�
 ## 7. 采集离线 A/B transcript
 
 ```
-npx tsx scripts/blind-eval.ts collect --stages coverage --prompt-version <组合冻结的 Prompt 版本>
+npx tsx scripts/blind-eval.ts collect --tag "<组合名>:v<版本号>" --stages coverage --prompt-version <组合冻结的 Prompt 版本>
 ```
 
 `--stages coverage` 会按 `expectedCoverageCells()` 的 **16 格**逐格产出回合，
@@ -76,7 +76,7 @@ npx tsx scripts/blind-eval.ts collect --stages coverage --prompt-version <组合
 ## 8. 裁判并导入（`/data-lab/evaluations`）
 
 ```
-npx tsx scripts/blind-eval.ts judge <tagA> <tagB>
+npx tsx scripts/blind-eval.ts judge "<基线组合名>:v<版本号>" "<候选组合名>:v<版本号>"
 ```
 
 verdict 的 `summary` 必须含 `phase`、`trigger`、`focus` 三组桶，每桶带

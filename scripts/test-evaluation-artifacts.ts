@@ -1,6 +1,11 @@
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { validateEvaluationArtifacts, type ImportedEvaluationArtifact } from '../app/lib/dataLab/evaluationArtifacts';
+import {
+  evaluationArtifactFilePart,
+  normalizeEvaluationArtifactTag,
+  resolveCollectArtifactTag,
+} from './lib/evaluation-artifact-tag';
 import { evaluateDeploymentGate } from '../app/lib/deploymentGate';
 
 let passed = 0;
@@ -22,6 +27,14 @@ async function sample(name: string) {
 }
 
 async function main() {
+  const runtimeTag = 'data-lab-candidate-b:v1';
+  const runtimeFilePart = evaluationArtifactFilePart(runtimeTag);
+  check(resolveCollectArtifactTag(runtimeTag, 'legacy-env-tag') === runtimeTag, '--tag 优先于 MODEL_TAG 并保留 RuntimeBundle 身份');
+  check(resolveCollectArtifactTag(undefined, 'legacy-env-tag') === 'legacy-env-tag', '未传 --tag 时继续使用 MODEL_TAG');
+  check(normalizeEvaluationArtifactTag(runtimeTag) === runtimeTag, 'RuntimeBundle 冒号 tag 可作为评测身份');
+  check(!runtimeFilePart.includes(':') && runtimeFilePart === evaluationArtifactFilePart(runtimeTag), 'RuntimeBundle tag 映射为稳定且安全的文件名');
+  check(evaluationArtifactFilePart('legacy-safe-tag') === 'legacy-safe-tag', '旧安全 tag 的文件名保持兼容');
+
   const baseline = await sample('evaluation-baseline-transcript.json');
   const candidate = await sample('evaluation-candidate-transcript.json');
   const verdict = await sample('evaluation-verdict.json');

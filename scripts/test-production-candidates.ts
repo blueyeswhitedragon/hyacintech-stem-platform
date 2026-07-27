@@ -17,6 +17,8 @@ import {
 } from '../app/lib/tutorLanguage';
 import { TUTOR_TRAINING_COHORT } from '../app/lib/dataLab/trainingCohort';
 import { sha256 } from '../app/lib/dataLab/validation';
+import { resolveTutorCaseAllowedFocusIds } from '../app/lib/dataLab/bootstrap/contracts';
+import { generateTutorCandidates } from '../app/lib/dataLab/bootstrap/service';
 
 let passed = 0;
 let failed = 0;
@@ -190,6 +192,23 @@ async function main() {
   check(convertedCandidate.convertedTutorTurnCase?.sourceSystemPrompt?.includes(student.displayName) === false
     && convertedCandidate.convertedTutorTurnCase?.systemPrompt.includes(TUTOR_TRAINING_COHORT.promptVersion) === true, '来源 Prompt 脱敏留存并重建目标 Prompt');
 
+  const convertedCase = convertedCandidate.convertedTutorTurnCase!;
+  const convertedFocus = resolveTutorCaseAllowedFocusIds(convertedCase)[0];
+  const generatedProduction = await generateTutorCandidates({
+    caseId: convertedCase.id,
+    modelA: { provider: 'openai', model: 'test-anthropic', family: 'anthropic' },
+    modelB: { provider: 'deepseek', model: 'test-deepseek', family: 'deepseek' },
+    user: { id: admin.id, username: admin.username, displayName: admin.displayName, role: 'admin' },
+  }, {
+    generateOne: async (_case, config) => ({
+      raw: JSON.stringify({ dialogue: config.provider === 'openai' ? '请把你想研究的问题说得更具体一些。' : '你最想弄清这个现象中的哪一点？', interactionType: 'clarification', focus: convertedFocus, hints: [] }),
+      params: { usage: { totalTokens: 1 } },
+    }),
+    critiqueCandidate: async (input) => ({ status: 'COMPLETED' as const, issues: [], advisories: [], raw: '{"issues":[]}', critic: { provider: input.config.provider, model: input.config.model, family: input.config.family ?? input.config.provider }, params: { usage: { totalTokens: 1 } } }),
+  });
+  check(generatedProduction.status === 'COMPLETED' && (await db.tutorCandidate.count({ where: { generationRunId: generatedProduction.runId, status: 'GENERATED' } })) === 2, '生产转换案例可直接使用 private focus 完成双候选生成');
+  check((await db.tutorReviewTask.count({ where: { caseId: convertedCase.id, type: 'EDIT', status: 'PENDING' } })) === 1, '生产转换案例仅在完整 A/B 和交叉检查后进入初审');
+
   const reportSourcePrompt = buildTutorLanguagePrompt({
     phase: 5,
     triggerType: 'REPORT_BOOTSTRAP',
@@ -244,6 +263,7 @@ async function main() {
   await db.dataLabAuditLog.deleteMany({ where: { actorId: { in: [teacher.id, student.id, admin.id] } } });
   await db.productionCandidate.deleteMany({ where: { id: { in: [candidate.id, reportCandidate.id] } } });
   await db.tutorTurnCase.deleteMany({ where: { id: { in: [converted.cases[0].id, convertedReport.cases[0].id] } } });
+  await db.bootstrapGenerationRun.delete({ where: { id: generatedProduction.runId } });
   await db.generationTrace.deleteMany({ where: { id: { in: [trace.id, systemTrace.id, legacyTrace.id] } } });
   await db.studentAssignment.delete({ where: { id: studentAssignment.id } });
   await db.conversation.delete({ where: { id: conversation.id } });

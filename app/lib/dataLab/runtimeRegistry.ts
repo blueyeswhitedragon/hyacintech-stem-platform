@@ -450,6 +450,73 @@ async function providerWithSecret(connectionId: string) {
   };
 }
 
+export async function probeStructuredJson(input: {
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+  timeoutMs: number;
+  temperature?: number;
+}) {
+  const started = Date.now();
+  const attempts: Array<{ attempt: number; failureCode: string; contentChars?: number; finishReason?: string | null }> = [];
+  let useJsonFormat = true;
+  let lastSnippet = '';
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), input.timeoutMs);
+    try {
+      const response = await fetch(`${normalizeServiceBaseUrl(input.baseUrl)}/chat/completions`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${input.apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: input.model,
+          messages: [
+            { role: 'system', content: '只返回一个完整合法的 JSON 对象，不要输出 Markdown 或解释。' },
+            { role: 'user', content: attempt === 1 ? '返回 {"ok":true}。' : '上一次结构输出失败。现在只返回 {"ok":true}。' },
+          ],
+          ...(useJsonFormat ? { response_format: { type: 'json_object' } } : {}),
+          temperature: input.temperature ?? 0,
+          max_tokens: 256,
+        }),
+        signal: controller.signal,
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error(`实际生成探针返回 HTTP ${response.status}`);
+      const body = await response.json() as {
+        choices?: Array<{ finish_reason?: unknown; message?: { content?: unknown; reasoning_content?: unknown } }>;
+      };
+      const choice = body.choices?.[0];
+      const content = typeof choice?.message?.content === 'string' ? choice.message.content : '';
+      const finishReason = typeof choice?.finish_reason === 'string' ? choice.finish_reason : null;
+      lastSnippet = content.trim().slice(0, 80);
+      const parsed = parseLlmJsonObject(content);
+      if (parsed?.ok === true && finishReason !== 'length') {
+        return {
+          ok: true as const,
+          latencyMs: Date.now() - started,
+          responseSha256: sha256Text(content),
+          successfulAttempt: attempt,
+          previousAttempts: attempts,
+        };
+      }
+      const failureCode = finishReason === 'length'
+        ? 'OUTPUT_TRUNCATED'
+        : !content.trim() ? 'EMPTY_CONTENT' : 'INVALID_JSON';
+      attempts.push({ attempt, failureCode, contentChars: content.length, finishReason });
+      useJsonFormat = false;
+    } catch (error) {
+      const failureCode = error instanceof DOMException && error.name === 'AbortError' ? 'TIMEOUT' : 'TRANSPORT_ERROR';
+      attempts.push({ attempt, failureCode });
+      if (attempt === 3) throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  throw new Error(`实际生成探针未返回 {"ok":true}（收到：${lastSnippet}；尝试：${attempts.map((item) => item.failureCode).join(',')}）`);
+}
+
 export async function testProviderConnection(connectionId: string, user: SessionUser) {
   const started = Date.now();
   try {
@@ -483,33 +550,10 @@ export async function testProviderConnection(connectionId: string, user: Session
         probeModelSource = 'FIRST_LISTED';
       }
 
-      const probeResponse = await fetch(`${normalizeServiceBaseUrl(connection.baseUrl)}/chat/completions`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: probeModel,
-          messages: [
-            { role: 'system', content: '只返回合法 JSON 对象。' },
-            { role: 'user', content: '返回 {"ok":true}。' },
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0,
-          max_tokens: 32,
-        }),
-        signal: controller.signal,
-        cache: 'no-store',
-      });
-      if (!probeResponse.ok) throw new Error(`实际生成探针返回 HTTP ${probeResponse.status}`);
-      const probeJson = await probeResponse.json() as { choices?: Array<{ message?: { content?: unknown } }> };
-      const content = probeJson.choices?.[0]?.message?.content;
-      if (typeof content !== 'string') throw new Error('实际生成探针未返回文本内容');
-      const parsed = parseLlmJsonObject(content);
-      if (parsed?.ok !== true) {
-        throw new Error(`实际生成探针未返回 {"ok":true}（收到：${content.slice(0, 80)}）`);
-      }
     } finally {
       clearTimeout(timer);
     }
+    const probe = await probeStructuredJson({ baseUrl: connection.baseUrl, apiKey, model: probeModel, timeoutMs });
     const latencyMs = Date.now() - started;
     await db.providerConnection.update({
       where: { id: connection.id },
@@ -528,6 +572,7 @@ export async function testProviderConnection(connectionId: string, user: Session
       modelCount: modelIds.length,
       probeModel,
       probeModelSource,
+      structuredProbe: probe,
     });
     return { ok: true, latencyMs, modelIds, probeModel };
   } catch (error) {
@@ -815,38 +860,13 @@ export async function resolveRuntimeBundleCallConfig(bundleId: string) {
 async function runBundleProbe(bundleId: string) {
   const { bundle, apiKey } = await bundleWithRuntime(bundleId);
   const params = parseObject(bundle.generationParamsJson);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 30_000);
-  const started = Date.now();
-  try {
-    const response = await fetch(`${normalizeServiceBaseUrl(bundle.endpoint.connection.baseUrl)}/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: bundle.endpoint.remoteModelId,
-        messages: [
-          { role: 'system', content: '只输出一个 JSON 对象：{"ok":true}' },
-          { role: 'user', content: '执行结构化输出探针。' },
-        ],
-        response_format: { type: 'json_object' },
-        temperature: typeof params.temperature === 'number' ? params.temperature : 0,
-        max_tokens: 80,
-      }),
-      signal: controller.signal,
-      cache: 'no-store',
-    });
-    if (!response.ok) throw new Error(`服务返回 HTTP ${response.status}`);
-    const body = await response.json() as { choices?: Array<{ message?: { content?: unknown } }> };
-    const content = body.choices?.[0]?.message?.content;
-    if (typeof content !== 'string' || !content.trim()) throw new Error('服务没有返回有效 completion');
-    // 转换网关（如 Anthropic→OpenAI）即便收到 response_format=json_object 仍可能包 Markdown 围栏，
-    // 所以这里必须与正式调用链走同一套解析，否则可用网关会被探针误判为不兼容。
-    const parsed = parseLlmJsonObject(content);
-    if (!parsed) throw new Error(`模型未返回 JSON 对象（收到：${content.trim().slice(0, 80)}）`);
-    return { ok: true, latencyMs: Date.now() - started, responseSha256: sha256Text(content) };
-  } finally {
-    clearTimeout(timer);
-  }
+  return probeStructuredJson({
+    baseUrl: bundle.endpoint.connection.baseUrl,
+    apiKey,
+    model: bundle.endpoint.remoteModelId,
+    timeoutMs: 30_000,
+    temperature: typeof params.temperature === 'number' ? params.temperature : 0,
+  });
 }
 
 export async function checkRuntimeBundle(bundleId: string) {
@@ -956,7 +976,9 @@ export async function updateRuntimeBundleStatus(input: {
     if (bundle.status !== 'COMPATIBLE' || bundle.promptCompatibilities[0]?.status !== 'PASS') {
       throw new Error('只有兼容性评测通过的组合可以标记为可用');
     }
-    return db.runtimeBundle.update({ where: { id: bundle.id }, data: { status: 'AVAILABLE' } });
+    const updated = await db.runtimeBundle.update({ where: { id: bundle.id }, data: { status: 'AVAILABLE' } });
+    await audit(input.user.id, 'RUNTIME_BUNDLE_MARKED_AVAILABLE', 'RuntimeBundle', bundle.id, { compatibilityId: bundle.promptCompatibilities[0].id });
+    return updated;
   }
   if (bundle.status === 'DEPLOYED') throw new Error('已部署组合必须先回滚或退出生产流量');
   if (bundle.roleBindings.length) throw new Error('请先取消该组合的角色默认绑定');

@@ -142,15 +142,20 @@
 每次比较必须让两个模型完成同一种目标风格的采集，并把风格写进标签，避免不同风格的文件互相覆盖。例如评测“证据分析型”：
 
 ```powershell
-npx tsx scripts/blind-eval.ts collect --scope smoke --style evidence_analyst --tag baseline-evidence
-npx tsx scripts/blind-eval.ts collect --scope smoke --style evidence_analyst --tag tuned-evidence
-npx tsx scripts/blind-eval.ts judge baseline-evidence tuned-evidence --scope smoke
+npx tsx scripts/blind-eval.ts collect --scope smoke --style evidence_analyst --tag "baseline-evidence:v1"
+npx tsx scripts/blind-eval.ts collect --scope smoke --style evidence_analyst --tag "tuned-evidence:v1"
+npx tsx scripts/blind-eval.ts judge "baseline-evidence:v1" "tuned-evidence:v1" --scope smoke
 ```
 
 脚本产物位于 `data/blind-eval/`，常见文件为：
 
 - `transcript-<模型标签>.json`：某个模型的完整对话采集结果；
 - `verdict-<模型A>-vs-<模型B>.json`：匿名裁判结果。
+
+正式 RuntimeBundle 评测的 tag 必须精确使用 `${组合名}:v${版本号}`。脚本会在 JSON 内保留完整 tag，
+并自动把磁盘文件名转换为带短哈希的安全名称；运行 `judge` 时仍传完整 tag，不要传转换后的文件名。
+`--tag` 优先于环境变量 `MODEL_TAG`，旧的 `MODEL_TAG` 调用方式继续兼容。
+如需按 persona 标签筛选场景，请使用 `--persona-tag`，它不会改变评测产物身份。
 
 进入“高级管理 → 双盲评测”：
 

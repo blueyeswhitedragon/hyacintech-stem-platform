@@ -26,6 +26,11 @@ import {
   type TutorLanguagePromptVersion,
 } from '../app/lib/tutorLanguage';
 import { planCoverageTurns, missingCoverageCells, type CoverageTurnPlan } from './lib/coverage-driver';
+import {
+  evaluationArtifactFilePart,
+  normalizeEvaluationArtifactTag,
+  resolveCollectArtifactTag,
+} from './lib/evaluation-artifact-tag';
 import { EVAL_CASE_COUNTS, expectedCoverageCells } from '../app/lib/dataLab/bootstrap/caseCompiler';
 import {
   countSummary,
@@ -252,11 +257,12 @@ const PRIOR_SUMMARY = `【选题确认书】
 
 function printHelp() {
   console.log(`Usage:
-  npx tsx scripts/blind-eval.ts collect [--scope smoke|full] [--style <style-family>] [--stages coverage,persona,3,4,5,6] [--prompt-version <tutor-language-prompt-vX>] [--limit N] [--subject <area>] [--student-type <type>] [--difficulty easy|medium|hard] [--persona <id-or-name>] [--tag <tag>] [--include-regression true|false]
+  npx tsx scripts/blind-eval.ts collect [--scope smoke|full] [--style <style-family>] [--stages coverage,persona,3,4,5,6] [--prompt-version <tutor-language-prompt-vX>] [--limit N] [--subject <area>] [--student-type <type>] [--difficulty easy|medium|hard] [--persona <id-or-name>] [--persona-tag <tag>] [--tag <artifact-tag>] [--include-regression true|false]
   npx tsx scripts/blind-eval.ts judge <tagA> <tagB> [--scope smoke|full] [--judge-level scenario|full] [--scenario <id-or-name>]
 
 Collect env:
-  MODEL_TAG=<safe-tag>
+  --tag takes precedence over MODEL_TAG. RuntimeBundle evaluations must use <bundle-name>:v<version> exactly.
+  MODEL_TAG=<artifact-tag>
   LLM_PROVIDER=openai|deepseek
   OPENAI_API_KEY / DEEPSEEK_API_KEY
   OPENAI_API_BASE / DEEPSEEK_API_BASE=https://api.deepseek.com
@@ -300,15 +306,6 @@ function parseScenarioFilter(args: string[]): string | undefined {
   return value;
 }
 
-function safeTag(tag: string | undefined): string {
-  const trimmed = tag?.trim();
-  if (!trimmed) throw new Error('collect 需要设置 MODEL_TAG');
-  if (!/^[A-Za-z0-9._-]+$/.test(trimmed)) {
-    throw new Error('MODEL_TAG 只能包含字母、数字、点、下划线和短横线');
-  }
-  return trimmed;
-}
-
 function safeFilePart(value: string): string {
   return value.trim().replace(/[\\/:*?"<>|\s]+/g, '_').replace(/^_+|_+$/g, '') || 'scenario';
 }
@@ -321,7 +318,8 @@ interface CollectOptions {
   subject?: SubjectArea;
   studentType?: StudentType;
   difficulty?: 'easy' | 'medium' | 'hard';
-  tag?: string;
+  artifactTag?: string;
+  personaTag?: string;
   limit?: number;
   styleFamily: StyleFamily;
   /** 结构覆盖场景使用的 Tutor Prompt 版本；与运行组合里冻结的版本保持一致。 */
@@ -386,7 +384,8 @@ function parseCollectOptions(args: string[], scope: Scope): CollectOptions {
     subject,
     studentType,
     difficulty,
-    tag: parseFlagValue(args, '--tag'),
+    artifactTag: parseFlagValue(args, '--tag'),
+    personaTag: parseFlagValue(args, '--persona-tag'),
     limit: parseLimit(args),
     styleFamily: requestedStyle,
   };
@@ -402,7 +401,7 @@ function selectedPersonas(options: CollectOptions | Scope): StemPersona[] {
     subject: options.subject,
     studentType: options.studentType,
     difficulty: options.difficulty,
-    tag: options.tag,
+    tag: options.personaTag,
     limit: options.limit,
   });
 }
@@ -1112,7 +1111,7 @@ function collectModelConfig(): Transcript['modelConfig'] {
 }
 
 async function collect(options: CollectOptions) {
-  const tag = safeTag(process.env.MODEL_TAG);
+  const tag = resolveCollectArtifactTag(options.artifactTag, process.env.MODEL_TAG);
   evaluationStyleFamily = options.styleFamily;
   evaluationStylePolicyVersion = DEFAULT_STYLE_POLICY_VERSION;
   const provider = createLLMProvider();
@@ -1181,7 +1180,7 @@ async function collect(options: CollectOptions) {
     summary: collectSummary(scenarios),
     scenarios,
   };
-  const outPath = path.join(OUT_DIR, `transcript-${tag}.json`);
+  const outPath = path.join(OUT_DIR, `transcript-${evaluationArtifactFilePart(tag)}.json`);
   await writeFile(outPath, `${JSON.stringify(transcript, null, 2)}\n`, 'utf8');
   console.log(`Wrote ${outPath}`);
   console.log(`Scenarios: ${transcript.summary.scenarios}, turns: ${transcript.summary.turns}, parseOk: ${transcript.summary.parseOk}, clean: ${transcript.summary.cleanTurns}`);
@@ -1446,11 +1445,15 @@ function normalizeScenarioRecord(scenario: ScenarioRecord): ScenarioRecord {
 }
 
 async function readTranscript(tag: string): Promise<Transcript> {
-  const file = path.join(OUT_DIR, `transcript-${safeTag(tag)}.json`);
+  const normalizedTag = normalizeEvaluationArtifactTag(tag, 'transcript tag');
+  const file = path.join(OUT_DIR, `transcript-${evaluationArtifactFilePart(normalizedTag)}.json`);
   const raw = await readFile(file, 'utf8');
   const parsed = JSON.parse(raw) as Transcript;
   if (parsed.schemaVersion !== TRANSCRIPT_SCHEMA_VERSION) {
     throw new Error(`${file} schemaVersion 不兼容：需要 ${TRANSCRIPT_SCHEMA_VERSION}，实际 ${parsed.schemaVersion}`);
+  }
+  if (parsed.tag !== normalizedTag) {
+    throw new Error(`${file} 内的 tag 与请求身份不一致：需要 ${normalizedTag}，实际 ${parsed.tag}`);
   }
   return {
     ...parsed,
@@ -1702,7 +1705,7 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
 
   await mkdir(OUT_DIR, { recursive: true });
   const scenarioSuffix = scenarioFilter ? `-${safeFilePart(scenarioFilter)}` : '';
-  const outPath = path.join(OUT_DIR, `verdict-${safeTag(tagA)}-vs-${safeTag(tagB)}${scenarioSuffix}.json`);
+  const outPath = path.join(OUT_DIR, `verdict-${evaluationArtifactFilePart(tagA)}-vs-${evaluationArtifactFilePart(tagB)}${scenarioSuffix}.json`);
   await writeFile(outPath, `${JSON.stringify(verdict, null, 2)}\n`, 'utf8');
   console.log(`Wrote ${outPath}`);
   console.log(`Scenario wins: A=${verdict.summary.scenario.A}, B=${verdict.summary.scenario.B}, tie=${verdict.summary.scenario.tie}, inconsistent=${verdict.summary.scenario.inconsistent}`);
@@ -1740,7 +1743,7 @@ async function loadDotEnv() {
 function positionalArgs(args: string[]): string[] {
   const valueFlags = new Set([
     '--scope', '--judge-level', '--scenario', '--stages', '--limit', '--subject',
-    '--student-type', '--difficulty', '--persona', '--tag', '--style', '--include-regression',
+    '--student-type', '--difficulty', '--persona', '--persona-tag', '--tag', '--style', '--include-regression',
   ]);
   const out: string[] = [];
   for (let i = 0; i < args.length; i++) {
