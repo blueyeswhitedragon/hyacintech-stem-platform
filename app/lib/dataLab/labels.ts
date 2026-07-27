@@ -17,6 +17,7 @@ export const DATA_LAB_STATUS_LABELS: Record<string, string> = {
   REGEN_REQUESTED: '等待重新生成',
   NEEDS_REGEN: '需要重新生成',
   NEEDS_CRITIC: '等待补齐交叉检查',
+  CASE_NEEDS_REVISION: '案例需要修订',
   BLOCKED: '被自动检查阻断',
   FINALIZED: '已定稿',
   APPROVED: '已批准',
@@ -235,7 +236,7 @@ export const GATE_FAILURE_LABELS: Record<string, string> = {
   NEAR_DUPLICATE_RATE_AT_OR_ABOVE_10_PERCENT: '近重复率达到或超过 10%',
   TEMPLATE_REPEAT_RATE_AT_OR_ABOVE_10_PERCENT: '模板化表达重复率达到或超过 10%',
   TRIAL_REQUIRES_36_CASES: '需要完成并定稿 36 条试验案例（创建案例 → 生成双候选 → 初审 → 定稿，全流程走完后统计）',
-  TRIAL_STRUCTURAL_DISTRIBUTION_OUTDATED: '当前试验批次仍是旧阶段配比；请先标记为已替代，再按六阶段新配比重跑 36 条并重新完成人工签署',
+  TRIAL_STRUCTURAL_DISTRIBUTION_OUTDATED: '当前试验批次是旧阶段配比。请直接用上方「编译 36 条试验案例」重新编译一批（确认创建新批次即可），门禁只看最新有效批次；旧批次含已定稿记录时保留即可，无需标记为已替代。',
   SMOKE_REQUIRES_SIX_FINALIZED_CASES: '需要完成并定稿 6 条冒烟案例',
   SMOKE_REQUIRES_FOUR_LIGHT_OR_NO_EDIT: '至少 4 条冒烟案例应无需大改',
   SMOKE_REQUIRES_ALL_DIRECT_CONFIRM: '6 条冒烟案例均需一次通过定稿',
@@ -357,7 +358,7 @@ export function gateFailureLabel(value: string): string {
   if (GATE_FAILURE_LABELS[value]) return GATE_FAILURE_LABELS[value];
   const [code, detail, count] = value.split(':');
   if (code === 'FULL_REQUIRES_AT_LEAST_15_APPROVED_TOPIC_CARDS') return `至少需要 15 张已批准话题卡，当前 ${detail ?? 0} 张`;
-  if (code === 'FULL_REQUIRES_ALL_V2_TOPIC_CARDS') return `正式集要求全部使用新版话题卡，当前 ${detail ?? '未达标'}`;
+  if (code === 'FULL_REQUIRES_ALL_V2_TOPIC_CARDS') return `正式集要求全部使用新版话题卡，当前 ${detail ?? '未达标'}；需把历史结构话题卡升级为新版修订后批准`;
   if (code === 'FULL_REQUIRES_3_TOPIC_CARDS_PER_SUBJECT') return `${dataLabValueLabel(detail)}至少需要 3 张话题卡，当前 ${count ?? 0} 张`;
   if (code === 'FULL_REQUIRES_3_TOPIC_CARDS_PER_CONTEXT_MODULE') return `${dataLabValueLabel(detail)}至少需要 3 张话题卡，当前 ${count ?? 0} 张`;
   if (code === 'FULL_REQUIRES_ENGINEERING_OR_HYBRID_PER_CONTEXT_MODULE') return `${dataLabValueLabel(detail)}至少需要 1 张工程或混合型话题卡`;

@@ -48,6 +48,7 @@ SQLite + Prisma persist operational, teaching, Data Lab, model, and audit record
 ## Conventions
 
 - All route handlers use `requireUser()` / `requireRole()` guards from `app/lib/auth.ts`
+- New protected pages must use `getSessionState()` + `loginRedirectPath()` rather than `redirect('/auth/login')`, so superseded or invalid sessions are not silently redirected.
 - `checkBlacklistedKeywords()` must run before every chat LLM call
 - Dynamic Tutor responses use the versioned Tutor parser/contract; legacy six-phase responses may still use `safeParseChatResponse()`. Always handle parse failure.
 - Stage artifacts, confirmation hashes, safety verification, evidence fingerprints, and transitions are server-owned. Never trust client claims for them.

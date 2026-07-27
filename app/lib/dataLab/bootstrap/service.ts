@@ -7,11 +7,13 @@ import type { LLMCompletion } from '@/app/lib/llm/types';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
 import {
   CALIBRATION_12_SCENARIOS,
+  compileBackfillCases,
   compileCases,
   compileScenarioCases,
   EVAL_CASE_COUNTS,
   expectedCoverageCells,
   FULL_CASE_COUNTS,
+  planBackfillSlots,
   SMOKE_6_SCENARIOS,
   TRIAL_CASE_COUNTS,
   type CoverageCell,
@@ -30,6 +32,7 @@ import {
   type CandidateCheck,
   type CandidateModelConfig,
   type CandidateModelSelection,
+  type BootstrapSubject,
   type DeterministicIssue,
   type TopicCardInput,
   type TutorCaseSplit,
@@ -41,6 +44,7 @@ import { deriveAcceptableDirections, effectiveFamilyKey, normalizeInquiryBridges
 import { isLegacyTutorWarningClosure, isTutorWarningAssessment, isTutorWarningAssessmentV2, isTutorWarningClosed, sanitizeTutorWarningClosures, tutorWarningBlocksFinal, TUTOR_WARNING_SEVERITIES, type TutorWarningClosureMap, type TutorWarningDetectorVerdict, type TutorWarningFinalRelation, type TutorWarningSeverity } from './warningClosure';
 import { caseStageContractVersion, tutorCohortReasons, TUTOR_TRAINING_COHORT } from '@/app/lib/dataLab/trainingCohort';
 import { isSystemTriggeredTurn } from '@/app/lib/stageContract';
+import { buildTrialReviewRows, trialReviewShareGpt } from './trialExport';
 
 export const REVIEW_LEASE_MS = 30 * 60 * 1000;
 export const TUTOR_CRITIC_PROMPT_VERSION = 'tutor-critic-prompt-v2.1';
@@ -464,6 +468,7 @@ curriculumAnchors 至少一条，引用初中科学课程中的真实概念。
 
 export async function generateTopicCardDrafts(input: {
   theme?: string;
+  subject?: BootstrapSubject;
   activityMode?: TopicActivityMode;
   contextModule?: TopicContextModule;
   count?: number;
@@ -486,7 +491,7 @@ export async function generateTopicCardDrafts(input: {
       kind: 'TOPIC_CARD_IDEATION', status: 'RUNNING', totalItems: count,
       modelConfigJson: JSON.stringify({ role: 'EVALUATOR', promptVersion: TOPIC_CARD_IDEATION_PROMPT_VERSION }),
       promptHashesJson: JSON.stringify({ system: sha256(system) }),
-      parametersJson: JSON.stringify({ theme: input.theme ?? '', activityMode: input.activityMode ?? '', contextModule: input.contextModule ?? '', count }),
+      parametersJson: JSON.stringify({ theme: input.theme ?? '', subject: input.subject ?? '', activityMode: input.activityMode ?? '', contextModule: input.contextModule ?? '', count }),
       createdById: input.user.id, startedAt: new Date(),
     },
   });
@@ -498,6 +503,7 @@ export async function generateTopicCardDrafts(input: {
     for (let index = 0; index < count; index += 1) {
       const brief = {
         主题方向: input.theme?.trim() || '由你选择一个未被已有话题覆盖的方向',
+        指定学科: input.subject ?? '不限',
         指定活动模式: input.activityMode ?? '不限',
         指定情境模块: input.contextModule ?? '不限',
         已有话题: avoidList,
@@ -547,7 +553,7 @@ export async function generateTopicCardDrafts(input: {
         displayTitle: String(parsed.displayTitle ?? ''),
         studentOpening: String(parsed.studentOpening ?? ''),
         internalArchetype: 'ai_ideation_v1',
-        subject: String(parsed.subject ?? '') as TopicCardInput['subject'],
+        subject: input.subject ?? String(parsed.subject ?? '') as TopicCardInput['subject'],
         gradeBand: String(parsed.gradeBand ?? '初中'),
         coreMechanism: String(parsed.coreMechanism ?? ''),
         acceptableDirections: deriveAcceptableDirections(bridges),
@@ -582,7 +588,7 @@ export async function generateTopicCardDrafts(input: {
     await db.bootstrapGenerationRun.update({ where: { id: run.id }, data: { status: 'FAILED', completedItems: completed, failedItems: failed + 1, failureReason: error instanceof Error ? error.message : String(error), completedAt: new Date() } });
     throw error;
   }
-  await audit(input.user.id, 'TOPIC_CARD_IDEATION_COMPLETED', 'BootstrapGenerationRun', run.id, { completed, failed, failures, theme: input.theme ?? '' });
+  await audit(input.user.id, 'TOPIC_CARD_IDEATION_COMPLETED', 'BootstrapGenerationRun', run.id, { completed, failed, failures, theme: input.theme ?? '', subject: input.subject ?? '' });
   return { runId: run.id, cards, completed, failed, failures };
 }
 
@@ -1257,6 +1263,7 @@ export async function listTutorCases() {
       sourceContractVersion: true,
       sourcePromptVersion: true,
       hardCheckJson: true,
+      revisionOfId: true,
       topicCard: { select: { displayTitle: true, subject: true, status: true } },
       generationRun: { select: { id: true, status: true, reviewPolicy: true, firstReviewMode: true, candidateARuntimeBundleId: true, candidateBRuntimeBundleId: true, promptPolicyVersionId: true, parametersJson: true, createdAt: true, completedAt: true, failureReason: true } },
       _count: { select: { candidates: true, reviewTasks: true } },
@@ -1314,6 +1321,83 @@ export async function overrideBlockedCases(runId: string, reason: string, user: 
     db.dataLabAuditLog.create({ data: { actorId: user.id, action: 'TUTOR_CASES_BLOCK_OVERRIDDEN', entityType: 'BootstrapGenerationRun', entityId: runId, payloadJson: JSON.stringify({ reason: reason.trim(), count: run.cases.length, originalErrors: run.cases.map((item) => ({ id: item.id, errors: item.hardCheckJson })) }) } }),
   ]);
   return { runId, unblocked: run.cases.length };
+}
+
+export async function backfillRejectedTutorCases(runId: string, user: SessionUser) {
+  if (user.role !== 'admin') throw new Error('只有管理员可以补全被驳回的案例');
+  const run = await db.bootstrapGenerationRun.findUnique({ where: { id: runId }, include: { cases: true } });
+  if (!run || run.kind !== 'CASE_COMPILATION') throw new Error('案例编译批次不存在');
+  if (run.status !== 'COMPLETED') throw new Error('只有已完成的案例编译批次可以补全被驳回的案例');
+  const slots = planBackfillSlots(run.cases);
+  if (!slots.length) throw new Error('该批次没有待补位的被驳回案例');
+
+  const parameters = parseJson<{ split?: string; promptVersion?: string }>(run.parametersJson, {});
+  const split = (TUTOR_CASE_SPLITS.includes(parameters.split as TutorCaseSplit) ? parameters.split : run.cases[0]?.split ?? 'PILOT') as TutorCaseSplit;
+  const promptVersion = (TUTOR_LANGUAGE_PROMPT_VERSIONS.includes(parameters.promptVersion as TutorLanguagePromptVersion)
+    ? parameters.promptVersion
+    : run.cases[0]?.promptVersion ?? DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION) as TutorLanguagePromptVersion;
+  const cards = await db.topicCard.findMany({
+    where: { status: 'APPROVED' },
+    orderBy: { approvedAt: 'asc' },
+    include: { sourceCandidate: { select: { familyKey: true, familyOverrideKey: true } } },
+  });
+  const used = {
+    cardKeys: new Set(run.cases
+      .filter((item) => item.topicCardId)
+      .map((item) => `${item.phase}|${parseJson<{ challenge?: string }>(item.privateReviewSpecJson, {}).challenge ?? ''}|${item.topicCardId}`)),
+    studentMessages: new Set(run.cases.map((item) => item.studentMessage)),
+  };
+  const compiled = compileBackfillCases(cards, slots, used, split, promptVersion);
+  const revisionByRejectedId = new Map(run.cases.map((item) => [item.id, item.revision]));
+
+  const created = await db.$transaction(async (tx) => {
+    const rows = [];
+    for (const item of compiled) {
+      rows.push(await tx.tutorTurnCase.create({
+        data: {
+          topicCardId: item.topicCardId,
+          generationRunId: run.id,
+          revisionOfId: item.rejectedCaseId,
+          revision: (revisionByRejectedId.get(item.rejectedCaseId) ?? 1) + 1,
+          phase: item.phase,
+          triggerType: item.triggerType,
+          studentMessage: item.studentMessage,
+          historyJson: JSON.stringify(item.history),
+          stageStateJson: JSON.stringify(item.stageState),
+          visibleFactsJson: JSON.stringify(item.visibleFacts),
+          privateReviewSpecJson: JSON.stringify(item.privateReviewSpec),
+          dataSource: 'BOOTSTRAP', split: item.split,
+          contractVersion: TUTOR_LANGUAGE_CONTRACT_VERSION,
+          extractorVersion: EXTRACTOR_VERSION,
+          promptVersion: item.promptVersion,
+          promptPolicyVersionId: run.promptPolicyVersionId,
+          systemPrompt: item.systemPrompt,
+          promptSha256: item.promptSha256,
+          hardCheckJson: JSON.stringify(item.hardCheck),
+          status: item.hardCheck.errors.length ? 'BLOCKED' : 'READY',
+        },
+      }));
+    }
+    const promptHashes = new Set(parseJson<string[]>(run.promptHashesJson ?? '[]', []));
+    for (const row of rows) promptHashes.add(row.promptSha256);
+    await tx.bootstrapGenerationRun.update({
+      where: { id: run.id },
+      data: { completedItems: run.completedItems + rows.length, promptHashesJson: JSON.stringify([...promptHashes]) },
+    });
+    return rows;
+  });
+
+  await audit(user.id, 'TUTOR_CASES_BACKFILLED', 'BootstrapGenerationRun', run.id, {
+    count: created.length,
+    replacements: compiled.map((item, index) => ({
+      rejectedCaseId: item.rejectedCaseId,
+      newCaseId: created[index].id,
+      phase: item.phase,
+      challenge: item.challenge,
+      topicCardId: item.topicCardId,
+    })),
+  });
+  return { runId: run.id, created: created.length, blocked: created.filter((item) => item.status === 'BLOCKED').length };
 }
 
 export async function deleteGenerationRun(runId: string, user: SessionUser) {
@@ -2222,19 +2306,22 @@ export function evaluateTrialQuality(records: Array<{
   return { pass: total >= 36 && failures.length === 0, failures: total < 36 ? ['TRIAL_REQUIRES_36_CASES', ...failures] : failures, metrics };
 }
 
-async function qualityRecordsForRun(runId: string) {
-  const records = await db.finalizedTutorTurn.findMany({
-    where: { case: { generationRunId: runId } },
-    select: { caseId: true, finalOutputJson: true, editMetricsJson: true, trainingEligibility: true, eligibilityReasonJson: true },
-  });
-  const caseIds = records.map((item) => item.caseId);
+async function directConfirmByCaseIds(caseIds: string[]): Promise<Map<string, boolean>> {
   const confirmTasks = caseIds.length
     ? await db.tutorReviewTask.findMany({ where: { caseId: { in: caseIds }, type: 'CONFIRM' }, select: { id: true, caseId: true, decision: true } })
     : [];
   const returnedTaskIds = new Set(confirmTasks.length
     ? (await db.dataLabAuditLog.findMany({ where: { action: 'TUTOR_CONFIRM_RETURNED', entityType: 'TutorReviewTask', entityId: { in: confirmTasks.map((item) => item.id) } }, select: { entityId: true } })).map((item) => item.entityId)
     : []);
-  const directByCase = new Map(confirmTasks.map((task) => [task.caseId, task.decision === 'CONFIRM' && !returnedTaskIds.has(task.id)]));
+  return new Map(confirmTasks.map((task) => [task.caseId, task.decision === 'CONFIRM' && !returnedTaskIds.has(task.id)]));
+}
+
+async function qualityRecordsForRun(runId: string) {
+  const records = await db.finalizedTutorTurn.findMany({
+    where: { case: { generationRunId: runId } },
+    select: { caseId: true, finalOutputJson: true, editMetricsJson: true, trainingEligibility: true, eligibilityReasonJson: true },
+  });
+  const directByCase = await directConfirmByCaseIds(records.map((item) => item.caseId));
   return records.map((item) => ({ ...item, directConfirmed: directByCase.get(item.caseId) === true }));
 }
 
@@ -2271,6 +2358,51 @@ export async function trialQualityReport(runId?: string) {
     signoffId: distributionCurrent ? signoff?.id ?? null : null,
     distributionCurrent,
   };
+}
+
+export async function trialReviewExport(user: SessionUser, runId?: string) {
+  const report = await trialQualityReport(runId);
+  if (!report.runId) throw new Error('没有可导出的 36 条试验批次');
+  const cases = await db.tutorTurnCase.findMany({
+    where: { generationRunId: report.runId, status: { not: 'SUPERSEDED' } },
+    include: {
+      finalizedTurn: {
+        select: {
+          finalOutputJson: true,
+          reviewerEditMetricsJson: true,
+          trainingEligibility: true,
+          eligibilityReasonJson: true,
+          contentSha256: true,
+        },
+      },
+      topicCard: { select: { displayTitle: true } },
+    },
+  });
+  const directByCase = await directConfirmByCaseIds(cases.flatMap((item) => item.finalizedTurn ? [item.id] : []));
+  const rows = buildTrialReviewRows(cases.map((item) => ({
+    caseId: item.id,
+    phase: item.phase,
+    triggerType: item.triggerType,
+    caseStatus: item.status,
+    topicTitle: item.topicCard?.displayTitle ?? null,
+    historyJson: item.historyJson,
+    studentMessage: item.studentMessage,
+    finalizedTurn: item.finalizedTurn,
+    directConfirmed: directByCase.get(item.id),
+  })));
+  const json = trialReviewShareGpt(rows, {
+    runId: report.runId,
+    distributionCurrent: report.distributionCurrent,
+    metrics: report.metrics,
+    failures: report.failures,
+  });
+  const finalized = rows.filter((row) => row.hasFinalizedTurn).length;
+  await audit(user.id, 'TRIAL_36_REVIEW_EXPORTED', 'BootstrapGenerationRun', report.runId, {
+    total: rows.length,
+    finalized,
+    distributionCurrent: report.distributionCurrent,
+  });
+  return { fileName: `trial36-review-${report.runId.slice(0, 8)}.json`, json };
 }
 
 export async function smokeQualityReport(runId?: string) {

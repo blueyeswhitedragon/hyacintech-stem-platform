@@ -335,7 +335,7 @@ export function expectedCoverageCells(counts: Record<number, number>): CoverageC
   return [...cells.values()];
 }
 
-function focusDescriptions(focusIds: string[]) {
+export function focusDescriptions(focusIds: string[]) {
   const descriptions: Record<string, string> = {
     research_question: '只帮助学生把当前兴趣缩小为一个可观察、可研究的问题，不提供指标菜单',
     direction_confirmation: '只核对学生刚刚提出的研究方向是否准确，不补充新的方向',
@@ -528,5 +528,96 @@ export function compileCases(cards: TopicCard[], counts: Record<number, number>,
   return caseSpecs(counts).map(({ phase, challenge, variant, fallbackIndex }) => {
     const card = cardForChallenge(cards, phase, challenge, fallbackIndex);
     return compileOneCase({ card, phase, challenge, variant, split, promptVersion });
+  });
+}
+
+export interface BackfillSlot {
+  rejectedCaseId: string;
+  phase: number;
+  challenge: string;
+  usedCardId: string | null;
+}
+
+export interface BackfillSourceCase {
+  id: string;
+  status: string;
+  phase: number;
+  revisionOfId: string | null;
+  revision: number;
+  topicCardId: string | null;
+  studentMessage: string;
+  privateReviewSpecJson: string;
+}
+
+function challengeOfCase(caseItem: { phase: number; privateReviewSpecJson: string }) {
+  const spec = parseJson<{ challenge?: unknown }>(caseItem.privateReviewSpecJson, {});
+  if (typeof spec.challenge === 'string' && spec.challenge.trim()) return spec.challenge;
+  return (CHALLENGES[caseItem.phase] ?? ['一般澄清'])[0];
+}
+
+/**
+ * 一个批次里「已驳回且还没有补位」的槽位。补位案例通过 revisionOfId 指回被驳回案例，
+ * 所以重复点击不会补第二次。
+ */
+export function planBackfillSlots(cases: BackfillSourceCase[]): BackfillSlot[] {
+  const replaced = new Set(cases.map((item) => item.revisionOfId).filter((id): id is string => Boolean(id)));
+  return cases
+    .filter((item) => item.status === 'CASE_REJECTED' && !replaced.has(item.id))
+    .sort((a, b) => (a.phase - b.phase) || a.id.localeCompare(b.id))
+    .map((item) => ({
+      rejectedCaseId: item.id,
+      phase: item.phase,
+      challenge: challengeOfCase(item),
+      usedCardId: item.topicCardId,
+    }));
+}
+
+const BACKFILL_MAX_VARIANTS = 4;
+
+/**
+ * 为被驳回的案例编译替换案例：phase 与 challenge 保持不变（triggerType 与 allowed focus
+ * 由这两者推出，结构覆盖因此不变），但换一张话题卡（必要时再换 variant），
+ * 使新案例与该批次已有的任何案例都不同——包括它自己要替换的那一条。
+ */
+export function compileBackfillCases(
+  cards: TopicCard[],
+  slots: BackfillSlot[],
+  used: { cardKeys: Set<string>; studentMessages: Set<string> },
+  split: TutorCaseSplit,
+  promptVersion: TutorLanguagePromptVersion = DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION,
+): Array<CompiledTutorCase & { rejectedCaseId: string }> {
+  assertCardsReady(cards);
+  const cardKeys = new Set(used.cardKeys);
+  const studentMessages = new Set(used.studentMessages);
+  const pickedCards = new Set<string>();
+  return slots.map((slot) => {
+    // 候选按优先级挑选：0=消息不重复且本次没用过这张卡（最好），1=只做到消息不重复，
+    // 2=只做到本次没用过这张卡，3=仅保证话题卡组合在批次里没出现过。
+    // 学生开场白只在部分考察点里带话题卡内容；像 P5「局限讨论缺失」这类是固定话术，
+    // 换任何卡片都得到同一句，所以「消息不重复」只能是优先项而不是硬条件——
+    // 退档后阶段/考察点不变，但状态、数据表、系统提示词仍来自新的话题卡。
+    let best: { tier: number; key: string; cardId: string; compiled: CompiledTutorCase } | null = null;
+    for (let index = 0; index < cards.length * BACKFILL_MAX_VARIANTS; index += 1) {
+      const card = cardForChallenge(cards, slot.phase, slot.challenge, index);
+      const variant = Math.floor(index / cards.length);
+      // 先在 variant 0 上试遍所有卡片，卡片用尽后才回到已用过的卡片换 variant。
+      // 批次已有案例的 key 不带 variant，因此原卡片的任何 variant 都不会被选中。
+      const key = variant === 0 ? `${slot.phase}|${slot.challenge}|${card.id}` : `${slot.phase}|${slot.challenge}|${card.id}|v${variant}`;
+      if (cardKeys.has(key)) continue;
+      const compiled = compileOneCase({
+        card, phase: slot.phase, challenge: slot.challenge,
+        variant, split, promptVersion,
+      });
+      const tier = (studentMessages.has(compiled.studentMessage) ? 2 : 0) + (pickedCards.has(card.id) ? 1 : 0);
+      if (!best || tier < best.tier) best = { tier, key, cardId: card.id, compiled };
+      if (tier === 0) break;
+    }
+    if (!best) {
+      throw new Error(`已批准话题卡不足以为第 ${slot.phase} 阶段「${slot.challenge}」补出内容不同的案例，请先补充并批准新的话题卡`);
+    }
+    cardKeys.add(best.key);
+    pickedCards.add(best.cardId);
+    studentMessages.add(best.compiled.studentMessage);
+    return { ...best.compiled, rejectedCaseId: slot.rejectedCaseId };
   });
 }

@@ -19,6 +19,7 @@ import {
 } from '@/app/lib/dataLab/labels';
 import { buttonClass } from '@/app/components/ui/Button';
 import { Input, Select, Textarea } from '@/app/components/ui/Field';
+import { planTopicCardGaps } from '@/app/lib/dataLab/topicGaps';
 
 type Profile = 'SMOKE_6' | 'CALIBRATION_12' | 'TRIAL_36' | 'FULL_180' | 'EVAL_80';
 
@@ -35,6 +36,7 @@ interface CaseView {
   sourceContractVersion: string | null;
   sourcePromptVersion: string | null;
   hardCheckJson: string;
+  revisionOfId: string | null;
   topicCard: { displayTitle: string; subject: string; status: string } | null;
   generationRun: {
     id: string;
@@ -153,6 +155,10 @@ function countStatuses(items: CaseView[]) {
     finalized: items.filter((item) => item.status === 'FINALIZED' || Boolean(item.finalizedTurn)).length,
     blocked: items.filter((item) => item.status === 'BLOCKED').length,
     superseded: items.filter((item) => item.status === 'SUPERSEDED').length,
+    rejected: items.filter((item) => item.status === 'CASE_REJECTED').length,
+    // 已驳回且还没有补位案例指回它的，才需要补全。
+    backfillable: items.filter((item) => item.status === 'CASE_REJECTED'
+      && !items.some((other) => other.revisionOfId === item.id)).length,
   };
 }
 
@@ -238,6 +244,14 @@ export default function CaseGenerationManager({
     && candidateA.family !== candidateB.family
     && candidateA.promptVersion === targetPrompt.version
     && candidateB.promptVersion === targetPrompt.version);
+  const topicGapPlans = Object.fromEntries(profileOrder.map((profile) => [
+    profile,
+    planTopicCardGaps(
+      profile === 'FULL_180' ? topicCoverage.fullFailures : [],
+      topicCoverage.coverage,
+      topicRequirements[profile] ?? { total: 1 },
+    ),
+  ])) as Record<Profile, ReturnType<typeof planTopicCardGaps>>;
 
   const groupedRuns = useMemo(() => {
     const groups = new Map<string, RunGroup>();
@@ -368,10 +382,14 @@ export default function CaseGenerationManager({
     }
   }
 
-  async function generateAll(runId: string, runtimeOverride = false, explicitTargets?: CaseView[]) {
+  async function generateAll(runId: string, explicitTargets?: CaseView[]) {
     const group = groupedRuns.find((item) => item.id === runId);
     const targets = explicitTargets ?? group?.cases.filter((item) => ['READY', 'NEEDS_REGEN'].includes(item.status)) ?? [];
     if (!targets.length) return;
+    // 只有批次自己冻结了运行组合时才交给服务端沿用；否则必须把当前选择发上去。
+    // 编译早于运行组合注册表的历史批次没有冻结记录，不带选择就会被服务端判为
+    //「案例未冻结运行组合，modelA 和 modelB 必填」而整批立刻失败。
+    const runtimeFrozen = Boolean(group?.candidateARuntimeBundleId && group?.candidateBRuntimeBundleId);
     setGenerationConfirmation(null);
     start(`generate-${runId}`);
     setGenerationProgress({ runId, current: 0, total: targets.length });
@@ -384,10 +402,10 @@ export default function CaseGenerationManager({
       for (const item of targets) {
         const label = `阶段 ${item.phase}“${item.topicCard?.displayTitle ?? '生产回流案例'}”`;
         try {
-          const body = runtimeOverride ? {
+          const body = runtimeFrozen ? {} : {
             modelA: { runtimeBundleId: candidateARuntimeBundleId },
             modelB: { runtimeBundleId: candidateBRuntimeBundleId },
-          } : {};
+          };
           const response = await fetch(`/api/data-lab/tutor-cases/${item.id}/candidates`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
           const data = await response.json();
           if (!response.ok) throw new Error(data.error ?? '候选生成失败');
@@ -474,34 +492,23 @@ export default function CaseGenerationManager({
     start(`autofill-${profile}`);
     setAutofillProgress(null);
     try {
-      const gaps: Array<{ contextModule: string; activityMode: string }> = [];
-      if (profile === 'FULL_180') {
-        for (const failure of topicCoverage.fullFailures) {
-          const parts = failure.split(':');
-          if (parts[0] === 'FULL_REQUIRES_3_TOPIC_CARDS_PER_CONTEXT_MODULE') gaps.push({ contextModule: parts[1], activityMode: '' });
-          else if (parts[0] === 'FULL_REQUIRES_ENGINEERING_OR_HYBRID_PER_CONTEXT_MODULE') gaps.push({ contextModule: parts[1], activityMode: 'ENGINEERING_DESIGN' });
-          else if (parts[0] === 'FULL_REQUIRES_6_ENGINEERING_OR_HYBRID_TOPIC_CARDS') gaps.push({ contextModule: '', activityMode: 'ENGINEERING_DESIGN' });
-        }
-      }
-      const requirement = topicRequirements[profile];
-      const totalGap = Math.max((requirement?.total ?? 1) - topicCoverage.coverage.total, 0);
-      const gapsToFill = (gaps.length ? gaps : Array.from({ length: totalGap }, () => ({ contextModule: '', activityMode: '' }))).slice(0, 5);
-      if (!gapsToFill.length) {
+      const requests = topicGapPlans[profile].requests;
+      if (!requests.length) {
         setFeedback({ tone: 'info', text: '没有可自动补全的数量缺口，请按门禁提示手动检查话题覆盖。' });
         return;
       }
       let completed = 0;
       let failed = 0;
-      setAutofillProgress({ profile, current: 0, total: gapsToFill.length });
+      setAutofillProgress({ profile, current: 0, total: requests.length });
       // 与批量生成同理：逐张调用 LLM，网络抛错时也只能算这一张失败。
       // 原先整个循环共用外层 catch，一次 fetch reject 就会丢掉剩余缺口。
-      for (let index = 0; index < gapsToFill.length; index += 1) {
-        const gap = gapsToFill[index];
+      for (let index = 0; index < requests.length; index += 1) {
+        const request = requests[index];
         try {
           const response = await fetch('/api/data-lab/topic-cards/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ count: 1, contextModule: gap.contextModule || undefined, activityMode: gap.activityMode || undefined }),
+            body: JSON.stringify({ count: 1, ...request }),
           });
           const data = await response.json();
           if (response.ok) completed += data.completed ?? 0;
@@ -510,7 +517,7 @@ export default function CaseGenerationManager({
           failed += 1;
         }
         // 进度在这一张真正结束后才推进，否则起手就显示 1/5。
-        setAutofillProgress({ profile, current: index + 1, total: gapsToFill.length });
+        setAutofillProgress({ profile, current: index + 1, total: requests.length });
       }
       setFeedback({ tone: completed ? 'success' : 'error', text: `已生成 ${completed} 张话题卡草稿${failed ? `，${failed} 张失败（可再次点击只补剩余缺口）` : ''}。请到话题库审批后再编译案例。` });
       router.refresh();
@@ -545,7 +552,7 @@ export default function CaseGenerationManager({
     }
     setFeedback({
       tone: failures.length ? (completed ? 'info' : 'error') : 'success',
-      text: `${completed} 个旧批次已标记为已替代${failures.length ? `；${failures.join('；')}` : ''}。`,
+      text: `${completed} 个旧批次已标记为已替代${failures.length ? `；${failures.join('；')}` : ''}。${failures.length > 0 && completed === 0 ? '这些批次含定稿记录，保留即可；要换配比请直接重新编译新批次。' : ''}`,
     });
     setPendingAction(null);
     router.refresh();
@@ -562,6 +569,18 @@ export default function CaseGenerationManager({
       setFeedback({ tone: 'success', text: `已解锁 ${data.unblocked} 条阻断案例为待生成状态。` });
       setOverrideRunId(null);
       setOverrideReason('');
+      router.refresh();
+    } catch (error) { fail(error); }
+    finally { setPendingAction(null); }
+  }
+
+  async function backfillRejected(runId: string) {
+    start(`backfill-${runId}`);
+    try {
+      const response = await fetch(`/api/data-lab/bootstrap-runs/${runId}/backfill`, { method: 'POST' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? '补全失败');
+      setFeedback({ tone: 'success', text: `已补 ${data.created} 条待生成案例${data.blocked ? `（其中 ${data.blocked} 条被硬检查阻断）` : ''}；请点击「生成双候选回复」后重新走初审与定稿。` });
       router.refresh();
     } catch (error) { fail(error); }
     finally { setPendingAction(null); }
@@ -659,24 +678,30 @@ export default function CaseGenerationManager({
         const statusLabel = !step.unlocked ? '未解锁' : step.quality?.pass ? '门禁通过' : group ? '进行中' : '可编译';
         const statusTone = !step.unlocked ? 'bg-surface-card text-muted' : step.quality?.pass ? 'bg-success/10 text-body-strong' : group ? 'bg-info/10 text-body-strong' : 'bg-canvas text-body';
         const generateProgress = generationProgress?.runId === group?.id ? generationProgress : null;
+        const groupRuntimeFrozen = Boolean(group?.candidateARuntimeBundleId && group?.candidateBRuntimeBundleId);
+        const topicGapPlan = topicGapPlans[step.profile];
+        const requiresV2Revision = topicGapPlan.manualActions.some((action) => action.startsWith('FULL_REQUIRES_ALL_V2_TOPIC_CARDS'));
+        const requiresDuplicateReview = topicGapPlan.manualActions.some((action) => action.startsWith('FULL_DUPLICATE_PROJECT_FAMILY'));
         return <article key={step.profile} className={`border border-hairline bg-canvas ${!step.unlocked ? 'border-hairline bg-surface-soft' : step.quality?.pass ? 'border-success/40' : group ? 'border-info/40' : 'border-hairline'}`}>
           <header className="border-b border-b-hairline p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div><div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold">{meta.label} · {meta.target} 条</h3><span className={`px-2 py-1 text-xs font-medium ${statusTone}`}>{statusLabel}</span></div><p className="mt-1 text-xs leading-5 text-muted">{meta.purpose}</p></div>
-              {activeOld.length > 0 && <button type="button" onClick={() => document.getElementById('case-run-history')?.scrollIntoView({ behavior: 'smooth' })} className="border border-hairline px-2 py-1 text-xs text-body">{activeOld.length} 个旧批次</button>}
+              {activeOld.length > 0 && <button type="button" onClick={() => document.getElementById('case-run-history')?.scrollIntoView({ behavior: 'smooth' })} className="border border-hairline px-2 py-1 text-xs text-body">{activeOld.length} 个旧批次 · 保留不影响门禁</button>}
             </div>
-            {group ? <><p className="mt-3 text-sm font-medium">{group.cases.length} 条案例：{counts.finalized} 已定稿 / {counts.ready} 待生成 / {counts.blocked} 阻断{counts.editing ? ` / ${counts.editing} 初审中` : ''}{counts.confirming ? ` / ${counts.confirming} 待定稿` : ''}</p><p className="mt-1 text-xs text-muted">run: {group.id.slice(0, 8)} · 创建于 {formatDate(group.createdAt)}</p></> : <p className="mt-3 text-sm text-muted">尚未编译此类案例。</p>}
+            {group ? <><p className="mt-3 text-sm font-medium">{group.cases.length} 条案例：{counts.finalized} 已定稿 / {counts.ready} 待生成 / {counts.blocked} 阻断{counts.editing ? ` / ${counts.editing} 初审中` : ''}{counts.confirming ? ` / ${counts.confirming} 待定稿` : ''}{counts.rejected ? ` / ${counts.rejected} 已驳回` : ''}</p><p className="mt-1 text-xs text-muted">run: {group.id.slice(0, 8)} · 创建于 {formatDate(group.createdAt)}</p></> : <p className="mt-3 text-sm text-muted">尚未编译此类案例。</p>}
           </header>
 
           <div className="divide-y">
             <section className="p-4">
-              <div className="flex items-start gap-3"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-on-dark">1</span><div className="min-w-0 flex-1"><h4 className="text-sm font-semibold">编译案例</h4><p className={`mt-1 text-xs ${topicReady ? 'text-[#2f7a43]' : 'text-error'}`}>{topicReady ? `话题卡充足（${topicCoverage.coverage.total}/${requirement.total} 张）` : `话题卡不足或覆盖未达标（${topicCoverage.coverage.total}/${requirement.total} 张）`} · {requirement.description}</p>{group && <p className="mt-2 text-sm">已编译 {group.cases.length} 条（{counts.ready} 待生成、{counts.blocked} 阻断）</p>}<div className="mt-3 flex flex-wrap gap-2"><button type="button" disabled={pending || !step.unlocked || !topicReady || !runtimeSelectionReady} onClick={() => requestCompile(step.profile)} className="border border-ink bg-canvas px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-35">{pendingAction === `compile-${step.profile}` ? '编译中…' : `编译 ${meta.target} 条${meta.shortLabel}案例`}</button>{!topicReady && <button type="button" disabled={pending} onClick={() => autofillTopicGaps(step.profile)} className={buttonClass('secondary', 'sm')}>{autofillProgress?.profile === step.profile ? `生成中 ${autofillProgress.current}/${autofillProgress.total}` : `一键补全 ${Math.min(Math.max(requirement.total - topicCoverage.coverage.total, 1), 5)} 张`}</button>}</div>{!step.unlocked && <p className="mt-2 text-xs text-error">{step.reason}</p>}
+              <div className="flex items-start gap-3"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-on-dark">1</span><div className="min-w-0 flex-1"><h4 className="text-sm font-semibold">编译案例</h4><p className={`mt-1 text-xs ${topicReady ? 'text-[#2f7a43]' : 'text-error'}`}>{topicReady ? `话题卡充足（${topicCoverage.coverage.total}/${requirement.total} 张）` : `话题卡不足或覆盖未达标（${topicCoverage.coverage.total}/${requirement.total} 张）`} · {requirement.description}</p>{group && <p className="mt-2 text-sm">已编译 {group.cases.length} 条（{counts.ready} 待生成、{counts.blocked} 阻断）</p>}<div className="mt-3 flex flex-wrap gap-2"><button type="button" disabled={pending || !step.unlocked || !topicReady || !runtimeSelectionReady} onClick={() => requestCompile(step.profile)} className="border border-ink bg-canvas px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-35">{pendingAction === `compile-${step.profile}` ? '编译中…' : `编译 ${meta.target} 条${meta.shortLabel}案例`}</button>{!topicReady && topicGapPlan.requests.length > 0 && <button type="button" disabled={pending} onClick={() => autofillTopicGaps(step.profile)} className={buttonClass('secondary', 'sm')}>{autofillProgress?.profile === step.profile ? `生成中 ${autofillProgress.current}/${autofillProgress.total}` : `一键补全 ${topicGapPlan.requests.length} 张`}</button>}</div>{!step.unlocked && <p className="mt-2 text-xs text-error">{step.reason}</p>}
+                {group && counts.backfillable > 0 && <div className="mt-3 border border-warning/40 bg-warning/8 p-3 text-xs leading-5 text-body-strong">本批次有 {counts.backfillable} 条案例在审核中被驳回，定稿数因此达不到 {meta.target} 条。补全会在<b>同一批次</b>内为每条被驳回案例生成一条替换案例：阶段与考察点不变（结构覆盖不变），但换用另一张话题卡，内容不会与批次里已有的任何案例重复。被驳回的记录保持原样保留。<div className="mt-2"><button type="button" disabled={pending} onClick={() => backfillRejected(group.id)} className={buttonClass('secondary', 'sm')}>{pendingAction === `backfill-${group.id}` ? '补全中…' : `补全被驳回的 ${counts.backfillable} 条`}</button></div></div>}
+                {step.profile === 'FULL_180' && topicCoverage.fullFailures.length > 0 && <div className="mt-3 border border-warning/40 bg-warning/8 p-3 text-xs leading-5 text-body-strong"><ul className="list-disc space-y-1 pl-4 text-error">{topicCoverage.fullFailures.map((failure) => <li key={failure}>{gateFailureLabel(failure)}</li>)}</ul>{requiresV2Revision && <p className="mt-2">历史话题结构不能通过新生成关闭；请到<Link href="/data-lab/topic-cards" className="mx-1 font-medium text-coral hover:underline">话题库</Link>依次完成「创建新版修订 → AI 自动填充 → 补全并批准」。批准修订会自动替代旧版。</p>}{requiresDuplicateReview && <p className="mt-2">重复项目族需要在<Link href="/data-lab/topic-cards" className="mx-1 font-medium text-coral hover:underline">话题库</Link>人工保留一张有效版本，不会自动生成新卡。</p>}</div>}
                 {blockedCases.length > 0 && <details className="mt-3 border-l-2 border-l-warning pl-3"><summary className="cursor-pointer text-sm font-medium text-[#8a6a0f]">查看 {blockedCases.length} 条阻断案例</summary><div className="mt-3 space-y-3">{blockedCases.map((item) => <div key={item.id} className="text-xs leading-5"><div className="font-medium text-ink">{item.topicCard?.displayTitle ?? '未命名话题'}（{item.id.slice(0, 8)}）</div>{hardCheckErrors(item).map((error) => <div key={error} className="mt-1 text-error">{hardCheckErrorLabel(error)}</div>)}</div>)}<div className="bg-warning/8 p-3 text-xs leading-5 text-body-strong">实际上这些 &quot;泄漏&quot; 出现在给 AI 导师的系统提示词中，学生看不到。如果确认不影响案例质量，可以忽略阻断直接解锁。<div className="mt-2 flex flex-wrap gap-2"><button type="button" disabled={pending} onClick={() => { if (group) setOverrideRunId(group.id); }} className={buttonClass('secondary', 'sm')}>忽略阻断并解锁为待生成</button><Link href="/data-lab/topic-cards" className={buttonClass('secondary', 'sm')}>或前往话题库修改</Link></div></div></div></details>}
               </div></div>
             </section>
 
             <section className="p-4">
-              <div className="flex items-start gap-3"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-on-dark">2</span><div className="min-w-0 flex-1"><h4 className="text-sm font-semibold">生成双候选</h4>{group ? <><p className="mt-1 text-sm">{counts.ready} 条待生成；每条调用模型 A/B 各生成一个回复并交叉检查。</p><button type="button" disabled={pending || counts.ready === 0} onClick={() => setGenerationConfirmation(group.id)} className="mt-3 border border-info/50 px-3 py-2 text-sm text-[#2f7f70] disabled:opacity-40">{pendingAction === `generate-${group.id}` ? `生成中 ${generateProgress?.current ?? 0}/${generateProgress?.total ?? counts.ready}` : `生成双候选回复（调用 LLM）· ${counts.ready} 条`}</button>{generateProgress && <div className="mt-3"><div className="h-2 overflow-hidden rounded-full bg-surface-cream-strong"><div className="h-full bg-coral transition-all" style={{ width: `${generateProgress.total ? (generateProgress.current / generateProgress.total) * 100 : 0}%` }} /></div><p className="mt-1 text-xs text-muted">{generateProgress.current}/{generateProgress.total} 已完成</p></div>}{criticCases.length > 0 && <details className="mt-3"><summary className="cursor-pointer text-xs text-[#8a6a0f]">{criticCases.length} 条等待补齐交叉检查</summary><div className="mt-2 space-y-2">{criticCases.map((item) => <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-t-hairline pt-2 text-xs"><span>阶段 {item.phase} · {item.topicCard?.displayTitle ?? item.id.slice(0, 8)}</span><button type="button" disabled={pending} onClick={() => retryCritics(item.id)} className={buttonClass('primary', 'sm')}>补齐交叉检查</button></div>)}</div></details>}</> : <p className="mt-1 text-sm text-muted">先完成步骤 1。</p>}</div></div>
+              <div className="flex items-start gap-3"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-on-dark">2</span><div className="min-w-0 flex-1"><h4 className="text-sm font-semibold">生成双候选</h4>{group ? <><p className="mt-1 text-sm">{counts.ready} 条待生成；每条调用模型 A/B 各生成一个回复并交叉检查。</p>{!groupRuntimeFrozen && counts.ready > 0 && <p className="mt-1 text-xs text-muted">本批次编译时没有冻结运行组合，将使用上方当前选择的候选 A/B。</p>}{counts.ready > 0 ? <button type="button" disabled={pending || (!groupRuntimeFrozen && !runtimeSelectionReady)} onClick={() => setGenerationConfirmation(group.id)} className="mt-3 border border-info/50 px-3 py-2 text-sm text-[#2f7f70] disabled:opacity-40">{pendingAction === `generate-${group.id}` ? `生成中 ${generateProgress?.current ?? 0}/${generateProgress?.total ?? counts.ready}` : `生成双候选回复（调用 LLM）· ${counts.ready} 条`}</button> : <p className="mt-3 text-xs text-[#2f7a43]">{counts.editing + counts.confirming + counts.finalized > 0 ? '双候选已生成，当前批次已进入初审或定稿。' : counts.blocked > 0 ? '当前案例均被硬检查阻断，请先处理阻断案例。' : '当前批次没有待生成案例。'}</p>}{generateProgress && <div className="mt-3"><div className="h-2 overflow-hidden rounded-full bg-surface-cream-strong"><div className="h-full bg-coral transition-all" style={{ width: `${generateProgress.total ? (generateProgress.current / generateProgress.total) * 100 : 0}%` }} /></div><p className="mt-1 text-xs text-muted">{generateProgress.current}/{generateProgress.total} 已完成</p></div>}{criticCases.length > 0 && <details className="mt-3"><summary className="cursor-pointer text-xs text-[#8a6a0f]">{criticCases.length} 条等待补齐交叉检查</summary><div className="mt-2 space-y-2">{criticCases.map((item) => <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-t-hairline pt-2 text-xs"><span>阶段 {item.phase} · {item.topicCard?.displayTitle ?? item.id.slice(0, 8)}</span><button type="button" disabled={pending} onClick={() => retryCritics(item.id)} className={buttonClass('primary', 'sm')}>补齐交叉检查</button></div>)}</div></details>}</> : <p className="mt-1 text-sm text-muted">先完成步骤 1。</p>}</div></div>
             </section>
 
             <section className="p-4">
@@ -684,7 +709,7 @@ export default function CaseGenerationManager({
             </section>
           </div>
 
-          {step.quality && <details className="border-t border-t-hairline p-4"><summary className="cursor-pointer text-sm font-medium">门禁检查{step.quality.pass ? ' · 已通过' : ''}</summary><div className="mt-3 grid gap-2 text-xs sm:grid-cols-2 xl:grid-cols-3">{Object.entries(step.quality.metrics).map(([key, value]) => <span key={key}>{formatGateMetric(key, value)}</span>)}</div>{step.quality.failures.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-error">{step.quality.failures.map((failure) => <li key={failure}>{gateFailureLabel(failure)}</li>)}</ul>}{step.profile === 'TRIAL_36' && trial.pass && !trial.signedOff && <button type="button" onClick={() => setSignoffOpen(true)} className={buttonClass('primary', 'sm', 'mt-3')}>填写人工复盘并签署</button>}{step.profile === 'TRIAL_36' && trial.signedOff && <p className="mt-3 text-xs text-[#2f7a43]">人工逐条复盘已签署。</p>}</details>}
+          {step.quality && <details className="border-t border-t-hairline p-4"><summary className="cursor-pointer text-sm font-medium">门禁检查{step.quality.pass ? ' · 已通过' : ''}</summary><div className="mt-3 grid gap-2 text-xs sm:grid-cols-2 xl:grid-cols-3">{Object.entries(step.quality.metrics).map(([key, value]) => <span key={key}>{formatGateMetric(key, value)}</span>)}</div>{step.quality.failures.length > 0 && <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-error">{step.quality.failures.map((failure) => <li key={failure}>{gateFailureLabel(failure)}</li>)}</ul>}{step.profile === 'TRIAL_36' && trial.runId && <a href={`/api/data-lab/bootstrap-runs/trial-export?runId=${trial.runId}`} className={buttonClass('secondary', 'sm', 'mt-3 mr-2 inline-flex')}>导出逐条复盘表（ShareGPT）</a>}{step.profile === 'TRIAL_36' && trial.pass && !trial.signedOff && <button type="button" onClick={() => setSignoffOpen(true)} className={buttonClass('primary', 'sm', 'mt-3')}>填写人工复盘并签署</button>}{step.profile === 'TRIAL_36' && trial.signedOff && <p className="mt-3 text-xs text-[#2f7a43]">人工逐条复盘已签署。</p>}</details>}
         </article>;
       })}</div>
     </section>
@@ -709,13 +734,13 @@ export default function CaseGenerationManager({
     </section>
 
     <section id="case-run-history" className="scroll-mt-4 space-y-3">
-      <div><h2 className="font-semibold">历史批次记录</h2><p className="mt-1 text-xs text-muted">这里展示旧 run、自定义来源和已替代批次；它们不参与最新批次的进度统计。</p></div>
+      <div><h2 className="font-semibold">历史批次记录</h2><p className="mt-1 text-xs text-muted">这里展示旧 run、自定义来源和已替代批次；它们不参与最新批次的进度统计。含已定稿或已提交审核记录的批次保留是正常的，不影响门禁。</p></div>
       {profileOrder.map((profile) => {
         const runs = oldActiveRuns.filter((group) => group.profile === profile);
         const ready = runs.reduce((sum, group) => sum + countStatuses(group.cases).ready, 0);
         if (!runs.length || !ready || dismissedOldRunWarnings.includes(profile)) return null;
         const latest = latestByProfile.get(profile);
-        return <div key={profile} className="border border-warning/40 bg-warning/8 p-4 text-sm text-body-strong"><p>检测到 {runs.length} 个旧的{profileMeta[profile].label}还有 {ready} 条待生成案例。门禁只看最新批次{latest ? `（${latest.id.slice(0, 8)}）` : ''}，旧案例不影响解锁。</p><div className="mt-3 flex flex-wrap gap-2"><button type="button" disabled={pending} onClick={() => setBulkSupersedeConfirmation(profile)} className={buttonClass('secondary', 'sm')}>全部标记为已替代</button><button type="button" onClick={() => setDismissedOldRunWarnings([...dismissedOldRunWarnings, profile])} className="px-3 py-2 text-xs text-muted">保留</button></div></div>;
+        return <div key={profile} className="border border-warning/40 bg-warning/8 p-4 text-sm text-body-strong"><p>检测到 {runs.length} 个旧的{profileMeta[profile].label}还有 {ready} 条待生成案例。门禁只看最新批次{latest ? `（${latest.id.slice(0, 8)}）` : ''}，旧案例不影响解锁。含已定稿或已提交审核记录的批次无法整体替代时，保留即可。</p><div className="mt-3 flex flex-wrap gap-2"><button type="button" disabled={pending} onClick={() => setBulkSupersedeConfirmation(profile)} className={buttonClass('secondary', 'sm')}>全部标记为已替代</button><button type="button" onClick={() => setDismissedOldRunWarnings([...dismissedOldRunWarnings, profile])} className="px-3 py-2 text-xs text-muted">保留</button></div></div>;
       })}
       {historyRuns.map((group) => {
         const counts = countStatuses(group.cases);
@@ -726,12 +751,12 @@ export default function CaseGenerationManager({
     </section>
 
     <ConfirmDialog open={compileConfirmation !== null} title="确认创建新批次" description={compileConfirmation ? `检测到已有${profileMeta[compileConfirmation].label}（${formatDate(latestByProfile.get(compileConfirmation)?.createdAt ?? null)}）。` : ''} consequence="创建新批次会保留旧批次，但进度与门禁只看最新有效批次。" confirmLabel="确认编译新批次" pending={Boolean(compileConfirmation && pendingAction === `compile-${compileConfirmation}`)} onClose={() => { if (!pending) setCompileConfirmation(null); }} onConfirm={() => { if (compileConfirmation) void compile(compileConfirmation, true); }} />
-    <ConfirmDialog open={selectedGenerationRun !== null || generationConfirmation === 'production-all'} title="确认生成双候选" description={generationConfirmation === 'production-all' ? `将为 ${productionRuns.reduce((sum, group) => sum + countStatuses(group.cases).ready, 0)} 条生产回流案例生成两个独立候选并执行交叉检查。` : selectedGenerationRun ? `将为 run ${selectedGenerationRun.id.slice(0, 8)} 的 ${countStatuses(selectedGenerationRun.cases).ready} 条待处理案例生成两个独立候选并执行交叉检查。` : ''} consequence={generationConfirmation === 'production-all' ? `预计产生约 ${productionRuns.reduce((sum, group) => sum + countStatuses(group.cases).ready, 0) * 4} 次模型调用，已完成的案例会逐条保存。` : selectedGenerationRun ? `预计产生约 ${countStatuses(selectedGenerationRun.cases).ready * 4} 次模型调用，已完成的案例会逐条保存。` : ''} confirmLabel="开始生成双候选" pending={Boolean(generationConfirmation && pendingAction === `generate-${generationConfirmation}`)} onClose={() => { if (!pending) setGenerationConfirmation(null); }} onConfirm={() => { if (generationConfirmation === 'production-all') void generateAll('production-all', true, productionRuns.flatMap((group) => group.cases).filter((item) => ['READY', 'NEEDS_REGEN'].includes(item.status))); else if (selectedGenerationRun) void generateAll(selectedGenerationRun.id, selectedGenerationRun.profile === 'CUSTOM'); }} />
+    <ConfirmDialog open={selectedGenerationRun !== null || generationConfirmation === 'production-all'} title="确认生成双候选" description={generationConfirmation === 'production-all' ? `将为 ${productionRuns.reduce((sum, group) => sum + countStatuses(group.cases).ready, 0)} 条生产回流案例生成两个独立候选并执行交叉检查。` : selectedGenerationRun ? `将为 run ${selectedGenerationRun.id.slice(0, 8)} 的 ${countStatuses(selectedGenerationRun.cases).ready} 条待处理案例生成两个独立候选并执行交叉检查。` : ''} consequence={generationConfirmation === 'production-all' ? `预计产生约 ${productionRuns.reduce((sum, group) => sum + countStatuses(group.cases).ready, 0) * 4} 次模型调用，已完成的案例会逐条保存。` : selectedGenerationRun ? `预计产生约 ${countStatuses(selectedGenerationRun.cases).ready * 4} 次模型调用，已完成的案例会逐条保存。` : ''} confirmLabel="开始生成双候选" pending={Boolean(generationConfirmation && pendingAction === `generate-${generationConfirmation}`)} onClose={() => { if (!pending) setGenerationConfirmation(null); }} onConfirm={() => { if (generationConfirmation === 'production-all') void generateAll('production-all', productionRuns.flatMap((group) => group.cases).filter((item) => ['READY', 'NEEDS_REGEN'].includes(item.status))); else if (selectedGenerationRun) void generateAll(selectedGenerationRun.id); }} />
     <ConfirmDialog open={selectedSupersedeRun !== null} title="标记旧批次为已替代" description={selectedSupersedeRun ? `run ${selectedSupersedeRun.id.slice(0, 8)} 将退出待处理队列。` : ''} consequence="案例和未完成的审核任务会标记为 SUPERSEDED；候选与审计记录保留。包含已定稿或已提交审核记录的批次不会被处理。" confirmLabel="确认标记" danger pending={Boolean(selectedSupersedeRun && pendingAction === `supersede-${selectedSupersedeRun.id}`)} onClose={() => { if (!pending) setSupersedeConfirmation(null); }} onConfirm={() => { if (selectedSupersedeRun) void supersedeRuns([selectedSupersedeRun]); }} />
     <ConfirmDialog open={bulkSupersedeConfirmation !== null} title="清理同类旧批次" description={bulkSupersedeConfirmation ? `将处理 ${oldActiveRuns.filter((group) => group.profile === bulkSupersedeConfirmation).length} 个旧的${profileMeta[bulkSupersedeConfirmation].label}。` : ''} consequence="系统会逐个处理；包含已定稿或已提交审核记录的批次会保留并报告原因。" confirmLabel="全部标记为已替代" danger pending={Boolean(bulkSupersedeConfirmation && pendingAction === `supersede-${bulkSupersedeConfirmation}`)} onClose={() => { if (!pending) setBulkSupersedeConfirmation(null); }} onConfirm={() => { if (bulkSupersedeConfirmation) void supersedeRuns(oldActiveRuns.filter((group) => group.profile === bulkSupersedeConfirmation)); }} />
 
-    <Dialog open={signoffOpen} title="签署 36 条试验人工复盘" description="自动指标通过后，团队仍需逐条确认没有系统性主题漂移或伪学生表达。" onClose={() => { if (!pending) setSignoffOpen(false); }} maxWidth="max-w-2xl" footer={<><button type="button" disabled={pending} onClick={() => setSignoffOpen(false)} className="border border-hairline px-4 py-2 text-sm">取消</button><button type="button" disabled={pending || !signoff.drift.trim() || !signoff.studentVoice.trim() || !signoff.signer.trim() || !signoff.confirmed} onClick={signoffTrial} className={buttonClass('primary', 'md')}>{pendingAction === 'trial-signoff' ? '签署中…' : '确认签署'}</button></>}>
-      <div className="space-y-4"><label className="block text-sm font-medium">主题漂移复盘结论<Textarea value={signoff.drift} onChange={(event) => setSignoff({ ...signoff, drift: event.target.value })} className="mt-1 min-h-24" /></label><label className="block text-sm font-medium">伪学生表达复盘结论<Textarea value={signoff.studentVoice} onChange={(event) => setSignoff({ ...signoff, studentVoice: event.target.value })} className="mt-1 min-h-24" /></label><label className="block text-sm font-medium">签署人<Input value={signoff.signer} onChange={(event) => setSignoff({ ...signoff, signer: event.target.value })} className="mt-1" /></label><label className="flex items-start gap-2 border border-warning/40 bg-warning/8 p-3 text-sm"><input type="checkbox" checked={signoff.confirmed} onChange={(event) => setSignoff({ ...signoff, confirmed: event.target.checked })} className="mt-1" /><span>我确认团队已逐条完成复盘，上述结论将作为正式扩产的审计依据。</span></label></div>
+    <Dialog open={signoffOpen} title="签署 36 条试验人工复盘" description="请先下载逐条复盘表，实际读完六阶段案例后，再填写主题漂移与伪学生表达的复盘结论。" onClose={() => { if (!pending) setSignoffOpen(false); }} maxWidth="max-w-2xl" footer={<><button type="button" disabled={pending} onClick={() => setSignoffOpen(false)} className="border border-hairline px-4 py-2 text-sm">取消</button><button type="button" disabled={pending || !signoff.drift.trim() || !signoff.studentVoice.trim() || !signoff.signer.trim() || !signoff.confirmed} onClick={signoffTrial} className={buttonClass('primary', 'md')}>{pendingAction === 'trial-signoff' ? '签署中…' : '确认签署'}</button></>}>
+      <div className="space-y-4">{trial.runId && <a href={`/api/data-lab/bootstrap-runs/trial-export?runId=${trial.runId}`} className={buttonClass('secondary', 'sm', 'inline-flex')}>导出逐条复盘表（ShareGPT）</a>}<label className="block text-sm font-medium">主题漂移复盘结论<Textarea value={signoff.drift} onChange={(event) => setSignoff({ ...signoff, drift: event.target.value })} className="mt-1 min-h-24" /></label><label className="block text-sm font-medium">伪学生表达复盘结论<Textarea value={signoff.studentVoice} onChange={(event) => setSignoff({ ...signoff, studentVoice: event.target.value })} className="mt-1 min-h-24" /></label><label className="block text-sm font-medium">签署人<Input value={signoff.signer} onChange={(event) => setSignoff({ ...signoff, signer: event.target.value })} className="mt-1" /></label><label className="flex items-start gap-2 border border-warning/40 bg-warning/8 p-3 text-sm"><input type="checkbox" checked={signoff.confirmed} onChange={(event) => setSignoff({ ...signoff, confirmed: event.target.checked })} className="mt-1" /><span>我确认团队已逐条完成复盘，上述结论将作为正式扩产的审计依据。</span></label></div>
     </Dialog>
 
     <Dialog open={overrideRunId !== null} title="忽略阻断并解锁" description="确认这些泄漏不影响案例质量后，阻断案例将解锁为待生成状态。" onClose={() => { if (!pending) { setOverrideRunId(null); setOverrideReason(''); } }} footer={<><button type="button" disabled={pending} onClick={() => { setOverrideRunId(null); setOverrideReason(''); }} className="border border-hairline px-4 py-2 text-sm">取消</button><button type="button" disabled={pending || !overrideReason.trim()} onClick={overrideBlocked} className={buttonClass('primary', 'md')}>{pendingAction?.startsWith('override-') ? '处理中…' : '确认解锁'}</button></>}><label className="block text-sm font-medium">忽略理由<Textarea autoFocus value={overrideReason} onChange={(event) => setOverrideReason(event.target.value)} placeholder="例如：泄漏内容在系统提示词中，学生不可见，不影响案例质量" className="mt-2 min-h-20" /></label></Dialog>
