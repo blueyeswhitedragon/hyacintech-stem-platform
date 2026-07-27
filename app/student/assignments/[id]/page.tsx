@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { ensureStudentConversation } from '@/app/lib/conversation';
 import { db } from '@/app/lib/db';
 import AuthNav from '@/app/components/AuthNav';
@@ -12,8 +13,9 @@ import { deterministicSafetyQuiz } from '@/app/lib/serverTutorState';
 export default async function StudentConversationPage(
   ctx: PageProps<'/student/assignments/[id]'>
 ) {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'student') redirect('/');
 
   const { id: assignmentId } = await ctx.params;

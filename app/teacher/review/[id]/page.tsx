@@ -1,5 +1,6 @@
 import { redirect, notFound } from 'next/navigation';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getReviewItem } from '@/app/lib/queries';
 import { parseStageData } from '@/app/lib/conversation';
 import AuthNav from '@/app/components/AuthNav';
@@ -15,8 +16,9 @@ import Table, { TBody, TD, TH, THead, TR } from '@/app/components/ui/Table';
 import { releasedTraceBlockReason } from '@/app/lib/releasePolicy';
 
 export default async function TeacherReviewDetailPage(ctx: PageProps<'/teacher/review/[id]'>) {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'teacher') redirect('/');
 
   const { id } = await ctx.params;

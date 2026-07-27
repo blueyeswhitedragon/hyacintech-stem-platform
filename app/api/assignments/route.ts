@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { getClassAssignments } from '@/app/lib/queries';
 import { DATA_POLICY_VERSION } from '@/app/lib/productionCandidates';
 
@@ -19,7 +19,7 @@ async function assertClassOwnership(classId: string, teacherId: string) {
 // POST /api/assignments —— 教师发布作业到指定班级
 export async function POST(request: Request) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   let body: { classId?: string; title?: string; topicDirection?: string; dueDate?: string; allowDataContribution?: boolean };
   try {
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 // GET /api/assignments?classId=... —— 教师获取某班级作业列表
 export async function GET(request: Request) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const classId = new URL(request.url).searchParams.get('classId')?.trim();
   if (!classId) return NextResponse.json({ error: '缺少 classId' }, { status: 400 });

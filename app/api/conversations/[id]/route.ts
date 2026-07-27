@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 
 // GET /api/conversations/[id] —— 获取归属于当前用户的会话（恢复进度）
 export async function GET(_req: Request, ctx: RouteContext<'/api/conversations/[id]'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id } = await ctx.params;
   const conv = await getConversationForUser(id, auth.user.id);

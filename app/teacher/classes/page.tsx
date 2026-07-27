@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getTeacherClasses } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import CreateClassForm from '@/app/components/CreateClassForm';
@@ -9,8 +10,9 @@ import EmptyState from '@/app/components/ui/EmptyState';
 import PageHeader from '@/app/components/ui/PageHeader';
 
 export default async function TeacherClassesPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'teacher') redirect('/');
 
   const classes = await getTeacherClasses(user.id);

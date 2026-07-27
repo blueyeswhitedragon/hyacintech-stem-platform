@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { getReviewItem } from '@/app/lib/queries';
 import {
   applyRelease,
@@ -25,7 +25,7 @@ function isReleaseStage(stage: number | undefined): stage is ReleaseStage {
 // GET /api/teacher/review/[studentAssignmentId] —— 审核详情
 export async function GET(_req: Request, ctx: RouteContext<'/api/teacher/review/[studentAssignmentId]'>) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { studentAssignmentId } = await ctx.params;
   const item = await getReviewItem(studentAssignmentId);
@@ -48,7 +48,7 @@ export async function GET(_req: Request, ctx: RouteContext<'/api/teacher/review/
 // POST /api/teacher/review/[studentAssignmentId] —— 审核操作 approve/reject/release
 export async function POST(req: Request, ctx: RouteContext<'/api/teacher/review/[studentAssignmentId]'>) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { studentAssignmentId } = await ctx.params;
 

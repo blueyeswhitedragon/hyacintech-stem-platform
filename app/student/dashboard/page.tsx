@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getStudentClasses } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import JoinClassForm from '@/app/components/JoinClassForm';
@@ -8,8 +9,9 @@ import Card, { SectionHeader } from '@/app/components/ui/Card';
 import EmptyState from '@/app/components/ui/EmptyState';
 
 export default async function StudentDashboardPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'student') redirect('/');
 
   const memberships = await getStudentClasses(user.id);

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED: Record<string, string> = {
@@ -15,7 +15,7 @@ const ALLOWED: Record<string, string> = {
 // POST /api/uploads —— 学生上传实验图片（≤5MB、仅图片），存 public/uploads/
 export async function POST(request: Request) {
   const auth = await requireRole('student');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   let form: FormData;
   try {

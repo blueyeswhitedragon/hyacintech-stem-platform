@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { getClassDetail } from '@/app/lib/queries';
 
 // GET /api/classes/[id] —— 班级详情（仅所属教师）
 export async function GET(_req: Request, ctx: RouteContext<'/api/classes/[id]'>) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id } = await ctx.params;
   const detail = await getClassDetail(id);
@@ -23,7 +23,7 @@ export async function GET(_req: Request, ctx: RouteContext<'/api/classes/[id]'>)
 // DELETE /api/classes/[id] —— 解散班级（事务级联删除依赖数据）
 export async function DELETE(_req: Request, ctx: RouteContext<'/api/classes/[id]'>) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id } = await ctx.params;
   const klass = await db.class.findUnique({

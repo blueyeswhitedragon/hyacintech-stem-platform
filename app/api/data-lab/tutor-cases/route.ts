@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server';
-import { requireAnyRole } from '@/app/lib/auth';
+import { authFailureResponse, requireAnyRole } from '@/app/lib/auth';
 import { compileTutorTurnCases, ExistingTutorCaseRunError, listTutorCases, structuralCaseCoverage, type TutorCaseProfile, type TutorReviewPolicy } from '@/app/lib/dataLab/bootstrap/service';
 import type { TutorCaseSplit } from '@/app/lib/dataLab/bootstrap/contracts';
 import type { TutorLanguagePromptVersion } from '@/app/lib/tutorLanguage';
 
 export async function GET() {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const [cases, caseCoverage] = await Promise.all([listTutorCases(), structuralCaseCoverage()]);
   return NextResponse.json({ cases, caseCoverage });
 }
 
 export async function POST(request: Request) {
   const auth = await requireAnyRole(['admin']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const body = await request.json() as { profile?: TutorCaseProfile; counts?: Record<number, number>; split?: TutorCaseSplit; topicCardIds?: string[]; promptVersion?: TutorLanguagePromptVersion; promptPolicyVersionId?: string; candidateARuntimeBundleId?: string; candidateBRuntimeBundleId?: string; firstReviewMode?: 'HUMAN' | 'PLATFORM_AI' | 'AUTHORIZED_AGENT'; reviewPolicy?: TutorReviewPolicy; allowExistingRun?: boolean };
     return NextResponse.json(await compileTutorTurnCases({ profile: body.profile ?? 'TRIAL_36', counts: body.counts, split: body.split ?? 'PILOT', topicCardIds: body.topicCardIds, promptVersion: body.promptVersion, promptPolicyVersionId: body.promptPolicyVersionId, candidateARuntimeBundleId: body.candidateARuntimeBundleId, candidateBRuntimeBundleId: body.candidateBRuntimeBundleId, firstReviewMode: body.firstReviewMode, reviewPolicy: body.reviewPolicy, allowExistingRun: body.allowExistingRun === true, user: auth.user }), { status: 201 });

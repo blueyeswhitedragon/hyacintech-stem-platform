@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireAnyRole } from '@/app/lib/auth';
+import { authFailureResponse, requireAnyRole } from '@/app/lib/auth';
 import { renewTutorReviewLease, saveTutorReviewDraft, submitConfirmReview, submitEditReview } from '@/app/lib/dataLab/bootstrap/service';
 
 export async function PATCH(_request: Request, ctx: RouteContext<'/api/data-lab/tutor-reviews/[id]'>) {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     return NextResponse.json(await renewTutorReviewLease(id, auth.user));
@@ -15,7 +15,7 @@ export async function PATCH(_request: Request, ctx: RouteContext<'/api/data-lab/
 
 export async function PUT(request: Request, ctx: RouteContext<'/api/data-lab/tutor-reviews/[id]'>) {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     const body = await request.json() as Record<string, unknown>;
@@ -41,7 +41,7 @@ export async function PUT(request: Request, ctx: RouteContext<'/api/data-lab/tut
 
 export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/tutor-reviews/[id]'>) {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     const body = await request.json() as Record<string, unknown>;

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import type { StageData } from '@/app/models/stageData';
 import { finalizeStageData, studentVisibleStageData } from '@/app/lib/stageState';
@@ -9,7 +9,7 @@ import { recordLateEvent } from '@/app/lib/deadline';
 // POST /api/conversations/[id]/submit-stage2 —— 学生提交方案，进入教师审核
 export async function POST(_req: Request, ctx: RouteContext<'/api/conversations/[id]/submit-stage2'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
   const conv = await getConversationForUser(conversationId, auth.user.id);

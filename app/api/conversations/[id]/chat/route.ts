@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import { checkBlacklistedKeywords, getPromptForPhase, type PromptContext } from '@/app/prompts';
 import { classifyError } from '@/app/lib/llm/errors';
@@ -73,7 +73,7 @@ function buildContext(stage: number, conv: {
 // POST /api/conversations/[id]/chat —— 学生在会话内发消息（阶段由服务端决定，结构化产出落库）
 export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[id]/chat'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
 

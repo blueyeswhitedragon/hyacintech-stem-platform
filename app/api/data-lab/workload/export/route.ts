@@ -1,9 +1,9 @@
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { workloadCsv } from '@/app/lib/dataLab/service';
 
 export async function GET() {
   const auth = await requireRole('admin');
-  if (!auth.ok) return Response.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const csv = await workloadCsv();
   return new Response(csv, {
     headers: {

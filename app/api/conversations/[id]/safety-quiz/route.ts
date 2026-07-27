@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import { deterministicSafetyQuiz } from '@/app/lib/serverTutorState';
 import { finalizeStageData, studentVisibleStageData } from '@/app/lib/stageState';
@@ -10,7 +10,7 @@ import { advanceHint } from '@/app/lib/advanceHint';
 // body: { answer: number }。不能信任客户端直接声明 passed。
 export async function POST(req: Request, ctx: RouteContext<'/api/conversations/[id]/safety-quiz'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
 

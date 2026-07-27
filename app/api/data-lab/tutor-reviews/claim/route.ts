@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireAnyRole } from '@/app/lib/auth';
+import { authFailureResponse, requireAnyRole } from '@/app/lib/auth';
 import { claimTutorReviewTask } from '@/app/lib/dataLab/bootstrap/service';
 
 export async function POST(request: Request) {
   const auth = await requireAnyRole(['admin', 'annotator', 'reviewer']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const body = await request.json() as { type?: 'EDIT' | 'CONFIRM' };
     if (!body.type) return NextResponse.json({ error: 'type 必填' }, { status: 400 });

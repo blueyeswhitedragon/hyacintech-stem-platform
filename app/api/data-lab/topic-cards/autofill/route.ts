@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { createLLMProvider } from '@/app/lib/llm/provider';
+import { parseLlmJsonObject } from '@/app/lib/llm/jsonRepair';
 import {
   deriveAcceptableDirections,
   normalizeInquiryBridges,
@@ -11,19 +12,10 @@ import {
 } from '@/app/lib/dataLab/bootstrap/topicCardV2';
 import type { TopicCardInput } from '@/app/lib/dataLab/bootstrap/contracts';
 
-// 内部辅助函数（从 service.ts 复制）
+// 与 stateExtractor / tutorLanguage / bootstrap service 共用同一套围栏与修复策略；
+// 这里不再自带副本，避免各入口的解析能力随时间漂移。
 function objectFromRaw(raw: string): Record<string, unknown> | null {
-  const clean = raw.trim();
-  try { return JSON.parse(clean) as Record<string, unknown>; } catch {}
-  const fenced = /^```(?:json)?\s*\n([\s\S]*?)\n```$/m.exec(clean);
-  if (fenced) {
-    try { return JSON.parse(fenced[1]) as Record<string, unknown>; } catch {}
-  }
-  const braced = /(\{[\s\S]*\})/.exec(clean);
-  if (braced) {
-    try { return JSON.parse(braced[1]) as Record<string, unknown>; } catch {}
-  }
-  return null;
+  return parseLlmJsonObject(raw);
 }
 
 function cleanStrings(value: unknown): string[] {
@@ -47,7 +39,7 @@ curriculumAnchors 至少一条，引用初中科学课程中的真实概念。
 
 export async function POST(request: Request) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const body = await request.json() as Partial<TopicCardInput>;
     const provider = createLLMProvider({ role: 'EVALUATOR' });

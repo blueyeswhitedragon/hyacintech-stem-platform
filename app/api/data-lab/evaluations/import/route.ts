@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { importEvaluation } from '@/app/lib/dataLab/service';
 import { MAX_IMPORT_BYTES } from '@/app/lib/dataLab/validation';
 
 export async function POST(request: Request) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const form = await request.formData();
   const name = String(form.get('name') ?? '').trim();
   const evaluationRunId = String(form.get('evaluationRunId') ?? '').trim();

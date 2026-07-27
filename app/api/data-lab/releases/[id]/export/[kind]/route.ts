@@ -1,11 +1,11 @@
 import { readFile } from 'fs/promises';
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { releaseForDownload } from '@/app/lib/dataLab/service';
 
 export async function GET(_request: Request, ctx: RouteContext<'/api/data-lab/releases/[id]/export/[kind]'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id, kind } = await ctx.params;
     if (!['clean', 'gold', 'silver', 'training', 'preference', 'manifest'].includes(kind)) return NextResponse.json({ error: '导出类型无效' }, { status: 400 });

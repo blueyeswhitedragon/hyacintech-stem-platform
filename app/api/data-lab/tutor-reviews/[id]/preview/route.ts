@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireAnyRole } from '@/app/lib/auth';
+import { authFailureResponse, requireAnyRole } from '@/app/lib/auth';
 import { previewTutorConfirmFinal } from '@/app/lib/dataLab/bootstrap/service';
 
 export async function POST(request: Request, ctx: RouteContext<'/api/data-lab/tutor-reviews/[id]/preview'>) {
   const auth = await requireAnyRole(['reviewer', 'admin']);
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   const { id } = await ctx.params;
   try {
     const body = await request.json() as { finalOutput?: string };

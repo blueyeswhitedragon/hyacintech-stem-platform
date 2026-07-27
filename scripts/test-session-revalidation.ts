@@ -17,6 +17,9 @@ async function main() {
   const password = 'session-test-password';
   const user = await db.user.create({ data: { username, displayName: '会话验证测试', role: 'annotator', passwordHash: await bcrypt.hash(password, 4) } });
   try {
+    const anonymousPage = await fetch(`${BASE_URL}/data-lab`, { redirect: 'manual' });
+    check('匿名访问 Data Lab 保持无原因重定向', anonymousPage.status === 307 && anonymousPage.headers.get('location') === '/auth/login');
+
     const login = await fetch(`${BASE_URL}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
     const cookie = login.headers.get('set-cookie')?.split(';')[0] ?? '';
     check('启用账户可以登录', login.status === 200 && cookie.includes('hyacintech_session='));
@@ -26,8 +29,18 @@ async function main() {
     await db.user.update({ where: { id: user.id }, data: { sessionVersion: { increment: 1 } } });
     const stale = await fetch(`${BASE_URL}/api/auth/me`, { headers: { Cookie: cookie } });
     check('会话版本变化后旧登录立即失效', stale.status === 401);
+    const stalePayload = await stale.json() as { reason?: string };
+    check('被替代会话的 401 带 SESSION_SUPERSEDED 原因', stalePayload.reason === 'SESSION_SUPERSEDED');
+    const supersededPage = await fetch(`${BASE_URL}/data-lab`, { headers: { Cookie: cookie }, redirect: 'manual' });
+    check('被替代会话访问 Data Lab 带原因重定向', supersededPage.status === 307 && supersededPage.headers.get('location') === '/auth/login?reason=SESSION_SUPERSEDED');
 
     await db.user.update({ where: { id: user.id }, data: { isActive: false } });
+    const disabledSession = await fetch(`${BASE_URL}/api/auth/me`, { headers: { Cookie: cookie } });
+    check('停用账户的旧会话立即失效', disabledSession.status === 401);
+    const disabledPayload = await disabledSession.json() as { reason?: string };
+    check('停用账户的 401 带 ACCOUNT_DISABLED 原因', disabledPayload.reason === 'ACCOUNT_DISABLED');
+    const disabledPage = await fetch(`${BASE_URL}/data-lab`, { headers: { Cookie: cookie }, redirect: 'manual' });
+    check('停用账户访问 Data Lab 带原因重定向', disabledPage.status === 307 && disabledPage.headers.get('location') === '/auth/login?reason=ACCOUNT_DISABLED');
     const disabledLogin = await fetch(`${BASE_URL}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
     check('停用账户不能重新登录', disabledLogin.status === 401);
   } finally {

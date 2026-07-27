@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { generateUniqueInviteCode } from '@/app/lib/inviteCode';
 import { getTeacherClasses } from '@/app/lib/queries';
 
 // POST /api/classes —— 教师创建班级
 export async function POST(request: Request) {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   let body: { name?: string };
   try {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 // GET /api/classes —— 教师自己的班级列表
 export async function GET() {
   const auth = await requireRole('teacher');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const classes = await getTeacherClasses(auth.user.id);
   return NextResponse.json({ classes });

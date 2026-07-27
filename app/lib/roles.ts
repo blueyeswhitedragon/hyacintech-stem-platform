@@ -1,3 +1,5 @@
+import type { SessionInvalidReason } from './session';
+
 export type UserRole = 'student' | 'teacher' | 'annotator' | 'reviewer' | 'admin';
 
 export const DATA_LAB_ROLES: UserRole[] = ['annotator', 'reviewer', 'admin'];
@@ -14,6 +16,10 @@ export function dashboardForRole(role: UserRole): string {
   if (role === 'teacher') return '/teacher/dashboard';
   if (isDataLabRole(role)) return '/data-lab';
   return '/student/dashboard';
+}
+
+export function loginRedirectPath(reason: SessionInvalidReason): string {
+  return reason === 'ANONYMOUS' ? '/auth/login' : `/auth/login?reason=${reason}`;
 }
 
 export function roleLabel(role: UserRole): string {

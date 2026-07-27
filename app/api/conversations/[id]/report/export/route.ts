@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { requireUser } from '@/app/lib/auth';
+import { authFailureResponse, requireUser } from '@/app/lib/auth';
 import { getConversationForUser } from '@/app/lib/conversation';
 import { buildReportDocx } from '@/app/lib/reportDocx';
 
 // POST /api/conversations/[id]/report/export —— 把第五阶段报告导出为 .docx（含数据表）
 export async function POST(_req: Request, ctx: RouteContext<'/api/conversations/[id]/report/export'>) {
   const auth = await requireUser();
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
 
   const { id: conversationId } = await ctx.params;
   const conv = await getConversationForUser(conversationId, auth.user.id);

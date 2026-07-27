@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { getCurrentUser } from '@/app/lib/session';
+import { getSessionState } from '@/app/lib/session';
+import { loginRedirectPath } from '@/app/lib/roles';
 import { getPendingReviews, getOptionalStage3Reviews, getStuckStudents } from '@/app/lib/queries';
 import AuthNav from '@/app/components/AuthNav';
 import Badge, { type BadgeTone } from '@/app/components/ui/Badge';
@@ -45,8 +46,9 @@ export default async function TeacherReviewPage({
 }: {
   searchParams: Promise<{ p?: string; s3?: string; st?: string }>;
 }) {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
+  const sessionState = await getSessionState();
+  if (!sessionState.user) redirect(loginRedirectPath(sessionState.reason));
+  const user = sessionState.user;
   if (user.role !== 'teacher') redirect('/');
 
   // 三个列表各有自己的页码参数，翻其中一个不影响另外两个。

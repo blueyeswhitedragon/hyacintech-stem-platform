@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/app/lib/auth';
+import { authFailureResponse, requireRole } from '@/app/lib/auth';
 import { freezeDatasetRelease } from '@/app/lib/dataLab/service';
 
 export async function POST(_request: Request, ctx: RouteContext<'/api/data-lab/releases/[id]/freeze'>) {
   const auth = await requireRole('admin');
-  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (!auth.ok) return authFailureResponse(auth);
   try {
     const { id } = await ctx.params;
     return NextResponse.json({ summary: await freezeDatasetRelease(id, auth.user) });
