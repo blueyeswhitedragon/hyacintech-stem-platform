@@ -3,7 +3,7 @@ import type { Prisma, TopicCard } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import type { SessionUser } from '@/app/lib/session';
 import { createConfiguredLLMProvider, createLLMProvider } from '@/app/lib/llm/provider';
-import type { LLMCompletion } from '@/app/lib/llm/types';
+import type { LLMCompletion, LLMProvider } from '@/app/lib/llm/types';
 import { repairJson } from '@/app/lib/llm/jsonRepair';
 import {
   CALIBRATION_12_SCENARIOS,
@@ -25,6 +25,7 @@ import {
   casePromptLeaksPrivate,
   checkTutorCandidate,
   normalizeModelFamily,
+  resolveTutorCaseAllowedFocusIds,
   sha256,
   TUTOR_CASE_SPLITS,
   validateTopicCardInput,
@@ -872,9 +873,8 @@ export async function compileTutorTurnCases(input: {
   }
 }
 
-function allowedFocus(caseItem: { visibleFactsJson: string }) {
-  const visible = parseJson<{ allowedFocusIds?: unknown }>(caseItem.visibleFactsJson, {});
-  return Array.isArray(visible.allowedFocusIds) ? visible.allowedFocusIds.filter((item): item is string => typeof item === 'string') : [];
+function allowedFocus(caseItem: { visibleFactsJson: string; privateReviewSpecJson: string }) {
+  return resolveTutorCaseAllowedFocusIds(caseItem);
 }
 
 async function reviewPolicyForCase(caseItem: { generationRunId?: string | null }) {
@@ -886,9 +886,19 @@ async function reviewPolicyForCase(caseItem: { generationRunId?: string | null }
   return { policy, authorizedById: run?.aiDirectAuthorizedById ?? null };
 }
 
-interface GeneratedCandidatePayload {
+export interface GeneratedCandidatePayload {
   raw: string;
   params: Record<string, unknown>;
+}
+
+export interface CandidateGenerationCase {
+  systemPrompt: string;
+  historyJson: string;
+  visibleFactsJson: string;
+  privateReviewSpecJson: string;
+  phase: number;
+  triggerType: string;
+  studentMessage: string;
 }
 
 interface CritiqueInput {
@@ -910,11 +920,18 @@ interface CritiquePayload {
 }
 
 export interface CandidateGenerationDeps {
-  generateOne?: (caseItem: { systemPrompt: string; historyJson: string; triggerType: string; studentMessage: string }, config: CandidateModelConfig) => Promise<GeneratedCandidatePayload>;
+  generateOne?: (caseItem: CandidateGenerationCase, config: CandidateModelConfig) => Promise<GeneratedCandidatePayload>;
   critiqueCandidate?: (input: CritiqueInput) => Promise<CritiquePayload>;
 }
 
-async function generateOne(caseItem: { systemPrompt: string; historyJson: string; triggerType: string; studentMessage: string }, config: CandidateModelConfig) {
+function candidateFailureCode(raw: string, finishReason: string | null, checked: ReturnType<typeof checkTutorCandidate>) {
+  if (finishReason === 'length') return 'OUTPUT_TRUNCATED';
+  if (finishReason === 'content_filter') return 'CONTENT_FILTERED';
+  if (!raw.trim()) return 'EMPTY_CONTENT';
+  return checked.check.issues.find((item) => item.severity === 'error')?.code ?? 'CONTRACT_INVALID';
+}
+
+async function generateOne(caseItem: CandidateGenerationCase, config: CandidateModelConfig) {
   const runtime = config.runtimeBundleId ? await resolveRuntimeBundleConfig(config.runtimeBundleId) : null;
   const provider = runtime
     ? createConfiguredLLMProvider({
@@ -924,13 +941,84 @@ async function generateOne(caseItem: { systemPrompt: string; historyJson: string
       provider: runtime.provider,
     })
     : createLLMProvider({ provider: config.provider, model: config.model, role: 'TUTOR' });
+  return generateTutorCandidateWithRetries(caseItem, provider);
+}
+
+export async function generateTutorCandidateWithRetries(caseItem: CandidateGenerationCase, provider: LLMProvider) {
   const history = parseJson<Array<{ role: 'user' | 'assistant'; content: string }>>(caseItem.historyJson, []);
-  const completion = await provider.complete([
-    { role: 'system', content: caseItem.systemPrompt },
-    ...history,
-    { role: 'user', content: isSystemTriggeredTurn(caseItem.triggerType) ? '这是系统触发，不是学生发言。请按合同给出自然引导。' : caseItem.studentMessage },
-  ], { useJsonFormat: true, maxTokens: 1200 });
-  return { raw: completion.content, params: { ...completion.request, finishReason: completion.finishReason, usage: completion.usage } };
+  const focuses = allowedFocus(caseItem);
+  const baseUserMessage = isSystemTriggeredTurn(caseItem.triggerType)
+    ? '这是系统触发，不是学生发言。请按合同给出自然引导。'
+    : caseItem.studentMessage;
+  const attempts: Array<Record<string, unknown>> = [];
+  let useJsonFormat = true;
+  let repair = '';
+  let lastCompletion: LLMCompletion | null = null;
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const completion = await provider.complete([
+        { role: 'system', content: caseItem.systemPrompt },
+        ...history,
+        { role: 'user', content: repair ? `${baseUserMessage}\n\n${repair}` : baseUserMessage },
+      ], { useJsonFormat, maxTokens: 1200 });
+      lastCompletion = completion;
+      const checked = checkTutorCandidate({
+        rawOutput: completion.content,
+        allowedFocusIds: focuses,
+        phase: caseItem.phase,
+        triggerType: caseItem.triggerType,
+        studentMessage: caseItem.studentMessage,
+      });
+      if (checked.check.ok && completion.finishReason !== 'length') {
+        return {
+          raw: completion.content,
+          params: {
+            ...completion.request,
+            finishReason: completion.finishReason,
+            reasoningChars: completion.reasoningChars,
+            usage: completion.usage,
+            successfulAttempt: attempt,
+            previousAttempts: attempts,
+          },
+        };
+      }
+      const failureCode = candidateFailureCode(completion.content, completion.finishReason, checked);
+      attempts.push({
+        attempt,
+        failureCode,
+        finishReason: completion.finishReason,
+        contentChars: completion.content.length,
+        reasoningChars: completion.reasoningChars,
+        usage: completion.usage,
+        request: completion.request,
+        issues: checked.check.issues,
+      });
+      if (failureCode === 'EMPTY_CONTENT') useJsonFormat = false;
+      repair = [
+        '【结构化候选重试】',
+        `上一次输出未通过校验（${failureCode}）。`,
+        `只输出一个完整合法的 JSON 对象；focus 必须是 ${focuses.join('、')} 之一。`,
+        'dialogue 内部双引号必须正确转义，不要输出 Markdown 围栏或前后说明。',
+      ].join('\n');
+    } catch (error) {
+      attempts.push({ attempt, failureCode: 'TRANSPORT_ERROR', error: errorText(error) });
+      if (attempt === 3) throw error;
+      repair = '【传输重试】继续遵守原始合同，只在最终 content 中输出一个完整合法的 JSON 对象。';
+    }
+  }
+
+  return {
+    raw: lastCompletion?.content ?? '',
+    params: {
+      ...(lastCompletion?.request ?? {}),
+      finishReason: lastCompletion?.finishReason ?? null,
+      reasoningChars: lastCompletion?.reasoningChars ?? 0,
+      usage: lastCompletion?.usage,
+      successfulAttempt: null,
+      attempts,
+    },
+  };
 }
 
 async function critiqueCandidate(input: CritiqueInput): Promise<CritiquePayload> {
@@ -1022,6 +1110,16 @@ function candidateCreateData(input: {
 }
 
 async function completeCandidateReviewFlow(caseId: string, runId: string, actorId: string) {
+  const candidates = await db.tutorCandidate.findMany({
+    where: { caseId, generationRunId: runId },
+    select: { slot: true, status: true, normalizedOutput: true },
+  });
+  const completeSlots = new Set(candidates
+    .filter((candidate) => candidate.status === 'GENERATED' && candidate.normalizedOutput.trim())
+    .map((candidate) => candidate.slot));
+  if (candidates.length !== 2 || !completeSlots.has('A') || !completeSlots.has('B')) {
+    throw new Error('候选 run 尚未形成通过结构校验与交叉检查的完整 A/B，不能进入初审');
+  }
   await db.$transaction(async (tx) => {
     await tx.tutorReviewTask.upsert({
       where: { caseId_type: { caseId, type: 'EDIT' } },
@@ -1127,6 +1225,41 @@ export async function generateTutorCandidates(
       ]);
       await audit(input.user.id, 'TUTOR_GENERATION_PARTIAL_FAILED', 'BootstrapGenerationRun', run.id, { caseId: caseItem.id, failedStages });
       return { status: 'PARTIAL_FAILED' as const, runId: run.id, candidates: persisted, failedStages, canRetryCritics: false };
+    }
+
+    const invalidCandidates = successful.filter((item) => !item.checked.check.ok);
+    if (invalidCandidates.length > 0) {
+      const invalidBySlot = new Set(invalidCandidates.map((item) => item.slot));
+      const validationFailures = invalidCandidates.map((item) => ({
+        stage: `TUTOR_${item.slot}`,
+        error: item.checked.check.issues.filter((issue) => issue.severity === 'error').map((issue) => `${issue.code}: ${issue.message}`).join('；') || '候选结构校验失败',
+      }));
+      const validCandidates = persisted.filter((candidate) => !invalidBySlot.has(candidate.slot as 'A' | 'B'));
+      await db.$transaction([
+        ...persisted.map((candidate) => db.tutorCandidate.update({
+          where: { id: candidate.id },
+          data: { status: invalidBySlot.has(candidate.slot as 'A' | 'B') ? 'HARD_FAILED' : 'CRITIQUE_PENDING' },
+        })),
+        db.bootstrapGenerationRun.update({
+          where: { id: run.id },
+          data: {
+            status: 'PARTIAL_FAILED',
+            completedItems: validCandidates.length,
+            failedItems: 4 - validCandidates.length,
+            failureReason: JSON.stringify(validationFailures),
+            completedAt: new Date(),
+          },
+        }),
+        db.tutorTurnCase.update({ where: { id: caseItem.id }, data: { status: 'NEEDS_REGEN' } }),
+      ]);
+      await audit(input.user.id, 'TUTOR_GENERATION_VALIDATION_FAILED', 'BootstrapGenerationRun', run.id, { caseId: caseItem.id, failedStages: validationFailures });
+      return {
+        status: 'PARTIAL_FAILED' as const,
+        runId: run.id,
+        candidates: await db.tutorCandidate.findMany({ where: { generationRunId: run.id }, orderBy: { slot: 'asc' } }),
+        failedStages: validationFailures,
+        canRetryCritics: false,
+      };
     }
 
     const candidateA = persisted.find((item) => item.slot === 'A')!;
@@ -1248,7 +1381,7 @@ async function latestPair(caseId: string) {
 }
 
 export async function listTutorCases() {
-  return db.tutorTurnCase.findMany({
+  const cases = await db.tutorTurnCase.findMany({
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
@@ -1266,10 +1399,30 @@ export async function listTutorCases() {
       revisionOfId: true,
       topicCard: { select: { displayTitle: true, subject: true, status: true } },
       generationRun: { select: { id: true, status: true, reviewPolicy: true, firstReviewMode: true, candidateARuntimeBundleId: true, candidateBRuntimeBundleId: true, promptPolicyVersionId: true, parametersJson: true, createdAt: true, completedAt: true, failureReason: true } },
+      candidates: {
+        orderBy: { createdAt: 'desc' },
+        take: 2,
+        select: {
+          id: true,
+          slot: true,
+          attempt: true,
+          status: true,
+          normalizedOutput: true,
+          deterministicCheckJson: true,
+          generationRun: { select: { id: true, kind: true, status: true, failureReason: true, createdAt: true } },
+        },
+      },
       _count: { select: { candidates: true, reviewTasks: true } },
       finalizedTurn: { select: { id: true, trainingEligibility: true } },
     },
   });
+  return cases.map(({ candidates, ...caseItem }) => ({
+    ...caseItem,
+    latestCandidates: candidates.map(({ normalizedOutput, ...candidate }) => ({
+      ...candidate,
+      normalizedOutputReady: Boolean(normalizedOutput.trim()),
+    })),
+  }));
 }
 
 export async function supersedeTutorCaseRun(runId: string, reason: string, user: SessionUser) {

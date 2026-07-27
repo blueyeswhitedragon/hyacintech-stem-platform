@@ -51,6 +51,15 @@ interface CaseView {
     candidateBRuntimeBundleId: string | null;
     promptPolicyVersionId: string | null;
   } | null;
+  latestCandidates: Array<{
+    id: string;
+    slot: string;
+    attempt: number;
+    status: string;
+    normalizedOutputReady: boolean;
+    deterministicCheckJson: string;
+    generationRun: { id: string; kind: string; status: string; failureReason: string; createdAt: string | Date } | null;
+  }>;
   _count: { candidates: number; reviewTasks: number };
   finalizedTurn: { id: string; trainingEligibility: string } | null;
 }
@@ -169,6 +178,33 @@ function hardCheckErrors(item: CaseView) {
   } catch {
     return [];
   }
+}
+
+function candidateErrorCode(raw: string) {
+  try {
+    const issues = (JSON.parse(raw) as { issues?: Array<{ code?: unknown; severity?: unknown }> }).issues;
+    const hard = Array.isArray(issues) ? issues.find((issue) => issue.severity === 'error') : null;
+    return typeof hard?.code === 'string' ? hard.code : '';
+  } catch {
+    return '';
+  }
+}
+
+function latestAttempt(item: CaseView) {
+  const runId = item.latestCandidates[0]?.generationRun?.id;
+  const candidates = runId
+    ? item.latestCandidates.filter((candidate) => candidate.generationRun?.id === runId)
+    : [];
+  const attempt = Math.max(0, ...candidates.map((candidate) => candidate.attempt));
+  const ready = candidates.length === 2
+    && candidates.every((candidate) => candidate.status === 'GENERATED' && candidate.normalizedOutputReady);
+  return {
+    candidates,
+    attempt,
+    ready,
+    runStatus: candidates[0]?.generationRun?.status ?? '',
+    historicalCount: Math.max(0, item._count.candidates - candidates.length),
+  };
 }
 
 function formatDate(value: string | Date | null) {
@@ -414,7 +450,12 @@ export default function CaseGenerationManager({
           // 本按钮的 targets 过滤不包含它，必须走「补齐交叉检查」。分开计数才不会误导。
           if (data.status === 'PARTIAL_FAILED') {
             if (data.canRetryCritics) criticPending += 1;
-            else throw new Error('候选生成未完成');
+            else {
+              const details = Array.isArray(data.failedStages)
+                ? data.failedStages.map((failure: { stage?: unknown; error?: unknown }) => `${String(failure.stage ?? '候选')}：${String(failure.error ?? '生成未完成')}`).join('；')
+                : '';
+              throw new Error(details || '候选生成未完成');
+            }
           } else {
             completed += 1;
           }
@@ -722,12 +763,16 @@ export default function CaseGenerationManager({
         </div>
         {!runtimeSelectionReady && productionRuns.length > 0 && <div className="mt-3 border border-warning/40 bg-warning/8 p-3 text-sm text-body-strong"><b>暂不能生成：</b>{!candidateA || !candidateB ? '请先在上方选择候选 A/B 运行组合。' : candidateA.family === candidateB.family ? '候选 A/B 必须来自不同模型家族。' : !targetPrompt ? '请选择训练目标 Prompt。' : '候选运行组合的 Prompt 必须与训练目标一致。'}</div>}
         <div className="mt-4 divide-y border-y">
-          {productionRuns.flatMap((group) => group.cases.map((item) => <div key={item.id} className="py-4">
+          {productionRuns.flatMap((group) => group.cases.map((item) => {
+            const latest = latestAttempt(item);
+            return <div key={item.id} className="py-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0 flex-1"><div className="text-xs text-muted">阶段 {item.phase} · 来源 Prompt {item.sourcePromptVersion ?? '未知'} / 合同 {item.sourceContractVersion ?? '未知'}</div><p className="mt-1 line-clamp-2 text-sm leading-6">{item.studentMessage || '平台状态触发，本回合没有学生发言。'}</p></div>
+              <div className="min-w-0 flex-1"><div className="text-xs text-muted">阶段 {item.phase} · 来源 Prompt {item.sourcePromptVersion ?? '未知'} / 合同 {item.sourceContractVersion ?? '未知'}</div><p className="mt-1 line-clamp-2 text-sm leading-6">{item.studentMessage || '平台状态触发，本回合没有学生发言。'}</p>{latest.candidates.length > 0 && <div className={`mt-2 text-xs leading-5 ${latest.ready ? 'text-[#2f7a43]' : 'text-error'}`}>{latest.ready
+                ? `最新尝试 #${latest.attempt}：A/B 均已通过结构校验并完成交叉检查`
+                : `最新尝试 #${latest.attempt}：${latest.candidates.map((candidate) => `${candidate.slot} ${candidateErrorCode(candidate.deterministicCheckJson) || candidate.status}`).join('；')}（run ${latest.runStatus || '状态未知'}）`}{latest.historicalCount > 0 ? ` · 保留 ${latest.historicalCount} 条历史候选` : ''}</div>}</div>
               <div className="flex items-center gap-2"><span className="bg-surface-card px-2 py-1 text-xs">{dataLabStatusLabel(item.status)}</span>{['READY', 'NEEDS_REGEN'].includes(item.status) && <button type="button" disabled={pending || !runtimeSelectionReady} onClick={() => setGenerationConfirmation(group.id)} className={buttonClass('secondary', 'sm')}>生成双候选</button>}</div>
             </div>
-          </div>))}
+          </div>;}))}
           {productionRuns.length === 0 && <p className="py-6 text-sm text-muted">暂无生产回流案例。教师提名并由管理员在<Link href="/data-lab/candidates" className="mx-1 text-coral hover:underline">线上候选审核</Link>通过后，会出现在这里。</p>}
         </div>
       </div>

@@ -84,6 +84,33 @@ export interface CandidateCheck {
   issues: DeterministicIssue[];
 }
 
+function parseObjectJson(raw: string): Record<string, unknown> {
+  try {
+    const value = JSON.parse(raw) as unknown;
+    return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  } catch {
+    return {};
+  }
+}
+
+function focusIds(value: unknown): string[] {
+  return Array.isArray(value)
+    ? [...new Set(value.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean))]
+    : [];
+}
+
+/** Resolve the server-owned focus without exposing the rest of the private review spec. */
+export function resolveTutorCaseAllowedFocusIds(input: { visibleFactsJson: string; privateReviewSpecJson: string }): string[] {
+  const visible = focusIds(parseObjectJson(input.visibleFactsJson).allowedFocusIds);
+  const privateReview = focusIds(parseObjectJson(input.privateReviewSpecJson).allowedFocusIds);
+  if (visible.length > 0 && privateReview.length > 0 && JSON.stringify(visible) !== JSON.stringify(privateReview)) {
+    throw new Error(`案例 focus 来源不一致：visible=${visible.join(',')} private=${privateReview.join(',')}`);
+  }
+  const resolved = visible.length > 0 ? visible : privateReview;
+  if (resolved.length === 0) throw new Error('案例缺少服务器确认的 allowedFocusIds');
+  return resolved;
+}
+
 export const TUTOR_CRITIQUE_CATEGORIES = ['grounding', 'pedagogy', 'safety', 'leakage', 'contract'] as const;
 export type TutorCritiqueCategory = (typeof TUTOR_CRITIQUE_CATEGORIES)[number];
 export type TutorCritiqueConfidence = 'high' | 'medium' | 'low';
@@ -177,7 +204,7 @@ export function checkTutorCandidate(input: {
   triggerType: string;
   studentMessage: string;
 }): { normalized: TutorLanguageResponse | null; check: CandidateCheck } {
-  const normalized = parseTutorLanguageResponse(input.rawOutput, input.allowedFocusIds);
+  const normalized = parseTutorLanguageResponse(input.rawOutput, input.allowedFocusIds, input.phase);
   const issues: DeterministicIssue[] = [];
   if (!normalized) issues.push(issue('CONTRACT_INVALID', 'error', '候选不符合 tutor-language-v1 结构或 allowed focus 约束'));
   if (normalized) {

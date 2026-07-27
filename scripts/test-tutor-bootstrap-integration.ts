@@ -352,7 +352,7 @@ async function main() {
     generateOne: async (_case, config) => {
       tutorCalls += 1;
       return {
-        raw: JSON.stringify({ dialogue: config.provider === 'openai' ? '先说清你准备怎样记录一次观察？' : '你打算用什么一致的方法记录观察结果？', interactionType: 'clarification', focus: orchestrationFocus, hints: [] }),
+        raw: JSON.stringify({ dialogue: config.provider === 'openai' ? '请继续补充当前方案中的这项信息。' : '请只说明当前方案还缺少的这项信息。', interactionType: 'clarification', focus: orchestrationFocus, hints: [] }),
         params: { usage: { totalTokens: 1 } },
       };
     },
@@ -367,6 +367,41 @@ async function main() {
     critiqueCandidate: async (input) => ({ status: 'COMPLETED' as const, issues: [], advisories: [], raw: '{"issues":[]}', critic: { provider: input.config.provider, model: input.config.model, family: input.config.provider }, params: { usage: { totalTokens: 1 } } }),
   });
   check(retried.status === 'COMPLETED' && tutorCalls === 2 && (await db.tutorTurnCase.findUniqueOrThrow({ where: { id: orchestrationCase.id } })).status === 'IN_REVIEW', '仅重试失败 Critic，不重复调用 Tutor，并恢复首次审核任务');
+
+  const invalidCompiled = await compileTutorTurnCases({ profile: 'CUSTOM', counts: { 2: 1 }, split: 'PILOT', topicCardIds: [card.id], user: admin });
+  const invalidCase = invalidCompiled.cases[0];
+  const invalidFocus = (JSON.parse(invalidCase.visibleFactsJson) as { allowedFocusIds: string[] }).allowedFocusIds[0];
+  let invalidCriticCalls = 0;
+  const invalidGeneration = await generateTutorCandidates({
+    caseId: invalidCase.id,
+    modelA: { provider: 'openai', model: 'Qwen3.5-35B-A3B' },
+    modelB: { provider: 'deepseek', model: 'deepseek-v4-pro' },
+    user: admin,
+  }, {
+    generateOne: async (_case, config) => ({
+      raw: config.provider === 'openai'
+        ? JSON.stringify({ dialogue: '请只补充当前这一个方案信息。', interactionType: 'clarification', focus: invalidFocus, hints: [] })
+        : '   ',
+      params: { usage: { totalTokens: 1 } },
+    }),
+    critiqueCandidate: async (input) => {
+      invalidCriticCalls += 1;
+      return { status: 'COMPLETED' as const, issues: [], advisories: [], raw: '{"issues":[]}', critic: { provider: input.config.provider, model: input.config.model, family: input.config.provider }, params: { usage: { totalTokens: 1 } } };
+    },
+  });
+  const invalidRun = await db.bootstrapGenerationRun.findUniqueOrThrow({ where: { id: invalidGeneration.runId }, include: { candidates: true } });
+  check(invalidGeneration.status === 'PARTIAL_FAILED' && !invalidGeneration.canRetryCritics && invalidCriticCalls === 0, '任一候选结构失败时不调用 Critic');
+  check(invalidRun.completedItems === 1 && invalidRun.failedItems === 3 && invalidRun.candidates.some((candidate) => candidate.status === 'HARD_FAILED') && (await db.tutorReviewTask.count({ where: { caseId: invalidCase.id } })) === 0, '结构失败 run 保留诊断但不创建审核队列');
+  await db.tutorTurnCase.update({ where: { id: invalidCase.id }, data: { status: 'NEEDS_CRITIC' } });
+  let completionDefense = false;
+  try {
+    await retryTutorCandidateCritics({ caseId: invalidCase.id, user: admin }, {
+      critiqueCandidate: async (input) => ({ status: 'COMPLETED' as const, issues: [], advisories: [], raw: '{"issues":[]}', critic: { provider: input.config.provider, model: input.config.model, family: input.config.provider }, params: { usage: { totalTokens: 1 } } }),
+    });
+  } catch (error) {
+    completionDefense = error instanceof Error && error.message.includes('完整 A/B');
+  }
+  check(completionDefense && (await db.tutorReviewTask.count({ where: { caseId: invalidCase.id } })) === 0, '最终完成防线拒绝无 normalized output 的 A/B 进入初审');
 
   const caseEditPayload = await claimTutorReviewTask('EDIT', annotator);
   const caseEditCandidate = caseEditPayload!.candidates[0];
