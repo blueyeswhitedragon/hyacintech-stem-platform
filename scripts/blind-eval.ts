@@ -17,7 +17,22 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { getPromptForPhase, type PromptContext } from '../app/prompts/index';
-import { validateStageResponseBehavior, type StageTriggerType } from '../app/lib/stageContract';
+import { validateStageResponseBehavior, isSystemTriggeredTurn, type StageTriggerType } from '../app/lib/stageContract';
+import {
+  callTutorLanguageWithTrace,
+  toCompatibleChatResponse,
+  DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION,
+  TUTOR_LANGUAGE_PROMPT_VERSIONS,
+  type TutorLanguagePromptVersion,
+} from '../app/lib/tutorLanguage';
+import { planCoverageTurns, missingCoverageCells, type CoverageTurnPlan } from './lib/coverage-driver';
+import { EVAL_CASE_COUNTS, expectedCoverageCells } from '../app/lib/dataLab/bootstrap/caseCompiler';
+import {
+  countSummary,
+  structuralSummary,
+  type CountSummary,
+  type StructuralCountSummary,
+} from './lib/structural-summary';
 import { repairJson } from '../app/lib/llm/jsonRepair';
 import { safeParseChatResponse } from '../app/lib/llm/parser';
 import { shouldNudgeConvergence } from '../app/lib/pacing';
@@ -57,8 +72,8 @@ const FALLBACKS = [
 
 type Scope = 'smoke' | 'full';
 type JudgeLevel = 'scenario' | 'full';
-type ScenarioKind = 'persona' | 'phase3' | 'phase4' | 'phase5' | 'phase6' | 'fixed-regression';
-type StageSelector = 'persona' | '3' | '4' | '5' | '6';
+type ScenarioKind = 'persona' | 'phase3' | 'phase4' | 'phase5' | 'phase6' | 'fixed-regression' | 'coverage';
+type StageSelector = 'persona' | '3' | '4' | '5' | '6' | 'coverage';
 type Winner = 'A' | 'B' | 'tie';
 type JudgeWinner = 'X' | 'Y' | 'tie';
 type DimensionKey =
@@ -94,6 +109,9 @@ interface TurnRecord {
   actionType: string;
   structuredFields: string[];
   violations: Violation[];
+  /** 结构覆盖格：门禁按 (phase, triggerType, focus) 判定，缺一格即 INSUFFICIENT。 */
+  triggerType: StageTriggerType;
+  focus: string;
 }
 
 interface ScenarioRecord {
@@ -182,26 +200,17 @@ interface VerdictFile {
     turn: CountSummary;
     dimensions: Record<DimensionKey, CountSummary>;
     phase: Record<string, PhaseCountSummary>;
+    trigger: Record<string, StructuralCountSummary>;
+    focus: Record<string, StructuralCountSummary>;
     criticalErrors: number;
+    coverage: { expectedCells: number; missingCells: Array<{ phase: number; triggerType: string; focus: string }> };
   };
   scenarioVerdicts: FinalVerdict[];
   turnVerdicts: FinalVerdict[];
 }
 
-interface CountSummary {
-  A: number;
-  B: number;
-  tie: number;
-  inconsistent: number;
-}
-
-interface PhaseCountSummary extends CountSummary {
-  criticalErrors: number;
-  parseSuccessA: number;
-  parseTotalA: number;
-  parseSuccessB: number;
-  parseTotalB: number;
-}
+/** 结构覆盖桶与 phase 桶形状一致：COUNT_FIELDS 要求每个桶都带 criticalErrors。 */
+type PhaseCountSummary = StructuralCountSummary;
 
 const P2_TRIGGER = '我已确认选题，现在开始设计实验方案。';
 const DIMENSIONS: DimensionKey[] = [
@@ -243,7 +252,7 @@ const PRIOR_SUMMARY = `【选题确认书】
 
 function printHelp() {
   console.log(`Usage:
-  npx tsx scripts/blind-eval.ts collect [--scope smoke|full] [--style <style-family>] [--stages persona,3,4,5,6] [--limit N] [--subject <area>] [--student-type <type>] [--difficulty easy|medium|hard] [--persona <id-or-name>] [--tag <tag>] [--include-regression true|false]
+  npx tsx scripts/blind-eval.ts collect [--scope smoke|full] [--style <style-family>] [--stages coverage,persona,3,4,5,6] [--prompt-version <tutor-language-prompt-vX>] [--limit N] [--subject <area>] [--student-type <type>] [--difficulty easy|medium|hard] [--persona <id-or-name>] [--tag <tag>] [--include-regression true|false]
   npx tsx scripts/blind-eval.ts judge <tagA> <tagB> [--scope smoke|full] [--judge-level scenario|full] [--scenario <id-or-name>]
 
 Collect env:
@@ -262,7 +271,9 @@ Judge env:
   JUDGE_TIMEOUT_MS=180000
   JUDGE_MAX_TOKENS=2000
 
-Default scope is smoke. Collect defaults: --stages persona,4,5 --include-regression true.`);
+Default scope is smoke. Collect defaults: --stages coverage,persona,4,5 --include-regression true.
+--stages coverage 按 expectedCoverageCells() 逐格采集（含 STAGE_TRANSITION / STAGE_ENTER / REPORT_BOOTSTRAP），
+缺格会在结束时打印中文清单——部署门禁对缺格只会判 INSUFFICIENT。`);
 }
 
 function parseScope(args: string[]): Scope {
@@ -313,6 +324,8 @@ interface CollectOptions {
   tag?: string;
   limit?: number;
   styleFamily: StyleFamily;
+  /** 结构覆盖场景使用的 Tutor Prompt 版本；与运行组合里冻结的版本保持一致。 */
+  promptVersion: TutorLanguagePromptVersion;
 }
 
 function parseFlagValue(args: string[], flag: string): string | undefined {
@@ -332,9 +345,9 @@ function parseLimit(args: string[]): number | undefined {
 }
 
 function parseStages(args: string[]): StageSelector[] {
-  const raw = parseFlagValue(args, '--stages') ?? 'persona,4,5';
+  const raw = parseFlagValue(args, '--stages') ?? 'coverage,persona,4,5';
   const values = raw.split(',').map((s) => s.trim()).filter(Boolean);
-  const allowed = new Set<StageSelector>(['persona', '3', '4', '5', '6']);
+  const allowed = new Set<StageSelector>(['persona', '3', '4', '5', '6', 'coverage']);
   for (const value of values) {
     if (!allowed.has(value as StageSelector)) throw new Error(`--stages 不支持: ${value}`);
   }
@@ -360,7 +373,12 @@ function parseCollectOptions(args: string[], scope: Scope): CollectOptions {
   if (!isStyleFamily(requestedStyle)) {
     throw new Error(`--style 不支持：${requestedStyle}`);
   }
+  const requestedPrompt = parseFlagValue(args, '--prompt-version') ?? DATA_LAB_TUTOR_LANGUAGE_PROMPT_VERSION;
+  if (!(TUTOR_LANGUAGE_PROMPT_VERSIONS as readonly string[]).includes(requestedPrompt)) {
+    throw new Error(`--prompt-version 不支持：${requestedPrompt}`);
+  }
   return {
+    promptVersion: requestedPrompt as TutorLanguagePromptVersion,
     scope,
     stages: parseStages(args),
     includeRegression: parseBooleanFlag(args, '--include-regression', true),
@@ -640,14 +658,27 @@ function structuredFields(r: ChatResponse): string[] {
   return out;
 }
 
-function sharedStageContractViolations(phase: number, parsed: ChatResponse): Violation[] {
-  const triggerType: StageTriggerType = phase === 3 && parsed.safety_quiz
-    ? 'STAGE_ENTER'
-    : phase === 5
-      ? 'REPORT_BOOTSTRAP'
-      : phase === 6
-        ? 'OPTIONAL_COACHING'
-        : 'USER_MESSAGE';
+/** 遗留 persona 路径没有显式触发类型，只能从回复形状推断；覆盖模式会显式传入真实触发类型。 */
+function inferTriggerType(phase: number, parsed: ChatResponse): StageTriggerType {
+  if (phase === 3 && parsed.safety_quiz) return 'STAGE_ENTER';
+  if (phase === 5) return 'REPORT_BOOTSTRAP';
+  if (phase === 6) return 'OPTIONAL_COACHING';
+  return 'USER_MESSAGE';
+}
+
+const FALLBACK_FOCUS: Record<number, string> = {
+  1: 'research_question', 2: 'variable_design', 3: 'safety_checkpoint',
+  4: 'cite_evidence', 5: 'report_gap', 6: 'reflection_coaching',
+};
+
+function inferFocus(phase: number, parsed: ChatResponse): string {
+  const focus = (parsed as ChatResponse & { tutor_language?: { focus?: unknown } }).tutor_language?.focus;
+  if (typeof focus === 'string' && focus.trim()) return focus.trim();
+  return FALLBACK_FOCUS[phase] ?? 'clarification';
+}
+
+function sharedStageContractViolations(phase: number, parsed: ChatResponse, triggerOverride?: StageTriggerType): Violation[] {
+  const triggerType = triggerOverride ?? inferTriggerType(phase, parsed);
   return validateStageResponseBehavior(phase, parsed, { triggerType })
     .map((item) => ({ rule: item.code.toLowerCase(), detail: item.message }));
 }
@@ -725,7 +756,8 @@ function makeTurn(
   raw: string,
   parsed: ChatResponse,
   parseOk: boolean,
-  violations: Violation[]
+  violations: Violation[],
+  coverage?: { triggerType: StageTriggerType; focus: string }
 ): TurnRecord {
   return {
     id: `${scenario.id}:p${phase}:t${turn}`,
@@ -740,6 +772,8 @@ function makeTurn(
     actionType: parsed.next_action_type,
     structuredFields: structuredFields(parsed),
     violations,
+    triggerType: coverage?.triggerType ?? inferTriggerType(phase, parsed),
+    focus: coverage?.focus ?? inferFocus(phase, parsed),
   };
 }
 
@@ -795,6 +829,8 @@ async function runPersona(provider: ReturnType<typeof createLLMProvider>, person
       actionType: 'none',
       structuredFields: [],
       violations: [{ rule: 'p1-never-converged', detail: '8轮未输出确认书' }],
+      triggerType: 'USER_MESSAGE',
+      focus: FALLBACK_FOCUS[1],
     });
   }
 
@@ -816,6 +852,8 @@ async function runPersona(provider: ReturnType<typeof createLLMProvider>, person
       phase: 2,
       turn: 99,
       userMsg: '(未产表)',
+      triggerType: 'USER_MESSAGE',
+      focus: FALLBACK_FOCUS[2],
       raw: '',
       parsed: { dialogue: '', next_action_type: 'info', phase_complete: false },
       parseOk: false,
@@ -959,6 +997,53 @@ async function runPhase6FromPersona(provider: ReturnType<typeof createLLMProvide
   return scenario;
 }
 
+/**
+ * 结构覆盖场景：为门禁期望的每一格跑一个真实 Tutor 回合。
+ * 走 callTutorLanguageWithTrace（生产版本化路径），因为只有它接受显式 triggerType 与 allowedFocusIds。
+ */
+async function runCoverage(promptVersion: TutorLanguagePromptVersion): Promise<ScenarioRecord[]> {
+  const plans = planCoverageTurns();
+  const byPhase = new Map<number, CoverageTurnPlan[]>();
+  for (const plan of plans) byPhase.set(plan.phase, [...(byPhase.get(plan.phase) ?? []), plan]);
+
+  const scenarios: ScenarioRecord[] = [];
+  for (const [phase, phasePlans] of [...byPhase.entries()].sort((a, b) => a[0] - b[0])) {
+    const scenario: ScenarioRecord = {
+      id: `coverage-p${phase}`,
+      name: `结构覆盖-阶段${phase}`,
+      kind: 'coverage' as const,
+      turns: [],
+    };
+    let turn = 0;
+    for (const plan of phasePlans) {
+      turn += 1;
+      const trace = await callTutorLanguageWithTrace({
+        phase: plan.phase,
+        triggerType: plan.triggerType,
+        currentStudentMessage: isSystemTriggeredTurn(plan.triggerType) ? '' : plan.studentMessage,
+        priorStudentMessages: plan.priorStudentMessages,
+        tutorHistory: plan.tutorHistory,
+        visibleFacts: plan.visibleFacts,
+        allowedFocusIds: plan.allowedFocusIds,
+        focusDescriptions: plan.focusDescriptions,
+        completedFocusIds: plan.completedFocusIds,
+        planReady: plan.planReady,
+      }, { role: 'TUTOR' }, promptVersion);
+      const parsed = toCompatibleChatResponse(trace.response);
+      const parseOk = trace.generationParams.deterministicTutorFallback !== true;
+      const coverage = { triggerType: plan.triggerType as StageTriggerType, focus: trace.response.focus };
+      const violations = [
+        ...checkMarkdown(parsed.dialogue),
+        ...checkOptions(parsed),
+        ...sharedStageContractViolations(plan.phase, parsed, coverage.triggerType),
+      ];
+      scenario.turns.push(makeTurn(scenario, plan.phase, turn, plan.studentMessage, trace.rawOutput, parsed, parseOk, violations, coverage));
+    }
+    scenarios.push(scenario);
+  }
+  return scenarios;
+}
+
 async function runPhase4(provider: ReturnType<typeof createLLMProvider>): Promise<ScenarioRecord> {
   const scenario = {
     id: 'phase4-data-analysis',
@@ -1038,6 +1123,11 @@ async function collect(options: CollectOptions) {
   console.log(`Collecting ${tag} (${options.scope}; ${STYLE_LABELS[options.styleFamily]})`);
   console.log(`Personas: ${personas.length}; stages: ${options.stages.join(',')}; regression: ${options.includeRegression}`);
 
+  if (options.stages.includes('coverage')) {
+    console.log(`- coverage: ${options.promptVersion}`);
+    scenarios.push(...await runCoverage(options.promptVersion));
+  }
+
   for (const persona of personas) {
     if (options.stages.includes('persona')) {
       console.log(`- persona: ${persona.name}`);
@@ -1066,6 +1156,18 @@ async function collect(options: CollectOptions) {
     scenarios.push(await runPhase4(provider));
     console.log('- regression phase5');
     scenarios.push(await runPhase5(provider));
+  }
+
+  if (options.stages.includes('coverage')) {
+    const missing = missingCoverageCells(scenarios.flatMap((s) => s.turns));
+    if (missing.length > 0) {
+      console.warn(`警告：仍缺 ${missing.length} 个结构覆盖格，部署门禁会判 INSUFFICIENT：`);
+      for (const cell of missing) console.warn(`  - P${cell.phase} / ${cell.triggerType} / ${cell.focus}`);
+      // transcript 仍然落盘（便于排查），但退出码非零，避免把注定被门禁退回的产物当成成功。
+      process.exitCode = 1;
+    } else {
+      console.log('结构覆盖：16 格齐全（门禁按 phase/triggerType/focus 判定）');
+    }
   }
 
   const transcript: Transcript = {
@@ -1442,12 +1544,13 @@ function pairTurns(a: ScenarioRecord, b: ScenarioRecord[]) {
   });
 }
 
-function countSummary(verdicts: FinalVerdict[]): CountSummary {
+
+/** 门禁按格判定，缺格算 INSUFFICIENT；这里把 A/B 两份 transcript 实际覆盖到的格取并集。 */
+function coverageReport(scenariosA: ScenarioRecord[], scenariosB: ScenarioRecord[]) {
+  const turns = [...scenariosA, ...scenariosB].flatMap((scenario) => scenario.turns);
   return {
-    A: verdicts.filter((v) => v.winner === 'A').length,
-    B: verdicts.filter((v) => v.winner === 'B').length,
-    tie: verdicts.filter((v) => v.winner === 'tie').length,
-    inconsistent: verdicts.filter((v) => v.inconsistent).length,
+    expectedCells: expectedCoverageCells(EVAL_CASE_COUNTS).length,
+    missingCells: missingCoverageCells(turns),
   };
 }
 
@@ -1542,6 +1645,32 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
 
   const cfg = judgeConfig();
   const byPhase = phaseSummary(scenarioVerdicts, turnVerdicts, scenariosA, scenariosB);
+  const expectedCells = expectedCoverageCells(EVAL_CASE_COUNTS);
+  const byTrigger = structuralSummary(
+    'triggerType',
+    [...new Set(expectedCells.map((cell) => cell.triggerType))],
+    scenarioVerdicts, turnVerdicts, scenariosA, scenariosB,
+  );
+  const byFocus = structuralSummary(
+    'focus',
+    [...new Set(expectedCells.map((cell) => cell.focus))],
+    scenarioVerdicts, turnVerdicts, scenariosA, scenariosB,
+  );
+  const coverage = coverageReport(scenariosA, scenariosB);
+  // 空桶与缺格都会让门禁判 INSUFFICIENT；在这里明说，免得导入后才发现白跑一轮裁判。
+  const emptyBuckets = [
+    ...Object.entries(byTrigger).map(([key, counts]) => [`trigger:${key}`, counts] as const),
+    ...Object.entries(byFocus).map(([key, counts]) => [`focus:${key}`, counts] as const),
+  ].filter(([, counts]) => counts.A + counts.B + counts.tie + counts.inconsistent === 0);
+  for (const [label] of emptyBuckets) {
+    console.warn(`警告：${label} 没有任何裁决，这一格会让门禁判 INSUFFICIENT。`);
+  }
+  for (const cell of coverage.missingCells) {
+    console.warn(`警告：缺结构覆盖格 P${cell.phase} / ${cell.triggerType} / ${cell.focus}，门禁会判 INSUFFICIENT。`);
+  }
+  if (emptyBuckets.length === 0 && coverage.missingCells.length === 0) {
+    console.log(`结构覆盖：${coverage.expectedCells} 格齐全，trigger/focus 桶均有裁决。`);
+  }
   const verdict: VerdictFile = {
     schemaVersion: VERDICT_SCHEMA_VERSION,
     createdAt: new Date().toISOString(),
@@ -1562,7 +1691,10 @@ async function judge(tagA: string, tagB: string, scope: Scope, judgeLevel: Judge
       turn: countSummary(turnVerdicts),
       dimensions: dimensionSummary(scenarioVerdicts),
       phase: byPhase,
+      trigger: byTrigger,
+      focus: byFocus,
       criticalErrors: Object.values(byPhase).reduce((sum, counts) => sum + counts.criticalErrors, 0),
+      coverage,
     },
     scenarioVerdicts,
     turnVerdicts,

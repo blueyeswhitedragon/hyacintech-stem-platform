@@ -7,6 +7,29 @@ function runtimeTag(bundle: { name: string; version: number }) {
   return `${bundle.name}:v${bundle.version}`;
 }
 
+/** 非本平台训练的产物类型：只核验权重身份，不要求本地 TrainingRun。 */
+export const IDENTITY_BACKED_ARTIFACT_KINDS = ['BASE', 'EXTERNAL'] as const;
+
+export function identityBackedArtifact(artifactKind: string): boolean {
+  return (IDENTITY_BACKED_ARTIFACT_KINDS as readonly string[]).includes(artifactKind);
+}
+
+/**
+ * 训练血缘是否就绪。BASE/EXTERNAL 在外部产出，平台不为训练过程背书，只核验权重身份；
+ * 本平台训练产物仍要求成功的 TrainingRun 且资格报告无阻断。
+ */
+export function modelTrainingReady(model: {
+  artifactKind: string;
+  verificationStatus: string;
+  trainingRunStatus?: string | null;
+  trainingReport?: { blocked?: number; sftAllowed?: number };
+}): boolean {
+  if (identityBackedArtifact(model.artifactKind)) return model.verificationStatus === 'VERIFIED_IDENTITY';
+  return model.trainingRunStatus === 'SUCCEEDED'
+    && (model.trainingReport?.blocked ?? 1) === 0
+    && (model.trainingReport?.sftAllowed ?? 0) > 0;
+}
+
 async function runtimeCallConfig(runtimeBundleId: string) {
   const { resolveRuntimeBundleCallConfig } = await import('@/app/lib/dataLab/runtimeRegistry');
   return resolveRuntimeBundleCallConfig(runtimeBundleId);
@@ -49,7 +72,12 @@ export async function refreshModelDeploymentGate(modelVersionId: string) {
     where: { OR: [{ modelAVersionId: model.id }, { modelBVersionId: model.id }] },
   });
   const trainingReport = parseJson<{ blocked?: number; sftAllowed?: number }>(model.trainingRun?.eligibilityReportJson ?? '{}', {});
-  const trainingReady = model.trainingRun?.status === 'SUCCEEDED' && (trainingReport.blocked ?? 1) === 0 && (trainingReport.sftAllowed ?? 0) > 0;
+  const trainingReady = modelTrainingReady({
+    artifactKind: model.artifactKind,
+    verificationStatus: model.verificationStatus,
+    trainingRunStatus: model.trainingRun?.status,
+    trainingReport,
+  });
   const report = evaluateDeploymentGate({
     candidateTag: model.tag,
     trainingReady,
@@ -119,11 +147,12 @@ export async function refreshRuntimeBundleDeploymentGate(runtimeBundleId: string
     where: { OR: [{ runtimeBundleAId: bundle.id }, { runtimeBundleBId: bundle.id }] },
   });
   const trainingReport = parseJson<{ blocked?: number; sftAllowed?: number }>(bundle.modelVersion.trainingRun?.eligibilityReportJson ?? '{}', {});
-  const trainingReady = bundle.modelVersion.artifactKind === 'BASE'
-    ? bundle.modelVersion.verificationStatus === 'VERIFIED_IDENTITY'
-    : bundle.modelVersion.trainingRun?.status === 'SUCCEEDED'
-      && (trainingReport.blocked ?? 1) === 0
-      && (trainingReport.sftAllowed ?? 0) > 0;
+  const trainingReady = modelTrainingReady({
+    artifactKind: bundle.modelVersion.artifactKind,
+    verificationStatus: bundle.modelVersion.verificationStatus,
+    trainingRunStatus: bundle.modelVersion.trainingRun?.status,
+    trainingReport,
+  });
   const compatibilityReady = bundle.promptCompatibilities[0]?.status === 'PASS'
     && ['AVAILABLE', 'DEPLOYED'].includes(bundle.status);
   const report = evaluateDeploymentGate({
