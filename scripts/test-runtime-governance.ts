@@ -8,6 +8,7 @@ import {
   stableJson,
   type PromptPolicyManifest,
 } from '../app/lib/dataLab/runtimeGovernance';
+import { normalizeModelFamily } from '../app/lib/dataLab/bootstrap/contracts';
 
 let passed = 0;
 let failed = 0;
@@ -21,6 +22,13 @@ let credentialInUrlBlocked = false;
 try { normalizeServiceBaseUrl('https://user:secret@example.com/v1'); } catch { credentialInUrlBlocked = true; }
 check(credentialInUrlBlocked, 'Base URL 禁止内嵌凭据');
 check(inferModelFamily('custom', 'Qwen3.5-35B-A3B') === 'qwen', '从远程 model ID 识别 Qwen 家族');
+// 启动器登记的运行时模型曾把 modelFamily 留空，导致案例生成页把 DeepSeek 与
+// Anthropic 判成同一家族。家族必须能从 provider/model 推断出非空值。
+check(inferModelFamily('deepseek', 'deepseek-v4-pro') === 'deepseek', '从 provider 识别 DeepSeek 家族');
+check(normalizeModelFamily({ provider: 'openai', model: 'claude-opus-4-6' }) === 'anthropic', '网关 provider 为 openai 时仍按模型名归入 anthropic 家族');
+check(normalizeModelFamily({ provider: 'deepseek', model: 'deepseek-v4-pro', family: '' })
+  !== normalizeModelFamily({ provider: 'openai', model: 'claude-opus-4-6', family: '' }),
+  '家族为空时两个候选不会被推断成同一家族');
 check(stableJson({ b: 1, a: 2 }) === stableJson({ a: 2, b: 1 }), 'manifest 稳定序列化不受键顺序影响');
 
 const manifest: PromptPolicyManifest = {

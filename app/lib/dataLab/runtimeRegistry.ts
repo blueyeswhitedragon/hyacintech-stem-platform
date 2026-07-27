@@ -33,6 +33,7 @@ import {
   sha256Text,
   type PromptPolicyManifest,
 } from './runtimeGovernance';
+import { parseLlmJsonObject } from '@/app/lib/llm/jsonRepair';
 
 const BUILT_IN_PROMPTS = [
   {
@@ -459,6 +460,7 @@ export async function testProviderConnection(connectionId: string, user: Session
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     let modelIds: string[];
     let probeModel: string;
+    let probeModelSource: 'ENDPOINT' | 'FIRST_LISTED';
     try {
       const modelsResponse = await fetch(`${normalizeServiceBaseUrl(connection.baseUrl)}/models`, {
         headers: { Authorization: `Bearer ${apiKey}` },
@@ -468,8 +470,18 @@ export async function testProviderConnection(connectionId: string, user: Session
       if (!modelsResponse.ok) throw new Error(`模型列表返回 HTTP ${modelsResponse.status}`);
       const modelsJson = await modelsResponse.json() as { data?: Array<{ id?: unknown }> };
       modelIds = (modelsJson.data ?? []).map((item) => typeof item.id === 'string' ? item.id : '').filter(Boolean);
-      probeModel = modelIds[0] ?? '';
-      if (!probeModel) throw new Error('模型列表为空，无法执行实际生成探针');
+      if (modelIds.length === 0) throw new Error('模型列表为空，无法执行实际生成探针');
+      const endpoint = await db.modelEndpoint.findFirst({
+        where: { connectionId: connection.id, status: { not: 'DISABLED' } },
+        select: { remoteModelId: true },
+      });
+      if (endpoint && modelIds.includes(endpoint.remoteModelId)) {
+        probeModel = endpoint.remoteModelId;
+        probeModelSource = 'ENDPOINT';
+      } else {
+        probeModel = modelIds[0];
+        probeModelSource = 'FIRST_LISTED';
+      }
 
       const probeResponse = await fetch(`${normalizeServiceBaseUrl(connection.baseUrl)}/chat/completions`, {
         method: 'POST',
@@ -491,11 +503,9 @@ export async function testProviderConnection(connectionId: string, user: Session
       const probeJson = await probeResponse.json() as { choices?: Array<{ message?: { content?: unknown } }> };
       const content = probeJson.choices?.[0]?.message?.content;
       if (typeof content !== 'string') throw new Error('实际生成探针未返回文本内容');
-      try {
-        const parsed = JSON.parse(content) as { ok?: unknown };
-        if (parsed.ok !== true) throw new Error();
-      } catch {
-        throw new Error('实际生成探针未按 JSON 模式返回 {"ok":true}');
+      const parsed = parseLlmJsonObject(content);
+      if (parsed?.ok !== true) {
+        throw new Error(`实际生成探针未返回 {"ok":true}（收到：${content.slice(0, 80)}）`);
       }
     } finally {
       clearTimeout(timer);
@@ -517,6 +527,7 @@ export async function testProviderConnection(connectionId: string, user: Session
       latencyMs,
       modelCount: modelIds.length,
       probeModel,
+      probeModelSource,
     });
     return { ok: true, latencyMs, modelIds, probeModel };
   } catch (error) {
@@ -828,8 +839,10 @@ async function runBundleProbe(bundleId: string) {
     const body = await response.json() as { choices?: Array<{ message?: { content?: unknown } }> };
     const content = body.choices?.[0]?.message?.content;
     if (typeof content !== 'string' || !content.trim()) throw new Error('服务没有返回有效 completion');
-    const parsed = JSON.parse(content) as unknown;
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('模型未返回 JSON 对象');
+    // 转换网关（如 Anthropic→OpenAI）即便收到 response_format=json_object 仍可能包 Markdown 围栏，
+    // 所以这里必须与正式调用链走同一套解析，否则可用网关会被探针误判为不兼容。
+    const parsed = parseLlmJsonObject(content);
+    if (!parsed) throw new Error(`模型未返回 JSON 对象（收到：${content.trim().slice(0, 80)}）`);
     return { ok: true, latencyMs: Date.now() - started, responseSha256: sha256Text(content) };
   } finally {
     clearTimeout(timer);
